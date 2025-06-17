@@ -735,8 +735,7 @@ def parse_args():
     # Set vision-specific defaults
     parser.set_defaults(
         output_dir="./all_vision_test_results",
-        datasets="cifar10",
-        models="clam_tsne"
+        datasets="cifar10"
     )
     
     args = parser.parse_args()
@@ -744,10 +743,10 @@ def parse_args():
     # Convert comma-separated strings to lists for compatibility
     if hasattr(args, 'datasets') and isinstance(args.datasets, str):
         args.datasets = args.datasets.split(',')
-    if hasattr(args, 'models') and isinstance(args.models, str):
-        args.models = args.models.split(',')
     if hasattr(args, 'vision_datasets') and args.vision_datasets:
         args.datasets = args.vision_datasets  # Use vision_datasets if specified
+    
+    # models is already a list from nargs="+" so no conversion needed
     
     return args
 

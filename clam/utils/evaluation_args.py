@@ -436,9 +436,10 @@ def add_vision_args(parser: argparse.ArgumentParser):
     )
     parser.add_argument(
         "--models",
-        type=str,
-        default="clam_tsne",
-        help="Comma-separated list of models to evaluate"
+        nargs="+",
+        default=["clam_tsne", "dinov2_linear"],
+        choices=["clam_tsne", "clam_simple", "dinov2_linear", "qwen_vl"],
+        help="List of models to evaluate (default: clam_tsne and dinov2_linear)"
     )
 
 
