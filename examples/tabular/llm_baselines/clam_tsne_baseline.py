@@ -20,6 +20,7 @@ from typing import Dict, Any, Optional, List, Tuple
 import matplotlib.pyplot as plt
 from .model_loader import model_loader, GenerationConfig
 from clam.utils.vlm_prompting import create_classification_prompt, parse_vlm_response, create_vlm_conversation
+from clam.utils.class_name_utils import get_semantic_class_names_or_fallback
 
 
 def convert_numpy_types(obj):
@@ -198,6 +199,19 @@ def evaluate_clam_tsne(dataset, args):
         
         # Get unique classes for prompting
         unique_classes = np.unique(y_train_sample)
+        
+        # Extract semantic class names with fallback to Class_<NUM>
+        from clam.utils.class_name_utils import extract_class_names_from_labels
+        semantic_class_names, _ = extract_class_names_from_labels(
+            labels=unique_classes.tolist(),
+            dataset_name=dataset.get('name', None),
+            semantic_data_dir=getattr(args, 'semantic_data_dir', None),
+            use_semantic=getattr(args, 'use_semantic_names', False)
+        )
+        
+        # Create mapping from numeric labels to semantic names
+        class_to_semantic = {cls: name for cls, name in zip(sorted(unique_classes), semantic_class_names)}
+        
         class_list_str = ", ".join([str(cls) for cls in unique_classes])
         
         # Make predictions for each test point
@@ -295,14 +309,18 @@ def evaluate_clam_tsne(dataset, args):
                 # Convert to sorted list for consistent prompting
                 visible_classes_list = sorted(list(visible_classes))
                 
+                # Map visible classes to semantic names
+                visible_semantic_names = [class_to_semantic[cls] for cls in visible_classes_list]
+                
                 # Log the visible classes for debugging
                 if i == 0:  # Only log for first sample to avoid spam
                     logger.info(f"All classes in dataset: {sorted(unique_classes.tolist())}")
                     logger.info(f"Visible classes in plot/KNN: {visible_classes_list}")
+                    logger.info(f"Semantic class names: {semantic_class_names}")
                 
-                # Create prompt for VLM using only visible classes as answer choices
+                # Create prompt for VLM using semantic class names
                 prompt = create_classification_prompt(
-                    class_names=visible_classes_list,
+                    class_names=visible_semantic_names,
                     modality="tabular",
                     use_knn=use_knn_connections,
                     use_3d=use_3d_tsne,
@@ -325,8 +343,14 @@ def evaluate_clam_tsne(dataset, args):
                 # Generate response using the wrapper
                 response = vlm_wrapper.generate_from_conversation(conversation, gen_config)
                 
-                # Parse prediction from response using only visible classes
-                prediction = parse_vlm_response(response, visible_classes_list, logger, getattr(args, 'use_semantic_names', False))
+                # Parse prediction from response using semantic names
+                # Note: parse_vlm_response expects the same format used in the prompt
+                prediction = parse_vlm_response(response, visible_semantic_names, logger, use_semantic_names=True)
+                
+                # Map back to numeric label if needed
+                if prediction in visible_semantic_names:
+                    semantic_to_numeric = {name: cls for cls, name in class_to_semantic.items() if cls in visible_classes_list}
+                    prediction = semantic_to_numeric.get(prediction, prediction)
                 predictions.append(prediction)
                 
                 # Store details for debugging

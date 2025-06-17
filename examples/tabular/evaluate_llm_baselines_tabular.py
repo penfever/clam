@@ -86,6 +86,9 @@ from clam.utils import (
     save_results
 )
 
+# Import centralized argument parser
+from clam.utils.evaluation_args import create_tabular_llm_evaluation_parser
+
 # Import LLM baseline evaluation functions
 from .llm_baselines.tabllm_baseline import evaluate_tabllm
 from .llm_baselines.tabula_8b_baseline import evaluate_tabula_8b
@@ -93,6 +96,26 @@ from .llm_baselines.jolt_baseline import evaluate_jolt
 from .llm_baselines.clam_tsne_baseline import evaluate_clam_tsne
 
 def parse_args():
+    """Parse command line arguments using centralized tabular LLM evaluation parser."""
+    parser = create_tabular_llm_evaluation_parser("Evaluate LLM baselines (TabLLM, Tabula-8B, JOLT, CLAM-T-SNe) on tabular datasets")
+    
+    # Set tabular LLM-specific defaults
+    parser.set_defaults(
+        output_dir="./llm_baseline_results",
+        models="tabllm,tabula_8b,jolt,clam_tsne"
+    )
+    
+    args = parser.parse_args()
+    
+    # Convert comma-separated strings to lists for compatibility
+    if hasattr(args, 'models') and isinstance(args.models, str):
+        args.models = args.models.split(',')
+    
+    return args
+
+
+def parse_args_old():
+    """Legacy argument parser - replaced by centralized parser."""
     parser = argparse.ArgumentParser(description="Evaluate LLM baselines (TabLLM, Tabula-8B, JOLT, CLAM-T-SNe) on tabular datasets")
     
     # Model selection

@@ -28,6 +28,10 @@ import torch
 import pandas as pd
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score, classification_report
+
+# Add project root to path for imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from clam.utils.class_name_utils import get_semantic_class_names_or_fallback
 from sklearn.preprocessing import StandardScaler
 
 # Import wandb conditionally
@@ -180,7 +184,15 @@ class BioClip2KNNBaseline:
         logger.info(f"Fitting BioClip2 KNN classifier with {len(train_paths)} training samples")
         
         self.train_labels = np.array(train_labels)
-        self.class_names = class_names or [f"Class_{i}" for i in np.unique(train_labels)]
+        if class_names is None:
+            # Use new utility to extract class names with semantic support
+            unique_labels = np.unique(train_labels).tolist()
+            self.class_names = get_semantic_class_names_or_fallback(
+                labels=unique_labels,
+                dataset_name=getattr(self, 'dataset_name', None)
+            )
+        else:
+            self.class_names = class_names
         
         # Extract embeddings
         self.train_embeddings = self.embedding_extractor.extract_embeddings(train_paths)

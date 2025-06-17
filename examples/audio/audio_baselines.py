@@ -22,6 +22,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 from clam.data.audio_embeddings import get_whisper_embeddings
 from clam.utils.platform_utils import get_optimal_device
+from clam.utils.class_name_utils import get_semantic_class_names_or_fallback
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +84,7 @@ class WhisperKNNClassifier:
         self.class_names = None
         
     def fit(self, train_paths: List[str], train_labels: List[int], 
-            class_names: Optional[List[str]] = None):
+            class_names: Optional[List[str]] = None, use_semantic_names: bool = False):
         """
         Fit the classifier on training data.
         
@@ -91,6 +92,7 @@ class WhisperKNNClassifier:
             train_paths: List of paths to training audio files
             train_labels: List of training labels
             class_names: Optional list of class names
+            use_semantic_names: Whether to use semantic class names
         """
         logger.info(f"Fitting Whisper KNN classifier with {len(train_paths)} training samples")
         
@@ -98,8 +100,14 @@ class WhisperKNNClassifier:
         self.train_labels = np.array(train_labels)
         
         if class_names is None:
-            unique_labels = np.unique(train_labels)
-            self.class_names = [f"Class_{i}" for i in unique_labels]
+            # Use new utility to extract class names with semantic support
+            unique_labels = np.unique(train_labels).tolist()
+            from clam.utils.class_name_utils import extract_class_names_from_labels
+            self.class_names, _ = extract_class_names_from_labels(
+                labels=unique_labels,
+                dataset_name=getattr(self, 'dataset_name', None),
+                use_semantic=use_semantic_names
+            )
         else:
             self.class_names = class_names
             
@@ -308,7 +316,7 @@ class CLAPZeroShotClassifier:
         return [f"sound of {class_name}" for class_name in class_names]
         
     def fit(self, train_paths: List[str], train_labels: List[int], 
-            class_names: Optional[List[str]] = None):
+            class_names: Optional[List[str]] = None, use_semantic_names: bool = False):
         """
         Prepare the classifier (compute text embeddings).
         
@@ -319,14 +327,21 @@ class CLAPZeroShotClassifier:
             train_paths: Ignored (kept for API consistency)
             train_labels: Used to infer class names if not provided
             class_names: List of class names
+            use_semantic_names: Whether to use semantic class names
         """
         # Load model if needed
         self._load_model()
         
         # Set class names
         if class_names is None:
-            unique_labels = np.unique(train_labels)
-            self.class_names = [f"Class_{i}" for i in unique_labels]
+            # Use new utility to extract class names with semantic support
+            unique_labels = np.unique(train_labels).tolist()
+            from clam.utils.class_name_utils import extract_class_names_from_labels
+            self.class_names, _ = extract_class_names_from_labels(
+                labels=unique_labels,
+                dataset_name=getattr(self, 'dataset_name', None),
+                use_semantic=use_semantic_names
+            )
         else:
             self.class_names = class_names
             

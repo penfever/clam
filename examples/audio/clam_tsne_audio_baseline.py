@@ -24,6 +24,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from clam.utils.vlm_prompting import create_classification_prompt, parse_vlm_response, create_vlm_conversation
+from clam.utils.class_name_utils import get_semantic_class_names_or_fallback
 from clam.utils.visualization_utils import (
     plot_to_image, save_visualization_with_metadata, create_output_directories,
     generate_visualization_filename, close_figure_safely
@@ -149,7 +150,8 @@ class ClamAudioTsneClassifier:
         self.save_every_n = 10
         
     def fit(self, train_paths: List[str], train_labels: List[int], 
-            test_paths: Optional[List[str]] = None, class_names: Optional[List[str]] = None):
+            test_paths: Optional[List[str]] = None, class_names: Optional[List[str]] = None,
+            use_semantic_names: bool = False):
         """
         Fit the classifier on training data.
         
@@ -158,6 +160,7 @@ class ClamAudioTsneClassifier:
             train_labels: List of training labels
             test_paths: Optional list of test audio paths for visualization
             class_names: Optional list of class names
+            use_semantic_names: Whether to use semantic class names
         """
         logger.info(f"Fitting CLAM audio classifier with {len(train_paths)} training samples")
         
@@ -166,8 +169,14 @@ class ClamAudioTsneClassifier:
         
         # Infer class names if not provided
         if class_names is None:
-            unique_labels = np.unique(train_labels)
-            self.class_names = [f"Class_{i}" for i in unique_labels]
+            # Use new utility to extract class names with semantic support
+            unique_labels = np.unique(train_labels).tolist()
+            from clam.utils.class_name_utils import extract_class_names_from_labels
+            self.class_names, _ = extract_class_names_from_labels(
+                labels=unique_labels,
+                dataset_name=getattr(self, 'dataset_name', None),
+                use_semantic=use_semantic_names
+            )
         else:
             self.class_names = class_names
             

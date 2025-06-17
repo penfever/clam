@@ -316,9 +316,16 @@ def parse_vlm_response(response: str, unique_classes: List, logger_instance: Opt
                     logger_instance.debug(f"Found class in response: '{cls_str}' -> {cls}")
                     return cls
     
-    # Final fallback: Return first class
-    logger_instance.warning(f"Could not parse class from response: '{response}'. Using fallback: {unique_classes[0]}")
-    return unique_classes[0]
+    # Final fallback: Return appropriate default based on naming convention
+    if use_semantic_names:
+        # For semantic names, return the first class name
+        logger_instance.warning(f"Could not parse class from response: '{response}'. Using fallback: {unique_classes[0]}")
+        return unique_classes[0]
+    else:
+        # For "Class X" format, return index 0 (which should map to unique_classes[0])
+        # But log it in the expected "Class X" format for consistency
+        logger_instance.warning(f"Could not parse class from response: '{response}'. Using fallback: Class_0")
+        return unique_classes[0]
 
 
 def create_vlm_conversation(image, prompt: str) -> List[Dict]:

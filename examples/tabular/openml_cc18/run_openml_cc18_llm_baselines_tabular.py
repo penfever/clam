@@ -45,6 +45,11 @@ import time
 from datetime import datetime
 from tqdm import tqdm
 
+# Import centralized argument parser
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
+from clam.utils.evaluation_args import create_multimodal_evaluation_parser
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -58,7 +63,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def parse_args():
+    """Parse command line arguments for OpenML CC18 LLM baseline evaluation."""
     parser = argparse.ArgumentParser(description="Evaluate LLM baselines on OpenML CC18 collection")
+    
+    # Add common arguments that orchestration scripts need
     
     parser.add_argument(
         "--clam_repo_path",
@@ -241,6 +249,11 @@ def parse_args():
         dest="save_sample_visualizations",
         help="Disable saving of sample t-SNE visualizations (CLAM-T-SNe baseline)"
     )
+    parser.add_argument(
+        "--use_semantic_names",
+        action="store_true",
+        help="Use semantic class names in prompts instead of 'Class X' format"
+    )
     
     return parser.parse_args()
 
@@ -386,6 +399,8 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
         cmd.append("--save_sample_visualizations")
     else:
         cmd.append("--no-save_sample_visualizations")
+    if args.use_semantic_names:
+        cmd.append("--use_semantic_names")
     
     # Add custom viewing angles if specified
     if args.viewing_angles:

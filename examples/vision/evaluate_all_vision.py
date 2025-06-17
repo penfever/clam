@@ -46,6 +46,9 @@ except ImportError:
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+# Import centralized argument parser
+from clam.utils.evaluation_args import create_vision_evaluation_parser
+
 from clam.utils.json_utils import convert_for_json_serialization
 from clam.utils.platform_utils import log_platform_info
 from clam.utils import (
@@ -726,6 +729,29 @@ def save_results(results: dict, output_dir: str, args):
 
 
 def parse_args():
+    """Parse command line arguments using centralized vision evaluation parser."""
+    parser = create_vision_evaluation_parser("Test image classification datasets with CLAM and baselines")
+    
+    # Set vision-specific defaults
+    parser.set_defaults(
+        output_dir="./all_vision_test_results",
+        datasets="cifar10",
+        models="clam_tsne"
+    )
+    
+    args = parser.parse_args()
+    
+    # Convert comma-separated strings to lists for compatibility
+    if hasattr(args, 'datasets') and isinstance(args.datasets, str):
+        args.datasets = args.datasets.split(',')
+    if hasattr(args, 'vision_datasets') and args.vision_datasets:
+        args.datasets = args.vision_datasets  # Use vision_datasets if specified
+    
+    return args
+
+
+def parse_args_old():
+    """Legacy argument parser - replaced by centralized parser."""
     parser = argparse.ArgumentParser(description="Test image classification datasets with CLAM and baselines")
     
     # Dataset options

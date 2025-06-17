@@ -1,0 +1,1327 @@
+{
+  "dataset": "mfeat-pixel",
+  "description": "Multiple Features Dataset: Pixel averages. One of six datasets describing features of handwritten numerals (0-9) extracted from Dutch utility maps. This dataset contains pixel averages in 2x3 windows, providing spatial intensity information.",
+  "source": "UCI Machine Learning Repository",
+  "source_url": "https://archive.ics.uci.edu/ml/datasets/Multiple+Features",
+  "openml_task": 146824,
+  "openml_dataset": 20,
+  "date_donated": "1998",
+  "creator": "Robert P.W. Duin (Delft University of Technology)",
+  "instances": 2000,
+  "features": 240,
+  "target": "class",
+  "target_type": "multiclass",
+  "missing_values": false,
+  "feature_types": {
+    "all": "continuous"
+  },
+  "feature_extraction": "Pixel averaging",
+  "feature_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits.",
+  "instances_per_class": 200,
+  "target_values": {
+    "0": "Digit 0",
+    "1": "Digit 1",
+    "2": "Digit 2",
+    "3": "Digit 3",
+    "4": "Digit 4",
+    "5": "Digit 5",
+    "6": "Digit 6",
+    "7": "Digit 7",
+    "8": "Digit 8",
+    "9": "Digit 9"
+  },
+  "domain": "Computer Vision/Pattern Recognition",
+  "use_case": "Handwritten digit recognition for document processing, postal automation, bank check processing, form digitization, and multiple feature learning studies",
+  "dataset_family": {
+    "description": "Part of the Multiple Features dataset collection",
+    "other_datasets": [
+      "mfeat-fourier (76 Fourier coefficients)",
+      "mfeat-factors (216 profile correlations)",
+      "mfeat-karhunen (64 Karhunen-Loève coefficients)",
+      "mfeat-zernike (47 Zernike moments)",
+      "mfeat-morphological (6 morphological features)"
+    ],
+    "note": "Corresponding patterns in different datasets represent the same original character, enabling multi-view learning"
+  },
+  "data_collection": "Handwritten numerals extracted from a collection of Dutch utility maps. Original binary images were digitized and sampled to create 15x16 pixel versions.",
+  "image_properties": {
+    "original_size": "Binary images digitized from handwritten samples",
+    "sampled_size": "15x16 pixels",
+    "window_size": "2x3 for computing averages"
+  },
+  "advantages": "Pixel features provide direct spatial information, intuitive interpretation, good baseline for comparison with other feature types",
+  "challenges": "High dimensionality (240 features), sensitive to translation and scaling, may capture noise in pixel values",
+  "research_applications": "Multiple feature learning, feature fusion, classifier combination, comparative studies of feature representations",
+  "ethical_considerations": "Dataset represents Dutch handwriting styles and may not generalize to other writing systems or cultural contexts",
+  "citations": [
+    {
+      "author": "M. van Breukelen, R.P.W. Duin, D.M.J. Tax, and J.E. den Hartog",
+      "title": "Handwritten digit recognition by combined classifiers",
+      "venue": "Kybernetika",
+      "volume": "34",
+      "number": "4",
+      "pages": "381-386",
+      "year": "1998"
+    },
+    {
+      "author": "R.P.W. Duin",
+      "title": "Multiple Features Dataset",
+      "venue": "UCI Machine Learning Repository",
+      "year": "1998",
+      "url": "https://archive.ics.uci.edu/ml/datasets/Multiple+Features"
+    }
+  ],
+  "dataset_name": "mfeat-pixel",
+  "original_source": {
+    "creator": "Robert P.W. Duin (Delft University of Technology)",
+    "institution": "UCI Machine Learning Repository",
+    "date": "1998",
+    "publication": "M. van Breukelen, R.P.W. Duin, D.M.J. Tax, and J.E. den Hartog: Handwritten digit recognition by combined classifiers"
+  },
+  "columns": [
+    {
+      "name": "feature_1",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 1)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_2",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 2)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_3",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 3)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_4",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 4)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_5",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 5)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_6",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 6)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_7",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 7)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_8",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 8)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_9",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 9)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_10",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 10)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_11",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 11)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_12",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 12)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_13",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 13)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_14",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 14)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_15",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 15)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_16",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 16)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_17",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 17)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_18",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 18)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_19",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 19)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_20",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 20)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_21",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 21)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_22",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 22)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_23",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 23)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_24",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 24)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_25",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 25)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_26",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 26)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_27",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 27)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_28",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 28)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_29",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 29)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_30",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 30)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_31",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 31)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_32",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 32)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_33",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 33)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_34",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 34)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_35",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 35)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_36",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 36)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_37",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 37)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_38",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 38)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_39",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 39)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_40",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 40)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_41",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 41)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_42",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 42)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_43",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 43)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_44",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 44)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_45",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 45)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_46",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 46)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_47",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 47)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_48",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 48)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_49",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 49)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_50",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 50)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_51",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 51)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_52",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 52)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_53",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 53)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_54",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 54)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_55",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 55)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_56",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 56)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_57",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 57)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_58",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 58)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_59",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 59)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_60",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 60)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_61",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 61)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_62",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 62)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_63",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 63)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_64",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 64)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_65",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 65)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_66",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 66)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_67",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 67)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_68",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 68)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_69",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 69)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_70",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 70)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_71",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 71)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_72",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 72)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_73",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 73)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_74",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 74)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_75",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 75)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_76",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 76)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_77",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 77)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_78",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 78)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_79",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 79)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_80",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 80)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_81",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 81)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_82",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 82)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_83",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 83)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_84",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 84)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_85",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 85)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_86",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 86)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_87",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 87)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_88",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 88)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_89",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 89)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_90",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 90)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_91",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 91)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_92",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 92)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_93",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 93)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_94",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 94)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_95",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 95)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_96",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 96)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_97",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 97)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_98",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 98)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_99",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 99)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_100",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 100)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_101",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 101)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_102",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 102)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_103",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 103)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_104",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 104)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_105",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 105)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_106",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 106)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_107",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 107)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_108",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 108)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_109",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 109)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_110",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 110)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_111",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 111)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_112",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 112)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_113",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 113)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_114",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 114)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_115",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 115)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_116",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 116)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_117",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 117)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_118",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 118)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_119",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 119)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_120",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 120)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_121",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 121)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_122",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 122)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_123",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 123)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_124",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 124)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_125",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 125)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_126",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 126)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_127",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 127)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_128",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 128)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_129",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 129)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_130",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 130)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_131",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 131)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_132",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 132)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_133",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 133)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_134",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 134)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_135",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 135)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_136",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 136)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_137",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 137)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_138",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 138)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_139",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 139)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_140",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 140)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_141",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 141)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_142",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 142)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_143",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 143)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_144",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 144)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_145",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 145)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_146",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 146)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_147",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 147)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_148",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 148)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_149",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 149)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_150",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 150)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_151",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 151)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_152",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 152)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_153",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 153)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_154",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 154)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_155",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 155)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_156",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 156)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_157",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 157)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_158",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 158)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_159",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 159)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_160",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 160)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_161",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 161)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_162",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 162)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_163",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 163)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_164",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 164)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_165",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 165)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_166",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 166)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_167",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 167)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_168",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 168)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_169",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 169)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_170",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 170)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_171",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 171)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_172",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 172)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_173",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 173)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_174",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 174)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_175",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 175)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_176",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 176)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_177",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 177)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_178",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 178)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_179",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 179)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_180",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 180)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_181",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 181)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_182",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 182)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_183",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 183)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_184",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 184)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_185",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 185)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_186",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 186)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_187",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 187)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_188",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 188)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_189",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 189)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_190",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 190)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_191",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 191)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_192",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 192)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_193",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 193)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_194",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 194)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_195",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 195)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_196",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 196)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_197",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 197)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_198",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 198)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_199",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 199)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_200",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 200)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_201",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 201)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_202",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 202)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_203",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 203)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_204",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 204)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_205",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 205)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_206",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 206)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_207",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 207)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_208",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 208)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_209",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 209)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_210",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 210)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_211",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 211)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_212",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 212)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_213",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 213)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_214",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 214)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_215",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 215)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_216",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 216)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_217",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 217)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_218",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 218)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_219",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 219)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_220",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 220)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_221",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 221)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_222",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 222)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_223",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 223)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_224",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 224)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_225",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 225)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_226",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 226)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_227",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 227)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_228",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 228)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_229",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 229)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_230",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 230)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_231",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 231)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_232",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 232)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_233",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 233)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_234",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 234)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_235",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 235)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_236",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 236)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_237",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 237)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_238",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 238)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_239",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 239)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "feature_240",
+      "semantic_description": "240 pixel averages computed from 2x3 windows over the character images. These features capture local intensity patterns and spatial distribution of ink in the handwritten digits. (feature 240)",
+      "data_type": "continuous"
+    }
+  ],
+  "target_classes": [
+    {
+      "name": "0",
+      "meaning": "Digit 0"
+    },
+    {
+      "name": "1",
+      "meaning": "Digit 1"
+    },
+    {
+      "name": "2",
+      "meaning": "Digit 2"
+    },
+    {
+      "name": "3",
+      "meaning": "Digit 3"
+    },
+    {
+      "name": "4",
+      "meaning": "Digit 4"
+    },
+    {
+      "name": "5",
+      "meaning": "Digit 5"
+    },
+    {
+      "name": "6",
+      "meaning": "Digit 6"
+    },
+    {
+      "name": "7",
+      "meaning": "Digit 7"
+    },
+    {
+      "name": "8",
+      "meaning": "Digit 8"
+    },
+    {
+      "name": "9",
+      "meaning": "Digit 9"
+    }
+  ],
+  "dataset_history": "Data Collection: Handwritten numerals extracted from a collection of Dutch utility maps. Original binary images were digitized and sampled to create 15x16 pixel versions.",
+  "inference_notes": "Challenges: High dimensionality (240 features), sensitive to translation and scaling, may capture noise in pixel values. Advantages: Pixel features provide direct spatial information, intuitive interpretation, good baseline for comparison with other feature types. Applications: Multiple feature learning, feature fusion, classifier combination, comparative studies of feature representations. Use Case: Handwritten digit recognition for document processing, postal automation, bank check processing, form digitization, and multiple feature learning studies"
+}

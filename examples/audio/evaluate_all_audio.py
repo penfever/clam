@@ -28,6 +28,9 @@ except ImportError:
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+# Import centralized argument parser
+from clam.utils.evaluation_args import create_audio_evaluation_parser
+
 from clam.utils.json_utils import convert_for_json_serialization
 from clam.utils.platform_utils import log_platform_info
 from clam.utils import (
@@ -492,7 +495,49 @@ def save_results(results: dict, output_dir: str, k_shot: int):
     logger.info("="*80)
 
 
+def parse_args_old():
+    """Legacy argument parser - replaced by centralized parser."""
+    parser = argparse.ArgumentParser(description="Test audio datasets with CLAM t-SNE and baselines")
+
+
 def parse_args():
+    """Parse command line arguments using centralized audio evaluation parser."""
+    parser = create_audio_evaluation_parser("Test audio datasets with CLAM t-SNE and baselines")
+    
+    # Add audio-specific arguments that aren't in the centralized parser
+    parser.add_argument(
+        "--data_dir",
+        type=str,
+        default="./audio_data",
+        help="Base directory for all audio datasets"
+    )
+    parser.add_argument(
+        "--cache_dir",
+        type=str,
+        default="./cache",
+        help="Directory for caching embeddings"
+    )
+    
+    # Set audio-specific defaults
+    parser.set_defaults(
+        output_dir="./all_audio_test_results",
+        datasets="esc50,ravdess",
+        models="clam_tsne"
+    )
+    
+    args = parser.parse_args()
+    
+    # Convert comma-separated strings to lists for compatibility
+    if hasattr(args, 'datasets') and isinstance(args.datasets, str):
+        args.datasets = args.datasets.split(',')
+    if hasattr(args, 'models') and isinstance(args.models, str):
+        args.models = args.models.split(',')
+    
+    return args
+
+
+def parse_args_old_implementation():
+    """Old implementation preserved for reference - not used."""
     parser = argparse.ArgumentParser(description="Test audio datasets with CLAM t-SNE and baselines")
     
     parser.add_argument(

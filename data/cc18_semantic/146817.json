@@ -1,0 +1,273 @@
+{
+  "dataset": "steel-plates-fault",
+  "description": "Steel plates fault detection dataset for identifying surface defects in stainless steel plates. The data consists of 27 geometric features describing defect shapes and their outlines, used to classify 7 types of surface defects in steel manufacturing.",
+  "source": "UCI Machine Learning Repository",
+  "source_url": "https://archive.ics.uci.edu/ml/datasets/Steel+Plates+Faults",
+  "openml_task": 146817,
+  "openml_dataset": 1504,
+  "date_donated": "2010-10-26",
+  "creator": {
+    "name": "Semeion Research Center",
+    "affiliation": "Semeion, Research Center of Sciences of Communication, Rome, Italy",
+    "note": "Data was commissioned by Centro Sviluppo Materiali (Italy)"
+  },
+  "instances": 1941,
+  "features": 27,
+  "target": "fault_type",
+  "target_type": "multiclass",
+  "missing_values": false,
+  "feature_types": {
+    "all": "mixed",
+    "continuous": 27,
+    "categorical": 0
+  },
+  "feature_description": {
+    "X_Minimum": "Minimum X-coordinate of defect region",
+    "X_Maximum": "Maximum X-coordinate of defect region",
+    "Y_Minimum": "Minimum Y-coordinate of defect region",
+    "Y_Maximum": "Maximum Y-coordinate of defect region",
+    "Pixels_Areas": "Area of defect region in pixels",
+    "X_Perimeter": "Perimeter measurement along X-axis",
+    "Y_Perimeter": "Perimeter measurement along Y-axis",
+    "Sum_of_Luminosity": "Total luminosity value across defect region",
+    "Minimum_of_Luminosity": "Minimum luminosity value in defect region",
+    "Maximum_of_Luminosity": "Maximum luminosity value in defect region",
+    "Length_of_Conveyer": "Conveyor length measurement",
+    "TypeOfSteel_A300": "Steel type indicator (A300)",
+    "TypeOfSteel_A400": "Steel type indicator (A400)",
+    "Steel_Plate_Thickness": "Thickness of the steel plate",
+    "Edges_Index": "Index measuring edge characteristics",
+    "Empty_Index": "Index measuring empty regions",
+    "Square_Index": "Index measuring square-like properties",
+    "Outside_X_Index": "Index for outside X boundaries",
+    "Edges_X_Index": "Edge index along X-axis",
+    "Edges_Y_Index": "Edge index along Y-axis",
+    "Outside_Global_Index": "Global outside boundary index",
+    "LogOfAreas": "Logarithm of defect area",
+    "Log_X_Index": "Logarithmic X index",
+    "Log_Y_Index": "Logarithmic Y index",
+    "Orientation_Index": "Defect orientation measurement",
+    "Luminosity_Index": "Index based on luminosity characteristics",
+    "SigmoidOfAreas": "Sigmoid transformation of defect area"
+  },
+  "target_values": {
+    "Pastry": "Pastry-type defect",
+    "Z_Scratch": "Z-shaped scratch defect",
+    "K_Scratch": "K-shaped scratch defect",
+    "Stains": "Stain defects",
+    "Dirtiness": "Dirt-related defects",
+    "Bumps": "Bump defects",
+    "Other_Faults": "Other types of faults"
+  },
+  "class_distribution": {
+    "Pastry": "158 instances (8.1%)",
+    "Z_Scratch": "190 instances (9.8%)",
+    "K_Scratch": "391 instances (20.1%)",
+    "Stains": "72 instances (3.7%)",
+    "Dirtiness": "55 instances (2.8%)",
+    "Bumps": "402 instances (20.7%)",
+    "Other_Faults": "673 instances (34.7%)"
+  },
+  "domain": "Manufacturing/Quality Control",
+  "use_case": "Automated defect detection in steel manufacturing, quality control systems, industrial inspection, surface defect classification",
+  "preprocessing": "Geometric features extracted from defect regions, feature engineering including logarithmic and sigmoid transformations",
+  "performance_considerations": "Multi-class classification with imbalanced classes, Other_Faults being the dominant class",
+  "advantages": "Real industrial dataset, comprehensive geometric features, important manufacturing application",
+  "challenges": "Class imbalance, confidential nature of some feature details, need for domain expertise to interpret features",
+  "research_applications": "Industrial defect detection, multi-class classification, manufacturing quality control, pattern recognition in industrial settings",
+  "citations": [
+    {
+      "author": "M Buscema, S Terzi, W Tastle",
+      "title": "A New Meta-Classifier",
+      "venue": "NAFIPS 2010",
+      "location": "Toronto, Canada",
+      "dates": "26-28 July 2010",
+      "doi": "10.1109/NAFIPS.2010.5548298"
+    },
+    {
+      "author": "M Buscema",
+      "title": "MetaNet: The Theory of Independent Judges",
+      "venue": "Substance Use & Misuse",
+      "volume": "33",
+      "number": "2",
+      "pages": "439-461",
+      "year": "1998"
+    }
+  ],
+  "dataset_name": "steel-plates-fault",
+  "original_source": {
+    "creator": "Semeion Research Center",
+    "institution": "UCI Machine Learning Repository",
+    "date": "2010-10-26",
+    "publication": "M Buscema, S Terzi, W Tastle: A New Meta-Classifier"
+  },
+  "columns": [
+    {
+      "name": "feature_1",
+      "semantic_description": "Feature 1",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_2",
+      "semantic_description": "Feature 2",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_3",
+      "semantic_description": "Feature 3",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_4",
+      "semantic_description": "Feature 4",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_5",
+      "semantic_description": "Feature 5",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_6",
+      "semantic_description": "Feature 6",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_7",
+      "semantic_description": "Feature 7",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_8",
+      "semantic_description": "Feature 8",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_9",
+      "semantic_description": "Feature 9",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_10",
+      "semantic_description": "Feature 10",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_11",
+      "semantic_description": "Feature 11",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_12",
+      "semantic_description": "Feature 12",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_13",
+      "semantic_description": "Feature 13",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_14",
+      "semantic_description": "Feature 14",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_15",
+      "semantic_description": "Feature 15",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_16",
+      "semantic_description": "Feature 16",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_17",
+      "semantic_description": "Feature 17",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_18",
+      "semantic_description": "Feature 18",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_19",
+      "semantic_description": "Feature 19",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_20",
+      "semantic_description": "Feature 20",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_21",
+      "semantic_description": "Feature 21",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_22",
+      "semantic_description": "Feature 22",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_23",
+      "semantic_description": "Feature 23",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_24",
+      "semantic_description": "Feature 24",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_25",
+      "semantic_description": "Feature 25",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_26",
+      "semantic_description": "Feature 26",
+      "data_type": "mixed"
+    },
+    {
+      "name": "feature_27",
+      "semantic_description": "Feature 27",
+      "data_type": "mixed"
+    }
+  ],
+  "target_classes": [
+    {
+      "name": "Pastry",
+      "meaning": "Pastry-type defect"
+    },
+    {
+      "name": "Z_Scratch",
+      "meaning": "Z-shaped scratch defect"
+    },
+    {
+      "name": "K_Scratch",
+      "meaning": "K-shaped scratch defect"
+    },
+    {
+      "name": "Stains",
+      "meaning": "Stain defects"
+    },
+    {
+      "name": "Dirtiness",
+      "meaning": "Dirt-related defects"
+    },
+    {
+      "name": "Bumps",
+      "meaning": "Bump defects"
+    },
+    {
+      "name": "Other_Faults",
+      "meaning": "Other types of faults"
+    }
+  ],
+  "dataset_history": "Dataset history not available for steel-plates-fault",
+  "inference_notes": "Challenges: Class imbalance, confidential nature of some feature details, need for domain expertise to interpret features. Advantages: Real industrial dataset, comprehensive geometric features, important manufacturing application. Applications: Industrial defect detection, multi-class classification, manufacturing quality control, pattern recognition in industrial settings. Use Case: Automated defect detection in steel manufacturing, quality control systems, industrial inspection, surface defect classification"
+}

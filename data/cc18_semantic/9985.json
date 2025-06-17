@@ -1,0 +1,336 @@
+{
+  "dataset": "first-order-theorem-proving",
+  "description": "Machine learning dataset for automated theorem proving. Predicts which of five heuristics will give the fastest proof when used by a first-order prover, with a sixth option to decline attempting a proof if the theorem is too difficult.",
+  "source": "UCI Machine Learning Repository / University of Cambridge",
+  "source_url": "https://archive.ics.uci.edu/ml/datasets/First-order+theorem+proving",
+  "openml_task": 9985,
+  "openml_dataset": 1475,
+  "date_donated": "2013",
+  "creator": "James P. Bridge, Sean B. Holden, Lawrence C. Paulson (University of Cambridge Computer Laboratory)",
+  "instances": 6118,
+  "features": 51,
+  "target": "Class",
+  "target_type": "multiclass",
+  "missing_values": false,
+  "feature_types": {
+    "continuous": 51
+  },
+  "feature_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas",
+  "target_values": {
+    "1": "Heuristic 1 fastest",
+    "2": "Heuristic 2 fastest",
+    "3": "Heuristic 3 fastest",
+    "4": "Heuristic 4 fastest",
+    "5": "Heuristic 5 fastest",
+    "6": "Theorem too difficult - decline to prove"
+  },
+  "domain": "Automated Reasoning/Logic",
+  "use_case": "Automated theorem proving, heuristic selection for proof search, machine learning for mathematical reasoning, optimization of theorem provers",
+  "data_collection": "Features extracted from first-order logic theorems, with performance data from running different heuristics on a theorem prover",
+  "mathematical_background": "First-order logic theorem proving using resolution-based methods with different search heuristics",
+  "challenges": "Complex feature engineering required, difficulty in capturing logical structure, heuristic performance may vary with prover implementation",
+  "advantages": "Enables intelligent heuristic selection, improves theorem prover efficiency, bridges machine learning and automated reasoning",
+  "research_impact": "Demonstrates application of machine learning to improve automated reasoning systems",
+  "ethical_considerations": "Automated reasoning systems should be transparent about their limitations and not replace human mathematical verification for critical applications",
+  "citations": [
+    {
+      "author": "James P. Bridge, Sean B. Holden, Lawrence C. Paulson",
+      "title": "Machine learning for first-order theorem proving: learning to select a good heuristic",
+      "venue": "Journal of Automated Reasoning",
+      "publisher": "Springer",
+      "year": "2013"
+    }
+  ],
+  "dataset_name": "first-order-theorem-proving",
+  "original_source": {
+    "creator": "James P. Bridge, Sean B. Holden, Lawrence C. Paulson (University of Cambridge Computer Laboratory)",
+    "institution": "UCI Machine Learning Repository / University of Cambridge",
+    "date": "2013",
+    "publication": "James P. Bridge, Sean B. Holden, Lawrence C. Paulson: Machine learning for first-order theorem proving: learning to select a good heuristic"
+  },
+  "columns": [
+    {
+      "name": "feature_1",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 1)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_2",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 2)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_3",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 3)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_4",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 4)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_5",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 5)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_6",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 6)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_7",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 7)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_8",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 8)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_9",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 9)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_10",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 10)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_11",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 11)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_12",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 12)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_13",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 13)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_14",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 14)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_15",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 15)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_16",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 16)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_17",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 17)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_18",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 18)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_19",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 19)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_20",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 20)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_21",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 21)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_22",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 22)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_23",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 23)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_24",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 24)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_25",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 25)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_26",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 26)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_27",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 27)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_28",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 28)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_29",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 29)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_30",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 30)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_31",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 31)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_32",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 32)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_33",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 33)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_34",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 34)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_35",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 35)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_36",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 36)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_37",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 37)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_38",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 38)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_39",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 39)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_40",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 40)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_41",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 41)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_42",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 42)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_43",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 43)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_44",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 44)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_45",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 45)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_46",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 46)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_47",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 47)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_48",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 48)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_49",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 49)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_50",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 50)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_51",
+      "semantic_description": "Mixture of static and dynamic features derived from theorems to be proved, including structural properties, complexity measures, and syntactic characteristics of first-order logic formulas (feature 51)",
+      "data_type": "numeric"
+    }
+  ],
+  "target_classes": [
+    {
+      "name": "1",
+      "meaning": "Heuristic 1 fastest"
+    },
+    {
+      "name": "2",
+      "meaning": "Heuristic 2 fastest"
+    },
+    {
+      "name": "3",
+      "meaning": "Heuristic 3 fastest"
+    },
+    {
+      "name": "4",
+      "meaning": "Heuristic 4 fastest"
+    },
+    {
+      "name": "5",
+      "meaning": "Heuristic 5 fastest"
+    },
+    {
+      "name": "6",
+      "meaning": "Theorem too difficult - decline to prove"
+    }
+  ],
+  "dataset_history": "Data Collection: Features extracted from first-order logic theorems, with performance data from running different heuristics on a theorem prover",
+  "inference_notes": "Challenges: Complex feature engineering required, difficulty in capturing logical structure, heuristic performance may vary with prover implementation. Advantages: Enables intelligent heuristic selection, improves theorem prover efficiency, bridges machine learning and automated reasoning. Use Case: Automated theorem proving, heuristic selection for proof search, machine learning for mathematical reasoning, optimization of theorem provers"
+}

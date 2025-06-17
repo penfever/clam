@@ -1,0 +1,138 @@
+{
+  "dataset": "dresses-sales",
+  "description": "Dataset containing attributes of dresses and their sales-based recommendations. Sales are monitored on alternate days. The dataset helps predict dress recommendations based on various fashion attributes.",
+  "source": "UCI Machine Learning Repository",
+  "source_url": "https://archive.ics.uci.edu/ml/datasets/Dresses_Attribute_Sales",
+  "openml_task": 125920,
+  "openml_dataset": 23381,
+  "date_donated": "2013",
+  "creator": "Muhammad Usman & Adeel Ahmed (Air University)",
+  "instances": 500,
+  "features": 13,
+  "target": "Recommendation",
+  "target_type": "binary",
+  "missing_values": true,
+  "feature_types": {
+    "categorical": 12,
+    "continuous": 0,
+    "binary": 1
+  },
+  "feature_description": {
+    "Style": "Fashion style categories: Bohemia, brief, casual, cute, fashion, flare, novelty, OL, party, sexy, vintage, work",
+    "Price": "Price range: Low, Average, Medium, High, Very-High",
+    "Rating": "Customer rating from 1-5",
+    "Size": "Size options: S, M, L, XL, Free",
+    "Season": "Seasonal category: Autumn, Winter, Spring, Summer",
+    "NeckLine": "Neckline style: O-neck, backless, board-neck, Bowneck, halter, mandarin-collar, open, peterpan-collar, ruffled, scoop, slash-neck, square-collar, sweetheart, turndowncollar, V-neck",
+    "SleeveLength": "Sleeve length: full, half, halfsleeves, butterfly, sleeveless, short, threequarter, turndown, null",
+    "waiseline": "Waist style: dropped, empire, natural, princess, null",
+    "Material": "Fabric material: wool, cotton, mix, etc.",
+    "FabricType": "Fabric type: chiffon, dobby, poplin, satin, knitted, jersey, flannel, corduroy, etc.",
+    "Decoration": "Decorative elements: applique, beading, bow, button, cascading, crystal, draped, embroidery, feathers, flowers, etc.",
+    "Pattern Type": "Pattern design",
+    "Recommendation": "Binary target indicating whether the dress is recommended based on sales (0 or 1)"
+  },
+  "target_values": {
+    "0": "Not recommended",
+    "1": "Recommended"
+  },
+  "domain": "E-commerce/Fashion Retail",
+  "use_case": "Fashion product recommendation, sales prediction, inventory management, and understanding fashion preferences based on product attributes",
+  "data_collection": "Sales data collected from fashion e-commerce platform with recommendations based on alternate day sales monitoring",
+  "challenges": "Highly imbalanced dataset with subjective fashion attributes, missing values, and cultural/regional variations in fashion preferences",
+  "ethical_considerations": "Fashion preferences may reflect cultural biases and socioeconomic factors. Size categories may not be inclusive of all body types",
+  "citations": [
+    {
+      "author": "Muhammad Usman & Adeel Ahmed",
+      "title": "Main steps for doing data mining project using Weka",
+      "venue": "ResearchGate",
+      "year": "2016"
+    }
+  ],
+  "dataset_name": "dresses-sales",
+  "original_source": {
+    "creator": "Muhammad Usman & Adeel Ahmed (Air University)",
+    "institution": "UCI Machine Learning Repository",
+    "date": "2013",
+    "publication": "Muhammad Usman & Adeel Ahmed: Main steps for doing data mining project using Weka"
+  },
+  "columns": [
+    {
+      "name": "feature_1",
+      "semantic_description": "Feature 1",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_2",
+      "semantic_description": "Feature 2",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_3",
+      "semantic_description": "Feature 3",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_4",
+      "semantic_description": "Feature 4",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_5",
+      "semantic_description": "Feature 5",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_6",
+      "semantic_description": "Feature 6",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_7",
+      "semantic_description": "Feature 7",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_8",
+      "semantic_description": "Feature 8",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_9",
+      "semantic_description": "Feature 9",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_10",
+      "semantic_description": "Feature 10",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_11",
+      "semantic_description": "Feature 11",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_12",
+      "semantic_description": "Feature 12",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_13",
+      "semantic_description": "Feature 13",
+      "data_type": "numeric"
+    }
+  ],
+  "target_classes": [
+    {
+      "name": "0",
+      "meaning": "Not recommended"
+    },
+    {
+      "name": "1",
+      "meaning": "Recommended"
+    }
+  ],
+  "dataset_history": "Data Collection: Sales data collected from fashion e-commerce platform with recommendations based on alternate day sales monitoring",
+  "inference_notes": "Challenges: Highly imbalanced dataset with subjective fashion attributes, missing values, and cultural/regional variations in fashion preferences. Use Case: Fashion product recommendation, sales prediction, inventory management, and understanding fashion preferences based on product attributes"
+}

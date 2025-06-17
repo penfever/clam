@@ -1,0 +1,297 @@
+{
+  "dataset": "connect-4",
+  "description": "Connect-4 game dataset containing all legal 8-ply positions where neither player has won yet and the next move is not forced. Used for game-theoretic analysis and predicting game outcomes.",
+  "source": "UCI Machine Learning Repository",
+  "source_url": "https://archive.ics.uci.edu/ml/datasets/Connect-4",
+  "openml_task": 146195,
+  "openml_dataset": 40668,
+  "date_donated": "1995-10-01",
+  "creator": {
+    "name": "John Tromp",
+    "affiliation": "Independent researcher"
+  },
+  "instances": 67557,
+  "features": 42,
+  "target": "game_result",
+  "target_type": "multiclass",
+  "missing_values": false,
+  "feature_types": {
+    "all": "categorical"
+  },
+  "feature_description": {
+    "board_positions": "42 features (a1-g6) representing each position on the 6x7 game board",
+    "position_values": {
+      "x": "Position taken by player X (first player)",
+      "o": "Position taken by player O (second player)",
+      "b": "Blank/empty position"
+    },
+    "board_layout": "Board numbered with columns a-g (left to right) and rows 1-6 (bottom to top)"
+  },
+  "target_values": {
+    "win": "First player (X) wins",
+    "loss": "First player (X) loses",
+    "draw": "Game ends in a draw"
+  },
+  "game_specifications": {
+    "board_size": "6 rows × 7 columns",
+    "win_condition": "4 pieces in a row (horizontal, vertical, or diagonal)",
+    "ply_depth": "8-ply positions (4 moves by each player)",
+    "move_constraint": "Next move is not forced"
+  },
+  "domain": "Game Playing/Artificial Intelligence",
+  "use_case": "Game AI development, reinforcement learning, game tree search evaluation, pattern recognition in games, strategic decision making",
+  "data_properties": {
+    "game_theoretical": "Each position has a determined game-theoretical value",
+    "exhaustive": "Contains all legal 8-ply positions meeting criteria",
+    "balanced_gameplay": "Positions where neither player has won yet"
+  },
+  "research_applications": "Game tree learning, position evaluation, pattern discovery, comparative study of learning algorithms, minimax alternatives",
+  "advantages": "Complete coverage of 8-ply positions, well-defined problem domain, deterministic outcomes, suitable for classification",
+  "challenges": "Large feature space (42 positions × 3 values), requires understanding of spatial patterns, game-specific knowledge helpful",
+  "algorithm_considerations": "Spatial relationships important, symmetry can be exploited, sequential nature of gameplay, combinatorial complexity",
+  "historical_significance": "Classic benchmark for game-playing AI, used in comparative studies of machine learning algorithms",
+  "citations": [
+    {
+      "author": "John Tromp",
+      "title": "Connect-4 Dataset",
+      "venue": "UCI Machine Learning Repository",
+      "year": "1995",
+      "doi": "https://doi.org/10.24432/C59P43"
+    }
+  ],
+  "dataset_name": "connect-4",
+  "original_source": {
+    "creator": "John Tromp",
+    "institution": "UCI Machine Learning Repository",
+    "date": "1995-10-01",
+    "publication": "John Tromp: Connect-4 Dataset"
+  },
+  "columns": [
+    {
+      "name": "feature_1",
+      "semantic_description": "Feature 1",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_2",
+      "semantic_description": "Feature 2",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_3",
+      "semantic_description": "Feature 3",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_4",
+      "semantic_description": "Feature 4",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_5",
+      "semantic_description": "Feature 5",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_6",
+      "semantic_description": "Feature 6",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_7",
+      "semantic_description": "Feature 7",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_8",
+      "semantic_description": "Feature 8",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_9",
+      "semantic_description": "Feature 9",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_10",
+      "semantic_description": "Feature 10",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_11",
+      "semantic_description": "Feature 11",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_12",
+      "semantic_description": "Feature 12",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_13",
+      "semantic_description": "Feature 13",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_14",
+      "semantic_description": "Feature 14",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_15",
+      "semantic_description": "Feature 15",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_16",
+      "semantic_description": "Feature 16",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_17",
+      "semantic_description": "Feature 17",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_18",
+      "semantic_description": "Feature 18",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_19",
+      "semantic_description": "Feature 19",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_20",
+      "semantic_description": "Feature 20",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_21",
+      "semantic_description": "Feature 21",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_22",
+      "semantic_description": "Feature 22",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_23",
+      "semantic_description": "Feature 23",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_24",
+      "semantic_description": "Feature 24",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_25",
+      "semantic_description": "Feature 25",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_26",
+      "semantic_description": "Feature 26",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_27",
+      "semantic_description": "Feature 27",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_28",
+      "semantic_description": "Feature 28",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_29",
+      "semantic_description": "Feature 29",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_30",
+      "semantic_description": "Feature 30",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_31",
+      "semantic_description": "Feature 31",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_32",
+      "semantic_description": "Feature 32",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_33",
+      "semantic_description": "Feature 33",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_34",
+      "semantic_description": "Feature 34",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_35",
+      "semantic_description": "Feature 35",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_36",
+      "semantic_description": "Feature 36",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_37",
+      "semantic_description": "Feature 37",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_38",
+      "semantic_description": "Feature 38",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_39",
+      "semantic_description": "Feature 39",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_40",
+      "semantic_description": "Feature 40",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_41",
+      "semantic_description": "Feature 41",
+      "data_type": "categorical"
+    },
+    {
+      "name": "feature_42",
+      "semantic_description": "Feature 42",
+      "data_type": "categorical"
+    }
+  ],
+  "target_classes": [
+    {
+      "name": "win",
+      "meaning": "First player (X) wins"
+    },
+    {
+      "name": "loss",
+      "meaning": "First player (X) loses"
+    },
+    {
+      "name": "draw",
+      "meaning": "Game ends in a draw"
+    }
+  ],
+  "dataset_history": "Dataset history not available for connect-4",
+  "inference_notes": "Challenges: Large feature space (42 positions × 3 values), requires understanding of spatial patterns, game-specific knowledge helpful. Advantages: Complete coverage of 8-ply positions, well-defined problem domain, deterministic outcomes, suitable for classification. Applications: Game tree learning, position evaluation, pattern discovery, comparative study of learning algorithms, minimax alternatives. Use Case: Game AI development, reinforcement learning, game tree search evaluation, pattern recognition in games, strategic decision making"
+}
