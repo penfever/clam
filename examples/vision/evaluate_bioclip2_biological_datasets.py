@@ -21,6 +21,8 @@ import datetime
 import urllib.request
 import zipfile
 import shutil
+import subprocess
+import requests
 from pathlib import Path
 import numpy as np
 from PIL import Image
@@ -28,6 +30,7 @@ import torch
 import pandas as pd
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score, classification_report
+from sklearn.preprocessing import StandardScaler
 
 # Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -53,7 +56,8 @@ from clam.utils import (
 )
 
 from examples.vision.clam_tsne_image_baseline import ClamImageTsneClassifier
-from examples.vision.qwen_vl_baseline import BiologicalQwenVLBaseline
+from examples.vision.qwen_vl_baseline import QwenVLBaseline
+from examples.vision.image_baselines import DINOV2LinearProbe
 
 # Configure logging
 logging.basicConfig(
@@ -63,7 +67,19 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class BioClip2EmbeddingExtractor:
+class GenericEmbeddingExtractor:
+    """Generic interface for extracting embeddings from images."""
+    
+    def extract_embeddings(self, image_paths: list) -> np.ndarray:
+        """Extract embeddings for a list of images."""
+        raise NotImplementedError
+    
+    def _extract_single_embedding(self, image_path: str) -> np.ndarray:
+        """Extract embedding for a single image."""
+        raise NotImplementedError
+
+
+class BioClip2EmbeddingExtractor(GenericEmbeddingExtractor):
     """Extract embeddings using BioClip2 model."""
     
     def __init__(self, model_name: str = "imageomics/bioclip-2", device: str = "auto"):
@@ -103,18 +119,9 @@ class BioClip2EmbeddingExtractor:
             logger.info("BioClip2 model loaded successfully")
             
         except ImportError as e:
-            logger.error(f"BioClip2 requires transformers library: {e}")
-            logger.warning("Install with: pip install transformers")
-            # Fallback to mock implementation for testing
-            logger.warning("Using mock BioClip2 implementation for testing")
-            self.model = "mock"
-            self.processor = "mock"
+            raise RuntimeError(f"BioClip2 requires transformers library: {e}. Install with: pip install transformers")
         except Exception as e:
-            logger.error(f"Failed to load BioClip2 model: {e}")
-            # Fallback to mock implementation for testing
-            logger.warning("Using mock BioClip2 implementation for testing")
-            self.model = "mock"
-            self.processor = "mock"
+            raise RuntimeError(f"Failed to load BioClip2 model: {e}")
     
     def extract_embeddings(self, image_paths: list) -> np.ndarray:
         """Extract embeddings from images."""
@@ -129,18 +136,12 @@ class BioClip2EmbeddingExtractor:
                 logger.info(f"Processing image {i+1}/{len(image_paths)}")
             
             try:
-                if self.model == "mock":
-                    # Mock embedding for testing
-                    embedding = np.random.randn(512).astype(np.float32)
-                else:
-                    embedding = self._extract_single_embedding(image_path)
-                
+                embedding = self._extract_single_embedding(image_path)
                 embeddings.append(embedding)
                 
             except Exception as e:
-                logger.warning(f"Error processing image {image_path}: {e}")
-                # Default to random embedding
-                embeddings.append(np.random.randn(512).astype(np.float32))
+                logger.error(f"Error processing image {image_path}: {e}")
+                raise RuntimeError(f"Failed to extract embedding for {image_path}: {e}")
         
         return np.array(embeddings)
     
@@ -161,16 +162,16 @@ class BioClip2EmbeddingExtractor:
         return embedding
 
 
-class BioClip2KNNBaseline:
-    """BioClip2 embeddings + KNN classifier baseline."""
+class GenericKNNBaseline:
+    """Generic KNN classifier baseline that works with any embedding extractor."""
     
-    def __init__(self, n_neighbors: int = 5, metric: str = "cosine", standardize: bool = True, device: str = "auto"):
+    def __init__(self, embedding_extractor: GenericEmbeddingExtractor, 
+                 n_neighbors: int = 5, metric: str = "cosine", standardize: bool = True):
+        self.embedding_extractor = embedding_extractor
         self.n_neighbors = n_neighbors
         self.metric = metric
         self.standardize = standardize
-        self.device = device
         
-        self.embedding_extractor = BioClip2EmbeddingExtractor(device=device)
         self.knn = KNeighborsClassifier(n_neighbors=n_neighbors, metric=metric, n_jobs=-1)
         self.scaler = StandardScaler() if standardize else None
         
@@ -181,7 +182,7 @@ class BioClip2KNNBaseline:
     
     def fit(self, train_paths: list, train_labels: list, class_names: list = None):
         """Fit the classifier."""
-        logger.info(f"Fitting BioClip2 KNN classifier with {len(train_paths)} training samples")
+        logger.info(f"Fitting generic KNN classifier with {len(train_paths)} training samples")
         
         self.train_labels = np.array(train_labels)
         if class_names is None:
@@ -205,7 +206,7 @@ class BioClip2KNNBaseline:
         self.knn.fit(self.train_embeddings, self.train_labels)
         self.is_fitted = True
         
-        logger.info("BioClip2 KNN classifier fitted successfully")
+        logger.info("Generic KNN classifier fitted successfully")
     
     def predict(self, test_paths: list) -> np.ndarray:
         """Predict labels for test images."""
@@ -237,6 +238,14 @@ class BioClip2KNNBaseline:
             'predictions': predictions,
             'true_labels': test_labels
         }
+
+
+class BioClip2KNNBaseline(GenericKNNBaseline):
+    """BioClip2 embeddings + KNN classifier baseline."""
+    
+    def __init__(self, n_neighbors: int = 5, metric: str = "cosine", standardize: bool = True, device: str = "auto"):
+        embedding_extractor = BioClip2EmbeddingExtractor(device=device)
+        super().__init__(embedding_extractor, n_neighbors, metric, standardize)
 
 
 
@@ -370,7 +379,7 @@ class BioClip2ClamClassifier(ClamImageTsneClassifier):
         
         # Import VLM modules
         try:
-            from transformers import Qwen2VLForConditionalGeneration, AutoProcessor
+            from transformers import AutoModelForVision2Seq, AutoProcessor
             
             logger.info(f"Loading VLM: {self.vlm_model_id}")
             
@@ -382,7 +391,7 @@ class BioClip2ClamClassifier(ClamImageTsneClassifier):
                 torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
                 device_map = "auto" if torch.cuda.is_available() else "cpu"
             
-            self.vlm_model = Qwen2VLForConditionalGeneration.from_pretrained(
+            self.vlm_model = AutoModelForVision2Seq.from_pretrained(
                 self.vlm_model_id,
                 torch_dtype=torch_dtype,
                 device_map=device_map,
@@ -397,10 +406,7 @@ class BioClip2ClamClassifier(ClamImageTsneClassifier):
             logger.info("VLM loaded successfully")
             
         except Exception as e:
-            logger.error(f"Failed to load VLM: {e}")
-            logger.warning("Using mock VLM for testing")
-            self.vlm_model = "mock"
-            self.vlm_processor = "mock"
+            raise RuntimeError(f"Failed to load VLM: {e}")
 
 
 def download_and_prepare_awa2(data_dir: str = "./awa2_data") -> tuple:
@@ -412,12 +418,40 @@ def download_and_prepare_awa2(data_dir: str = "./awa2_data") -> tuple:
         logger.info("AwA2 already prepared, loading existing data...")
         return load_existing_awa2(data_dir)
     
-    logger.info("AwA2 dataset requires manual download. Please download from:")
-    logger.info("https://cvml.ista.ac.at/AwA2/")
-    logger.info("Extract to: " + str(data_dir))
+    logger.info("Downloading AwA2 dataset...")
+    data_dir.mkdir(exist_ok=True)
     
-    # For now, create mock data structure for testing
-    return create_mock_awa2_data(data_dir)
+    # Download URLs for AwA2 dataset components
+    base_url = "https://cvml.ista.ac.at/AwA2"
+    urls = {
+        "AwA2-base.zip": f"{base_url}/AwA2-base.zip",
+        "AwA2-data.zip": f"{base_url}/AwA2-data.zip"  # This is the 13GB image data
+    }
+    
+    # Download and extract each component
+    for filename, url in urls.items():
+        zip_path = data_dir / filename
+        if not zip_path.exists():
+            logger.info(f"Downloading {filename} from {url}")
+            try:
+                urllib.request.urlretrieve(url, zip_path)
+                logger.info(f"Downloaded {filename}")
+            except Exception as e:
+                raise RuntimeError(f"Failed to download {filename} from {url}: {e}")
+        
+        # Extract the zip file
+        logger.info(f"Extracting {filename}...")
+        try:
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                zip_ref.extractall(data_dir)
+            logger.info(f"Extracted {filename}")
+        except Exception as e:
+            raise RuntimeError(f"Failed to extract {filename}: {e}")
+    
+    # Organize the extracted data
+    organize_awa2_data(data_dir)
+    
+    return load_existing_awa2(data_dir)
 
 
 def download_and_prepare_plantdoc(data_dir: str = "./plantdoc_data") -> tuple:
@@ -425,16 +459,46 @@ def download_and_prepare_plantdoc(data_dir: str = "./plantdoc_data") -> tuple:
     data_dir = Path(data_dir)
     
     # Check if already prepared
-    if (data_dir / "images").exists() and len(list((data_dir / "images").glob("*/*.jpg"))) > 100:
+    if (data_dir / "train").exists() and (data_dir / "test").exists():
         logger.info("PlantDoc already prepared, loading existing data...")
         return load_existing_plantdoc(data_dir)
     
-    logger.info("PlantDoc dataset can be downloaded from:")
-    logger.info("https://github.com/pratikkayal/PlantDoc-Dataset")
-    logger.info("Or Roboflow: https://public.roboflow.com/object-detection/plantdoc")
+    logger.info("Downloading PlantDoc dataset from GitHub...")
+    data_dir.mkdir(exist_ok=True)
     
-    # For now, create mock data structure for testing
-    return create_mock_plantdoc_data(data_dir)
+    # Clone the GitHub repository
+    repo_url = "https://github.com/pratikkayal/PlantDoc-Dataset.git"
+    repo_dir = data_dir / "PlantDoc-Dataset"
+    
+    try:
+        if not repo_dir.exists():
+            logger.info(f"Cloning repository: {repo_url}")
+            subprocess.run(["git", "clone", repo_url, str(repo_dir)], check=True)
+            logger.info("Repository cloned successfully")
+        
+        # Copy the train and test directories to the main data directory
+        train_src = repo_dir / "train"
+        test_src = repo_dir / "test"
+        train_dst = data_dir / "train"
+        test_dst = data_dir / "test"
+        
+        if train_src.exists() and not train_dst.exists():
+            shutil.copytree(train_src, train_dst)
+            logger.info("Copied training data")
+        
+        if test_src.exists() and not test_dst.exists():
+            shutil.copytree(test_src, test_dst)
+            logger.info("Copied test data")
+            
+        # Clean up the repository directory if desired
+        # shutil.rmtree(repo_dir)
+        
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"Failed to clone PlantDoc repository: {e}")
+    except Exception as e:
+        raise RuntimeError(f"Failed to prepare PlantDoc dataset: {e}")
+    
+    return load_existing_plantdoc(data_dir)
 
 
 def download_and_prepare_fishnet(data_dir: str = "./fishnet_data") -> tuple:
@@ -446,138 +510,119 @@ def download_and_prepare_fishnet(data_dir: str = "./fishnet_data") -> tuple:
         logger.info("FishNet already prepared, loading existing data...")
         return load_existing_fishnet(data_dir)
     
-    logger.info("FishNet dataset information:")
-    logger.info("Paper: https://openaccess.thecvf.com/content/ICCV2023/papers/Khan_FishNet_A_Large-scale_Dataset_and_Benchmark_for_Fish_Recognition_Detection_ICCV_2023_paper.pdf")
-    logger.info("Website: https://www.fishnet.ai/")
-    
-    # For now, create mock data structure for testing
-    return create_mock_fishnet_data(data_dir)
-
-
-def create_mock_fishnet_data(data_dir: Path) -> tuple:
-    """Create mock FishNet data for testing."""
-    logger.info("Creating mock FishNet data for testing...")
-    
+    logger.info("Downloading FishNet dataset...")
     data_dir.mkdir(exist_ok=True)
-    (data_dir / "images" / "train").mkdir(parents=True, exist_ok=True)
-    (data_dir / "images" / "test").mkdir(parents=True, exist_ok=True)
     
-    # Mock habitat classes
-    habitat_classes = [
-        "coral_reef", "open_ocean", "kelp_forest", "rocky_reef", "sandy_bottom",
-        "seagrass_bed", "mangrove", "estuary", "deep_sea", "coastal_water"
-    ]
+    # FishNet dataset Google Drive URL (from fishnet-2023.github.io)
+    gdrive_url = "https://drive.google.com/file/d/1mqLoap9QIVGYaPJ7T_KSBfLxJOg2yFY3/view?usp=sharing"
+    file_id = "1mqLoap9QIVGYaPJ7T_KSBfLxJOg2yFY3"
     
-    train_paths, train_labels = [], []
-    test_paths, test_labels = [], []
+    # Download from Google Drive using gdown if available, otherwise provide instructions
+    zip_path = data_dir / "fishnet_dataset.zip"
     
-    # Create mock images (small colored squares)
-    for split, (paths_list, labels_list) in [("train", (train_paths, train_labels)), 
-                                             ("test", (test_paths, test_labels))]:
-        n_samples = 20 if split == "train" else 10
+    try:
+        # Try to import and use gdown for Google Drive downloads
+        import gdown
         
-        for class_idx, class_name in enumerate(habitat_classes):
-            class_dir = data_dir / "images" / split / class_name
-            class_dir.mkdir(parents=True, exist_ok=True)
-            
-            for i in range(n_samples):
-                # Create simple colored image
-                img = Image.new('RGB', (64, 64), color=(class_idx * 25 % 255, i * 10 % 255, 128))
-                img_path = class_dir / f"{i:03d}.jpg"
-                img.save(img_path)
-                
-                paths_list.append(str(img_path))
-                labels_list.append(class_idx)
-    
-    logger.info(f"Created mock FishNet data: {len(train_paths)} train, {len(test_paths)} test images")
-    return train_paths, train_labels, test_paths, test_labels, habitat_classes
-
-
-def create_mock_awa2_data(data_dir: Path) -> tuple:
-    """Create mock AwA2 data for testing."""
-    logger.info("Creating mock AwA2 data for testing...")
-    
-    data_dir.mkdir(exist_ok=True)
-    (data_dir / "images" / "train").mkdir(parents=True, exist_ok=True)
-    (data_dir / "images" / "test").mkdir(parents=True, exist_ok=True)
-    
-    # Subset of AwA2 animal classes
-    animal_classes = [
-        "antelope", "bat", "bear", "bobcat", "buffalo", "chihuahua", "cow", "deer",
-        "dolphin", "elephant", "fox", "giraffe", "horse", "lion", "moose", "rabbit",
-        "raccoon", "rat", "seal", "sheep", "squirrel", "tiger", "whale", "wolf"
-    ]
-    
-    train_paths, train_labels = [], []
-    test_paths, test_labels = [], []
-    
-    # Create mock images
-    for split, (paths_list, labels_list) in [("train", (train_paths, train_labels)), 
-                                             ("test", (test_paths, test_labels))]:
-        n_samples = 15 if split == "train" else 8
+        if not zip_path.exists():
+            logger.info(f"Downloading FishNet dataset from Google Drive...")
+            gdown.download(f"https://drive.google.com/uc?id={file_id}", str(zip_path), quiet=False)
+            logger.info("FishNet dataset downloaded")
         
-        for class_idx, class_name in enumerate(animal_classes):
-            class_dir = data_dir / "images" / split / class_name
-            class_dir.mkdir(parents=True, exist_ok=True)
-            
-            for i in range(n_samples):
-                img = Image.new('RGB', (64, 64), color=(class_idx * 10 % 255, i * 15 % 255, 100))
-                img_path = class_dir / f"{i:03d}.jpg"
-                img.save(img_path)
-                
-                paths_list.append(str(img_path))
-                labels_list.append(class_idx)
-    
-    logger.info(f"Created mock AwA2 data: {len(train_paths)} train, {len(test_paths)} test images")
-    return train_paths, train_labels, test_paths, test_labels, animal_classes
-
-
-def create_mock_plantdoc_data(data_dir: Path) -> tuple:
-    """Create mock PlantDoc data for testing."""
-    logger.info("Creating mock PlantDoc data for testing...")
-    
-    data_dir.mkdir(exist_ok=True)
-    (data_dir / "images" / "train").mkdir(parents=True, exist_ok=True)
-    (data_dir / "images" / "test").mkdir(parents=True, exist_ok=True)
-    
-    # PlantDoc disease classes
-    disease_classes = [
-        "apple_scab", "apple_black_rot", "apple_cedar_rust", "apple_healthy",
-        "corn_gray_leaf_spot", "corn_common_rust", "corn_northern_leaf_blight", "corn_healthy",
-        "grape_black_rot", "grape_esca", "grape_leaf_blight", "grape_healthy",
-        "potato_early_blight", "potato_late_blight", "potato_healthy",
-        "strawberry_leaf_scorch", "strawberry_healthy", "tomato_bacterial_spot",
-        "tomato_early_blight", "tomato_late_blight", "tomato_leaf_mold", "tomato_healthy"
-    ]
-    
-    train_paths, train_labels = [], []
-    test_paths, test_labels = [], []
-    
-    # Create mock images
-    for split, (paths_list, labels_list) in [("train", (train_paths, train_labels)), 
-                                             ("test", (test_paths, test_labels))]:
-        n_samples = 12 if split == "train" else 6
+        # Extract the dataset
+        logger.info("Extracting FishNet dataset...")
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(data_dir)
         
-        for class_idx, class_name in enumerate(disease_classes):
-            class_dir = data_dir / "images" / split / class_name
-            class_dir.mkdir(parents=True, exist_ok=True)
-            
-            for i in range(n_samples):
-                # Different colors for healthy vs diseased
-                if "healthy" in class_name:
-                    color = (50, 200, 50)  # Green for healthy
-                else:
-                    color = (200, 100, 50)  # Brown/red for diseased
-                
-                img = Image.new('RGB', (64, 64), color=color)
-                img_path = class_dir / f"{i:03d}.jpg"
-                img.save(img_path)
-                
-                paths_list.append(str(img_path))
-                labels_list.append(class_idx)
+        # Organize the extracted data
+        organize_fishnet_data(data_dir)
+        
+    except ImportError:
+        raise RuntimeError(
+            "gdown package is required to download FishNet dataset. Install with: pip install gdown\n"
+            f"Alternatively, manually download from: {gdrive_url}\n"
+            f"And extract to: {data_dir}"
+        )
+    except Exception as e:
+        raise RuntimeError(f"Failed to download or extract FishNet dataset: {e}")
     
-    logger.info(f"Created mock PlantDoc data: {len(train_paths)} train, {len(test_paths)} test images")
-    return train_paths, train_labels, test_paths, test_labels, disease_classes
+    return load_existing_fishnet(data_dir)
+
+
+def organize_fishnet_data(data_dir: Path):
+    """Organize extracted FishNet data into train/test structure."""
+    logger.info("Organizing FishNet data...")
+    
+    # FishNet likely has its own organization - this function should be adapted
+    # based on the actual structure of the downloaded dataset
+    # For now, assume it already has the correct structure or implement as needed
+    images_dir = data_dir / "images"
+    if not images_dir.exists():
+        # Look for other possible directory structures in the extracted data
+        extracted_dirs = [d for d in data_dir.iterdir() if d.is_dir() and d.name != "__pycache__"]
+        if extracted_dirs:
+            logger.info(f"Found extracted directories: {[d.name for d in extracted_dirs]}")
+            # Move or symlink the data as needed
+            # This would need to be customized based on actual FishNet structure
+
+
+def organize_awa2_data(data_dir: Path):
+    """Organize extracted AwA2 data into train/test structure."""
+    logger.info("Organizing AwA2 data...")
+    
+    # AwA2 dataset structure needs to be organized
+    # Look for JPEGImages directory from the extraction
+    jpeg_dir = None
+    for root_dir in data_dir.iterdir():
+        if root_dir.is_dir():
+            potential_jpeg = root_dir / "JPEGImages"
+            if potential_jpeg.exists():
+                jpeg_dir = potential_jpeg
+                break
+    
+    if not jpeg_dir:
+        # Look for any Images directory
+        for root_dir in data_dir.iterdir():
+            if root_dir.is_dir() and "images" in root_dir.name.lower():
+                jpeg_dir = root_dir
+                break
+    
+    if jpeg_dir and jpeg_dir.exists():
+        # Create organized structure
+        images_dir = data_dir / "images"
+        train_dir = images_dir / "train"  
+        test_dir = images_dir / "test"
+        train_dir.mkdir(parents=True, exist_ok=True)
+        test_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Get class directories from the original structure
+        class_dirs = [d for d in jpeg_dir.iterdir() if d.is_dir()]
+        
+        for class_dir in class_dirs:
+            class_name = class_dir.name
+            images = list(class_dir.glob("*.jpg"))
+            
+            if images:
+                # Split 80/20 train/test
+                split_idx = int(0.8 * len(images))
+                train_images = images[:split_idx]
+                test_images = images[split_idx:]
+                
+                # Create class directories
+                train_class_dir = train_dir / class_name
+                test_class_dir = test_dir / class_name
+                train_class_dir.mkdir(exist_ok=True)
+                test_class_dir.mkdir(exist_ok=True)
+                
+                # Copy or symlink images
+                for img in train_images:
+                    shutil.copy2(img, train_class_dir / img.name)
+                for img in test_images:
+                    shutil.copy2(img, test_class_dir / img.name)
+        
+        logger.info("AwA2 data organized successfully")
+    else:
+        logger.warning("Could not find AwA2 image directory in extracted data")
 
 
 def load_existing_fishnet(data_dir: Path) -> tuple:
@@ -592,33 +637,73 @@ def load_existing_awa2(data_dir: Path) -> tuple:
 
 def load_existing_plantdoc(data_dir: Path) -> tuple:
     """Load existing PlantDoc data."""
-    return load_existing_dataset(data_dir, "PlantDoc")
+    train_paths, train_labels = [], []
+    test_paths, test_labels = [], []
+    class_names = []
+    
+    # PlantDoc has train/ and test/ directories directly
+    train_dir = data_dir / "train"
+    test_dir = data_dir / "test"
+    
+    if not (train_dir.exists() and test_dir.exists()):
+        raise RuntimeError(f"PlantDoc data not found in {data_dir}. Expected train/ and test/ directories.")
+    
+    # Get class names from train directory structure
+    for class_dir in sorted(train_dir.iterdir()):
+        if class_dir.is_dir():
+            class_names.append(class_dir.name)
+    
+    # Load train and test data
+    for split, split_dir, (paths_list, labels_list) in [
+        ("train", train_dir, (train_paths, train_labels)), 
+        ("test", test_dir, (test_paths, test_labels))
+    ]:
+        for class_idx, class_name in enumerate(class_names):
+            class_dir = split_dir / class_name
+            if class_dir.exists():
+                # Support multiple image formats
+                for pattern in ["*.jpg", "*.jpeg", "*.png"]:
+                    for img_path in sorted(class_dir.glob(pattern)):
+                        paths_list.append(str(img_path))
+                        labels_list.append(class_idx)
+    
+    logger.info(f"Loaded PlantDoc: {len(train_paths)} train, {len(test_paths)} test images, {len(class_names)} classes")
+    return train_paths, train_labels, test_paths, test_labels, class_names
 
 
 def load_existing_dataset(data_dir: Path, dataset_name: str) -> tuple:
-    """Generic function to load existing dataset."""
+    """Generic function to load existing dataset with images/ structure."""
     train_paths, train_labels = [], []
     test_paths, test_labels = [], []
     class_names = []
     
     images_dir = data_dir / "images"
+    train_dir = images_dir / "train"
+    test_dir = images_dir / "test"
+    
+    if not (train_dir.exists() and test_dir.exists()):
+        raise RuntimeError(f"{dataset_name} data not found in {data_dir}. Expected images/train/ and images/test/ directories.")
     
     # Get class names from directory structure
-    for class_dir in sorted((images_dir / "train").iterdir()):
+    for class_dir in sorted(train_dir.iterdir()):
         if class_dir.is_dir():
             class_names.append(class_dir.name)
     
     # Load train and test data
-    for split, (paths_list, labels_list) in [("train", (train_paths, train_labels)), 
-                                             ("test", (test_paths, test_labels))]:
+    for split, split_dir, (paths_list, labels_list) in [
+        ("train", train_dir, (train_paths, train_labels)), 
+        ("test", test_dir, (test_paths, test_labels))
+    ]:
         for class_idx, class_name in enumerate(class_names):
-            class_dir = images_dir / split / class_name
+            class_dir = split_dir / class_name
             if class_dir.exists():
-                for img_path in sorted(class_dir.glob("*.jpg")):
-                    paths_list.append(str(img_path))
-                    labels_list.append(class_idx)
+                # Support multiple image formats
+                for pattern in ["*.jpg", "*.jpeg", "*.png"]:
+                    for img_path in sorted(class_dir.glob(pattern)):
+                        paths_list.append(str(img_path))
+                        labels_list.append(class_idx)
     
-    logger.info(f"Loaded {dataset_name}: {len(train_paths)} train, {len(test_paths)} test images")
+    logger.info(f"Loaded {dataset_name}: {len(train_paths)} train, {len(test_paths)} test images, {len(class_names)} classes")
     return train_paths, train_labels, test_paths, test_labels, class_names
 
 
@@ -688,14 +773,14 @@ def test_single_dataset(dataset_name: str, args):
     if 'qwen_vl' in args.models:
         logger.info("Testing Qwen VL...")
         try:
-            classifier = BiologicalQwenVLBaseline(
+            classifier = QwenVLBaseline(
                 num_classes=len(class_names),
                 class_names=class_names,
                 model_name=args.vlm_model_id
             )
             
             start_time = time.time()
-            classifier.fit(train_paths, train_labels)
+            classifier.fit(train_paths, train_labels, class_names)
             training_time = time.time() - start_time
             
             eval_results = classifier.evaluate(

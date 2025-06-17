@@ -492,7 +492,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
             
             # Log to wandb
             if use_wandb_logging:
-                log_results_to_wandb('clam_tsne', eval_results, args, class_names)
+                log_results_to_wandb('clam_tsne', eval_results, args, class_names, dataset_name)
             
         except Exception as e:
             logger.error(f"CLAM t-SNE failed: {e}")
@@ -525,7 +525,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
             
             # Log to wandb
             if use_wandb_logging:
-                log_results_to_wandb('clam_simple', eval_results, args, class_names)
+                log_results_to_wandb('clam_simple', eval_results, args, class_names, dataset_name)
             
         except Exception as e:
             logger.error(f"Simple CLAM failed: {e}")
@@ -560,7 +560,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
             
             # Log to wandb
             if use_wandb_logging:
-                log_results_to_wandb('dinov2_linear', eval_results, args, class_names)
+                log_results_to_wandb('dinov2_linear', eval_results, args, class_names, dataset_name)
             
         except Exception as e:
             logger.error(f"DINOV2 Linear Probe failed: {e}")
@@ -584,7 +584,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
                 test_paths, test_labels,
                 save_raw_responses=args.save_outputs,
                 output_dir=args.output_dir if args.save_outputs else None,
-                benchmark_name=args.dataset
+                benchmark_name=dataset_name
             )
             eval_results['training_time'] = training_time
             
@@ -593,7 +593,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
             
             # Log to wandb
             if use_wandb_logging:
-                log_results_to_wandb('qwen_vl', eval_results, args, class_names)
+                log_results_to_wandb('qwen_vl', eval_results, args, class_names, dataset_name)
             
         except Exception as e:
             logger.error(f"Qwen VL failed: {e}")
@@ -602,7 +602,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
     return results
 
 
-def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names: list):
+def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names: list, dataset_name: str = None):
     """Log evaluation results to Weights & Biases."""
     if 'error' in eval_results:
         # Log failed runs
@@ -610,7 +610,7 @@ def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names:
             f"{model_name}/status": "failed",
             f"{model_name}/error": eval_results['error'],
             "model_name": model_name,
-            "dataset": args.dataset.upper(),
+            "dataset": (dataset_name or getattr(args, 'dataset', 'unknown')).upper(),
             "quick_test": args.quick_test
         })
         return
@@ -622,7 +622,7 @@ def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names:
         f"{model_name}/prediction_time": eval_results.get('prediction_time', 0),
         f"{model_name}/num_test_samples": eval_results.get('num_test_samples', 0),
         "model_name": model_name,
-        "dataset": args.dataset.upper(),
+        "dataset": (dataset_name or getattr(args, 'dataset', 'unknown')).upper(),
         "num_classes": len(class_names),
         "quick_test": args.quick_test
     }
@@ -738,6 +738,20 @@ def parse_args():
         type=str,
         default="./cache",
         help="Directory for caching embeddings"
+    )
+    
+    # Add missing save_outputs argument
+    parser.add_argument(
+        "--save_outputs",
+        action="store_true",
+        default=True,
+        help="Save visualizations and VLM responses"
+    )
+    parser.add_argument(
+        "--no_save_outputs",
+        dest="save_outputs",
+        action="store_false",
+        help="Disable saving visualizations and VLM responses"
     )
     
     # Set vision-specific defaults
