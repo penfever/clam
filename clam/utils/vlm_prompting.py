@@ -260,6 +260,7 @@ def parse_vlm_response(response: str, unique_classes: List, logger_instance: Opt
         logger_instance = logger
         
     response_lower = response.lower().strip()
+    logger_instance.debug(f"Parsing VLM response: '{response}' (use_semantic_names={use_semantic_names})")
     
     # Try to parse structured response format first
     if "class:" in response_lower:
@@ -270,16 +271,19 @@ def parse_vlm_response(response: str, unique_classes: List, logger_instance: Opt
             # Remove quotes if present
             class_part = class_part.strip('"\'')
             
-            # If using "Class X" format, extract the number
-            if not use_semantic_names and class_part.lower().startswith("class "):
-                try:
-                    class_num_str = class_part.lower().replace("class ", "").strip()
-                    class_num = int(class_num_str)
-                    if 0 <= class_num < len(unique_classes):
-                        logger_instance.debug(f"Parsed Class {class_num} -> {unique_classes[class_num]}")
-                        return unique_classes[class_num]
-                except (ValueError, IndexError):
-                    pass
+            # If using "Class X" format, extract the number (handle both "class 6" and "class_6")
+            if not use_semantic_names:
+                import re
+                # Try to extract number from various class formats
+                class_match = re.search(r'class[_\s]*(\d+)', class_part.lower())
+                if class_match:
+                    try:
+                        class_num = int(class_match.group(1))
+                        if 0 <= class_num < len(unique_classes):
+                            logger_instance.debug(f"Parsed Class {class_num} -> {unique_classes[class_num]}")
+                            return unique_classes[class_num]
+                    except (ValueError, IndexError):
+                        pass
             
             # Try to match with available classes (semantic names or direct)
             if use_semantic_names:
@@ -294,16 +298,23 @@ def parse_vlm_response(response: str, unique_classes: List, logger_instance: Opt
     # Fallback: Look for "Class X" pattern anywhere in response
     if not use_semantic_names:
         import re
-        class_pattern = r'\bclass\s+(\d+)\b'
-        match = re.search(class_pattern, response_lower)
-        if match:
-            try:
-                class_num = int(match.group(1))
-                if 0 <= class_num < len(unique_classes):
-                    logger_instance.debug(f"Found Class {class_num} pattern -> {unique_classes[class_num]}")
-                    return unique_classes[class_num]
-            except (ValueError, IndexError):
-                pass
+        # Enhanced regex to handle both "class 6", "class_6", "Class 6", "Class_6" patterns
+        class_patterns = [
+            r'\bclass[_\s]+(\d+)\b',  # matches "class 6", "class_6", etc.
+            r'\bclass(\d+)\b',        # matches "class6" (no separator)
+            r'class[_\s]*:?[_\s]*(\d+)', # matches "class: 6", "class_: 6", etc.
+        ]
+        
+        for pattern in class_patterns:
+            match = re.search(pattern, response_lower)
+            if match:
+                try:
+                    class_num = int(match.group(1))
+                    if 0 <= class_num < len(unique_classes):
+                        logger_instance.debug(f"Found Class {class_num} pattern -> {unique_classes[class_num]}")
+                        return unique_classes[class_num]
+                except (ValueError, IndexError):
+                    continue
     
     # Fallback: Look for any class name in the response (for semantic names)
     if use_semantic_names:
