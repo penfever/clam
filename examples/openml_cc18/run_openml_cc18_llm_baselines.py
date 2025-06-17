@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 """
-Script to evaluate LLM baselines (TabLLM, Tabula-8B, JOLT, and LlaTa-T-SNe) on the OpenML CC18 collection.
+Script to evaluate LLM baselines (TabLLM, Tabula-8B, JOLT, and CLAM-T-SNe) on the OpenML CC18 collection.
 
 This script:
 1. Retrieves the OpenML CC18 collection (study_id=99)
 2. For each task in the collection:
-   a. Evaluates TabLLM, Tabula-8B, JOLT, and LlaTa-T-SNe baselines on multiple splits
+   a. Evaluates TabLLM, Tabula-8B, JOLT, and CLAM-T-SNe baselines on multiple splits
 3. Logs the results to Weights & Biases with version control by date
 
 Requirements:
@@ -14,13 +14,13 @@ Requirements:
 - W&B account for logging results
 - RTFM package for Tabula-8B (pip install git+https://github.com/penfever/rtfm.git)
 - Transformers and torch for LLM baselines
-- Vision dependencies for LlaTa-T-SNe: PIL, scikit-learn, matplotlib
+- Vision dependencies for CLAM-T-SNe: PIL, scikit-learn, matplotlib
 
 Usage:
     # Basic usage with all models
     python run_openml_cc18_llm_baselines.py --clam_repo_path /path/to/clam --output_dir ./results
     
-    # Run only LlaTa-T-SNe with 3D t-SNE and KNN connections
+    # Run only CLAM-T-SNe with 3D t-SNE and KNN connections
     python run_openml_cc18_llm_baselines.py --clam_repo_path /path/to/clam --output_dir ./results \
         --models clam_tsne --use_3d_tsne --use_knn_connections --knn_k 7
     
@@ -152,94 +152,94 @@ def parse_args():
         help="GPU memory utilization for VLLM (0.0-1.0)"
     )
     
-    # LlaTa-T-SNe specific parameters
+    # CLAM-T-SNe specific parameters
     parser.add_argument(
         "--vlm_model_id",
         type=str,
         default="Qwen/Qwen2.5-VL-32B-Instruct",
-        help="HuggingFace model name for Vision Language Model (LlaTa-T-SNe baseline)"
+        help="HuggingFace model name for Vision Language Model (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--embedding_size",
         type=int,
         default=1000,
-        help="Size of TabPFN embeddings for LlaTa-T-SNe baseline"
+        help="Size of TabPFN embeddings for CLAM-T-SNe baseline"
     )
     parser.add_argument(
         "--tsne_perplexity",
         type=int,
         default=30,
-        help="t-SNE perplexity parameter for LlaTa-T-SNe baseline"
+        help="t-SNE perplexity parameter for CLAM-T-SNe baseline"
     )
     parser.add_argument(
         "--tsne_n_iter",
         type=int,
         default=1000,
-        help="Number of t-SNE iterations for LlaTa-T-SNe baseline"
+        help="Number of t-SNE iterations for CLAM-T-SNe baseline"
     )
     parser.add_argument(
         "--max_tabpfn_samples",
         type=int,
         default=3000,
-        help="Maximum samples for TabPFN fitting in LlaTa-T-SNe baseline"
+        help="Maximum samples for TabPFN fitting in CLAM-T-SNe baseline"
     )
     parser.add_argument(
         "--use_3d_tsne",
         action="store_true",
-        help="Use 3D t-SNE with multiple viewing angles instead of 2D (LlaTa-T-SNe baseline)"
+        help="Use 3D t-SNE with multiple viewing angles instead of 2D (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--viewing_angles",
         type=str,
         default=None,
-        help="Custom viewing angles for 3D t-SNE as 'elev1,azim1;elev2,azim2;...' (LlaTa-T-SNe baseline)"
+        help="Custom viewing angles for 3D t-SNE as 'elev1,azim1;elev2,azim2;...' (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--use_knn_connections",
         action="store_true",
-        help="Show KNN connections from query point to nearest neighbors in embedding space (LlaTa-T-SNe baseline)"
+        help="Show KNN connections from query point to nearest neighbors in embedding space (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--knn_k",
         type=int,
         default=5,
-        help="Number of nearest neighbors to show when using KNN connections (LlaTa-T-SNe baseline)"
+        help="Number of nearest neighbors to show when using KNN connections (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--max_vlm_image_size",
         type=int,
         default=2048,
-        help="Maximum image size (width/height) for VLM compatibility (LlaTa-T-SNe baseline)"
+        help="Maximum image size (width/height) for VLM compatibility (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--image_dpi",
         type=int,
         default=100,
-        help="DPI for saving t-SNE visualizations (LlaTa-T-SNe baseline)"
+        help="DPI for saving t-SNE visualizations (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--force_rgb_mode",
         action="store_true",
         default=True,
-        help="Convert images to RGB mode to improve VLM processing speed (LlaTa-T-SNe baseline)"
+        help="Convert images to RGB mode to improve VLM processing speed (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--no-force_rgb_mode",
         action="store_false",
         dest="force_rgb_mode",
-        help="Disable RGB conversion (keep RGBA mode) for LlaTa-T-SNe baseline"
+        help="Disable RGB conversion (keep RGBA mode) for CLAM-T-SNe baseline"
     )
     parser.add_argument(
         "--save_sample_visualizations",
         action="store_true",
         default=True,
-        help="Save sample t-SNE visualizations for debugging and documentation (LlaTa-T-SNe baseline)"
+        help="Save sample t-SNE visualizations for debugging and documentation (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--no-save_sample_visualizations",
         action="store_false",
         dest="save_sample_visualizations",
-        help="Disable saving of sample t-SNE visualizations (LlaTa-T-SNe baseline)"
+        help="Disable saving of sample t-SNE visualizations (CLAM-T-SNe baseline)"
     )
     
     return parser.parse_args()
@@ -361,7 +361,7 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
         "--gpu_memory_utilization", str(args.gpu_memory_utilization),
     ])
     
-    # Add LlaTa-T-SNe specific parameters
+    # Add CLAM-T-SNe specific parameters
     cmd.extend([
         "--vlm_model_id", args.vlm_model_id,
         "--embedding_size", str(args.embedding_size),
@@ -373,7 +373,7 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
         "--image_dpi", str(args.image_dpi),
     ])
     
-    # Add LlaTa-T-SNe boolean flags
+    # Add CLAM-T-SNe boolean flags
     if args.use_3d_tsne:
         cmd.append("--use_3d_tsne")
     if args.use_knn_connections:

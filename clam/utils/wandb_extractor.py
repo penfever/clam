@@ -173,10 +173,10 @@ def fetch_wandb_train_data(entity, projects):
         if run.name.startswith("train_task"):
             model_name = "clam"
         elif run.name.startswith("baselines_task"):
-            # Skip baseline training runs as they don't provide LlaTa runtime data
+            # Skip baseline training runs as they don't provide CLAM runtime data
             continue
         else:
-            # Skip other types of runs that don't provide LlaTa runtime
+            # Skip other types of runs that don't provide CLAM runtime
             continue
             
         # Extract task ID from run name or config

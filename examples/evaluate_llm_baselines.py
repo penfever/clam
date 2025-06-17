@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Script for evaluating LLM baselines (TabLLM, Tabula-8B, JOLT, and LlaTa-T-SNe) on tabular datasets.
+Script for evaluating LLM baselines (TabLLM, Tabula-8B, JOLT, and CLAM-T-SNe) on tabular datasets.
 This script handles:
 1. Loading and preprocessing datasets from multiple sources
 2. Creating textual serializations for LLMs
@@ -11,7 +11,7 @@ LLM Baselines evaluated:
 - TabLLM: Few-shot classification using textual serializations
 - Tabula-8B: Large language model fine-tuned for tabular data
 - JOLT: Joint probabilistic predictions on tabular data using LLMs
-- LlaTa-T-SNe: Vision Language Model classification using t-SNE visualizations of TabPFN embeddings
+- CLAM-T-SNe: Vision Language Model classification using t-SNE visualizations of TabPFN embeddings
 
 Usage examples:
     # Basic usage with a single dataset
@@ -32,7 +32,7 @@ Usage examples:
     # TabLLM automatically uses semantic templates and meaningful class names when available
     python evaluate_llm_baselines.py --dataset_name adult --models tabllm
     
-    # Using 3D t-SNE with multiple viewing angles for LlaTa-T-SNe
+    # Using 3D t-SNE with multiple viewing angles for CLAM-T-SNe
     python evaluate_llm_baselines.py --dataset_name diabetes --models clam_tsne --use_3d_tsne --output_dir ./results
     
     # Custom viewing angles for 3D t-SNE
@@ -93,7 +93,7 @@ from llm_baselines.jolt_baseline import evaluate_jolt
 from llm_baselines.clam_tsne_baseline import evaluate_clam_tsne
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Evaluate LLM baselines (TabLLM, Tabula-8B, JOLT, LlaTa-T-SNe) on tabular datasets")
+    parser = argparse.ArgumentParser(description="Evaluate LLM baselines (TabLLM, Tabula-8B, JOLT, CLAM-T-SNe) on tabular datasets")
     
     # Model selection
     parser.add_argument(
@@ -157,106 +157,106 @@ def parse_args():
         "--vlm_model_id",
         type=str,
         default="Qwen/Qwen2.5-VL-32B-Instruct",
-        help="HuggingFace model name for Vision Language Model (LlaTa-T-SNe baseline)"
+        help="HuggingFace model name for Vision Language Model (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--embedding_size",
         type=int,
         default=1000,
-        help="Size of TabPFN embeddings for LlaTa-T-SNe baseline"
+        help="Size of TabPFN embeddings for CLAM-T-SNe baseline"
     )
     parser.add_argument(
         "--tsne_perplexity",
         type=int,
         default=30,
-        help="t-SNE perplexity parameter for LlaTa-T-SNe baseline"
+        help="t-SNE perplexity parameter for CLAM-T-SNe baseline"
     )
     parser.add_argument(
         "--tsne_n_iter",
         type=int,
         default=1000,
-        help="Number of t-SNE iterations for LlaTa-T-SNe baseline"
+        help="Number of t-SNE iterations for CLAM-T-SNe baseline"
     )
     parser.add_argument(
         "--max_tabpfn_samples",
         type=int,
         default=3000,
-        help="Maximum samples for TabPFN fitting in LlaTa-T-SNe baseline"
+        help="Maximum samples for TabPFN fitting in CLAM-T-SNe baseline"
     )
     parser.add_argument(
         "--cache_dir",
         type=str,
         default=None,
-        help="Directory to cache TabPFN embeddings for LlaTa-T-SNe baseline"
+        help="Directory to cache TabPFN embeddings for CLAM-T-SNe baseline"
     )
     parser.add_argument(
         "--force_recompute_embeddings",
         action="store_true",
-        help="Force recomputation of cached embeddings for LlaTa-T-SNe baseline"
+        help="Force recomputation of cached embeddings for CLAM-T-SNe baseline"
     )
     parser.add_argument(
         "--use_3d_tsne",
         action="store_true",
-        help="Use 3D t-SNE with multiple viewing angles instead of 2D (LlaTa-T-SNe baseline)"
+        help="Use 3D t-SNE with multiple viewing angles instead of 2D (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--viewing_angles",
         type=str,
         default=None,
-        help="Custom viewing angles for 3D t-SNE as 'elev1,azim1;elev2,azim2;...' (LlaTa-T-SNe baseline)"
+        help="Custom viewing angles for 3D t-SNE as 'elev1,azim1;elev2,azim2;...' (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--use_knn_connections",
         action="store_true",
-        help="Show KNN connections from query point to nearest neighbors in embedding space (LlaTa-T-SNe baseline)"
+        help="Show KNN connections from query point to nearest neighbors in embedding space (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--knn_k",
         type=int,
         default=5,
-        help="Number of nearest neighbors to show when using KNN connections (LlaTa-T-SNe baseline)"
+        help="Number of nearest neighbors to show when using KNN connections (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--max_vlm_image_size",
         type=int,
         default=2048,
-        help="Maximum image size (width/height) for VLM compatibility (LlaTa-T-SNe baseline)"
+        help="Maximum image size (width/height) for VLM compatibility (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--image_dpi",
         type=int,
         default=100,
-        help="DPI for saving t-SNE visualizations (LlaTa-T-SNe baseline)"
+        help="DPI for saving t-SNE visualizations (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--force_rgb_mode",
         action="store_true",
         default=True,
-        help="Convert images to RGB mode to improve VLM processing speed (LlaTa-T-SNe baseline)"
+        help="Convert images to RGB mode to improve VLM processing speed (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--no-force_rgb_mode",
         action="store_false",
         dest="force_rgb_mode",
-        help="Disable RGB conversion (keep RGBA mode) for LlaTa-T-SNe baseline"
+        help="Disable RGB conversion (keep RGBA mode) for CLAM-T-SNe baseline"
     )
     parser.add_argument(
         "--save_sample_visualizations",
         action="store_true",
         default=True,
-        help="Save sample t-SNE visualizations for debugging and documentation (LlaTa-T-SNe baseline)"
+        help="Save sample t-SNE visualizations for debugging and documentation (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--no-save_sample_visualizations",
         action="store_false",
         dest="save_sample_visualizations",
-        help="Disable saving of sample t-SNE visualizations (LlaTa-T-SNe baseline)"
+        help="Disable saving of sample t-SNE visualizations (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
         "--tsne_zoom_factor",
         type=float,
         default=4.0,
-        help="Zoom factor for t-SNE visualizations (2.0 = 200%% zoom, showing 50%% of the range) (LlaTa-T-SNe baseline)"
+        help="Zoom factor for t-SNE visualizations (2.0 = 200%% zoom, showing 50%% of the range) (CLAM-T-SNe baseline)"
     )
     
     # Evaluation parameters

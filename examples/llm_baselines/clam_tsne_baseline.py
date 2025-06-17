@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-LlaTa-T-SNe baseline evaluation module.
+CLAM-T-SNe baseline evaluation module.
 
 This baseline uses TabPFNv2 to generate embeddings, creates t-SNE visualizations
 with colored training points and grayed-out test points, then uses a Vision Language Model
@@ -43,9 +43,9 @@ def convert_numpy_types(obj):
 
 
 def evaluate_clam_tsne(dataset, args):
-    """Evaluate LlaTa-T-SNe baseline on a dataset."""
+    """Evaluate CLAM-T-SNe baseline on a dataset."""
     logger = logging.getLogger(__name__)
-    logger.info(f"Evaluating LlaTa-T-SNe on dataset {dataset['name']}")
+    logger.info(f"Evaluating CLAM-T-SNe on dataset {dataset['name']}")
     
     # Import required utilities
     from clam.utils import (
@@ -73,7 +73,7 @@ def evaluate_clam_tsne(dataset, args):
             logger.error(f"VLM dependencies not found: {e}")
             logger.error("Please install required packages: pip install pillow")
             return {
-                'model_name': 'LlaTa-T-SNe',
+                'model_name': 'CLAM-T-SNe',
                 'dataset_name': dataset['name'],
                 'error': f"Missing dependencies: {e}"
             }
@@ -481,7 +481,7 @@ def evaluate_clam_tsne(dataset, args):
         prediction_time = total_time  # For LLMs, prediction time includes model loading and inference
         
         results = {
-            'model_name': 'LlaTa-T-SNe',
+            'model_name': 'CLAM-T-SNe',
             'dataset_name': dataset['name'],
             'dataset_id': dataset['id'],
             'task_id': dataset['id'],  # For consistency with CLAM extraction logic
@@ -505,7 +505,7 @@ def evaluate_clam_tsne(dataset, args):
             'f1_weighted': float(f1_weighted) if f1_weighted is not None else None,
             'precision_macro': float(precision_macro) if precision_macro is not None else None,
             'recall_macro': float(recall_macro) if recall_macro is not None else None,
-            # LlaTa-T-SNe specific metadata
+            # CLAM-T-SNe specific metadata
             'vlm_model_id': vlm_model_id,
             'tsne_params': {
                 'perplexity': getattr(args, 'tsne_perplexity', 30),
@@ -718,7 +718,7 @@ def evaluate_clam_tsne(dataset, args):
                             'dataset_name': dataset['name'],
                             'dataset_id': dataset['id'],
                             'task_id': dataset['id'],  # For consistency with CLAM extraction logic
-                            'model_name': 'LlaTa-T-SNe',
+                            'model_name': 'CLAM-T-SNe',
                             'accuracy': float(accuracy),
                             'num_samples': len(example_inputs_outputs),
                             'example_inputs_outputs': convert_numpy_types(example_inputs_outputs),
@@ -802,15 +802,15 @@ def evaluate_clam_tsne(dataset, args):
         except Exception as wandb_error:
             logger.warning(f"Failed to log artifacts to wandb: {wandb_error}")
         
-        logger.info(f"LlaTa-T-SNe accuracy on {dataset['name']}: {accuracy:.4f}")
+        logger.info(f"CLAM-T-SNe accuracy on {dataset['name']}: {accuracy:.4f}")
         return results
         
     except Exception as e:
-        logger.error(f"Error evaluating LlaTa-T-SNe: {e}")
+        logger.error(f"Error evaluating CLAM-T-SNe: {e}")
         import traceback
         logger.error(traceback.format_exc())
         return {
-            'model_name': 'LlaTa-T-SNe',
+            'model_name': 'CLAM-T-SNe',
             'dataset_name': dataset['name'],
             'error': str(e)
         }

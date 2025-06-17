@@ -97,14 +97,14 @@ Detailed results saved to: ./esc50_test_results
 
 ## Architecture
 
-### LlataAudioTsneClassifier
+### CLAMAudioTsneClassifier
 
 Main classifier implementing the audio CLAM pipeline:
 
 ```python
-from examples.audio import LlataAudioTsneClassifier
+from examples.audio import CLAMAudioTsneClassifier
 
-classifier = LlataAudioTsneClassifier(
+classifier = CLAMAudioTsneClassifier(
     whisper_model="base",           # Whisper model size
     embedding_layer="encoder_last", # Which layer to use
     use_3d_tsne=False,             # 2D vs 3D visualization
