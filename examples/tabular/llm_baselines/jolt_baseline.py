@@ -17,7 +17,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, roc_auc_score, f1_score, precision_score, recall_score
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from typing import Dict, Any, Optional, List, Tuple
-from .model_loader import model_loader, GenerationConfig
+from clam.utils.model_loader import model_loader, GenerationConfig
 
 def load_jolt_config_by_openml_id(openml_task_id, original_feature_count=None):
     """Load JOLT configuration by OpenML task ID with feature count validation.

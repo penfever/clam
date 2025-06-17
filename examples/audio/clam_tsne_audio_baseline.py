@@ -578,7 +578,7 @@ class ClamAudioTsneClassifier:
         """Load the Vision Language Model using standardized model loader."""
         try:
             # Use the centralized model loader from CLAM
-            from examples.tabular.llm_baselines.model_loader import model_loader
+            from clam.utils.model_loader import model_loader
             
             # Get platform-compatible kwargs
             vlm_kwargs = configure_model_kwargs_for_platform(
@@ -628,7 +628,7 @@ class ClamAudioTsneClassifier:
             
             # Import the proper GenerationConfig class
             try:
-                from examples.tabular.llm_baselines.model_loader import GenerationConfig
+                from clam.utils.model_loader import GenerationConfig
                 gen_config = GenerationConfig(
                     max_new_tokens=100,
                     temperature=0.1,

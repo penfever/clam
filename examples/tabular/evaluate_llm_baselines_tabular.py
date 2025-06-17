@@ -93,7 +93,7 @@ from clam.utils.evaluation_args import create_tabular_llm_evaluation_parser
 from .llm_baselines.tabllm_baseline import evaluate_tabllm
 from .llm_baselines.tabula_8b_baseline import evaluate_tabula_8b
 from .llm_baselines.jolt_baseline import evaluate_jolt
-from .llm_baselines.clam_tsne_baseline import evaluate_clam_tsne
+from clam.models.clam_tsne import evaluate_clam_tsne
 
 def parse_args():
     """Parse command line arguments using centralized tabular LLM evaluation parser."""
