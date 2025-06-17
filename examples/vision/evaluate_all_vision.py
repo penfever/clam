@@ -732,6 +732,14 @@ def parse_args():
     """Parse command line arguments using centralized vision evaluation parser."""
     parser = create_vision_evaluation_parser("Test image classification datasets with CLAM and baselines")
     
+    # Add missing cache_dir argument
+    parser.add_argument(
+        "--cache_dir",
+        type=str,
+        default="./cache",
+        help="Directory for caching embeddings"
+    )
+    
     # Set vision-specific defaults
     parser.set_defaults(
         output_dir="./all_vision_test_results",
