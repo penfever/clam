@@ -9,7 +9,7 @@
 /secrets/*
 !/secrets/.gitkeep
 
-
+.claude
 catboost_info
 openml_cc18_analysis_wandb
 cifar10_data
