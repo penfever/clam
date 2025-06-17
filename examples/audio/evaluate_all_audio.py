@@ -521,8 +521,7 @@ def parse_args():
     # Set audio-specific defaults
     parser.set_defaults(
         output_dir="./all_audio_test_results",
-        datasets="esc50,ravdess",
-        models="clam_tsne"
+        datasets="esc50,ravdess"
     )
     
     args = parser.parse_args()
@@ -530,8 +529,8 @@ def parse_args():
     # Convert comma-separated strings to lists for compatibility
     if hasattr(args, 'datasets') and isinstance(args.datasets, str):
         args.datasets = args.datasets.split(',')
-    if hasattr(args, 'models') and isinstance(args.models, str):
-        args.models = args.models.split(',')
+    
+    # models is already a list from nargs="+" so no conversion needed
     
     return args
 

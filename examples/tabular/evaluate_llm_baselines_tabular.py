@@ -101,15 +101,12 @@ def parse_args():
     
     # Set tabular LLM-specific defaults
     parser.set_defaults(
-        output_dir="./llm_baseline_results",
-        models="tabllm,tabula_8b,jolt,clam_tsne"
+        output_dir="./llm_baseline_results"
     )
     
     args = parser.parse_args()
     
-    # Convert comma-separated strings to lists for compatibility
-    if hasattr(args, 'models') and isinstance(args.models, str):
-        args.models = args.models.split(',')
+    # models is already a list from nargs="+" so no conversion needed
     
     return args
 
@@ -571,11 +568,8 @@ def main():
         logger.info(f"Applying k-shot splitting: {args.k_shot} samples per class")
         datasets = [apply_k_shot_split(dataset, args.k_shot, args.seed) for dataset in datasets]
     
-    # Parse models to evaluate
-    if isinstance(args.models, list):
-        models_to_evaluate = [model.strip() for model in args.models]
-    else:
-        models_to_evaluate = [model.strip() for model in args.models.split(',')]
+    # Parse models to evaluate (already a list from nargs="+")
+    models_to_evaluate = [model.strip() for model in args.models]
     logger.info(f"Evaluating models: {models_to_evaluate}")
     
     # Evaluate each model on each dataset

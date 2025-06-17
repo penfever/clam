@@ -368,6 +368,13 @@ def add_audio_args(parser: argparse.ArgumentParser):
         action="store_false",
         help="Disable saving visualizations and VLM responses"
     )
+    parser.add_argument(
+        "--models",
+        nargs="+",
+        default=["clam_tsne"],
+        choices=["clam_tsne", "whisper_knn", "clap_zero_shot"],
+        help="List of models to evaluate (default: clam_tsne)"
+    )
 
 
 def add_vision_args(parser: argparse.ArgumentParser):
@@ -536,8 +543,10 @@ def add_llm_baseline_args(parser: argparse.ArgumentParser):
     """Add LLM baseline model arguments."""
     parser.add_argument(
         "--models",
-        type=str,
-        help="Comma-separated list of models to evaluate"
+        nargs="+",
+        default=["tabllm", "tabula_8b", "jolt", "clam_tsne"],
+        choices=["tabllm", "tabula_8b", "jolt", "clam_tsne"],
+        help="List of models to evaluate (default: all models)"
     )
     parser.add_argument(
         "--tabllm_model",
