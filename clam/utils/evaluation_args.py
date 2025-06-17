@@ -351,6 +351,23 @@ def add_audio_args(parser: argparse.ArgumentParser):
         action="store_true",
         help="Do not download datasets (assume they exist locally)"
     )
+    parser.add_argument(
+        "--quick_test",
+        action="store_true",
+        help="Run quick test with subset of data"
+    )
+    parser.add_argument(
+        "--save_outputs",
+        action="store_true",
+        default=True,
+        help="Save visualizations and VLM responses"
+    )
+    parser.add_argument(
+        "--no_save_outputs",
+        dest="save_outputs",
+        action="store_false",
+        help="Disable saving visualizations and VLM responses"
+    )
 
 
 def add_vision_args(parser: argparse.ArgumentParser):

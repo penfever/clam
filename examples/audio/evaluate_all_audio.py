@@ -724,7 +724,6 @@ def main():
         logger.info(f"  Whisper model: {args.whisper_model}")
     elif args.embedding_model == "clap":
         logger.info(f"  CLAP version: {args.clap_version}")
-    logger.info(f"  Quick test: {args.quick_test}")
     logger.info(f"  Use PCA: {args.use_pca_backend}")
     logger.info(f"  3D t-SNE: {args.use_3d_tsne}")
     logger.info(f"  Include spectrogram: {args.include_spectrogram}")
