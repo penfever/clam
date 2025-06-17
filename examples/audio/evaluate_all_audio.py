@@ -217,11 +217,9 @@ def test_dataset(dataset_class, dataset_name, data_dir, args, use_wandb_logging=
             logger.info(f"Testing CLAP zero-shot baseline...")
             try:
                 classifier = CLAPZeroShotClassifier(
-                    model_name="microsoft/msclap",
-                    device='cpu' if sys.platform == "darwin" else None,
-                    cache_dir=args.cache_dir,
-                    batch_size=4,  # Smaller batch for CPU
-                    use_amp=False if sys.platform == "darwin" else True
+                    version=args.clap_version,  # "2022", "2023", or "clapcap"
+                    use_cuda=False if sys.platform == "darwin" else None,  # Auto-detect if not Mac
+                    batch_size=4  # Smaller batch for CPU
                 )
                 
                 start_time = time.time()
