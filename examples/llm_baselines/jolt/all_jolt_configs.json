@@ -1,0 +1,910 @@
+{
+  "hiva_agnostic": {
+    "dataset_name": "hiva_agnostic",
+    "task_prefix": "HIV drug discovery dataset for predicting compounds active against AIDS HIV infection. Part of Agnostic Learning vs. Prior Knowledge Challenge, with binary classification of molecular compounds based on chemical descriptors. Each example contains 1 features. Predict the target class.",
+    "column_descriptions": {
+      "V1-V1617": "Binary chemical descriptors and molecular fingerprints. Each variable indicates presence/absence of specific molecular substructures, functional groups, or chemical properties relevant to drug activity."
+    },
+    "class_names": [
+      "1",
+      "-1"
+    ],
+    "class_description": "Classes: '1' (Active compound - shows inhibitory activity against HIV (positive class, ~3.5% of instances)), '-1' (Inactive compound - no significant anti-HIV activity (negative class, ~96.5% of instances))",
+    "num_features": 1,
+    "num_classes": 2
+  },
+  "KDDCup09_appetency": {
+    "dataset_name": "KDDCup09_appetency",
+    "task_prefix": "Customer relationship management dataset for predicting appetency (likelihood to buy a product) in telecom industry. Part of KDD Cup 2009 focusing on customer behavior prediction from large-scale, noisy, incomplete real-world data. Each example contains 1 features. Predict the target class.",
+    "column_descriptions": {
+      "Var1-Var230": "Anonymized customer features including demographics, usage patterns, billing information, service subscriptions, and behavioral indicators. Mix of numerical and categorical variables with high missing rate."
+    },
+    "class_names": [
+      "1",
+      "-1"
+    ],
+    "class_description": "Classes: '1' (Positive appetency - customer likely to buy new product/service (1.8% of instances)), '-1' (Negative appetency - customer unlikely to buy new product/service (98.2% of instances))",
+    "num_features": 1,
+    "num_classes": 2
+  },
+  "bank-marketing": {
+    "dataset_name": "bank-marketing",
+    "task_prefix": "Portuguese bank telemarketing campaign data for predicting term deposit subscriptions. Records direct marketing campaigns (phone calls) with goal of assessing whether client will subscribe to term deposit product. Each example contains 20 features. Predict the target class.",
+    "column_descriptions": {
+      "age": "Client's age in years. Different age groups have varying savings behaviors and financial product needs.",
+      "job": "Type of job/occupation. Indicates income stability and financial capacity for savings products.",
+      "marital": "Marital status. Affects financial responsibilities and savings decisions.",
+      "education": "Education level. Higher education often correlates with financial literacy and income.",
+      "default": "Has credit in default. Indicates financial distress affecting ability to invest.",
+      "housing": "Has housing loan. Major debt affecting disposable income for savings.",
+      "loan": "Has personal loan. Additional debt burden reducing savings capacity.",
+      "contact": "Contact communication type. Cellular contact often more effective than telephone.",
+      "month": "Last contact month of year. Seasonal patterns in marketing effectiveness.",
+      "day_of_week": "Last contact day of week. Timing affects contact success and decision-making.",
+      "duration": "Last contact duration in seconds. Longer calls indicate interest but unknown before call ends.",
+      "campaign": "Number of contacts during this campaign. Too many contacts may annoy clients.",
+      "pdays": "Days since previous campaign contact (999 means not previously contacted). Recent contact may influence decision.",
+      "previous": "Number of contacts before this campaign. History of engagement with bank.",
+      "poutcome": "Outcome of previous marketing campaign. Past success predicts future response.",
+      "emp.var.rate": "Employment variation rate - quarterly indicator. Economic context affects savings decisions.",
+      "cons.price.idx": "Consumer price index - monthly indicator. Inflation impacts savings attractiveness.",
+      "cons.conf.idx": "Consumer confidence index - monthly indicator. Confidence drives investment behavior.",
+      "euribor3m": "Euribor 3 month rate - daily indicator. Interest rates affect term deposit attractiveness.",
+      "nr.employed": "Number of employees - quarterly indicator. Employment levels indicate economic health."
+    },
+    "class_names": [
+      "yes",
+      "no"
+    ],
+    "class_description": "Classes: 'yes' (Client subscribed to term deposit (11.3% of instances)), 'no' (Client did not subscribe to term deposit (88.7% of instances))",
+    "num_features": 20,
+    "num_classes": 2
+  },
+  "blood-transfusion-service-center": {
+    "dataset_name": "blood-transfusion-service-center",
+    "task_prefix": "Blood donation records from the Blood Transfusion Service Center in Hsin-Chu City, Taiwan. Mobile blood donation bus visits one university campus approximately every three months. Task is to predict whether a donor will donate blood in the next campaign. Each example contains 4 features. Predict the target class.",
+    "column_descriptions": {
+      "Recency": "Months since the donor's last blood donation. Lower values indicate more recent donations, suggesting higher engagement with donation campaigns.",
+      "Frequency": "Total number of times the donor has donated blood. Captures the donor's lifetime donation behavior and commitment level.",
+      "Monetary": "Total volume of blood donated in cubic centimeters (c.c.). In Taiwan, standard donation is 250cc per session. Directly proportional to frequency since each donation has fixed volume.",
+      "Time": "Months since the donor's first blood donation. Represents how long the donor has been in the donation system, indicating donor relationship duration."
+    },
+    "class_names": [
+      "1",
+      "0"
+    ],
+    "class_description": "Classes: '1' (Donor donated blood in March 2007 target campaign (24% of instances)), '0' (Donor did not donate blood in March 2007 target campaign (76% of instances))",
+    "num_features": 4,
+    "num_classes": 2
+  },
+  "qsar-biodeg": {
+    "dataset_name": "qsar-biodeg",
+    "task_prefix": "QSAR biodegradation dataset containing molecular descriptors used to classify chemicals based on their biodegradability. Built by Milano Chemometrics and QSAR Research Group to study relationships between chemical structure and biodegradation of molecules. Each example contains 10 features. Predict the target class.",
+    "column_descriptions": {
+      "SpMax_L": "Leading eigenvalue from Laplace matrix. Represents the maximum eigenvalue of the Laplace matrix, capturing molecular connectivity and complexity.",
+      "J_Dz(e)": "Balaban-like index from Barysz matrix weighted by Sanderson electronegativity. Measures molecular branching considering electronegativity distribution.",
+      "nHM": "Number of heavy atoms (non-hydrogen atoms) in the molecule. Indicates molecular size and complexity.",
+      "F01[N-N]": "Frequency of N-N bonds at topological distance 1. Counts direct nitrogen-nitrogen connections in the molecular structure.",
+      "F04[C-N]": "Frequency of C-N bonds at topological distance 4. Counts carbon-nitrogen pairs separated by exactly 3 bonds.",
+      "NssssC": "Number of atoms of type ssssC (quaternary carbon atoms with four single bonds). Indicates degree of carbon branching.",
+      "nCb-": "Number of substituted benzene C(sp2) atoms. Counts aromatic carbons in substituted benzene rings.",
+      "C%": "Percentage of carbon atoms in the molecule. Indicates the carbon content relative to total atom count.",
+      "nCp": "Number of terminal primary C(sp3) atoms. Counts methyl groups and other terminal carbon atoms.",
+      "nO": "Number of oxygen atoms in the molecule. Important for polarity and hydrogen bonding capability."
+    },
+    "class_names": [
+      "RB",
+      "NRB"
+    ],
+    "class_description": "Classes: 'RB' (Ready Biodegradable - Chemical readily breaks down in the environment (356 instances, 33.7%)), 'NRB' (Not Ready Biodegradable - Chemical does not readily break down in the environment (699 instances, 66.3%))",
+    "num_features": 10,
+    "num_classes": 2
+  },
+  "anneal": {
+    "dataset_name": "anneal",
+    "task_prefix": "Annealing dataset containing metallurgical data for classifying steel types based on manufacturing attributes. Annealing is a heat treatment process that alters physical and chemical properties of materials to increase ductility and reduce hardness. The dataset helps determine the appropriate annealing conditions for different steel types. Each example contains 38 features. Predict the target class.",
+    "column_descriptions": {
+      "family": "Steel family classification indicating broad category of steel product. Different families have distinct metallurgical properties and processing requirements.",
+      "product-type": "Type of steel product being manufactured. C=Coil, H=Hot rolled, G=Galvanized, determining processing methods and end-use applications.",
+      "steel": "Specific steel grade or composition. Different grades have varying carbon content and alloying elements affecting mechanical properties.",
+      "carbon": "Carbon content percentage in the steel. Critical factor determining hardness, strength, and weldability of the final product.",
+      "hardness": "Measured hardness of the steel, typically in Rockwell or Brinell scale. Indicates resistance to deformation and wear.",
+      "temper_rolling": "Temper rolling process was applied. light cold rolling pass to improve flatness and surface finish.",
+      "condition": "Surface condition or treatment state of the steel. Affects appearance and corrosion resistance.",
+      "formability": "Rating of steel's ability to be formed into shapes without cracking. Scale from 1 (poor) to 5 (excellent).",
+      "strength": "Tensile strength of the steel in MPa. Measures maximum stress before failure.",
+      "non-ageing": "Steel has non-ageing properties. n indicates treatment to prevent brittleness over time.",
+      "surface-finish": "Type of surface finish applied. P=Polished, M=Matte, affects aesthetics and functionality.",
+      "surface-quality": "Quality grade of surface finish. Rated D through G, with G being highest quality.",
+      "enamelability": "Steel's suitability for enamel coating application. Important for appliances and decorative uses.",
+      "bc": "Base coating information. Related to protective coating applications.",
+      "bf": "Base finish characteristics. Affects adhesion of subsequent coatings.",
+      "bt": "Base treatment applied to steel. Pre-treatment for corrosion resistance.",
+      "bw/me": "Base weight or mechanical properties indicator.",
+      "bl": "Base layer characteristics affecting coating adhesion.",
+      "m": "Manufacturing process indicator.",
+      "chrom": "Chromium content or chrome plating indicator. C indicates presence of chromium.",
+      "phos": "Phosphorus content indicator. P indicates phosphorus presence affecting steel properties.",
+      "cbond": "Carbon bonding characteristics affecting steel microstructure.",
+      "marvi": "Martensite/virgin material indicator affecting heat treatment response.",
+      "exptl": "Experimental treatment or process applied.",
+      "ferro": "Ferrous content or ferrite phase indicator.",
+      "corr": "Corrosion resistance properties of the steel.",
+      "blue/bright/varn/clean": "Surface appearance classification. B=Blue, R=Bright, V=Varnished, C=Clean finish.",
+      "lustre": "Surface lustre or shine quality indicator.",
+      "jurofm": "Specific metallurgical property indicator.",
+      "s": "Sulfur content indicator affecting machinability.",
+      "p": "Additional phosphorus-related property.",
+      "shape": "Physical form of steel product. COIL or SHEET format.",
+      "thick": "Thickness of steel product in millimeters. Critical dimension for applications.",
+      "width": "Width of steel product in millimeters. Standard sizing for manufacturing.",
+      "len": "Length of steel product. Relevant for sheet products.",
+      "oil": "Oil coating application. Y=Yes, N=No, prevents corrosion during storage.",
+      "bore": "Bore diameter for coil products in millimeters. Standard values for handling equipment.",
+      "packing": "Packing method code. 1,2,3 indicate different packaging standards for shipping."
+    },
+    "class_names": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "U"
+    ],
+    "class_description": "Classes: '1' (Annealing class 1 - specific heat treatment parameters), '2' (Annealing class 2 - different temperature/time profile), '3' (Annealing class 3 - alternative annealing conditions), '4' (Annealing class 4 - specialized treatment), '5' (Annealing class 5 - highest temperature treatment), 'U' (Unannealed or unknown annealing class)",
+    "num_features": 38,
+    "num_classes": 6
+  },
+  "wine_quality": {
+    "dataset_name": "wine_quality",
+    "task_prefix": "Wine quality assessment based on physicochemical properties of Portuguese Vinho Verde wines. Contains both red (1599) and white (4898) wine samples with objective laboratory tests predicting subjective quality ratings from wine experts. Each example contains 11 features. Predict the target class.",
+    "column_descriptions": {
+      "fixed_acidity": "Non-volatile acids (g/dm\u00b3) primarily tartaric acid. Contributes to wine's crisp, tart taste and pH stability.",
+      "volatile_acidity": "Amount of acetic acid (g/dm\u00b3). High levels lead to unpleasant vinegar taste; indicator of spoilage.",
+      "citric_acid": "Citric acid content (g/dm\u00b3). Adds freshness and flavor; typically lower than other acids in wine.",
+      "residual_sugar": "Sugar remaining after fermentation (g/dm\u00b3). Affects sweetness perception; wines >45g/L considered sweet.",
+      "chlorides": "Sodium chloride content (g/dm\u00b3). High levels indicate contamination or salty taste; affects mouthfeel.",
+      "free_sulfur_dioxide": "Free SO2 (mg/dm\u00b3). Prevents microbial growth and oxidation; perceptible >50 mg/L as pungent smell.",
+      "total_sulfur_dioxide": "Total SO2 content (mg/dm\u00b3). Sum of free and bound forms; EU legal limit varies by wine type.",
+      "density": "Wine density (g/cm\u00b3). Depends on alcohol and sugar content; useful for determining wine style.",
+      "pH": "Acidity level on pH scale. Most wines 3.0-4.0; affects taste, color stability, and microbial safety.",
+      "sulphates": "Potassium sulphate content (g/dm\u00b3). Wine additive contributing to SO2 levels; antimicrobial agent.",
+      "alcohol": "Alcohol content (% by volume). Results from sugar fermentation; affects body, taste, and preservation."
+    },
+    "class_names": [
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9"
+    ],
+    "class_description": "Classes: '3' (Very poor quality wine (30 instances, 0.6%)), '4' (Poor quality wine (216 instances, 4.3%)), '5' (Below average quality wine (2138 instances, 42.6%)), '6' (Average quality wine (2836 instances, 43.6%)), '7' (Above average quality wine (1079 instances, 16.5%)), '8' (Good quality wine (193 instances, 3.0%)), '9' (Excellent quality wine (5 instances, 0.1%))",
+    "num_features": 11,
+    "num_classes": 7
+  },
+  "QSAR-TID-11": {
+    "dataset_name": "QSAR-TID-11",
+    "task_prefix": "QSAR dataset from ChEMBL version 17 showing activity values (pseudo-pCI50) of compounds on drug target TID-11. Part of the MetaQSAR project for drug discovery and meta-learning research. Each example contains 3 features. Predict the target class.",
+    "column_descriptions": {
+      "MOLECULE_CHEMBL_ID": "Unique identifier for the chemical compound in the ChEMBL database. Links to full chemical structure and properties.",
+      "FCFP_1 to FCFP_1024": "1024-bit Functional Class Fingerprint (FCFP) molecular descriptors. Binary features representing presence/absence of specific molecular substructures and functional groups.",
+      "MEDIAN_PXC50": "Median pseudo-pIC50 value representing the compound's biological activity against the target. Higher values indicate stronger binding/inhibition."
+    },
+    "class_names": [
+      "MEDIAN_PXC50"
+    ],
+    "class_description": "Classes: 'MEDIAN_PXC50' (Continuous regression target representing biological activity strength. Typically ranges from 4 to 10, where higher values indicate more potent compounds.)",
+    "num_features": 3,
+    "num_classes": 1
+  },
+  "credit-g": {
+    "dataset_name": "credit-g",
+    "task_prefix": "German Credit dataset classifying bank customers as good or bad credit risks based on personal and financial attributes. Used to assess creditworthiness of loan applicants with an asymmetric cost matrix where misclassifying bad customers as good is 5x more costly than the reverse. Each example contains 20 features. Predict the target class.",
+    "column_descriptions": {
+      "checking_status": "Status of existing checking account in Deutsche Mark. Indicates financial stability and cash flow management ability.",
+      "duration": "Duration of credit in months. Longer durations indicate higher total risk exposure for the lender.",
+      "credit_history": "Past credit behavior. Critical indicator of likelihood to repay based on historical performance.",
+      "purpose": "Purpose of the credit. Different purposes have varying risk profiles and importance to borrower.",
+      "credit_amount": "Requested credit amount in Deutsche Mark. Higher amounts represent greater risk exposure.",
+      "savings_status": "Status of savings accounts/bonds. Indicates financial reserves and ability to handle emergencies.",
+      "employment": "Present employment duration in years. Job stability indicates income reliability.",
+      "installment_commitment": "Installment rate as percentage of disposable income. Higher percentages indicate greater financial strain.",
+      "personal_status": "Combined personal status and sex. Demographics affecting financial obligations and stability.",
+      "other_parties": "Other debtors or guarantors. Indicates shared responsibility or additional security.",
+      "residence_since": "Present residence duration in years. Residential stability indicates life stability.",
+      "property_magnitude": "Most valuable property owned. Major assets provide security and indicate financial capacity.",
+      "age": "Age in years. Reflects life stage, earning potential, and credit experience.",
+      "other_payment_plans": "Other installment plans. Multiple credit obligations increase default risk.",
+      "housing": "Housing situation. Ownership indicates stability and wealth accumulation.",
+      "existing_credits": "Number of existing credits at this bank. Multiple loans indicate higher debt burden.",
+      "job": "Job category indicating skill level and income stability. Higher skills typically mean better income.",
+      "num_dependents": "Number of people financially dependent on applicant. More dependents mean higher expenses.",
+      "own_telephone": "Telephone ownership in 1990s Germany. Indicator of financial stability and reachability.",
+      "foreign_worker": "Foreign worker status. May affect income stability and credit access."
+    },
+    "class_names": [
+      "good",
+      "bad"
+    ],
+    "class_description": "Classes: 'good' (Good credit risk - likely to repay loan without issues (70% of instances)), 'bad' (Bad credit risk - likely to default or have payment problems (30% of instances))",
+    "num_features": 20,
+    "num_classes": 2
+  },
+  "diabetes": {
+    "dataset_name": "diabetes",
+    "task_prefix": "Pima Indians Diabetes dataset predicting diabetes onset based on diagnostic measurements. Focuses on females at least 21 years old of Pima Indian heritage, a population with high diabetes prevalence due to genetic predisposition and dietary changes. Each example contains 8 features. Predict the target class.",
+    "column_descriptions": {
+      "preg": "Number of times pregnant. Pregnancy affects glucose metabolism and is a risk factor for gestational diabetes leading to Type 2 diabetes.",
+      "plas": "Plasma glucose concentration at 2 hours in an oral glucose tolerance test (mg/dl). Primary diagnostic criterion for diabetes when \u2265200 mg/dl.",
+      "pres": "Diastolic blood pressure (mm Hg). Hypertension is both a risk factor for and complication of diabetes.",
+      "skin": "Triceps skin fold thickness (mm). Proxy measure for body fat; obesity is major diabetes risk factor.",
+      "insu": "2-Hour serum insulin (\u03bcU/ml). Indicates pancreatic function and insulin resistance.",
+      "mass": "Body mass index (weight in kg/(height in m)\u00b2). Key indicator of obesity and diabetes risk.",
+      "pedi": "Diabetes pedigree function. Scores likelihood of diabetes based on family history using genetic relationships.",
+      "age": "Age in years. Diabetes risk increases with age, especially after 45."
+    },
+    "class_names": [
+      "tested_negative",
+      "tested_positive"
+    ],
+    "class_description": "Classes: 'tested_negative' (No diabetes according to WHO criteria (500 instances, 65.1%)), 'tested_positive' (Diabetes present - 2hr glucose \u2265200 mg/dl at any survey exam (268 instances, 34.9%))",
+    "num_features": 8,
+    "num_classes": 2
+  },
+  "churn": {
+    "dataset_name": "churn",
+    "task_prefix": "Telephony customer churn dataset containing account features and usage patterns to predict customer attrition. Originally used in 'Discovering Knowledge in Data: An Introduction to Data Mining' textbook. Each example contains 13 features. Predict the target class.",
+    "column_descriptions": {
+      "state": "US state where the customer resides. Geographic indicator for regional patterns.",
+      "account_length": "Number of days the account has been active. Indicates customer tenure and loyalty.",
+      "area_code": "Telephone area code of the customer. Additional geographic information.",
+      "international_plan": "Customer has international calling plan. premium service indicator.",
+      "voice_mail_plan": "Customer has voice mail service. additional service adoption indicator.",
+      "number_vmail_messages": "Number of voice mail messages. Usage intensity of voice mail service.",
+      "total_day_minutes": "Total minutes used during daytime. Primary usage metric for billing period.",
+      "total_day_calls": "Total number of calls made during daytime. Call frequency pattern.",
+      "total_eve_minutes": "Total minutes used during evening. Off-peak usage pattern.",
+      "total_night_minutes": "Total minutes used during nighttime. Late night usage pattern.",
+      "total_intl_minutes": "Total international calling minutes. International usage intensity.",
+      "customer_service_calls": "Number of calls to customer service. Key indicator of customer dissatisfaction.",
+      "churn": "Customer churned (left the service). target variable for prediction."
+    },
+    "class_names": [
+      "True",
+      "False"
+    ],
+    "class_description": "Classes: 'True' (Customer churned - discontinued service with the company), 'False' (Customer retained - continued service with the company)",
+    "num_features": 13,
+    "num_classes": 2
+  },
+  "APSFailure": {
+    "dataset_name": "APSFailure",
+    "task_prefix": "Air Pressure System (APS) failure prediction for Scania trucks. Dataset contains sensor data and operational parameters to predict component failures for preventive maintenance and cost reduction. Each example contains 4 features. Predict the target class.",
+    "column_descriptions": {
+      "class": "Binary indicator of APS component failure. Positive class indicates APS-related failure, negative indicates other component failures.",
+      "aa_000 to az_xxx": "Anonymized operational sensor readings and counters. Single numerical values representing various truck system measurements like pressure, temperature, mileage, and operational cycles.",
+      "ba_000 to bz_xxx": "Histogram features representing distributions of operational conditions. Each feature contains binned counts of specific measurements over time windows.",
+      "ca_000 to cz_xxx": "Additional anonymized features including derived statistics, aggregated measurements, and complex operational indicators."
+    },
+    "class_names": [
+      "pos",
+      "neg"
+    ],
+    "class_description": "Classes: 'pos' (Positive class - APS component failure detected (1,000 instances in training set, ~1.7%)), 'neg' (Negative class - Failure in components not related to APS (59,000 instances in training set, ~98.3%))",
+    "num_features": 4,
+    "num_classes": 2
+  },
+  "Bioresponse": {
+    "dataset_name": "Bioresponse",
+    "task_prefix": "Predict biological response of molecules from their chemical properties. Dataset from Boehringer Ingelheim pharmaceutical company used in a Kaggle competition to identify molecules eliciting desired biological responses. Each example contains 2 features. Predict the target class.",
+    "column_descriptions": {
+      "Activity": "Experimental biological response indicator. Binary flag showing whether the molecule elicited the desired biological response in laboratory testing.",
+      "D1 through D1776": "Molecular descriptors capturing various chemical properties. These are calculated features representing molecular characteristics like size, shape, elemental composition, topology, and physicochemical properties. Descriptors have been normalized and anonymized for proprietary reasons."
+    },
+    "class_names": [
+      "1",
+      "0"
+    ],
+    "class_description": "Classes: '1' (Molecule elicited the desired biological response (positive class)), '0' (Molecule did not elicit the desired biological response (negative class))",
+    "num_features": 2,
+    "num_classes": 2
+  },
+  "Amazon_employee_access": {
+    "dataset_name": "Amazon_employee_access",
+    "task_prefix": "Historical data from Amazon's employee resource access system. Used to predict whether an employee's request for computer resource access will be approved or denied based on their role and organizational context. Each example contains 10 features. Predict the target class.",
+    "column_descriptions": {
+      "ACTION": "Target variable indicating whether the resource access request was approved or denied.",
+      "RESOURCE": "Unique identifier for each computer resource. Represents specific systems, applications, or data that employees request access to.",
+      "MGR_ID": "Employee ID of the requester's manager. Used to capture managerial hierarchy and approval patterns.",
+      "ROLE_ROLLUP_1": "Company role grouping at the highest level (e.g., US Engineering). Represents broad organizational divisions.",
+      "ROLE_ROLLUP_2": "Company role grouping at a more specific level (e.g., US Retail). Provides finer role categorization within ROLE_ROLLUP_1.",
+      "ROLE_DEPTNAME": "Department name of the employee's role (e.g., Retail). Indicates functional area within the organization.",
+      "ROLE_TITLE": "Business title of the employee's role (e.g., Senior Engineering Retail Manager). Most specific role designation.",
+      "ROLE_FAMILY_DESC": "Extended description of the role family (e.g., Retail Manager, Software Engineering). Groups similar roles across departments.",
+      "ROLE_FAMILY": "Shortened role family description (e.g., Retail Manager). Core role category.",
+      "ROLE_CODE": "Unique code for each specific role (e.g., Manager). Most granular role identifier."
+    },
+    "class_names": [
+      "1",
+      "0"
+    ],
+    "class_description": "Classes: '1' (Resource access request was approved), '0' (Resource access request was denied)",
+    "num_features": 10,
+    "num_classes": 2
+  },
+  "telco-customer-churn": {
+    "dataset_name": "telco-customer-churn",
+    "task_prefix": "IBM sample dataset containing telecommunications customer information and service details to predict customer churn. Includes demographic info, services subscribed, and billing information for customer retention analysis. Each example contains 21 features. Predict the target class.",
+    "column_descriptions": {
+      "customerID": "Unique identifier for each customer. Used for tracking individual customers.",
+      "gender": "Customer's gender. Basic demographic information.",
+      "SeniorCitizen": "Customer is a senior citizen (65+ years). binary demographic indicator.",
+      "Partner": "Customer has a partner/spouse. household composition indicator.",
+      "Dependents": "Customer has dependents. family status indicator.",
+      "tenure": "Number of months customer has stayed with the company. Key loyalty indicator.",
+      "PhoneService": "Customer has phone service. basic service indicator.",
+      "MultipleLines": "Customer has multiple phone lines. service complexity indicator.",
+      "InternetService": "Type of internet service customer has. Core service offering.",
+      "OnlineSecurity": "Customer has online security add-on. value-added service.",
+      "OnlineBackup": "Customer has online backup add-on. value-added service.",
+      "DeviceProtection": "Customer has device protection add-on. value-added service.",
+      "TechSupport": "Customer has tech support add-on. service quality indicator.",
+      "StreamingTV": "Customer has streaming tv service. entertainment service.",
+      "StreamingMovies": "Customer has streaming movies service. entertainment service.",
+      "Contract": "Type of customer contract. Commitment level indicator.",
+      "PaperlessBilling": "Customer has paperless billing. digital engagement indicator.",
+      "PaymentMethod": "Customer's payment method. Financial relationship indicator.",
+      "MonthlyCharges": "Amount charged to customer monthly. Current revenue indicator.",
+      "TotalCharges": "Total amount charged to customer. Lifetime value indicator.",
+      "Churn": "Customer churned in the last month. target variable."
+    },
+    "class_names": [
+      "Yes",
+      "No"
+    ],
+    "class_description": "Classes: 'Yes' (Customer churned - left the company within the last month), 'No' (Customer retained - still with the company)",
+    "num_features": 21,
+    "num_classes": 2
+  },
+  "diamonds": {
+    "dataset_name": "diamonds",
+    "task_prefix": "Classic dataset containing prices and attributes of nearly 54,000 diamonds. Used for regression analysis to understand and predict diamond prices based on the 4 Cs (carat, cut, clarity, color) and physical dimensions. Each example contains 10 features. Predict the target class.",
+    "column_descriptions": {
+      "price": "Price in US dollars. Target variable for prediction ranging from $326 to $18,823.",
+      "carat": "Weight of the diamond in carats. Primary factor in pricing, ranges from 0.2 to 5.01 carats.",
+      "cut": "Quality of the diamond cut, which affects how light reflects through the diamond. Ordered factor from worst to best.",
+      "color": "Diamond color grade based on absence of color. D is colorless (best) to J has noticeable color (worst).",
+      "clarity": "Diamond clarity grade based on absence of inclusions and blemishes. Ranges from I1 (inclusions visible to naked eye) to IF (internally flawless).",
+      "depth": "Total depth percentage calculated as z / mean(x, y) = 2 * z / (x + y). Measures diamond proportions.",
+      "table": "Width of diamond's top facet relative to widest point, expressed as percentage. Affects light reflection.",
+      "x": "Length of diamond in millimeters. Primary dimension measurement.",
+      "y": "Width of diamond in millimeters. Should be similar to x for round diamonds.",
+      "z": "Depth/height of diamond in millimeters. Used to calculate depth percentage."
+    },
+    "class_names": [
+      "price"
+    ],
+    "class_description": "Classes: 'price' (Continuous target variable representing diamond value in US dollars)",
+    "num_features": 10,
+    "num_classes": 1
+  },
+  "KDD98": {
+    "dataset_name": "KDD98",
+    "task_prefix": "Direct marketing dataset from Paralyzed Veterans of America (PVA) for donation prediction. Used in KDD Cup 1998 competition to optimize direct mail campaigns by predicting donor response and donation amounts. Each example contains 13 features. Predict the target class.",
+    "column_descriptions": {
+      "TARGET_B": "Binary indicator of whether the donor responded to the June 1997 mailing campaign. Primary classification target.",
+      "TARGET_D": "Donation amount in dollars if the donor responded. Used for regression to predict donation value.",
+      "RECENCY": "Months since last donation. Key RFM (Recency, Frequency, Monetary) metric for donor behavior.",
+      "FREQUENCY": "Total number of donations to date. Indicates donor loyalty and engagement level.",
+      "MONETARY": "Average donation amount historically. Indicates donor capacity and generosity level.",
+      "LASTGIFT": "Dollar amount of most recent donation. Recent giving behavior indicator.",
+      "RFA_2F": "Frequency status for most recent promotion (June 1997). Part of detailed RFA segmentation.",
+      "HOMEOWNR": "Home ownership status. Wealth and stability indicator.",
+      "GENDER": "Donor gender from overlay demographics. May influence giving patterns.",
+      "AGE": "Donor age from overlay data. Important demographic for donation propensity.",
+      "INCOME": "Estimated household income from demographic overlay. Capacity indicator.",
+      "WEALTH": "Wealth rating from external sources. Additional capacity indicator.",
+      "NUMPROMS": "Number of promotions received in last 12 months. Marketing pressure indicator."
+    },
+    "class_names": [
+      "1",
+      "0"
+    ],
+    "class_description": "Classes: '1' (Donor responded to June 1997 campaign with a donation), '0' (Donor did not respond to June 1997 campaign)",
+    "num_features": 13,
+    "num_classes": 2
+  },
+  "SantanderCustomerSatisfaction": {
+    "dataset_name": "SantanderCustomerSatisfaction",
+    "task_prefix": "Anonymized bank customer data from Santander Bank to predict customer satisfaction. The dataset contains hundreds of anonymized features representing various aspects of customers' banking relationships and their satisfaction status. Each example contains 11 features. Predict the target class.",
+    "column_descriptions": {
+      "var3": "Anonymized numeric feature. Appears to have strong correlation with customer dissatisfaction. Values range from -999999 to 238 with high concentration near zero.",
+      "var15": "Anonymized numeric feature. Shows age-like distribution pattern with values typically between 0-100.",
+      "imp_ent_var16_ult1": "Likely represents import/amount of entity variable 16 in the last period. Spanish banking terminology suggests transaction or balance information.",
+      "imp_op_var39_comer_ult1": "Import/amount of commercial operations variable 39 in the last period. Possibly related to commercial banking activities.",
+      "imp_op_var41_comer_ult1": "Import/amount of commercial operations variable 41 in the last period. Another commercial banking metric.",
+      "ind_var5": "Binary indicator variable. Likely flags presence/absence of specific product or service.",
+      "ind_var30": "Binary indicator variable. Analysis suggests possible relation to cash products.",
+      "num_var4": "Count variable. Represents number/frequency of specific banking activities or products.",
+      "num_var22_ult1": "Number/count of variable 22 in the last period. Temporal aspect suggests recent activity metric.",
+      "saldo_var5": "Balance of variable 5. 'Saldo' is Spanish for balance, indicating account balance information.",
+      "saldo_medio_var5_ult1": "Average balance of variable 5 in the last period. Represents recent average account balance."
+    },
+    "class_names": [
+      "1",
+      "0"
+    ],
+    "class_description": "Classes: '1' (Unsatisfied customer (3.95% of instances)), '0' (Satisfied customer (96.05% of instances))",
+    "num_features": 11,
+    "num_classes": 2
+  },
+  "Mercedes_Benz_Greener_Manufacturing": {
+    "dataset_name": "Mercedes_Benz_Greener_Manufacturing",
+    "task_prefix": "Anonymized Mercedes-Benz vehicle testing data representing different permutations of car features to predict the time vehicles spend on the test bench. Each row represents a unique car configuration with various customization options. Each example contains 10 features. Predict the target class.",
+    "column_descriptions": {
+      "X0": "Categorical feature representing a car configuration option. Has multiple levels (e.g., 'aa', 'ab', 'ac', etc.).",
+      "X1": "Categorical feature for another configuration aspect. Contains various coded values.",
+      "X2": "Categorical feature representing additional customization option.",
+      "X3": "Binary feature indicating presence/absence of specific car feature (e.g., could be 4WD, air suspension, etc.).",
+      "X4": "Binary feature for another car configuration option.",
+      "X5": "Categorical feature with multiple levels representing configuration variant.",
+      "X6": "Categorical feature for additional customization aspect.",
+      "X8": "Categorical feature representing another configuration dimension.",
+      "X10-X385": "Binary features representing presence/absence of various car features and options. Total of 376 binary variables indicating different customization choices.",
+      "y": "Target variable: Time in seconds that the car spent on the test bench. Represents testing duration for quality assurance."
+    },
+    "class_names": [
+      "continuous"
+    ],
+    "class_description": "Classes: 'continuous' (Regression target - testing time in seconds (ranges approximately 70-180 seconds))",
+    "num_features": 10,
+    "num_classes": 1
+  },
+  "Allstate_Claims_Severity": {
+    "dataset_name": "Allstate_Claims_Severity",
+    "task_prefix": "Insurance claim data from Allstate Corporation containing anonymized features to predict the severity (monetary loss value) of claims. Features are masked to prevent identification of specific insurance aspects while maintaining predictive value. Each example contains 5 features. Predict the target class.",
+    "column_descriptions": {
+      "cat1-cat116": "116 categorical features representing various anonymized aspects of the insurance claim, policyholder, or incident. Each has varying number of levels (some binary, others with 100+ categories).",
+      "cont1": "Continuous feature related to claim or policy characteristics. Shows bimodal distribution suggesting possible underlying categorical nature.",
+      "cont2": "Continuous feature with distinct clustering pattern, possibly representing discretized continuous data.",
+      "cont3-cont14": "Additional continuous features representing various normalized metrics related to the insurance claim. Each shows different distribution patterns.",
+      "loss": "Target variable: The severity of the insurance claim measured as monetary loss amount in dollars."
+    },
+    "class_names": [
+      "continuous"
+    ],
+    "class_description": "Classes: 'continuous' (Regression target - claim severity in dollars (median: $2,115, mean: $3,037))",
+    "num_features": 5,
+    "num_classes": 1
+  },
+  "Santander_transaction_value": {
+    "dataset_name": "Santander_transaction_value",
+    "task_prefix": "Anonymized customer transaction data from Santander Bank to predict whether customers will make specific transactions. Features are heavily anonymized numeric variables representing various aspects of customer banking behavior. Each example contains 2 features. Predict the target class.",
+    "column_descriptions": {
+      "var_0": "Anonymized numeric feature representing customer or transaction characteristic.",
+      "var_1-var_199": "199 anonymized numeric features capturing various aspects of customer banking behavior, transaction patterns, or account characteristics. Each variable has been normalized and anonymized."
+    },
+    "class_names": [
+      "1",
+      "0"
+    ],
+    "class_description": "Classes: '1' (Customer will make the transaction (positive class - approximately 10% of instances)), '0' (Customer will not make the transaction (negative class - approximately 90% of instances))",
+    "num_features": 2,
+    "num_classes": 2
+  },
+  "porto-seguro": {
+    "dataset_name": "porto-seguro",
+    "task_prefix": "Auto insurance data from Porto Seguro, one of Brazil's largest insurers, to predict the probability that a driver will file an insurance claim in the next year. Dataset contains anonymized driver and vehicle information. Each example contains 27 features. Predict the target class.",
+    "column_descriptions": {
+      "ps_ind_01": "Individual/driver indicator feature. Part of the 'ind' (individual) feature group.",
+      "ps_ind_02_cat": "Categorical individual/driver feature. Suffix '_cat' indicates categorical variable.",
+      "ps_ind_03": "Individual/driver feature, likely demographic or behavioral metric.",
+      "ps_ind_04_cat": "Categorical individual feature with multiple levels.",
+      "ps_ind_05_cat": "Categorical individual feature, possibly driver classification.",
+      "ps_ind_06_bin": "Binary individual/driver feature. Suffix '_bin' indicates binary variable.",
+      "ps_reg_01": "Regional feature, possibly geographic or regulatory information.",
+      "ps_reg_02": "Regional feature, normalized continuous value.",
+      "ps_reg_03": "Regional feature with some outliers, possibly demographic regional data.",
+      "ps_car_01_cat": "Categorical car/vehicle feature, potentially make or model category.",
+      "ps_car_02_cat": "Categorical car feature, binary in nature.",
+      "ps_car_03_cat": "Categorical car feature with missing values (-1).",
+      "ps_car_04_cat": "Categorical car feature with high cardinality (up to 10 levels).",
+      "ps_car_05_cat": "Categorical car feature, binary or low cardinality.",
+      "ps_car_06_cat": "Categorical car feature with very high cardinality (up to 18 levels).",
+      "ps_car_07_cat": "Categorical car feature, binary in nature.",
+      "ps_car_08_cat": "Categorical car feature, binary.",
+      "ps_car_09_cat": "Categorical car feature with moderate cardinality.",
+      "ps_car_10_cat": "Categorical car feature with moderate cardinality.",
+      "ps_car_11_cat": "Categorical car feature with extremely high cardinality (104 levels), likely vehicle model.",
+      "ps_car_11": "Ordinal car feature related to ps_car_11_cat.",
+      "ps_car_12": "Continuous car feature, normalized.",
+      "ps_car_13": "Continuous car feature showing near-normal distribution.",
+      "ps_car_14": "Continuous car feature with some outliers.",
+      "ps_car_15": "Continuous car feature, possibly mileage or age related.",
+      "ps_calc_01-ps_calc_14": "Calculated features derived from other variables. Competition discussions suggest these are engineered features.",
+      "ps_calc_15_bin-ps_calc_20_bin": "Binary calculated features derived from other variables."
+    },
+    "class_names": [
+      "1",
+      "0"
+    ],
+    "class_description": "Classes: '1' (Driver will file an insurance claim next year (3.645% of instances)), '0' (Driver will not file an insurance claim next year (96.355% of instances))",
+    "num_features": 27,
+    "num_classes": 2
+  },
+  "Is-this-a-good-customer": {
+    "dataset_name": "Is-this-a-good-customer",
+    "task_prefix": "Bank marketing campaign data from a Portuguese banking institution. The dataset contains results of direct marketing campaigns (phone calls) where the goal is to predict if a client will subscribe to a term deposit. Each example contains 20 features. Predict the target class.",
+    "column_descriptions": {
+      "age": "Age of the client in years.",
+      "job": "Type of job/occupation of the client.",
+      "marital": "Marital status of the client.",
+      "education": "Education level of the client.",
+      "default": "Has credit in default?",
+      "housing": "Has housing loan?",
+      "loan": "Has personal loan?",
+      "contact": "Contact communication type.",
+      "month": "Last contact month of year.",
+      "day_of_week": "Last contact day of the week.",
+      "duration": "Last contact duration in seconds. Important note: highly correlated with target, should only be used for benchmark purposes.",
+      "campaign": "Number of contacts performed during this campaign for this client.",
+      "pdays": "Number of days passed after client was last contacted from previous campaign (999 means client was not previously contacted).",
+      "previous": "Number of contacts performed before this campaign for this client.",
+      "poutcome": "Outcome of the previous marketing campaign.",
+      "emp.var.rate": "Employment variation rate - quarterly indicator.",
+      "cons.price.idx": "Consumer price index - monthly indicator.",
+      "cons.conf.idx": "Consumer confidence index - monthly indicator.",
+      "euribor3m": "Euribor 3 month rate - daily indicator.",
+      "nr.employed": "Number of employees - quarterly indicator."
+    },
+    "class_names": [
+      "yes",
+      "no"
+    ],
+    "class_description": "Classes: 'yes' (Client subscribed to a term deposit (11.3% of instances)), 'no' (Client did not subscribe to a term deposit (88.7% of instances))",
+    "num_features": 20,
+    "num_classes": 2
+  },
+  "Another-Dataset-on-used-Fiat-500-(1538-rows)": {
+    "dataset_name": "Another-Dataset-on-used-Fiat-500-(1538-rows)",
+    "task_prefix": "Used car pricing dataset containing information about Fiat 500 vehicles listed for sale. The dataset captures various attributes of used Fiat 500 cars to predict their market price. Each example contains 8 features. Predict the target class.",
+    "column_descriptions": {
+      "model": "Specific model/trim level of the Fiat 500.",
+      "year": "Year of manufacture of the vehicle.",
+      "price": "Listed sale price of the vehicle in local currency.",
+      "transmission": "Type of transmission system.",
+      "mileage": "Total distance traveled by the vehicle.",
+      "fuelType": "Type of fuel used by the vehicle.",
+      "mpg": "Fuel efficiency measured in miles per gallon.",
+      "engineSize": "Engine displacement in liters."
+    },
+    "class_names": [
+      "continuous"
+    ],
+    "class_description": "Classes: 'continuous' (Regression target - vehicle price in local currency)",
+    "num_features": 8,
+    "num_classes": 1
+  },
+  "credit": {
+    "dataset_name": "credit",
+    "task_prefix": "Credit card default payment data from Taiwan. Contains information on default payments, demographic factors, credit data, payment history, and bill statements of credit card clients to predict default payment next month. Each example contains 16 features. Predict the target class.",
+    "column_descriptions": {
+      "LIMIT_BAL": "Amount of given credit in NT dollars (includes individual and family/supplementary credit).",
+      "SEX": "Gender of credit card holder.",
+      "EDUCATION": "Education level of credit card holder.",
+      "MARRIAGE": "Marital status of credit card holder.",
+      "AGE": "Age of credit card holder in years.",
+      "PAY_0": "Repayment status in September 2005 (-1=pay duly, 1=payment delay for one month, 2=payment delay for two months, ..., 9=payment delay for nine months and above).",
+      "PAY_2": "Repayment status in August 2005 (same scale as PAY_0).",
+      "PAY_3": "Repayment status in July 2005 (same scale as PAY_0).",
+      "PAY_4": "Repayment status in June 2005 (same scale as PAY_0).",
+      "PAY_5": "Repayment status in May 2005 (same scale as PAY_0).",
+      "PAY_6": "Repayment status in April 2005 (same scale as PAY_0).",
+      "BILL_AMT1": "Amount of bill statement in September 2005 (NT dollar).",
+      "BILL_AMT2": "Amount of bill statement in August 2005 (NT dollar).",
+      "BILL_AMT3-BILL_AMT6": "Amount of bill statements from July to April 2005 (NT dollar).",
+      "PAY_AMT1": "Amount of previous payment in September 2005 (NT dollar).",
+      "PAY_AMT2-PAY_AMT6": "Amount of previous payments from August to April 2005 (NT dollar)."
+    },
+    "class_names": [
+      "1",
+      "0"
+    ],
+    "class_description": "Classes: '1' (Default payment next month (22.12% of instances)), '0' (No default payment next month (77.88% of instances))",
+    "num_features": 16,
+    "num_classes": 2
+  },
+  "airfoil_self_noise": {
+    "dataset_name": "airfoil_self_noise",
+    "task_prefix": "NASA dataset containing aerodynamic and acoustic test results of NACA 0012 airfoils. The data comprises measurements from two and three-dimensional airfoil blade sections tested in an anechoic wind tunnel to predict self-noise levels. Each example contains 6 features. Predict the target class.",
+    "column_descriptions": {
+      "Frequency": "Frequency of sound in Hertz. Represents the pitch of the noise generated.",
+      "AngleOfAttack": "Angle of attack in degrees. The angle between the airfoil chord line and the relative wind direction.",
+      "ChordLength": "Chord length in meters. The distance from the leading edge to the trailing edge of the airfoil.",
+      "FreeStreamVelocity": "Free-stream velocity in meters per second. The velocity of the undisturbed air flow.",
+      "SuctionSideDisplacementThickness": "Suction side displacement thickness in meters. Boundary layer parameter on the upper surface of the airfoil.",
+      "ScaledSoundPressureLevel": "Scaled sound pressure level in decibels. The target variable representing the intensity of self-generated noise."
+    },
+    "class_names": [
+      "continuous"
+    ],
+    "class_description": "Classes: 'continuous' (Regression target - scaled sound pressure level in decibels)",
+    "num_features": 6,
+    "num_classes": 1
+  },
+  "concrete_compressive_strength": {
+    "dataset_name": "concrete_compressive_strength",
+    "task_prefix": "High-performance concrete mixture data for predicting compressive strength. Contains quantities of raw materials (cement, water, etc.) and age to predict the resulting concrete strength, a critical parameter in civil engineering. Each example contains 9 features. Predict the target class.",
+    "column_descriptions": {
+      "Cement": "Cement content (component 1) - primary binding material in concrete. Higher amounts generally increase strength.",
+      "BlastFurnaceSlag": "Blast furnace slag (component 2) - industrial byproduct used as partial cement replacement. Improves durability and long-term strength.",
+      "FlyAsh": "Fly ash (component 3) - coal combustion byproduct used as supplementary cementitious material. Enhances workability and durability.",
+      "Water": "Water content (component 4) - activates cement hydration. Water-cement ratio is crucial for strength development.",
+      "Superplasticizer": "Superplasticizer (component 5) - chemical admixture that improves workability without adding water. Allows lower water-cement ratios.",
+      "CoarseAggregate": "Coarse aggregate (component 6) - large particles (gravel/crushed stone) providing bulk and strength to concrete.",
+      "FineAggregate": "Fine aggregate (component 7) - sand that fills voids between coarse aggregates and improves workability.",
+      "Age": "Age of concrete in days. Concrete strength increases with curing time, typically tested at 28 days.",
+      "CompressiveStrength": "Concrete compressive strength in MPa (megapascals). Target variable measured using cylindrical specimens (15cm x 30cm)."
+    },
+    "class_names": [
+      "continuous"
+    ],
+    "class_description": "Classes: 'continuous' (Regression target - compressive strength in MPa)",
+    "num_features": 9,
+    "num_classes": 1
+  },
+  "physicochemical-properties-of-protein-tertiary-structure": {
+    "dataset_name": "physicochemical-properties-of-protein-tertiary-structure",
+    "task_prefix": "Dataset containing physicochemical properties that characterize protein tertiary structures, used to predict Root Mean Square Deviation (RMSD) from native structures. The data is derived from CASP 5-9 protein structure prediction experiments. Each example contains 10 features. Predict the target class.",
+    "column_descriptions": {
+      "RMSD": "Root Mean Square Deviation of the predicted tertiary structure from the native structure. Target variable measuring structural similarity (lower values indicate better predictions).",
+      "F1": "Total surface area of the protein structure. Represents the overall size and exposed regions of the folded protein.",
+      "F2": "Non-polar exposed area. Indicates hydrophobic regions on the protein surface, important for protein-protein interactions and stability.",
+      "F3": "Fractional area of exposed non-polar residue. Ratio of hydrophobic surface to total surface area.",
+      "F4": "Fractional area of exposed non-polar part of residue. More detailed measure of hydrophobic exposure at residue level.",
+      "F5": "Molecular mass weighted exposed area. Accounts for the size of exposed residues in surface area calculations.",
+      "F6": "Average deviation from standard exposed area of residue. Measures how much the structure deviates from typical exposure patterns.",
+      "F7": "Euclidean distance. Geometric measure of structural differences between predicted and native conformations.",
+      "F8": "Secondary structure penalty. Quantifies deviations in alpha-helix and beta-sheet formations from the native structure.",
+      "F9": "Spatial distribution constraints (N,K Value). Measures how well the predicted structure maintains proper spatial relationships between residues."
+    },
+    "class_names": [
+      "Class_0",
+      "Class_1"
+    ],
+    "class_description": "Classes: Class_0, Class_1",
+    "num_features": 10,
+    "num_classes": 2
+  },
+  "superconductivity-critical-temperature": {
+    "dataset_name": "superconductivity-critical-temperature",
+    "task_prefix": "Dataset for predicting the critical temperature (Tc) of superconductors based on their chemical composition and derived features. The critical temperature is the threshold below which a material exhibits zero electrical resistance. Each example contains 12 features. Predict the target class.",
+    "column_descriptions": {
+      "number_of_elements": "Total count of unique chemical elements in the superconductor compound.",
+      "mean_atomic_mass": "Average atomic mass of all elements in the compound, weighted by stoichiometry. Measured in atomic mass units (AMU).",
+      "wtd_mean_atomic_mass": "Weighted mean of atomic masses considering element proportions in the chemical formula.",
+      "mean_fie": "Mean first ionization energy across all elements. Energy required to remove outermost electron, measured in kJ/mol.",
+      "mean_atomic_radius": "Average atomic radius of constituent elements. Indicates typical atomic size in the compound, measured in picometers.",
+      "mean_density": "Average density of constituent elements at standard conditions. Measured in kg/m\u00b3.",
+      "mean_electron_affinity": "Average energy change when adding electron to neutral atoms. Indicates electron-accepting tendency, measured in kJ/mol.",
+      "mean_fusion_heat": "Average heat of fusion (solid to liquid transition) across elements. Measured in kJ/mol.",
+      "mean_thermal_conductivity": "Average thermal conductivity coefficient of elements. Measured in W/(m\u00b7K).",
+      "mean_valence": "Average number of valence electrons across all atoms in the compound.",
+      "wtd_mean_valence": "Weighted mean valence considering element proportions. Critical for understanding electronic properties.",
+      "critical_temp": "Critical temperature below which the material becomes superconducting. Target variable measured in Kelvin (K)."
+    },
+    "class_names": [
+      "Class_0",
+      "Class_1"
+    ],
+    "class_description": "Classes: Class_0, Class_1",
+    "num_features": 12,
+    "num_classes": 2
+  },
+  "qsar-fish-toxicity": {
+    "dataset_name": "qsar-fish-toxicity",
+    "task_prefix": "Quantitative Structure-Activity Relationship (QSAR) dataset for predicting acute aquatic toxicity (LC50) of chemicals towards the fathead minnow (Pimephales promelas). Contains molecular descriptors calculated from chemical structures. Each example contains 7 features. Predict the target class.",
+    "column_descriptions": {
+      "CIC0": "Complementary Information Content index of 0-order. Information-theoretic descriptor measuring molecular complexity based on atom connectivity.",
+      "SM1_Dz(Z)": "Spectral moment of order 1 from Barysz matrix weighted by atomic number. 2D matrix-based descriptor capturing electronic distribution.",
+      "GATS1i": "Geary autocorrelation of lag 1 weighted by ionization potential. 2D autocorrelation descriptor reflecting spatial distribution of atomic properties.",
+      "NdsCH": "Number of atoms of type dsCH. Atom-type count representing secondary carbon with one hydrogen (=CH- groups).",
+      "NdssC": "Number of atoms of type dssC. Atom-type count representing secondary carbon with no hydrogens (=C< groups).",
+      "MLOGP": "Moriguchi octanol-water partition coefficient. Molecular property predicting lipophilicity, crucial for bioaccumulation and membrane permeability.",
+      "LC50": "Negative logarithm of the molar concentration causing 50% mortality in test fish over 96 hours. Higher values indicate greater toxicity."
+    },
+    "class_names": [
+      "Class_0",
+      "Class_1"
+    ],
+    "class_description": "Classes: Class_0, Class_1",
+    "num_features": 7,
+    "num_classes": 2
+  },
+  "miami-housing-prices": {
+    "dataset_name": "miami-housing-prices",
+    "task_prefix": "Real estate dataset containing property characteristics and sale prices for residential homes in Miami, Florida. Used for predicting housing prices based on various property features, location factors, and market conditions. Each example contains 11 features. Predict the target class.",
+    "column_descriptions": {
+      "PARCELNO": "Unique parcel identification number for the property. Administrative identifier used for property records.",
+      "SALE_PRC": "Sale price of the property in US dollars. Target variable representing the actual transaction amount.",
+      "LND_SQFOOT": "Land area in square feet. Total lot size which impacts property value especially in urban areas.",
+      "TOT_LVG_AREA": "Total living area in square feet. Interior space of the home, key determinant of property value.",
+      "SPEC_FEAT_VAL": "Value of special features like pools, decks, or other improvements. Additional amenities that add to property value.",
+      "age": "Age of the property in years since construction. Calculated from year built to present/sale date.",
+      "structure_quality": "Quality rating of the building structure. Categorical or ordinal measure of construction quality and condition.",
+      "avno60plus": "Indicator or count related to aviation noise exposure for properties near airports. Environmental factor affecting desirability.",
+      "month_sold": "Month when the property was sold. Captures seasonal patterns in real estate markets.",
+      "LATITUDE": "Geographic latitude coordinate. Used for spatial analysis and neighborhood effects on pricing.",
+      "LONGITUDE": "Geographic longitude coordinate. Enables location-based features and proximity calculations."
+    },
+    "class_names": [
+      "Class_0",
+      "Class_1"
+    ],
+    "class_description": "Classes: Class_0, Class_1",
+    "num_features": 11,
+    "num_classes": 2
+  },
+  "Diabetes130US": {
+    "dataset_name": "Diabetes130US",
+    "task_prefix": "10 years of clinical care data from 130 US hospitals and integrated delivery networks. Dataset focuses on diabetic patient encounters to analyze factors related to hospital readmission and patient outcomes. Each example contains 12 features. Predict the target class.",
+    "column_descriptions": {
+      "encounter_id": "Unique identifier for each patient hospital encounter. Links to specific admission event.",
+      "patient_nbr": "Unique identifier for each patient. Allows tracking multiple encounters per patient.",
+      "race": "Patient's race category. Important demographic factor for health disparities analysis.",
+      "gender": "Patient's gender. Basic demographic variable affecting diabetes progression and outcomes.",
+      "age": "Age group of the patient in 10-year intervals. Grouped to protect patient privacy.",
+      "admission_type_id": "Category of admission (Emergency, Urgent, Elective, etc.). Indicates severity and planning of hospital visit.",
+      "time_in_hospital": "Number of days patient stayed in hospital. Indicates severity and resource utilization.",
+      "num_lab_procedures": "Number of laboratory tests performed during encounter. Indicates complexity of care.",
+      "num_medications": "Number of distinct medications administered during encounter. Reflects treatment complexity.",
+      "number_diagnoses": "Number of diagnoses recorded. Indicates patient comorbidity burden.",
+      "A1Cresult": "Hemoglobin A1c test result indicating blood sugar control over past 2-3 months.",
+      "readmitted": "Patient was readmitted within 30 days, after 30 days, or not readmitted. primary outcome variable."
+    },
+    "class_names": [
+      "<30",
+      ">30",
+      "NO"
+    ],
+    "class_description": "Classes: '<30' (Patient was readmitted to hospital within 30 days of discharge), '>30' (Patient was readmitted to hospital after 30 days of discharge), 'NO' (Patient was not readmitted to hospital)",
+    "num_features": 12,
+    "num_classes": 3
+  },
+  "contaminant-detection-cocoa-hazelnut-spread-microwave": {
+    "dataset_name": "contaminant-detection-cocoa-hazelnut-spread-microwave",
+    "task_prefix": "Microwave sensing dataset for detecting contaminants in packaged cocoa-hazelnut spread jars using scattering parameters. Designed for real-time quality control in food manufacturing using non-invasive microwave technology at 10.0 GHz. Each example contains 8 features. Predict the target class.",
+    "column_descriptions": {
+      "S_parameters": "6x6 matrix of complex scattering parameters from microwave antenna array. Each S_ij represents transmission/reflection coefficients between antenna pairs i and j.",
+      "magnitude_features": "Magnitude components of S-parameters in dB. Represents signal attenuation through the jar and contents.",
+      "phase_features": "Phase components of S-parameters in degrees. Captures wave propagation delays indicating material properties.",
+      "frequency": "Operating frequency of microwave system. Fixed at 10.0 GHz for optimal penetration and sensitivity.",
+      "jar_position": "Position of jar on conveyor belt relative to antenna array. Affects signal path geometry.",
+      "contaminant_type": "Type of foreign object present: none, plastic, glass, metal, or other low-density materials.",
+      "contaminant_size": "Physical dimensions of contaminant if present. Measured in millimeters.",
+      "contaminated": "Binary label indicating presence (1) or absence (0) of any contaminant. Target variable for detection."
+    },
+    "class_names": [
+      "0",
+      "1"
+    ],
+    "class_description": "Classes: '0' (Uncontaminated jar - safe for consumption), '1' (Contaminated jar - contains foreign object requiring removal from production line)",
+    "num_features": 8,
+    "num_classes": 2
+  },
+  "otto-group-product-classification-challenge": {
+    "dataset_name": "otto-group-product-classification-challenge",
+    "task_prefix": "E-commerce product classification dataset from Otto Group, one of the world's largest e-commerce companies. Contains anonymized features derived from product descriptions and attributes for classifying products into 9 categories. Each example contains 5 features. Predict the target class.",
+    "column_descriptions": {
+      "feat_1": "Anonymized product feature 1. Derived from product attributes, descriptions, or behavior but obfuscated for proprietary reasons.",
+      "feat_2": "Anonymized product feature 2. Count or encoded categorical variable related to product characteristics.",
+      "...": "Features 3-92 follow similar pattern. Each represents different aspect of product data after feature engineering.",
+      "feat_93": "Anonymized product feature 93. Final engineered feature in the set.",
+      "target": "Product category class from Class_1 to Class_9. Represents major product groupings in Otto's catalog."
+    },
+    "class_names": [
+      "Class_1",
+      "Class_2",
+      "Class_3",
+      "Class_4",
+      "Class_5",
+      "Class_6",
+      "Class_7",
+      "Class_8",
+      "Class_9"
+    ],
+    "class_description": "Classes: 'Class_1' (Product category 1 (specific category anonymized - likely fashion, electronics, home goods, etc.)), 'Class_2' (Product category 2), 'Class_3' (Product category 3), 'Class_4' (Product category 4), 'Class_5' (Product category 5), 'Class_6' (Product category 6), 'Class_7' (Product category 7), 'Class_8' (Product category 8), 'Class_9' (Product category 9)",
+    "num_features": 5,
+    "num_classes": 9
+  },
+  "minimum-inhibitory-concentration-antibiotics": {
+    "dataset_name": "minimum-inhibitory-concentration-antibiotics",
+    "task_prefix": "Dataset for predicting Minimum Inhibitory Concentration (MIC) values of antibiotics against bacterial strains. MIC represents the lowest concentration of an antimicrobial that inhibits visible growth of a microorganism after incubation. Each example contains 9 features. Predict the target class.",
+    "column_descriptions": {
+      "bacterial_strain": "Specific bacterial species and strain identifier. Includes common pathogens like E. coli, K. pneumoniae, S. aureus.",
+      "antibiotic": "Name of the antimicrobial agent tested. Includes various classes: beta-lactams, aminoglycosides, fluoroquinolones, etc.",
+      "antibiotic_class": "Broad classification of antibiotic mechanism. Groups drugs by mode of action (cell wall synthesis inhibitors, protein synthesis inhibitors, etc.).",
+      "molecular_weight": "Molecular weight of the antibiotic compound in Daltons. Affects drug penetration and pharmacokinetics.",
+      "logP": "Octanol-water partition coefficient. Indicates lipophilicity affecting membrane permeability.",
+      "bacterial_features": "Genomic or phenotypic features of the bacterial strain. May include resistance genes, virulence factors, or growth characteristics.",
+      "testing_method": "Laboratory method used: broth microdilution, agar dilution, or E-test. Affects precision and range of MIC values.",
+      "MIC_value": "Minimum Inhibitory Concentration in \u03bcg/mL. Target variable representing antibiotic effectiveness.",
+      "resistance_phenotype": "Clinical interpretation: Susceptible, Intermediate, or Resistant based on breakpoint criteria."
+    },
+    "class_names": [
+      "Class_0",
+      "Class_1"
+    ],
+    "class_description": "Classes: Class_0, Class_1",
+    "num_features": 9,
+    "num_classes": 2
+  },
+  "splice": {
+    "dataset_name": "splice",
+    "task_prefix": "DNA splice site recognition dataset for identifying boundaries between exons (retained sequences) and introns (removed sequences) in genetic sequences. Critical for understanding gene expression and protein synthesis in eukaryotic organisms. Each example contains 5 features. Predict the target class.",
+    "column_descriptions": {
+      "instance_name": "Unique identifier for each DNA sequence sample. Should be ignored for modeling purposes.",
+      "position_-30": "Nucleotide at position 30 bases before the potential splice site. Part of upstream context.",
+      "position_-29": "Nucleotide at position 29 bases before the splice site. Contributes to sequence context.",
+      "[positions -28 through +29]": "Nucleotides at each position in the 60-base window centered on potential splice site. Each position may contain standard nucleotides or ambiguity codes.",
+      "position_+30": "Nucleotide at position 30 bases after the potential splice site. Part of downstream context."
+    },
+    "class_names": [
+      "EI",
+      "IE",
+      "N"
+    ],
+    "class_description": "Classes: 'EI' (Exon-Intron boundary (donor site) - where exon ends and intron begins), 'IE' (Intron-Exon boundary (acceptor site) - where intron ends and exon begins), 'N' (Neither - not a splice site, just a regular sequence region)",
+    "num_features": 5,
+    "num_classes": 3
+  },
+  "homesite-quote-conversion": {
+    "dataset_name": "homesite-quote-conversion",
+    "task_prefix": "Insurance quote conversion prediction dataset from Homesite, a leading provider of homeowners insurance. Contains anonymized customer and quote information to predict whether a quoted insurance policy will result in a purchase. Each example contains 9 features. Predict the target class.",
+    "column_descriptions": {
+      "QuoteNumber": "Unique identifier for each insurance quote. Links customer interaction with outcome.",
+      "Original_Quote_Date": "Date when the insurance quote was originally generated. Allows temporal analysis and seasonality detection.",
+      "QuoteConversion_Flag": "Binary target indicating whether the customer purchased the quoted policy (1) or not (0).",
+      "Field1-Field10": "Anonymized coverage information fields. Likely includes coverage types, limits, deductibles, and policy options.",
+      "CoverageField1-CoverageField8": "Specific coverage-related features. May represent different types of protection (dwelling, personal property, liability).",
+      "SalesField1-SalesField8": "Sales channel and process information. Could include agent details, quote source, marketing campaign identifiers.",
+      "PersonalField1-PersonalField84": "Anonymized personal customer information. Likely includes demographics, credit indicators, prior insurance history.",
+      "PropertyField1-PropertyField29": "Property characteristics. May include home age, size, construction type, safety features, location risk factors.",
+      "GeographicField1-GeographicField62": "Location-based features. Could include risk scores, distance to coast/fire stations, neighborhood statistics."
+    },
+    "class_names": [
+      "0",
+      "1"
+    ],
+    "class_description": "Classes: '0' (Quote not converted - Customer did not purchase the insurance policy), '1' (Quote converted - Customer purchased the insurance policy)",
+    "num_features": 9,
+    "num_classes": 2
+  },
+  "houses": {
+    "dataset_name": "houses",
+    "task_prefix": "Boston Housing dataset predicting median home values in Boston suburbs based on crime, environmental, and demographic factors. Classic dataset for regression analysis demonstrating urban economics and social factors affecting property values in 1970s Boston. Each example contains 13 features. Predict the target class.",
+    "column_descriptions": {
+      "CRIM": "Per capita crime rate by town. Higher crime rates negatively impact property values and neighborhood desirability.",
+      "ZN": "Proportion of residential land zoned for lots over 25,000 sq.ft. Indicates suburban vs urban character.",
+      "INDUS": "Proportion of non-retail business acres per town. Industrial presence affects residential desirability.",
+      "CHAS": "Charles River dummy variable (1 if tract bounds river, 0 otherwise). Waterfront property premium.",
+      "NOX": "Nitric oxide concentration (parts per 10 million). Air quality measure affecting health and property values.",
+      "RM": "Average number of rooms per dwelling. Larger homes command higher prices.",
+      "AGE": "Proportion of owner-occupied units built prior to 1940. Indicates neighborhood age and potential maintenance issues.",
+      "DIS": "Weighted distances to five Boston employment centers. Commute accessibility affects desirability.",
+      "RAD": "Index of accessibility to radial highways. Transportation infrastructure increases property values.",
+      "TAX": "Full-value property tax rate per $10,000. Higher taxes reduce net property value.",
+      "PTRATIO": "Pupil-teacher ratio by town. School quality indicator strongly affecting family home choices.",
+      "B": "1000(Bk - 0.63)\u00b2 where Bk is proportion of blacks by town. Captures racial segregation effects on housing.",
+      "LSTAT": "Percentage of lower status population. Socioeconomic status indicator affecting neighborhood values."
+    },
+    "class_names": [
+      "MEDV"
+    ],
+    "class_description": "Classes: 'MEDV' (Median value of owner-occupied homes in $1000's (1970s dollars). Continuous target variable ranging from $5,000 to $50,000.)",
+    "num_features": 13,
+    "num_classes": 1
+  }
+}
