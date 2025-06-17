@@ -53,20 +53,20 @@ If you encounter any issues with imports, see troubleshooting instructions in `P
 
 ```bash
 # Test CIFAR-10 with CLAM t-SNE and baselines
-python examples/vision/test_all_image.py --datasets cifar10 --models clam_tsne dinov2_linear qwen_vl --quick_test
+python examples/vision/evaluate_all_vision.py --datasets cifar10 --models clam_tsne dinov2_linear qwen_vl --quick_test
 
 # Test multiple datasets
-python examples/vision/test_all_image.py --datasets cifar10 cifar100 --models clam_tsne --use_3d_tsne --use_knn_connections
+python examples/vision/evaluate_all_vision.py --datasets cifar10 cifar100 --models clam_tsne --use_3d_tsne --use_knn_connections
 ```
 
 ### Audio Classification  
 
 ```bash
 # Test ESC-50 and RAVDESS datasets
-python examples/audio/test_all_audio.py --datasets esc50 ravdess --models clam_tsne whisper_baseline
+python examples/audio/evaluate_all_audio.py --datasets esc50 ravdess --models clam_tsne whisper_baseline
 
 # Test with CLAP embeddings
-python examples/audio/test_all_audio.py --datasets esc50 --embedding_type clap --models clam_tsne
+python examples/audio/evaluate_all_audio.py --datasets esc50 --embedding_type clap --models clam_tsne
 ```
 
 ### Tabular Data
@@ -134,22 +134,22 @@ CLAM provides a set of command-line scripts in the `examples` directory for easy
 
 ```bash
 # Basic usage with default 100 few-shot examples
-python examples/train_tabular_dataset.py --dataset_name har --output_dir ./models/har_model
+python examples/tabular/train_tabular_dataset_tabular.py --dataset_name har --output_dir ./models/har_model
 
 # Training with 50 few-shot examples instead of the default 100
-python examples/train_tabular_dataset.py --dataset_name har --num_few_shot_examples 50
+python examples/tabular/train_tabular_dataset_tabular.py --dataset_name har --num_few_shot_examples 50
 
 # Using example order permutation to discourage memorization
-python examples/train_tabular_dataset.py --dataset_name har --permute_examples
+python examples/tabular/train_tabular_dataset_tabular.py --dataset_name har --permute_examples
 
 # Using class-to-label mapping permutation to discourage memorization
-python examples/train_tabular_dataset.py --dataset_name har --permute_labels
+python examples/tabular/train_tabular_dataset_tabular.py --dataset_name har --permute_labels
 
 # Using variable few-shot examples to improve generalization
-python examples/train_tabular_dataset.py --dataset_name har --variable_few_shot --few_shot_min 10 --few_shot_max 150
+python examples/tabular/train_tabular_dataset_tabular.py --dataset_name har --variable_few_shot --few_shot_min 10 --few_shot_max 150
 
 # Combining all generalization strategies
-python examples/train_tabular_dataset.py --dataset_name har --permute_examples --permute_labels --variable_few_shot --few_shot_min 20 --few_shot_max 200
+python examples/tabular/train_tabular_dataset_tabular.py --dataset_name har --permute_examples --permute_labels --variable_few_shot --few_shot_min 20 --few_shot_max 200
 ```
 
 ### Training with Vector Quantization

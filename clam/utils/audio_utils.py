@@ -340,6 +340,42 @@ def normalize_audio(
         raise ValueError(f"Unknown normalization method: {method}")
 
 
+def create_synthetic_audio(
+    frequency: float,
+    duration: float = 1.0,
+    sample_rate: int = 16000,
+    amplitude: float = 0.5,
+    waveform: str = 'sine'
+) -> np.ndarray:
+    """
+    Create synthetic audio signal for testing.
+    
+    Args:
+        frequency: Frequency in Hz
+        duration: Duration in seconds
+        sample_rate: Sample rate
+        amplitude: Amplitude (0-1)
+        waveform: Type of waveform ('sine', 'square', 'sawtooth', 'triangle')
+        
+    Returns:
+        audio: Synthetic audio signal
+    """
+    t = np.linspace(0, duration, int(sample_rate * duration), False)
+    
+    if waveform == 'sine':
+        audio = amplitude * np.sin(2 * np.pi * frequency * t)
+    elif waveform == 'square':
+        audio = amplitude * np.sign(np.sin(2 * np.pi * frequency * t))
+    elif waveform == 'sawtooth':
+        audio = amplitude * 2 * (t * frequency - np.floor(t * frequency + 0.5))
+    elif waveform == 'triangle':
+        audio = amplitude * 2 * np.abs(2 * (t * frequency - np.floor(t * frequency + 0.5))) - amplitude
+    else:
+        raise ValueError(f"Unknown waveform: {waveform}")
+    
+    return audio.astype(np.float32)
+
+
 def create_audio_thumbnail(
     audio_path: Union[str, Path],
     output_path: Union[str, Path],

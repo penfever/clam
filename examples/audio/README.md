@@ -190,7 +190,7 @@ Added two audio classification baseline methods to complement the CLAM t-SNE app
 ### Modified Files
 - `examples/audio/test_esc50.py` - Added `--models` parameter and baseline support
 - `examples/audio/test_ravdess.py` - Added `--models` parameter and baseline support  
-- `examples/audio/test_all_audio.py` - Added `--models` parameter and baseline support
+- `examples/audio/evaluate_all_audio.py` - Added `--models` parameter and baseline support
 - `pyproject.toml` - Added CLAP dependencies (transformers, datasets)
 
 ## 🚀 Usage
@@ -210,10 +210,10 @@ python test_esc50.py --models clam_tsne
 ### Multi-Dataset Testing
 ```bash
 # Test all models on all datasets
-python test_all_audio.py --models clam_tsne whisper_knn clap_zero_shot --k_shot 5
+python evaluate_all_audio.py --models clam_tsne whisper_knn clap_zero_shot --k_shot 5
 
 # Quick test with baselines only
-python test_all_audio.py --models whisper_knn clap_zero_shot --quick_test
+python evaluate_all_audio.py --models whisper_knn clap_zero_shot --quick_test
 ```
 
 ### Validate Baselines
@@ -502,7 +502,7 @@ Updated all audio test scripts to match the CIFAR-10 functionality for saving im
 - ✅ Added `--save_every_n` parameter (default: 10)
 - ✅ Added `classifier.save_every_n = args.save_every_n` assignment
 
-### 2. **test_all_audio.py** 
+### 2. **evaluate_all_audio.py** 
 - ✅ Added `--save_every_n` parameter (default: 10)
 - ✅ Added `classifier.save_every_n = args.save_every_n` assignment
 
@@ -565,7 +565,7 @@ python test_esc50.py \
 
 ### Multi-Dataset Test
 ```bash
-python test_all_audio.py \
+python evaluate_all_audio.py \
   --models clam_tsne \
   --save_outputs \
   --save_every_n 5 \
@@ -655,7 +655,7 @@ All audio classification scripts now include full Weights & Biases integration f
 |--------|--------------|----------------|-------------|-----------------|
 | `test_esc50.py` | ✅ Full | ✅ Yes | ✅ Yes | `esc50-clam` |
 | `test_ravdess.py` | ✅ Full | ✅ Yes | ✅ Yes | `ravdess-clam` |
-| `test_all_audio.py` | ✅ Full | ✅ Yes | ✅ Yes | `audio-clam-all` |
+| `evaluate_all_audio.py` | ✅ Full | ✅ Yes | ✅ Yes | `audio-clam-all` |
 
 ## 🚀 Quick Start
 
@@ -669,7 +669,7 @@ python test_esc50.py --use_wandb --k_shot 5
 python test_ravdess.py --use_wandb --wandb_project my-audio-project
 
 # With custom run name
-python test_all_audio.py --use_wandb --wandb_name "experiment-v2"
+python evaluate_all_audio.py --use_wandb --wandb_name "experiment-v2"
 ```
 
 ### First Time Setup
@@ -709,7 +709,7 @@ python test_esc50.py --use_wandb --quick_test
 - **GPU Utilization**: Memory usage, compute utilization (if GPU available)
 - **System Metrics**: CPU, RAM usage
 
-### Summary Metrics (test_all_audio.py)
+### Summary Metrics (evaluate_all_audio.py)
 - **Datasets Tested**: Total number of datasets
 - **Datasets Successful**: How many completed without errors
 - **Mean Accuracy**: Average accuracy across all datasets
@@ -801,7 +801,7 @@ gpu_monitor = init_wandb_with_gpu_monitoring(
 
 2. **Group Related Runs**: Use consistent project names
    ```bash
-   python test_all_audio.py --use_wandb --wandb_project "audio-ablations"
+   python evaluate_all_audio.py --use_wandb --wandb_project "audio-ablations"
    ```
 
 3. **Log Additional Metrics**: Modify the scripts to add custom metrics

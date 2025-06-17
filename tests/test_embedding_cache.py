@@ -80,6 +80,7 @@ def test_load_embeddings_with_limit():
         train_embeddings_multi = np.random.randn(n_ensemble, 1000, 128)
         val_embeddings_multi = np.random.randn(n_ensemble, 5000, 128)
         test_embeddings_multi = np.random.randn(n_ensemble, 5000, 128)
+        y_train_sample_multi = np.random.randint(0, 10, 1000)
         
         # Save multi-ensemble cache
         np.savez(
@@ -87,7 +88,7 @@ def test_load_embeddings_with_limit():
             train_embeddings=train_embeddings_multi,
             val_embeddings=val_embeddings_multi,
             test_embeddings=test_embeddings_multi,
-            y_train_sample=y_train_sample,
+            y_train_sample=y_train_sample_multi,
             metadata={"test": True, "multi_ensemble": True}
         )
         

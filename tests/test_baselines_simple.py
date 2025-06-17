@@ -14,7 +14,8 @@ import numpy as np
 from pathlib import Path
 
 # Add project root to path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
 
 from examples.audio.audio_baselines import WhisperKNNClassifier, CLAPZeroShotClassifier
 from clam.utils.audio_utils import create_synthetic_audio
@@ -123,10 +124,9 @@ def test_clap_zero_shot():
         
         # Initialize classifier
         classifier = CLAPZeroShotClassifier(
-            model_name="microsoft/msclap",
-            device="cpu",  # Force CPU for compatibility
-            batch_size=2,  # Small batch size
-            use_amp=False  # Disable AMP for CPU
+            version="2023",  # Use 2023 version
+            use_cuda=False,  # Force CPU for compatibility
+            batch_size=2  # Small batch size
         )
         
         # "Fit" classifier (just sets up class names)

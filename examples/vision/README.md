@@ -71,7 +71,7 @@ pip install -e ".[vlm,vlm_cuda]"
 
 ```bash
 # Quick test with CIFAR-10 (recommended for first run)
-python examples/vision/test_all_image.py \
+python examples/vision/evaluate_all_vision.py \
     --dataset cifar10 \
     --models clam_tsne \
     --quick_test \
@@ -82,7 +82,7 @@ python examples/vision/test_all_image.py \
 
 ```bash
 # Test multiple datasets at once
-python examples/vision/test_all_image.py \
+python examples/vision/evaluate_all_vision.py \
     --datasets cifar10 cifar100 \
     --models clam_tsne dinov2_linear \
     --output_dir ./multi_dataset_results
@@ -92,7 +92,7 @@ python examples/vision/test_all_image.py \
 
 ```bash
 # Full CIFAR-100 evaluation
-python examples/vision/test_all_image.py \
+python examples/vision/evaluate_all_vision.py \
     --datasets cifar100 \
     --models clam_tsne dinov2_linear qwen_vl \
     --output_dir ./cifar100_results
@@ -102,7 +102,7 @@ python examples/vision/test_all_image.py \
 
 ```bash
 # ImageNet-1k from HuggingFace (requires authentication)
-python examples/vision/test_all_image.py \
+python examples/vision/evaluate_all_vision.py \
     --datasets imagenet \
     --models clam_tsne dinov2_linear \
     --quick_test \
@@ -113,7 +113,7 @@ python examples/vision/test_all_image.py \
 
 ```bash
 # Your own ImageNet-style dataset
-python examples/vision/test_all_image.py \
+python examples/vision/evaluate_all_vision.py \
     --datasets custom \
     --dataset_path /path/to/your/dataset \
     --num_classes 50 \
@@ -163,7 +163,7 @@ Choose from:
 ### 3D Visualizations
 
 ```bash
-python examples/vision/test_all_image.py \
+python examples/vision/evaluate_all_vision.py \
     --datasets cifar10 \
     --models clam_tsne \
     --use_3d_tsne \
@@ -173,7 +173,7 @@ python examples/vision/test_all_image.py \
 ### KNN Connections
 
 ```bash
-python examples/vision/test_all_image.py \
+python examples/vision/evaluate_all_vision.py \
     --datasets cifar10 \
     --models clam_tsne \
     --use_knn_connections \
@@ -184,7 +184,7 @@ python examples/vision/test_all_image.py \
 ### PCA Backend (faster)
 
 ```bash
-python examples/vision/test_all_image.py \
+python examples/vision/evaluate_all_vision.py \
     --datasets cifar10 \
     --models clam_tsne \
     --use_pca_backend \
@@ -194,7 +194,7 @@ python examples/vision/test_all_image.py \
 ### Combined Features
 
 ```bash
-python examples/vision/test_all_image.py \
+python examples/vision/evaluate_all_vision.py \
     --datasets cifar10 \
     --models clam_tsne \
     --use_3d_tsne \
@@ -221,7 +221,7 @@ Recommendation: Start with `dinov2_vits14` (fastest) or `dinov2_vitb14` (good ba
 ## Weights & Biases Integration
 
 ```bash
-python examples/vision/test_all_image.py \
+python examples/vision/evaluate_all_vision.py \
     --dataset cifar10 \
     --models clam_tsne dinov2_linear qwen_vl \
     --use_wandb \
@@ -234,7 +234,7 @@ python examples/vision/test_all_image.py \
 ### For Mac/CPU Systems
 
 ```bash
-python examples/vision/test_all_image.py \
+python examples/vision/evaluate_all_vision.py \
     --dataset cifar10 \
     --models clam_tsne \
     --dinov2_model dinov2_vits14 \
@@ -246,7 +246,7 @@ python examples/vision/test_all_image.py \
 ### For GPU Systems
 
 ```bash
-python examples/vision/test_all_image.py \
+python examples/vision/evaluate_all_vision.py \
     --dataset cifar100 \
     --models clam_tsne dinov2_linear \
     --dinov2_model dinov2_vitl14 \

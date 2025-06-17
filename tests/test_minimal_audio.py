@@ -11,7 +11,8 @@ import logging
 from pathlib import Path
 
 # Add project root to path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
 
 from examples.audio.clam_tsne_audio_baseline import ClamAudioTsneClassifier
 from clam.utils.audio_utils import create_synthetic_audio

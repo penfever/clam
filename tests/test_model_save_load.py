@@ -119,13 +119,13 @@ class TestModelSaveLoad(unittest.TestCase):
                 self.assertIn(token, loaded_tokenizer.get_vocab(),
                               f"Special token {token} not found in loaded tokenizer")
             
-            # Verify weights were preserved
+            # Verify weights were preserved (handle dtype and device differences)
             new_input_embeddings = loaded_model.base_model.get_input_embeddings().weight.data
-            self.assertTrue(torch.allclose(original_input_embeddings, new_input_embeddings),
+            self.assertTrue(torch.allclose(original_input_embeddings.float().cpu(), new_input_embeddings.float().cpu()),
                            "Input embeddings were not preserved")
             
             new_projector_weights = loaded_model.embedding_projector.weight.data
-            self.assertTrue(torch.allclose(original_projector_weights, new_projector_weights),
+            self.assertTrue(torch.allclose(original_projector_weights.float().cpu(), new_projector_weights.float().cpu()),
                            "Embedding projector weights were not preserved")
             
             # 5. Test inference with the loaded model
