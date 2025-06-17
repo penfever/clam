@@ -423,19 +423,53 @@ def save_results(results: dict, output_dir: str, k_shot: int):
     summary_data = []
     for dataset_name, result in results.items():
         if result['status'] == 'success':
-            eval_results = result['results']
-            dataset_info = eval_results.get('dataset_info', {})
-            summary_data.append({
-                'dataset': dataset_name.upper(),
-                'status': 'SUCCESS',
-                'accuracy': eval_results['accuracy'],
-                'num_classes': dataset_info.get('num_classes', 'N/A'),
-                'train_samples': dataset_info.get('train_samples', 'N/A'),
-                'test_samples': dataset_info.get('test_samples', 'N/A'),
-                'training_time': eval_results['training_time'],
-                'prediction_time': eval_results['prediction_time'],
-                'error': None
-            })
+            # Handle multiple models if available
+            if 'all_results' in result:
+                # Multiple models tested
+                for model_name, model_result in result['all_results'].items():
+                    if 'error' not in model_result:
+                        dataset_info = model_result.get('dataset_info', {})
+                        summary_data.append({
+                            'dataset': dataset_name.upper(),
+                            'model': model_name.upper().replace('_', ' '),
+                            'status': 'SUCCESS',
+                            'accuracy': model_result['accuracy'],
+                            'num_classes': dataset_info.get('num_classes', 'N/A'),
+                            'train_samples': dataset_info.get('train_samples', 'N/A'),
+                            'test_samples': dataset_info.get('test_samples', 'N/A'),
+                            'training_time': model_result.get('training_time', 0),
+                            'prediction_time': model_result.get('prediction_time', 0),
+                            'error': None
+                        })
+                    else:
+                        summary_data.append({
+                            'dataset': dataset_name.upper(),
+                            'model': model_name.upper().replace('_', ' '),
+                            'status': 'ERROR',
+                            'accuracy': None,
+                            'num_classes': None,
+                            'train_samples': None,
+                            'test_samples': None,
+                            'training_time': None,
+                            'prediction_time': None,
+                            'error': model_result['error']
+                        })
+            else:
+                # Single model result (backward compatibility)
+                eval_results = result['results']
+                dataset_info = eval_results.get('dataset_info', {})
+                summary_data.append({
+                    'dataset': dataset_name.upper(),
+                    'model': 'CLAM TSNE',  # Default model name
+                    'status': 'SUCCESS',
+                    'accuracy': eval_results['accuracy'],
+                    'num_classes': dataset_info.get('num_classes', 'N/A'),
+                    'train_samples': dataset_info.get('train_samples', 'N/A'),
+                    'test_samples': dataset_info.get('test_samples', 'N/A'),
+                    'training_time': eval_results['training_time'],
+                    'prediction_time': eval_results['prediction_time'],
+                    'error': None
+                })
         else:
             summary_data.append({
                 'dataset': dataset_name.upper(),

@@ -427,7 +427,7 @@ def add_vision_args(parser: argparse.ArgumentParser):
     parser.add_argument(
         "--bioclip2_model",
         type=str,
-        default="imageomics/bioclip-2",
+        default="hf-hub:imageomics/bioclip-2",
         help="BioClip2 model identifier for biological datasets"
     )
     parser.add_argument(

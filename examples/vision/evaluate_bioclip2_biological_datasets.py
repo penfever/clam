@@ -80,48 +80,39 @@ class GenericEmbeddingExtractor:
 
 
 class BioClip2EmbeddingExtractor(GenericEmbeddingExtractor):
-    """Extract embeddings using BioClip2 model."""
+    """Extract embeddings using BioCLIP-2 model."""
     
-    def __init__(self, model_name: str = "imageomics/bioclip-2", device: str = "auto"):
+    def __init__(self, model_name: str = "hf-hub:imageomics/bioclip-2", device: str = "auto"):
         self.model_name = model_name
         self.device = device if device != "auto" else ("cuda" if torch.cuda.is_available() else "cpu")
         self.model = None
-        self.processor = None
+        self.preprocess = None
         
     def load_model(self):
-        """Load BioClip2 model."""
+        """Load BioCLIP model using OpenCLIP."""
         try:
-            from transformers import AutoModel, AutoProcessor
+            import open_clip
             
-            logger.info(f"Loading BioClip2 model: {self.model_name}")
+            logger.info(f"Loading BioCLIP model: {self.model_name}")
             
-            # Mac-compatible loading
-            if sys.platform == "darwin":
-                logger.info("Mac detected: using CPU and float32 for BioClip2")
-                torch_dtype = torch.float32
-                device_map = "cpu"
-            else:
-                torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
-                device_map = "auto" if torch.cuda.is_available() else "cpu"
+            # Load BioCLIP model with OpenCLIP
+            model, preprocess_train, preprocess_val = open_clip.create_model_and_transforms(self.model_name)
             
-            self.model = AutoModel.from_pretrained(
-                self.model_name,
-                torch_dtype=torch_dtype,
-                device_map=device_map,
-                trust_remote_code=True
-            )
+            # Move to appropriate device
+            self.model = model.to(self.device)
             
-            self.processor = AutoProcessor.from_pretrained(
-                self.model_name,
-                trust_remote_code=True
-            )
+            # Use validation preprocessing for inference
+            self.preprocess = preprocess_val
             
-            logger.info("BioClip2 model loaded successfully")
+            # Set to eval mode
+            self.model.eval()
+            
+            logger.info(f"BioCLIP model loaded successfully on {self.device}")
             
         except ImportError as e:
-            raise RuntimeError(f"BioClip2 requires transformers library: {e}. Install with: pip install transformers")
+            raise RuntimeError(f"BioCLIP requires open_clip library: {e}. Install with: pip install open-clip-torch")
         except Exception as e:
-            raise RuntimeError(f"Failed to load BioClip2 model: {e}")
+            raise RuntimeError(f"Failed to load BioCLIP model: {e}")
     
     def extract_embeddings(self, image_paths: list) -> np.ndarray:
         """Extract embeddings from images."""
@@ -150,15 +141,17 @@ class BioClip2EmbeddingExtractor(GenericEmbeddingExtractor):
         # Load image
         image = Image.open(image_path).convert('RGB')
         
-        # Process image
-        inputs = self.processor(images=image, return_tensors="pt")
+        # Preprocess image
+        image_tensor = self.preprocess(image).unsqueeze(0).to(self.device)
         
         # Extract features
         with torch.no_grad():
-            outputs = self.model.get_image_features(**inputs)
+            image_features = self.model.encode_image(image_tensor)
+            # Normalize features (standard for CLIP models)
+            image_features = image_features / image_features.norm(dim=-1, keepdim=True)
             
         # Convert to numpy
-        embedding = outputs.cpu().numpy().flatten()
+        embedding = image_features.cpu().numpy().flatten()
         return embedding
 
 
@@ -252,7 +245,7 @@ class BioClip2KNNBaseline(GenericKNNBaseline):
 class BioClip2ClamClassifier(ClamImageTsneClassifier):
     """CLAM t-SNE classifier using BioClip2 backend instead of DINOV2."""
     
-    def __init__(self, bioclip2_model: str = "imageomics/bioclip-2", **kwargs):
+    def __init__(self, bioclip2_model: str = "hf-hub:imageomics/bioclip-2", **kwargs):
         # Remove dinov2_model if present and set a default
         kwargs.pop('bioclip2_model', None)
         if 'dinov2_model' not in kwargs:
