@@ -744,6 +744,8 @@ def parse_args():
     # Convert comma-separated strings to lists for compatibility
     if hasattr(args, 'datasets') and isinstance(args.datasets, str):
         args.datasets = args.datasets.split(',')
+    if hasattr(args, 'models') and isinstance(args.models, str):
+        args.models = args.models.split(',')
     if hasattr(args, 'vision_datasets') and args.vision_datasets:
         args.datasets = args.vision_datasets  # Use vision_datasets if specified
     
@@ -1002,12 +1004,12 @@ def main():
     logger.info(f"  Datasets: {', '.join(args.datasets)}")
     logger.info(f"  Models: {', '.join(args.models)}")
     logger.info(f"  DINOV2 model: {args.dinov2_model}")
-    logger.info(f"  Quick test: {args.quick_test}")
-    logger.info(f"  Use PCA: {args.use_pca_backend}")
-    logger.info(f"  3D t-SNE: {args.use_3d_tsne}")
-    logger.info(f"  KNN connections: {args.use_knn_connections}")
-    if args.use_knn_connections:
-        logger.info(f"  KNN k: {args.knn_k}")
+    logger.info(f"  Quick test: {getattr(args, 'quick_test', False)}")
+    logger.info(f"  Use PCA: {getattr(args, 'use_pca_backend', False)}")
+    logger.info(f"  3D t-SNE: {getattr(args, 'use_3d_tsne', False)}")
+    logger.info(f"  KNN connections: {getattr(args, 'use_knn_connections', False)}")
+    if getattr(args, 'use_knn_connections', False):
+        logger.info(f"  KNN k: {getattr(args, 'knn_k', 5)}")
     
     # Run tests on all datasets
     all_results = run_all_image_tests(args)

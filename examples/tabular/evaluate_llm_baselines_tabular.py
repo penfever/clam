@@ -572,7 +572,10 @@ def main():
         datasets = [apply_k_shot_split(dataset, args.k_shot, args.seed) for dataset in datasets]
     
     # Parse models to evaluate
-    models_to_evaluate = [model.strip() for model in args.models.split(',')]
+    if isinstance(args.models, list):
+        models_to_evaluate = [model.strip() for model in args.models]
+    else:
+        models_to_evaluate = [model.strip() for model in args.models.split(',')]
     logger.info(f"Evaluating models: {models_to_evaluate}")
     
     # Evaluate each model on each dataset

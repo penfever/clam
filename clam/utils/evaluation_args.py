@@ -423,6 +423,23 @@ def add_vision_args(parser: argparse.ArgumentParser):
         default="imageomics/bioclip-2",
         help="BioClip2 model identifier for biological datasets"
     )
+    parser.add_argument(
+        "--quick_test",
+        action="store_true",
+        help="Run quick test with subset of data"
+    )
+    parser.add_argument(
+        "--data_dir",
+        type=str,
+        default="./vision_data",
+        help="Base directory for vision datasets"
+    )
+    parser.add_argument(
+        "--models",
+        type=str,
+        default="clam_tsne",
+        help="Comma-separated list of models to evaluate"
+    )
 
 
 def add_tsne_visualization_args(parser: argparse.ArgumentParser):
@@ -562,6 +579,18 @@ def add_llm_baseline_args(parser: argparse.ArgumentParser):
         type=float,
         default=0.8,
         help="GPU memory utilization factor"
+    )
+    parser.add_argument(
+        "--timeout_minutes",
+        type=int,
+        default=30,
+        help="Timeout for each model evaluation in minutes"
+    )
+    parser.add_argument(
+        "--k_shot",
+        type=int,
+        default=None,
+        help="Number of training examples per class for few-shot learning"
     )
 
 

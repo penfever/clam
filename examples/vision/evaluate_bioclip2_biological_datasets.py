@@ -699,7 +699,7 @@ def run_biological_dataset_test(args):
                 test_paths, test_labels,
                 save_raw_responses=args.save_outputs,
                 output_dir=args.output_dir if args.save_outputs else None,
-                benchmark_name=f"{dataset_name.lower()}_biological"
+                benchmark_name=f"{args.dataset.lower()}_biological"
             )
             eval_results['training_time'] = training_time
             
