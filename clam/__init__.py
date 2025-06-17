@@ -1,5 +1,5 @@
 """
-LLATA: LLM-Augmented Tabular Adapter
+CLAM: Classify Anything Model
 A library for fine-tuning LLMs on tabular data using embeddings from tabular foundation models.
 """
 

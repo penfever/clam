@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Test script to verify that the llata package is installed correctly.
+Test script to verify that the clam package is installed correctly.
 """
 
 import os
@@ -13,17 +13,17 @@ def main():
     
     print("\nTrying to import clam...")
     try:
-        import llata
-        print("✅ Successfully imported llata package")
-        print("llata location:", llata.__file__)
-        print("llata version:", llata.__version__)
+        import clam
+        print("✅ Successfully imported clam package")
+        print("clam location:", clam.__file__)
+        print("clam version:", clam.__version__)
         
         print("\nChecking submodules...")
         modules = ["data", "models", "train", "utils"]
         for module_name in modules:
             try:
-                module = __import__(f"llata.{module_name}", fromlist=[""])
-                print(f"✅ Successfully imported llata.{module_name} from {module.__file__}")
+                module = __import__(f"clam.{module_name}", fromlist=[""])
+                print(f"✅ Successfully imported clam.{module_name} from {module.__file__}")
             except ImportError as e:
                 print(f"❌ Failed to import clam.{module_name}: {e}")
         
@@ -47,7 +47,7 @@ def main():
             print(f"❌ Failed to import create_llm_dataset: {e}")
             
     except ImportError as e:
-        print(f"❌ Failed to import llata: {e}")
+        print(f"❌ Failed to import clam: {e}")
     
     print("\nListing all installed packages:")
     import pkg_resources

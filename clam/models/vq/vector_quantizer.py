@@ -1,5 +1,5 @@
 """
-Vector Quantization layer for LLATA.
+Vector Quantization layer for CLAM.
 
 This module implements a Vector Quantization (VQ) layer that maps continuous
 tabular embeddings to a discrete codebook. The implementation is based on the

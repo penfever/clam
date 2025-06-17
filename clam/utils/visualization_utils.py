@@ -1,8 +1,8 @@
 """
-Visualization utilities for LLATA.
+Visualization utilities for CLAM.
 
 This module provides common functionality for saving and processing
-visualizations across different LLATA implementations.
+visualizations across different CLAM implementations.
 """
 
 import os

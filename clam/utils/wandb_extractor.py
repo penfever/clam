@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Weights & Biases data extraction utilities for LLATA evaluation results.
+Weights & Biases data extraction utilities for CLAM evaluation results.
 
 This module provides functionality to extract and parse evaluation results from W&B
 across different experiment formats:
@@ -64,15 +64,15 @@ def fetch_wandb_data(entity, projects):
         is_llm_baseline_run = any(key for key in run.summary._json_dict.keys() 
                                  if (
                                      # Model hierarchical format: model/{model}/dataset/{dataset}/{metric}
-                                     (any(key.startswith(f"model/{model}/dataset/") for model in ['tabllm', 'tabula_8b', 'jolt', 'llata_tsne']) and
+                                     (any(key.startswith(f"model/{model}/dataset/") for model in ['tabllm', 'tabula_8b', 'jolt', 'clam_tsne']) and
                                       any(metric in key.lower() for metric in ['accuracy', 'balanced_accuracy', 'roc_auc', 'f1_score', 'precision', 'recall']))
                                      or
                                      # New hierarchical format: {model}/dataset/{dataset}/{metric}
-                                     (any(key.startswith(f"{model}/dataset/") for model in ['tabllm', 'tabula_8b', 'jolt', 'llata_tsne']) and
+                                     (any(key.startswith(f"{model}/dataset/") for model in ['tabllm', 'tabula_8b', 'jolt', 'clam_tsne']) and
                                       any(metric in key.lower() for metric in ['accuracy', 'balanced_accuracy', 'roc_auc', 'f1_score', 'precision', 'recall']))
                                      or
                                      # Old format: {model}_{dataset}_{metric}
-                                     (any(model in key.lower() for model in ['tabllm', 'tabula_8b', 'jolt', 'llata_tsne']) 
+                                     (any(model in key.lower() for model in ['tabllm', 'tabula_8b', 'jolt', 'clam_tsne']) 
                                       and any(metric in key.lower() for metric in ['accuracy', 'balanced_accuracy', 'roc_auc', 'f1_score', 'precision', 'recall']))
                                  ))
         
@@ -171,7 +171,7 @@ def fetch_wandb_train_data(entity, projects):
         # Determine the model type based on run name prefix
         model_name = None
         if run.name.startswith("train_task"):
-            model_name = "llata"
+            model_name = "clam"
         elif run.name.startswith("baselines_task"):
             # Skip baseline training runs as they don't provide LlaTa runtime data
             continue
@@ -249,7 +249,7 @@ def extract_variables_from_wandb_data(summary, config, run_name, run_type="unkno
         summary: The W&B run summary dictionary
         config: The W&B run config dictionary  
         run_name: The name of the W&B run
-        run_type: Type of run ("standard_baseline", "llm_baseline", "llata_training", "eval")
+        run_type: Type of run ("standard_baseline", "llm_baseline", "clam_training", "eval")
         
     Returns:
         dict with keys: dataset_name (str), dataset_id (int), task_id (int)
@@ -285,7 +285,7 @@ def extract_variables_from_wandb_data(summary, config, run_name, run_type="unkno
         # 1. Old: {model_name}_{dataset_name}_{metric}
         # 2. New: {model_name}/dataset/{dataset_name}/{metric}
         # Extract dataset_name from metric keys
-        llm_models = ['tabllm', 'tabula_8b', 'jolt', 'llata_tsne']
+        llm_models = ['tabllm', 'tabula_8b', 'jolt', 'clam_tsne']
         
         # Try model hierarchical format first (most specific)
         for key in summary.keys():
@@ -324,8 +324,8 @@ def extract_variables_from_wandb_data(summary, config, run_name, run_type="unkno
                         # Extract dataset name from middle part
                         parts = key.split('_')
                         if len(parts) >= 3:
-                            if model == 'llata_tsne' and len(parts) >= 4:
-                                # Handle llata_tsne specially
+                            if model == 'clam_tsne' and len(parts) >= 4:
+                                # Handle clam_tsne specially
                                 dataset_name = parts[2]
                             else:
                                 dataset_name = parts[1]
@@ -338,7 +338,7 @@ def extract_variables_from_wandb_data(summary, config, run_name, run_type="unkno
         if result["dataset_name"]:
             result["task_id"] = _map_dataset_name_to_task_id(result["dataset_name"])
     
-    elif run_type == "llata_training":
+    elif run_type == "clam_training":
         # Format: test/{metric} or direct metrics
         # Get dataset_name from config
         if "dataset_name" in config:
@@ -826,14 +826,14 @@ def extract_model_metrics_from_summary(summary, debug=False):
             logger.debug(f"Excluding failed run from metric extraction")
         return model_metrics
     
-    # Extract LLATA metrics (these should be directly in the summary)
-    llata_metrics = {}
+    # Extract CLAM metrics (these should be directly in the summary)
+    clam_metrics = {}
     for key in metric_keys:
         if key in summary and is_numeric(summary[key]):
-            llata_metrics[key] = safe_float_convert(summary[key])
+            clam_metrics[key] = safe_float_convert(summary[key])
     
-    if llata_metrics:
-        model_metrics["llata"] = llata_metrics
+    if clam_metrics:
+        model_metrics["clam"] = clam_metrics
     
     # Extract baseline model metrics
     # These appear in patterns like "model/{model_name}/dataset/{dataset_name}/{metric}"
@@ -954,7 +954,7 @@ def extract_model_metrics_from_summary(summary, debug=False):
                 model_name = match.group(1)
                 # Fix empty or "." model names
                 if not model_name or model_name == ".":
-                    model_name = "llata"
+                    model_name = "clam"
                 metric_name = match.group(2)
                 # For old format, use a default dataset name
                 baseline_metrics[model_name]["default"][metric_name] = safe_float_convert(value)
@@ -972,18 +972,18 @@ def extract_model_metrics_from_summary(summary, debug=False):
     
     # Only add train_dataset_metrics if they exist and the run didn't fail
     if train_dataset_metrics and not should_exclude_failed_run(summary, debug=debug):
-        model_metrics["llata"] = train_dataset_metrics
+        model_metrics["clam"] = train_dataset_metrics
     elif train_dataset_metrics and debug:
         logger.debug(f"Excluding train_dataset_metrics due to failed run detection")
 
     # Extract LLM baseline metrics (new format from evaluate_llm_baselines.py)
     # These can appear in three patterns:
-    # 1. Old format: "tabllm_adult_accuracy", "jolt_har_balanced_accuracy", "llata_tsne_adult_accuracy", etc.
-    # 2. New hierarchical format: "llata_tsne/dataset/kr-vs-kp/balanced_accuracy", etc.
-    # 3. Model hierarchical format: "model/llata_tsne/dataset/kr-vs-kp/balanced_accuracy", etc.
-    llm_baseline_pattern_old = r'^(tabllm|tabula_8b|jolt|llata_tsne)_([^_]+)_(.+)$'
-    llm_baseline_pattern_new = r'^(tabllm|tabula_8b|jolt|llata_tsne)/dataset/([^/]+)/(.+)$'
-    llm_baseline_pattern_model = r'^model/(tabllm|tabula_8b|jolt|llata_tsne)/dataset/([^/]+)/(.+)$'
+    # 1. Old format: "tabllm_adult_accuracy", "jolt_har_balanced_accuracy", "clam_tsne_adult_accuracy", etc.
+    # 2. New hierarchical format: "clam_tsne/dataset/kr-vs-kp/balanced_accuracy", etc.
+    # 3. Model hierarchical format: "model/clam_tsne/dataset/kr-vs-kp/balanced_accuracy", etc.
+    llm_baseline_pattern_old = r'^(tabllm|tabula_8b|jolt|clam_tsne)_([^_]+)_(.+)$'
+    llm_baseline_pattern_new = r'^(tabllm|tabula_8b|jolt|clam_tsne)/dataset/([^/]+)/(.+)$'
+    llm_baseline_pattern_model = r'^model/(tabllm|tabula_8b|jolt|clam_tsne)/dataset/([^/]+)/(.+)$'
     
     llm_baseline_metrics = defaultdict(lambda: defaultdict(dict))
     for key, value in summary.items():
@@ -1156,7 +1156,7 @@ def extract_results_from_wandb(wandb_df, runtime_info=None, debug=False, save_ze
                     if len(parts) >= 5 and parts[0] == 'model' and parts[2] == 'dataset':  # model/model_name/dataset/dataset_name/accuracy
                         model_name = parts[1]
                         dataset_name = parts[3]
-                        if model_name in ['tabllm', 'tabula_8b', 'jolt', 'llata_tsne']:
+                        if model_name in ['tabllm', 'tabula_8b', 'jolt', 'clam_tsne']:
                             analysis = analyze_zero_accuracy_run(summary, run_name, config, model_name, dataset_name)
                             analysis['would_be_filtered'] = should_exclude_failed_run(summary, model_name, dataset_name, debug=debug)
                             zero_accuracy_details.append(analysis)
@@ -1164,7 +1164,7 @@ def extract_results_from_wandb(wandb_df, runtime_info=None, debug=False, save_ze
                     elif len(parts) >= 4 and parts[1] == 'dataset':  # model_name/dataset/dataset_name/accuracy
                         model_name = parts[0]
                         dataset_name = parts[2]
-                        if model_name in ['tabllm', 'tabula_8b', 'jolt', 'llata_tsne']:
+                        if model_name in ['tabllm', 'tabula_8b', 'jolt', 'clam_tsne']:
                             analysis = analyze_zero_accuracy_run(summary, run_name, config, model_name, dataset_name)
                             analysis['would_be_filtered'] = should_exclude_failed_run(summary, model_name, dataset_name, debug=debug)
                             zero_accuracy_details.append(analysis)
@@ -1174,10 +1174,10 @@ def extract_results_from_wandb(wandb_df, runtime_info=None, debug=False, save_ze
                 elif key.endswith('_accuracy') and value == 0.0:
                     # Extract model and dataset names
                     parts = key.split('_')
-                    if len(parts) >= 3:  # e.g., llata_tsne_adult_accuracy
-                        if parts[0] in ['tabllm', 'tabula', 'jolt', 'llata']:
-                            if parts[0] == 'llata' and parts[1] == 'tsne':
-                                model_name = 'llata_tsne'
+                    if len(parts) >= 3:  # e.g., clam_tsne_adult_accuracy
+                        if parts[0] in ['tabllm', 'tabula', 'jolt', 'clam']:
+                            if parts[0] == 'clam' and parts[1] == 'tsne':
+                                model_name = 'clam_tsne'
                                 dataset_name = parts[2]
                             else:
                                 model_name = parts[0]
@@ -1196,15 +1196,15 @@ def extract_results_from_wandb(wandb_df, runtime_info=None, debug=False, save_ze
         is_llm_baseline_run = any(key for key in summary.keys() 
                                  if (
                                      # Model hierarchical format: model/{model}/dataset/{dataset}/{metric}
-                                     (any(key.startswith(f"model/{model}/dataset/") for model in ['tabllm', 'tabula_8b', 'jolt', 'llata_tsne']) and
+                                     (any(key.startswith(f"model/{model}/dataset/") for model in ['tabllm', 'tabula_8b', 'jolt', 'clam_tsne']) and
                                       any(metric in key.lower() for metric in ['accuracy', 'balanced_accuracy']))
                                      or
                                      # New hierarchical format: {model}/dataset/{dataset}/{metric}
-                                     (any(key.startswith(f"{model}/dataset/") for model in ['tabllm', 'tabula_8b', 'jolt', 'llata_tsne']) and
+                                     (any(key.startswith(f"{model}/dataset/") for model in ['tabllm', 'tabula_8b', 'jolt', 'clam_tsne']) and
                                       any(metric in key.lower() for metric in ['accuracy', 'balanced_accuracy']))
                                      or
                                      # Old format: {model}_{dataset}_{metric}
-                                     (any(model in key.lower() for model in ['tabllm', 'tabula_8b', 'jolt', 'llata_tsne']) 
+                                     (any(model in key.lower() for model in ['tabllm', 'tabula_8b', 'jolt', 'clam_tsne']) 
                                       and any(metric in key.lower() for metric in ['accuracy', 'balanced_accuracy']))
                                  ))
         
@@ -1223,7 +1223,7 @@ def extract_results_from_wandb(wandb_df, runtime_info=None, debug=False, save_ze
         elif is_standard_baseline_run:
             run_type = "standard_baseline"
         elif is_train_dataset_run:
-            run_type = "llata_training"
+            run_type = "clam_training"
         elif is_eval_run:
             run_type = "eval"
         else:
@@ -1436,19 +1436,19 @@ def extract_results_from_wandb(wandb_df, runtime_info=None, debug=False, save_ze
             # Extract model metrics from summary
             model_metrics = extract_model_metrics_from_summary(summary, debug=debug)
             
-            # If no model metrics were found, check if LLATA metrics are in the summary directly
+            # If no model metrics were found, check if CLAM metrics are in the summary directly
             if not model_metrics:
                 # Extract metrics from summary
-                llata_metrics = {}
+                clam_metrics = {}
                 metric_keys = ["accuracy", "f1_macro", "f1_micro", "f1_weighted", 
                              "precision_macro", "recall_macro", "auc", "balanced_accuracy"]
                              
                 for key in metric_keys:
                     if key in summary and is_numeric(summary[key]):
-                        llata_metrics[key] = safe_float_convert(summary[key])
+                        clam_metrics[key] = safe_float_convert(summary[key])
                         
-                if llata_metrics:
-                    model_metrics["llata"] = llata_metrics
+                if clam_metrics:
+                    model_metrics["clam"] = clam_metrics
             
             # Store model results
             for model_name, metrics in model_metrics.items():
@@ -1566,15 +1566,15 @@ def detect_run_types(wandb_df):
         lambda x: any(key for key in x.keys() 
                      if (
                          # Model hierarchical format: model/{model}/dataset/{dataset}/{metric}
-                         (any(key.startswith(f"model/{model}/dataset/") for model in ['tabllm', 'tabula_8b', 'jolt', 'llata_tsne']) and
+                         (any(key.startswith(f"model/{model}/dataset/") for model in ['tabllm', 'tabula_8b', 'jolt', 'clam_tsne']) and
                           any(metric in key.lower() for metric in ['accuracy', 'balanced_accuracy', 'roc_auc', 'f1_score', 'precision', 'recall']))
                          or
                          # New hierarchical format: {model}/dataset/{dataset}/{metric}
-                         (any(key.startswith(f"{model}/dataset/") for model in ['tabllm', 'tabula_8b', 'jolt', 'llata_tsne']) and
+                         (any(key.startswith(f"{model}/dataset/") for model in ['tabllm', 'tabula_8b', 'jolt', 'clam_tsne']) and
                           any(metric in key.lower() for metric in ['accuracy', 'balanced_accuracy', 'roc_auc', 'f1_score', 'precision', 'recall']))
                          or
                          # Old format: {model}_{dataset}_{metric}
-                         (any(model in key.lower() for model in ['tabllm', 'tabula_8b', 'jolt', 'llata_tsne']) 
+                         (any(model in key.lower() for model in ['tabllm', 'tabula_8b', 'jolt', 'clam_tsne']) 
                           and any(metric in key.lower() for metric in ['accuracy', 'balanced_accuracy', 'roc_auc', 'f1_score', 'precision', 'recall']))
                      ))
     )]

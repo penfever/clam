@@ -1,10 +1,10 @@
-# LLATA Audio Classification
+# CLAM Audio Classification
 
 Few-shot audio classification using Whisper embeddings and t-SNE visualization.
 
 ## Overview
 
-This implementation adapts the LLATA (Large Language Model Augmented Tabular Analysis) framework for audio classification tasks. The pipeline works as follows:
+This implementation adapts the CLAM (Large Language Model Augmented Tabular Analysis) framework for audio classification tasks. The pipeline works as follows:
 
 1. **Audio → Whisper Embeddings**: Extract feature representations using OpenAI's Whisper encoder
 2. **t-SNE Visualization**: Project embeddings into 2D/3D space for visual analysis
@@ -90,7 +90,7 @@ python examples/audio/test_ravdess.py --k_shot 10 --whisper_model large-v2
 ```
 ESC-50 5-SHOT TEST RESULTS
 ============================================================
-llata_tsne     : ✓ 0.6450 accuracy (train: 45.2s, test: 123.4s)
+clam_tsne     : ✓ 0.6450 accuracy (train: 45.2s, test: 123.4s)
 
 Detailed results saved to: ./esc50_test_results
 ```
@@ -99,7 +99,7 @@ Detailed results saved to: ./esc50_test_results
 
 ### LlataAudioTsneClassifier
 
-Main classifier implementing the audio LLATA pipeline:
+Main classifier implementing the audio CLAM pipeline:
 
 ```python
 from examples.audio import LlataAudioTsneClassifier
@@ -175,7 +175,7 @@ The system generates rich visualizations including:
 
 ## 🎯 Overview
 
-Added two audio classification baseline methods to complement the LLATA t-SNE approach:
+Added two audio classification baseline methods to complement the CLAM t-SNE approach:
 
 1. **Whisper KNN**: Uses Whisper Large-v2 embeddings with K-Nearest Neighbors classification
 2. **CLAP Zero-Shot**: Uses Microsoft's CLAP model for zero-shot audio classification
@@ -198,19 +198,19 @@ Added two audio classification baseline methods to complement the LLATA t-SNE ap
 ### Single Dataset Testing
 ```bash
 # Test all models on ESC-50
-python test_esc50.py --models llata_tsne whisper_knn clap_zero_shot --k_shot 5
+python test_esc50.py --models clam_tsne whisper_knn clap_zero_shot --k_shot 5
 
 # Test only baselines on RAVDESS
 python test_ravdess.py --models whisper_knn clap_zero_shot --k_shot 3
 
-# Test LLATA only (default behavior)
-python test_esc50.py --models llata_tsne
+# Test CLAM only (default behavior)
+python test_esc50.py --models clam_tsne
 ```
 
 ### Multi-Dataset Testing
 ```bash
 # Test all models on all datasets
-python test_all_audio.py --models llata_tsne whisper_knn clap_zero_shot --k_shot 5
+python test_all_audio.py --models clam_tsne whisper_knn clap_zero_shot --k_shot 5
 
 # Quick test with baselines only
 python test_all_audio.py --models whisper_knn clap_zero_shot --quick_test
@@ -268,10 +268,10 @@ config = classifier.get_config()
 
 ### New `--models` Parameter
 ```bash
---models llata_tsne whisper_knn clap_zero_shot
+--models clam_tsne whisper_knn clap_zero_shot
 ```
-**Choices**: `llata_tsne`, `whisper_knn`, `clap_zero_shot`
-**Default**: Varies by script (ESC-50/RAVDESS: `llata_tsne whisper_knn`, All: `llata_tsne`)
+**Choices**: `clam_tsne`, `whisper_knn`, `clap_zero_shot`
+**Default**: Varies by script (ESC-50/RAVDESS: `clam_tsne whisper_knn`, All: `clam_tsne`)
 
 ### Existing Parameters
 All existing parameters (`--k_shot`, `--whisper_model`, `--use_wandb`, etc.) work with baseline models where applicable.
@@ -288,7 +288,7 @@ All existing parameters (`--k_shot`, `--whisper_model`, `--use_wandb`, etc.) wor
 - **Typical Range**: 40-70% accuracy (highly dependent on class name quality)
 - **Speed**: Medium-slow (CLAP inference)
 
-### LLATA t-SNE  
+### CLAM t-SNE  
 - **Strengths**: Interpretable visualizations, VLM reasoning
 - **Typical Range**: 65-90% accuracy with good visualizations
 - **Speed**: Slow (embeddings + t-SNE + VLM)
@@ -344,12 +344,12 @@ pip install openai-whisper>=20231117
 - All models use the same Whisper model version for fair comparison
 - CLAP prompts are automatically generated from class names
 - Error handling ensures individual model failures don't crash entire runs
-- Artifact saving works consistently across all models (LLATA t-SNE only saves visualizations)
+- Artifact saving works consistently across all models (CLAM t-SNE only saves visualizations)
 - Wandb logging tracks model-specific metrics separately for easy comparison
 
 # Audio Classification Parameters Explained
 
-This document clarifies the key parameters used in LLATA audio classification, particularly the distinction between different "k" parameters.
+This document clarifies the key parameters used in CLAM audio classification, particularly the distinction between different "k" parameters.
 
 ## 🎯 Core Parameters
 
@@ -463,7 +463,7 @@ python test_esc50.py --k_shot 5 --use_knn_connections --knn_k 3 --use_3d_tsne
 - Example: 5 samples × 50 classes = 250 training samples
 - Much more challenging and realistic scenario
 
-**LLATA Approach**:
+**CLAM Approach**:
 1. Extract rich Whisper embeddings from audio
 2. Create t-SNE visualization showing embedding relationships
 3. Use VLM to classify based on visual patterns in embedding space
@@ -510,7 +510,7 @@ Updated all audio test scripts to match the CIFAR-10 functionality for saving im
 - ✅ Already had `--save_every_n` parameter
 - ✅ Already had `classifier.save_every_n = args.save_every_n` assignment
 
-### 4. **llata_tsne_audio_baseline.py** - Major Updates
+### 4. **clam_tsne_audio_baseline.py** - Major Updates
 
 #### Enhanced `predict()` method:
 - ✅ Added `save_outputs` and `output_dir` parameters
@@ -548,13 +548,13 @@ When `--save_outputs` is used, creates:
 
 ### Basic Usage with Visualization Saving
 ```bash
-python test_esc50.py --models llata_tsne --save_outputs --save_every_n 5
+python test_esc50.py --models clam_tsne --save_outputs --save_every_n 5
 ```
 
 ### Full Feature Test
 ```bash
 python test_esc50.py \
-  --models llata_tsne whisper_knn clap_zero_shot \
+  --models clam_tsne whisper_knn clap_zero_shot \
   --k_shot 4 \
   --tsne_zoom_factor 8.0 \
   --use_knn_connections \
@@ -566,7 +566,7 @@ python test_esc50.py \
 ### Multi-Dataset Test
 ```bash
 python test_all_audio.py \
-  --models llata_tsne \
+  --models clam_tsne \
   --save_outputs \
   --save_every_n 5 \
   --output_dir ./all_audio_results
@@ -653,9 +653,9 @@ All audio classification scripts now include full Weights & Biases integration f
 
 | Script | Wandb Support | GPU Monitoring | Auto-naming | Project Default |
 |--------|--------------|----------------|-------------|-----------------|
-| `test_esc50.py` | ✅ Full | ✅ Yes | ✅ Yes | `esc50-llata` |
-| `test_ravdess.py` | ✅ Full | ✅ Yes | ✅ Yes | `ravdess-llata` |
-| `test_all_audio.py` | ✅ Full | ✅ Yes | ✅ Yes | `audio-llata-all` |
+| `test_esc50.py` | ✅ Full | ✅ Yes | ✅ Yes | `esc50-clam` |
+| `test_ravdess.py` | ✅ Full | ✅ Yes | ✅ Yes | `ravdess-clam` |
+| `test_all_audio.py` | ✅ Full | ✅ Yes | ✅ Yes | `audio-clam-all` |
 
 ## 🚀 Quick Start
 
@@ -737,9 +737,9 @@ If you don't specify `--wandb_name`, runs are automatically named with:
 - Key parameters: k-shot value, 3D mode, KNN settings
 
 Examples:
-- `esc50_llata_20240116_143022_k5`
-- `ravdess_llata_20240116_143022_k10_3d_knn5`
-- `audio_llata_20240116_143022_k5_all_pca`
+- `esc50_clam_20240116_143022_k5`
+- `ravdess_clam_20240116_143022_k10_3d_knn5`
+- `audio_clam_20240116_143022_k5_all_pca`
 
 ## 📈 Viewing Results
 
@@ -762,7 +762,7 @@ import wandb
 api = wandb.Api()
 
 # Get runs from a project
-runs = api.runs("your-entity/esc50-llata")
+runs = api.runs("your-entity/esc50-clam")
 for run in runs:
     print(f"{run.name}: {run.summary['accuracy']}")
 ```

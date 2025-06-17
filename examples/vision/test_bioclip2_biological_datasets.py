@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Test script for biological dataset classification using BioClip2 and LLATA t-SNE baselines.
+Test script for biological dataset classification using BioClip2 and CLAM t-SNE baselines.
 
 This script evaluates models on FishNet, AwA2, and PlantDoc datasets with:
 - BioClip2 embeddings + KNN baseline
 - Qwen VL baseline
-- LLATA t-SNE with BioClip2 backend
+- CLAM t-SNE with BioClip2 backend
 
 Based on BioClip2 paper: https://arxiv.org/abs/2505.23883
 Datasets: FishNet (habitat classification), AwA2 (trait prediction), PlantDoc (disease detection)
@@ -229,7 +229,7 @@ class BioClip2KNNBaseline:
 
 
 class BioClip2ClamClassifier(ClamImageTsneClassifier):
-    """LLATA t-SNE classifier using BioClip2 backend instead of DINOV2."""
+    """CLAM t-SNE classifier using BioClip2 backend instead of DINOV2."""
     
     def __init__(self, bioclip2_model: str = "imageomics/bioclip-2", **kwargs):
         # Remove dinov2_model if present and set a default
@@ -701,9 +701,9 @@ def run_biological_dataset_test(args):
             logger.error(f"Qwen VL failed: {e}")
             results['qwen_vl'] = {'error': str(e)}
     
-    # Test LLATA t-SNE with BioClip2 backend
-    if 'llata_tsne_bioclip2' in args.models:
-        logger.info("Testing LLATA t-SNE with BioClip2 backend...")
+    # Test CLAM t-SNE with BioClip2 backend
+    if 'clam_tsne_bioclip2' in args.models:
+        logger.info("Testing CLAM t-SNE with BioClip2 backend...")
         try:
             classifier = BioClip2ClamClassifier(
                 bioclip2_model="imageomics/bioclip-2",
@@ -740,15 +740,15 @@ def run_biological_dataset_test(args):
             eval_results['training_time'] = training_time
             eval_results['config'] = classifier.get_config()
             
-            results['llata_tsne_bioclip2'] = eval_results
-            logger.info(f"LLATA t-SNE BioClip2 completed: {eval_results['accuracy']:.4f} accuracy")
+            results['clam_tsne_bioclip2'] = eval_results
+            logger.info(f"CLAM t-SNE BioClip2 completed: {eval_results['accuracy']:.4f} accuracy")
             
             if use_wandb_logging:
-                log_results_to_wandb('llata_tsne_bioclip2', eval_results, args, class_names)
+                log_results_to_wandb('clam_tsne_bioclip2', eval_results, args, class_names)
             
         except Exception as e:
-            logger.error(f"LLATA t-SNE BioClip2 failed: {e}")
-            results['llata_tsne_bioclip2'] = {'error': str(e)}
+            logger.error(f"CLAM t-SNE BioClip2 failed: {e}")
+            results['clam_tsne_bioclip2'] = {'error': str(e)}
     
     return results
 
@@ -831,7 +831,7 @@ def save_results(results: dict, output_dir: str, args):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Test biological datasets with BioClip2 and LLATA baselines")
+    parser = argparse.ArgumentParser(description="Test biological datasets with BioClip2 and CLAM baselines")
     
     parser.add_argument(
         "--dataset",
@@ -861,8 +861,8 @@ def parse_args():
     parser.add_argument(
         "--models",
         nargs="+",
-        default=["bioclip2_knn", "qwen_vl", "llata_tsne_bioclip2"],
-        choices=["bioclip2_knn", "qwen_vl", "llata_tsne_bioclip2"],
+        default=["bioclip2_knn", "qwen_vl", "clam_tsne_bioclip2"],
+        choices=["bioclip2_knn", "qwen_vl", "clam_tsne_bioclip2"],
         help="Models to test"
     )
     parser.add_argument(
@@ -892,7 +892,7 @@ def parse_args():
         help="Vision Language Model to use"
     )
     
-    # LLATA t-SNE parameters (matching CIFAR script)
+    # CLAM t-SNE parameters (matching CIFAR script)
     parser.add_argument(
         "--tsne_zoom_factor",
         type=float,
@@ -925,7 +925,7 @@ def parse_args():
     parser.add_argument(
         "--use_knn_connections",
         action="store_true",
-        help="Show KNN connections from query point to nearest neighbors in embedding space (llata_tsne only)"
+        help="Show KNN connections from query point to nearest neighbors in embedding space (clam_tsne only)"
     )
     parser.add_argument(
         "--knn_k",
@@ -936,7 +936,7 @@ def parse_args():
     parser.add_argument(
         "--use_3d_tsne",
         action="store_true",
-        help="Use 3D t-SNE with multiple viewing angles (isometric, front, side, top views) instead of 2D (llata_tsne only)"
+        help="Use 3D t-SNE with multiple viewing angles (isometric, front, side, top views) instead of 2D (clam_tsne only)"
     )
     parser.add_argument(
         "--save_every_n",

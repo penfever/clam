@@ -1,5 +1,5 @@
 """
-Shared argument parsing utilities for LLATA training scripts.
+Shared argument parsing utilities for CLAM training scripts.
 
 This module provides common argument parsing functions to avoid code duplication
 between train_tabular_mix.py and train_tabular_dataset.py.
@@ -352,7 +352,7 @@ def add_regularization_args(parser: argparse.ArgumentParser):
     )
 
 
-def add_wandb_args(parser: argparse.ArgumentParser, default_project: str = "llata-training"):
+def add_wandb_args(parser: argparse.ArgumentParser, default_project: str = "clam-training"):
     """Add Weights & Biases arguments."""
     parser.add_argument(
         "--use_wandb",
@@ -389,7 +389,7 @@ def add_common_args(parser: argparse.ArgumentParser):
     parser.add_argument(
         "--output_dir",
         type=str,
-        default="./models/llata_output",
+        default="./models/clam_output",
         help="Directory to save model checkpoints and results"
     )
     parser.add_argument(
@@ -411,9 +411,9 @@ def add_common_args(parser: argparse.ArgumentParser):
     )
 
 
-def create_common_parser(description: str, default_wandb_project: str = "llata-training") -> argparse.ArgumentParser:
+def create_common_parser(description: str, default_wandb_project: str = "clam-training") -> argparse.ArgumentParser:
     """
-    Create an argument parser with all common arguments for LLATA training.
+    Create an argument parser with all common arguments for CLAM training.
     
     Args:
         description: Description for the argument parser
@@ -444,8 +444,8 @@ def create_common_parser(description: str, default_wandb_project: str = "llata-t
 def create_single_dataset_parser() -> argparse.ArgumentParser:
     """Create argument parser specific to single dataset training."""
     parser = create_common_parser(
-        "Train LLATA on a single tabular dataset from OpenML",
-        default_wandb_project="llata-training"
+        "Train CLAM on a single tabular dataset from OpenML",
+        default_wandb_project="clam-training"
     )
     
     # Add single-dataset specific arguments
@@ -500,10 +500,10 @@ def create_single_dataset_parser() -> argparse.ArgumentParser:
     
     # Override some defaults for single dataset usage
     parser.set_defaults(
-        output_dir="./models/llata_output",
+        output_dir="./models/clam_output",
         max_train_samples=None,  # Keep help text simple for single dataset
         permute_labels=False,  # Simpler help text without multi-step mention
-        wandb_project="llata-training",
+        wandb_project="clam-training",
         wandb_name=None  # Will default to dataset name + timestamp
     )
     
@@ -513,8 +513,8 @@ def create_single_dataset_parser() -> argparse.ArgumentParser:
 def create_multi_dataset_parser() -> argparse.ArgumentParser:
     """Create argument parser specific to multi-dataset training."""
     parser = create_common_parser(
-        "Train LLATA on multiple tabular datasets",
-        default_wandb_project="llata-multi-training"
+        "Train CLAM on multiple tabular datasets",
+        default_wandb_project="clam-multi-training"
     )
     
     # Add multi-dataset specific arguments
@@ -552,10 +552,10 @@ def create_multi_dataset_parser() -> argparse.ArgumentParser:
     
     # Override some defaults for multi-dataset usage
     parser.set_defaults(
-        output_dir="./models/llata_multi_output",
+        output_dir="./models/clam_multi_output",
         total_steps=10000,  # Multi-dataset uses step-based training by default
         save_steps=500,
-        wandb_project="llata-multi-training",
+        wandb_project="clam-multi-training",
         wandb_name=None  # Will default to 'multi_dataset' + timestamp
     )
     

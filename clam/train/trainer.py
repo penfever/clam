@@ -1,5 +1,5 @@
 """
-Training functions for LLATA models.
+Training functions for CLAM models.
 """
 
 import torch

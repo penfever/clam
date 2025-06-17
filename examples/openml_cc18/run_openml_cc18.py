@@ -1,23 +1,23 @@
 #!/usr/bin/env python
 """
-Script to train and evaluate LLATA models on the OpenML CC18 collection.
+Script to train and evaluate CLAM models on the OpenML CC18 collection.
 
 This script:
 1. Retrieves the OpenML CC18 collection (study_id=99)
 2. For each task in the collection:
-   a. Trains a LLATA model on 3 different splits of the dataset
+   a. Trains a CLAM model on 3 different splits of the dataset
    b. Evaluates the trained model and all baselines on each split
 3. Logs the results to Weights & Biases with version control by date
 
 Requirements:
 - OpenML installed (pip install openml)
-- LLATA installed and configured
+- CLAM installed and configured
 - W&B account for logging results
 
 Usage:
-    python run_openml_cc18.py --llata_repo_path /path/to/llata --output_dir ./results
+    python run_openml_cc18.py --clam_repo_path /path/to/clam --output_dir ./results
 
-The script assumes the LLATA repo structure.
+The script assumes the CLAM repo structure.
 """
 
 import os
@@ -47,13 +47,13 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Train and evaluate LLATA on OpenML CC18 collection")
+    parser = argparse.ArgumentParser(description="Train and evaluate CLAM on OpenML CC18 collection")
     
     parser.add_argument(
-        "--llata_repo_path",
+        "--clam_repo_path",
         type=str,
         required=True,
-        help="Path to the LLATA repository"
+        help="Path to the CLAM repository"
     )
     parser.add_argument(
         "--output_dir",
@@ -82,7 +82,7 @@ def parse_args():
     parser.add_argument(
         "--wandb_project",
         type=str,
-        default="llata-openml-cc18",
+        default="clam-openml-cc18",
         help="W&B project name"
     )
     parser.add_argument(
@@ -179,7 +179,7 @@ def get_openml_cc18_tasks():
 
 def train_on_task(task, split_idx, args):
     """
-    Train a LLATA model on a specific OpenML task and split.
+    Train a CLAM model on a specific OpenML task and split.
     
     Args:
         task: OpenML task object
@@ -210,7 +210,7 @@ def train_on_task(task, split_idx, args):
     wandb_project = f"{args.wandb_project}-{version_by_date}"
     
     # Build training command
-    train_script = os.path.join(args.llata_repo_path, "examples", "train_tabular_dataset.py")
+    train_script = os.path.join(args.clam_repo_path, "examples", "train_tabular_dataset.py")
     
     cmd = [
         "python", train_script,
@@ -248,7 +248,7 @@ def train_on_task(task, split_idx, args):
 
 def evaluate_model(task, split_idx, model_dir, args):
     """
-    Evaluate a trained LLATA model and baselines on a specific OpenML task and split.
+    Evaluate a trained CLAM model and baselines on a specific OpenML task and split.
     
     Args:
         task: OpenML task object
@@ -280,7 +280,7 @@ def evaluate_model(task, split_idx, model_dir, args):
     wandb_project = f"{args.wandb_project}-{version_by_date}"
     
     # Build evaluation command
-    eval_script = os.path.join(args.llata_repo_path, "examples", "evaluate_on_dataset.py")
+    eval_script = os.path.join(args.clam_repo_path, "examples", "evaluate_on_dataset.py")
     
     cmd = [
         "python", eval_script,

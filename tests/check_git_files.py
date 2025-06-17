@@ -28,12 +28,12 @@ def main():
     
     files = result.stdout.strip().split("\n")
     
-    # Print the files with focus on llata/data directory
+    # Print the files with focus on clam/data directory
     if not files or (len(files) == 1 and not files[0]):
         print("  No untracked files found.")
     else:
         for file in files:
-            if file.startswith("llata/data/"):
+            if file.startswith("clam/data/"):
                 print(f"  ✅ {file}")
             else:
                 print(f"  {file}")
@@ -47,28 +47,28 @@ def main():
     
     files = result.stdout.strip().split("\n")
     
-    # Print the files with focus on llata/data directory
+    # Print the files with focus on clam/data directory
     if not files or (len(files) == 1 and not files[0]):
         print("  No tracked files found.")
     else:
         for file in files:
-            if file.startswith("llata/data/"):
+            if file.startswith("clam/data/"):
                 print(f"  ✅ {file}")
             else:
                 print(f"  {file}")
     
-    # Check specifically for llata/data directory
-    print("\nChecking llata/data directory:")
-    llata_data_dir = current_dir / "llata" / "data"
-    if not llata_data_dir.exists():
-        print(f"  ❌ Directory {llata_data_dir} does not exist!")
+    # Check specifically for clam/data directory
+    print("\nChecking clam/data directory:")
+    clam_data_dir = current_dir / "clam" / "data"
+    if not clam_data_dir.exists():
+        print(f"  ❌ Directory {clam_data_dir} does not exist!")
         return
     
-    print(f"  ✅ Directory {llata_data_dir} exists")
+    print(f"  ✅ Directory {clam_data_dir} exists")
     
-    # List all files in llata/data directory
-    print("\nFiles in llata/data directory:")
-    for file in llata_data_dir.rglob("*"):
+    # List all files in clam/data directory
+    print("\nFiles in clam/data directory:")
+    for file in clam_data_dir.rglob("*"):
         if file.is_file():
             rel_path = file.relative_to(current_dir)
             ignored = is_ignored(rel_path)

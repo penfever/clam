@@ -17,7 +17,7 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 # Cache file for OpenML mappings
-CACHE_DIR = Path.home() / ".llata" / "cache"
+CACHE_DIR = Path.home() / ".clam" / "cache"
 MAPPING_CACHE_FILE = CACHE_DIR / "openml_mappings.pkl"
 CC18_TASKS_CACHE_FILE = CACHE_DIR / "openml_cc18_tasks.json"
 

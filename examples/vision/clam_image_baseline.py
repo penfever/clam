@@ -1,5 +1,5 @@
 """
-LLATA t-SNE baseline for image classification using DINOV2 embeddings.
+CLAM t-SNE baseline for image classification using DINOV2 embeddings.
 """
 
 import numpy as np
@@ -14,7 +14,7 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 import time
 import os
 
-# Import LLATA utilities
+# Import CLAM utilities
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 class ClamImageClassifier:
     """
-    LLATA t-SNE classifier for image classification using pre-trained embeddings.
+    CLAM t-SNE classifier for image classification using pre-trained embeddings.
     
     This approach:
     1. Extracts DINOV2 embeddings from images
@@ -48,7 +48,7 @@ class ClamImageClassifier:
         device: Optional[str] = None
     ):
         """
-        Initialize LLATA image classifier.
+        Initialize CLAM image classifier.
         
         Args:
             dinov2_model: DINOV2 model variant to use
@@ -104,7 +104,7 @@ class ClamImageClassifier:
         class_names: Optional[List[str]] = None
     ) -> 'ClamImageClassifier':
         """
-        Fit the LLATA image classifier.
+        Fit the CLAM image classifier.
         
         Args:
             train_image_paths: List of training image paths
@@ -114,7 +114,7 @@ class ClamImageClassifier:
         Returns:
             Self for method chaining
         """
-        logger.info(f"Fitting LLATA image classifier on {len(train_image_paths)} training images")
+        logger.info(f"Fitting CLAM image classifier on {len(train_image_paths)} training images")
         start_time = time.time()
         
         # Store class names
@@ -162,7 +162,7 @@ class ClamImageClassifier:
         
         self.is_fitted = True
         elapsed_time = time.time() - start_time
-        logger.info(f"LLATA image classifier fitted in {elapsed_time:.2f} seconds")
+        logger.info(f"CLAM image classifier fitted in {elapsed_time:.2f} seconds")
         
         return self
     
@@ -380,7 +380,7 @@ class ClamImageClassifier:
                 'true_labels': test_labels
             })
         
-        logger.info(f"LLATA image classifier accuracy: {accuracy:.4f}")
+        logger.info(f"CLAM image classifier accuracy: {accuracy:.4f}")
         
         return results
     

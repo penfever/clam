@@ -139,7 +139,7 @@ def test_dataset_loading():
 
 def main():
     """Run all tests."""
-    logger.info("🎵 Starting LLATA Audio Pipeline Tests")
+    logger.info("🎵 Starting CLAM Audio Pipeline Tests")
     logger.info("=" * 50)
     
     tests = [

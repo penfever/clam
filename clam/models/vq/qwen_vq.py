@@ -583,7 +583,7 @@ def load_vq_pretrained_model(model_path: str, device_map: str = "auto", embeddin
     torch.nn.Module, Any, int, int, List[int], bool
 ]:
     """
-    Load a pretrained Vector-Quantized LLATA model from a checkpoint directory.
+    Load a pretrained Vector-Quantized CLAM model from a checkpoint directory.
     
     This function handles different model loading scenarios for VQ models:
     1. Models saved with vector_quantizer.pt (saved using QwenWithVQPrefixEmbedding.save_pretrained)

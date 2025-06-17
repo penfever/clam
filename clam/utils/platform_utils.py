@@ -1,5 +1,5 @@
 """
-Platform compatibility utilities for LLATA.
+Platform compatibility utilities for CLAM.
 
 This module provides cross-platform compatibility functions for
 device detection, model configuration, and platform-specific optimizations.

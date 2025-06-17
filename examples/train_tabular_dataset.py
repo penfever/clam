@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Example script demonstrating how to use LLATA to train a model on tabular datasets.
+Example script demonstrating how to use CLAM to train a model on tabular datasets.
 Originally designed for the HAR dataset, but now supports any tabular dataset
 that can be loaded with OpenML.
 
@@ -459,7 +459,7 @@ def main():
     if args.use_wandb and WANDB_AVAILABLE:
         # Initialize unified metrics logger
         metrics_logger = MetricsLogger(
-            model_name="llata",  # This is the LLATA model being trained
+            model_name="clam",  # This is the CLAM model being trained
             dataset_name=args.dataset_name,
             use_wandb=True,
             logger=logger

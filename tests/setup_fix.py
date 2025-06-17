@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Script to fix any issues with the llata package installation.
+Script to fix any issues with the clam package installation.
 """
 
 import os
@@ -14,20 +14,20 @@ def main():
     current_dir = Path.cwd()
     print(f"Current directory: {current_dir}")
     
-    # Check if we're in the llata directory
-    if current_dir.name != "llata":
-        print("❌ This script should be run from the llata directory.")
+    # Check if we're in the clam directory
+    if current_dir.name != "clam":
+        print("❌ This script should be run from the clam directory.")
         sys.exit(1)
     
     # Make sure all __init__.py files exist
     print("Ensuring all necessary __init__.py files exist...")
     
     directories = [
-        "llata",
-        "llata/data",
-        "llata/models",
-        "llata/train",
-        "llata/utils"
+        "clam",
+        "clam/data",
+        "clam/models",
+        "clam/train",
+        "clam/utils"
     ]
     
     for dir_path in directories:
@@ -46,11 +46,11 @@ def main():
                 f.write('"""Auto-generated __init__.py file."""\n')
     
     # Update the main __init__.py file
-    main_init = current_dir / "llata" / "__init__.py"
+    main_init = current_dir / "clam" / "__init__.py"
     print(f"Updating {main_init}")
     with open(main_init, "w") as f:
         f.write('''"""
-LLATA: LLM-Augmented Tabular Adapter
+CLAM: Classify Anything Model
 A library for fine-tuning LLMs on tabular data using embeddings from tabular foundation models.
 """
 
@@ -83,12 +83,12 @@ __all__ = [
 ]
 ''')
     
-    # Uninstall existing llata package
-    print("Uninstalling any existing llata package...")
-    subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "llata"], check=False)
+    # Uninstall existing clam package
+    print("Uninstalling any existing clam package...")
+    subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "clam"], check=False)
     
     # Install the package in development mode
-    print("Installing llata package in development mode...")
+    print("Installing clam package in development mode...")
     subprocess.run([sys.executable, "-m", "pip", "install", "-e", "."], check=True)
     
     # Run the test script

@@ -3,7 +3,7 @@
 Comprehensive test script for audio classification datasets.
 
 Runs few-shot audio classification on ESC-50, RAVDESS, and UrbanSound8K
-using LLATA t-SNE with configurable audio embeddings (Whisper or CLAP).
+using CLAM t-SNE with configurable audio embeddings (Whisper or CLAP).
 Can test individual datasets or run comprehensive comparisons across multiple datasets.
 """
 
@@ -92,8 +92,8 @@ def test_dataset(dataset_class, dataset_name, data_dir, args, use_wandb_logging=
             
         results = {}
         
-        # Test LLATA t-SNE
-        if 'llata_tsne' in args.models:
+        # Test CLAM t-SNE
+        if 'clam_tsne' in args.models:
             backend_name = "PCA" if args.use_pca_backend else "t-SNE"
             features = []
             if args.use_3d_tsne:
@@ -102,7 +102,7 @@ def test_dataset(dataset_class, dataset_name, data_dir, args, use_wandb_logging=
                 features.append(f"KNN-{args.knn_k}")
             feature_str = f" ({', '.join(features)})" if features else ""
             
-            logger.info(f"Testing LLATA {backend_name}{feature_str} ({args.embedding_model.upper()} → {backend_name} → VLM)...")
+            logger.info(f"Testing CLAM {backend_name}{feature_str} ({args.embedding_model.upper()} → {backend_name} → VLM)...")
             
             try:
                 classifier = ClamAudioTsneClassifier(
@@ -153,16 +153,16 @@ def test_dataset(dataset_class, dataset_name, data_dir, args, use_wandb_logging=
                     'k_shot': args.k_shot
                 }
                 
-                results['llata_tsne'] = eval_results
-                logger.info(f"{dataset_name} LLATA t-SNE completed: {eval_results['accuracy']:.4f} accuracy")
+                results['clam_tsne'] = eval_results
+                logger.info(f"{dataset_name} CLAM t-SNE completed: {eval_results['accuracy']:.4f} accuracy")
                 
                 # Log to wandb
                 if use_wandb_logging:
-                    log_results_to_wandb(f'{dataset_name.lower()}_llata_tsne', eval_results, args, class_names)
+                    log_results_to_wandb(f'{dataset_name.lower()}_clam_tsne', eval_results, args, class_names)
                 
             except Exception as e:
-                logger.error(f"{dataset_name} LLATA t-SNE failed: {e}")
-                results['llata_tsne'] = {'error': str(e)}
+                logger.error(f"{dataset_name} CLAM t-SNE failed: {e}")
+                results['clam_tsne'] = {'error': str(e)}
         
         # Test Whisper KNN baseline
         if 'whisper_knn' in args.models:
@@ -344,8 +344,8 @@ def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names:
     
     # Add model-specific metrics
     config = eval_results.get('config', {})
-    if 'llata_tsne' in model_name:
-        # LLATA t-SNE specific metrics
+    if 'clam_tsne' in model_name:
+        # CLAM t-SNE specific metrics
         metrics.update({
             f"{model_name}/embedding_model": config.get('embedding_model', 'unknown'),
             f"{model_name}/whisper_model": config.get('whisper_model', 'unknown'),
@@ -493,7 +493,7 @@ def save_results(results: dict, output_dir: str, k_shot: int):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Test audio datasets with LLATA t-SNE and baselines")
+    parser = argparse.ArgumentParser(description="Test audio datasets with CLAM t-SNE and baselines")
     
     parser.add_argument(
         "--data_dir",
@@ -523,7 +523,7 @@ def parse_args():
         "--num_few_shot_examples",
         type=int,
         default=32,
-        help="Number of examples to use for in-context learning in LLM prompts (for LLATA baseline)"
+        help="Number of examples to use for in-context learning in LLM prompts (for CLAM baseline)"
     )
     parser.add_argument(
         "--balanced_few_shot",
@@ -611,7 +611,7 @@ def parse_args():
         nargs="+",
         default=["clam_tsne"],
         choices=["clam_tsne", "whisper_knn", "clap_zero_shot"],
-        help="Models to test (default: llata_tsne)"
+        help="Models to test (default: clam_tsne)"
     )
     parser.add_argument(
         "--save_every_n",
@@ -647,7 +647,7 @@ def parse_args():
     parser.add_argument(
         "--wandb_project",
         type=str,
-        default="audio-llata-all",
+        default="audio-clam-all",
         help="Weights & Biases project name"
     )
     parser.add_argument(
@@ -700,7 +700,7 @@ def main():
                     feature_suffix += f"_knn{args.knn_k}"
                 if args.use_pca_backend:
                     feature_suffix += "_pca"
-                args.wandb_name = f"audio_llata_{timestamp}{feature_suffix}"
+                args.wandb_name = f"audio_clam_{timestamp}{feature_suffix}"
             
             gpu_monitor = init_wandb_with_gpu_monitoring(
                 project=args.wandb_project,

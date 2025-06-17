@@ -1,5 +1,5 @@
 """
-Evaluation functions for LLATA models.
+Evaluation functions for CLAM models.
 """
 
 import torch

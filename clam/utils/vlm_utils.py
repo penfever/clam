@@ -1,8 +1,8 @@
 """
-VLM (Vision Language Model) utilities for LLATA.
+VLM (Vision Language Model) utilities for CLAM.
 
 This module provides common functionality for working with VLMs across
-different LLATA implementations, including response parsing, conversation
+different CLAM implementations, including response parsing, conversation
 formatting, and error handling.
 """
 

@@ -1,10 +1,10 @@
 """
-LLATA t-SNE baseline for image classification.
+CLAM t-SNE baseline for image classification.
 
-This implements the proper LLATA pipeline for images:
+This implements the proper CLAM pipeline for images:
 DINOV2 embeddings → t-SNE visualization → VLM classification
 
-Based on the tabular implementation in llm_baselines/llata_tsne_baseline.py
+Based on the tabular implementation in llm_baselines/clam_tsne_baseline.py
 """
 
 import os
@@ -20,7 +20,7 @@ from typing import Dict, Any, Optional, List, Tuple
 import matplotlib.pyplot as plt
 from PIL import Image
 
-# Import LLATA utilities
+# Import CLAM utilities
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -50,7 +50,7 @@ logger = logging.getLogger(__name__)
 
 class ClamImageTsneClassifier:
     """
-    LLATA t-SNE classifier for image classification.
+    CLAM t-SNE classifier for image classification.
     
     Pipeline: DINOV2 embeddings → t-SNE visualization → VLM classification
     """
@@ -77,7 +77,7 @@ class ClamImageTsneClassifier:
         seed: int = 42
     ):
         """
-        Initialize LLATA image t-SNE classifier.
+        Initialize CLAM image t-SNE classifier.
         
         Args:
             dinov2_model: DINOV2 model variant to use
@@ -138,7 +138,7 @@ class ClamImageTsneClassifier:
         class_names: Optional[List[str]] = None
     ) -> 'ClamImageTsneClassifier':
         """
-        Fit the LLATA image t-SNE classifier.
+        Fit the CLAM image t-SNE classifier.
         
         Args:
             train_image_paths: List of training image paths
@@ -148,7 +148,7 @@ class ClamImageTsneClassifier:
         Returns:
             Self for method chaining
         """
-        logger.info(f"Fitting LLATA image t-SNE classifier on {len(train_image_paths)} training images")
+        logger.info(f"Fitting CLAM image t-SNE classifier on {len(train_image_paths)} training images")
         start_time = time.time()
         
         # Store training labels and class names
@@ -270,14 +270,14 @@ class ClamImageTsneClassifier:
         
         self.is_fitted = True
         elapsed_time = time.time() - start_time
-        logger.info(f"LLATA image t-SNE classifier fitted in {elapsed_time:.2f} seconds")
+        logger.info(f"CLAM image t-SNE classifier fitted in {elapsed_time:.2f} seconds")
         
         return self
     
     def _load_vlm_model(self):
         """Load the Vision Language Model using standardized model loader."""
         try:
-            # Use the centralized model loader from LLATA
+            # Use the centralized model loader from CLAM
             from examples.llm_baselines.model_loader import model_loader
             
             # Get platform-compatible kwargs
@@ -299,7 +299,7 @@ class ClamImageTsneClassifier:
             return vlm_wrapper
             
         except ImportError:
-            logger.warning("LLATA model loader not available, using simple VLM implementation")
+            logger.warning("CLAM model loader not available, using simple VLM implementation")
             return self._create_simple_vlm()
     
     def _create_simple_vlm(self):
@@ -678,7 +678,7 @@ class ClamImageTsneClassifier:
                 # Use the standardized JSON conversion utility
                 json.dump(convert_for_json_serialization(detailed_outputs), f, indent=2)
         
-        logger.info(f"LLATA image t-SNE classifier accuracy: {accuracy:.4f}")
+        logger.info(f"CLAM image t-SNE classifier accuracy: {accuracy:.4f}")
         
         return results
     

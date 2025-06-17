@@ -1,6 +1,6 @@
-# LLATA Tests
+# CLAM Tests
 
-This directory contains test scripts for the LLATA library.
+This directory contains test scripts for the CLAM library.
 
 ## Test Files
 
@@ -20,7 +20,7 @@ This directory contains test scripts for the LLATA library.
 
 ### Other Tests
 
-- **test_install.py**: Tests the installation of the LLATA package.
+- **test_install.py**: Tests the installation of the CLAM package.
 
 ## Running Tests
 
@@ -52,4 +52,4 @@ The tests cover:
 
 ## Writing New Tests
 
-When adding new features to LLATA, please add corresponding tests to this directory. Test files should follow the naming convention `test_*.py` to be automatically discovered by unittest.
+When adding new features to CLAM, please add corresponding tests to this directory. Test files should follow the naming convention `test_*.py` to be automatically discovered by unittest.

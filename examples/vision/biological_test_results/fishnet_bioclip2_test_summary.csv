@@ -1,2 +1,0 @@
-model,status,error,accuracy,training_time,prediction_time
-qwen_vl,SUCCESS,,0.5,11.356284856796265,45.77925181388855

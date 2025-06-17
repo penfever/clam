@@ -409,7 +409,7 @@ def predict_with_jolt_logprobs(full_prompt: str, answer_choices: List[str], toke
                         "examples", "llm_baselines", "jolt", "official_jolt"),
             # Check if we're in a different working directory
             os.path.join(os.getcwd(), "examples", "llm_baselines", "jolt", "official_jolt"),
-            os.path.join(os.getcwd(), "llata", "examples", "llm_baselines", "jolt", "official_jolt"),
+            os.path.join(os.getcwd(), "clam", "examples", "llm_baselines", "jolt", "official_jolt"),
             # Direct path if available in environment
             os.path.join(os.path.dirname(__file__), "..", "..", "examples", "llm_baselines", "jolt", "official_jolt")
         ]

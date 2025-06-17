@@ -1,4 +1,4 @@
-# Audio processing dependencies for LLATA audio classification
+# Audio processing dependencies for CLAM audio classification
 # Install with: pip install -r requirements_audio.txt
 
 # Core audio processing

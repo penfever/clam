@@ -1,5 +1,5 @@
 """
-Training and evaluation functions for LLATA models.
+Training and evaluation functions for CLAM models.
 
 This module provides functionality for:
 - Training LLMs with tabular embeddings

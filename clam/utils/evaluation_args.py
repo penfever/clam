@@ -1,5 +1,5 @@
 """
-Shared argument parsing utilities for LLATA evaluation scripts.
+Shared argument parsing utilities for CLAM evaluation scripts.
 
 This module provides common argument parsing functions to avoid code duplication
 between evaluation scripts and make the main evaluation logic more focused.
@@ -14,13 +14,13 @@ def add_model_args(parser: argparse.ArgumentParser):
     parser.add_argument(
         "--model_path",
         type=str,
-        help="Path to the pretrained model directory (for LLATA models)"
+        help="Path to the pretrained model directory (for CLAM models)"
     )
     parser.add_argument(
         "--model_id",
         type=str,
         help="Model identifier: 'catboost', 'tabpfn_v2', 'random_forest', 'logistic_regression', 'gradient_boosting', "
-             "or a Hugging Face model ID like 'Qwen/Qwen2.5-3B-Instruct' for LLATA models. "
+             "or a Hugging Face model ID like 'Qwen/Qwen2.5-3B-Instruct' for CLAM models. "
              "When used with --model_path, specifies the base model architecture for fallback model creation."
     )
     parser.add_argument(
@@ -175,7 +175,7 @@ def add_tabpfn_args(parser: argparse.ArgumentParser):
     )
 
 
-def add_evaluation_wandb_args(parser: argparse.ArgumentParser, default_project: str = "llata-evaluation"):
+def add_evaluation_wandb_args(parser: argparse.ArgumentParser, default_project: str = "clam-evaluation"):
     """Add Weights & Biases arguments for evaluation."""
     parser.add_argument(
         "--use_wandb",
@@ -285,7 +285,7 @@ def add_evaluation_control_args(parser: argparse.ArgumentParser):
     parser.add_argument(
         "--baselines_only",
         action="store_true",
-        help="Only run baseline models (skip LLATA evaluation)"
+        help="Only run baseline models (skip CLAM evaluation)"
     )
 
 
@@ -311,9 +311,9 @@ def add_common_evaluation_args(parser: argparse.ArgumentParser):
     )
 
 
-def create_evaluation_parser(description: str, default_wandb_project: str = "llata-evaluation") -> argparse.ArgumentParser:
+def create_evaluation_parser(description: str, default_wandb_project: str = "clam-evaluation") -> argparse.ArgumentParser:
     """
-    Create an argument parser with all common arguments for LLATA evaluation.
+    Create an argument parser with all common arguments for CLAM evaluation.
     
     Args:
         description: Description for the argument parser
@@ -345,8 +345,8 @@ def create_evaluation_parser(description: str, default_wandb_project: str = "lla
 def create_dataset_evaluation_parser() -> argparse.ArgumentParser:
     """Create argument parser specific to dataset evaluation."""
     parser = create_evaluation_parser(
-        "Evaluate a pretrained LLATA model or baseline ML models on tabular datasets",
-        default_wandb_project="llata-evaluation"
+        "Evaluate a pretrained CLAM model or baseline ML models on tabular datasets",
+        default_wandb_project="clam-evaluation"
     )
     
     return parser

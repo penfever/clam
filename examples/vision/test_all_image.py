@@ -5,12 +5,12 @@ Comprehensive test script for image classification datasets and models.
 This script supports:
 - CIFAR-10/CIFAR-100 (automatically downloaded)
 - Custom ImageNet-style datasets 
-- Multiple models: LLATA t-SNE, Simple LLATA, DINOV2 baselines, QwenVL
+- Multiple models: CLAM t-SNE, Simple CLAM, DINOV2 baselines, QwenVL
 - Various configurations and visualization options
 
 Examples:
     # Test CIFAR-10 with multiple models
-    python test_all_image.py --dataset cifar10 --models llata_tsne dinov2_linear qwen_vl
+    python test_all_image.py --dataset cifar10 --models clam_tsne dinov2_linear qwen_vl
     
     # Test custom dataset
     python test_all_image.py --dataset custom --dataset_path /path/to/data --num_classes 10
@@ -433,8 +433,8 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
     
     results = {}
     
-    # Test LLATA t-SNE (DINOV2 → t-SNE/PCA → VLM)
-    if 'llata_tsne' in args.models:
+    # Test CLAM t-SNE (DINOV2 → t-SNE/PCA → VLM)
+    if 'clam_tsne' in args.models:
         backend_name = "PCA" if args.use_pca_backend else "t-SNE"
         features = []
         if args.use_3d_tsne:
@@ -447,7 +447,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
         if args.use_knn_connections and args.use_pca_backend:
             logger.warning("KNN connections are only supported with t-SNE, not PCA. KNN will be disabled for PCA backend.")
         
-        logger.info(f"Testing LLATA {backend_name}{feature_str} (DINOV2 → {backend_name} → VLM)...")
+        logger.info(f"Testing CLAM {backend_name}{feature_str} (DINOV2 → {backend_name} → VLM)...")
         try:
             classifier = ClamImageTsneClassifier(
                 dinov2_model=args.dinov2_model,
@@ -484,20 +484,20 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
             eval_results['training_time'] = training_time
             eval_results['config'] = classifier.get_config()
             
-            results['llata_tsne'] = eval_results
-            logger.info(f"LLATA t-SNE completed: {eval_results['accuracy']:.4f} accuracy")
+            results['clam_tsne'] = eval_results
+            logger.info(f"CLAM t-SNE completed: {eval_results['accuracy']:.4f} accuracy")
             
             # Log to wandb
             if use_wandb_logging:
-                log_results_to_wandb('llata_tsne', eval_results, args, class_names)
+                log_results_to_wandb('clam_tsne', eval_results, args, class_names)
             
         except Exception as e:
-            logger.error(f"LLATA t-SNE failed: {e}")
-            results['llata_tsne'] = {'error': str(e)}
+            logger.error(f"CLAM t-SNE failed: {e}")
+            results['clam_tsne'] = {'error': str(e)}
     
-    # Test Simple LLATA (DINOV2 → PCA → k-NN)
-    if 'llata_simple' in args.models:
-        logger.info("Testing Simple LLATA (DINOV2 → PCA → k-NN)...")
+    # Test Simple CLAM (DINOV2 → PCA → k-NN)
+    if 'clam_simple' in args.models:
+        logger.info("Testing Simple CLAM (DINOV2 → PCA → k-NN)...")
         try:
             classifier = SimpleClamImageClassifier(
                 dinov2_model=args.dinov2_model,
@@ -517,16 +517,16 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
             eval_results['training_time'] = training_time
             eval_results['config'] = classifier.get_config()
             
-            results['llata_simple'] = eval_results
-            logger.info(f"Simple LLATA completed: {eval_results['accuracy']:.4f} accuracy")
+            results['clam_simple'] = eval_results
+            logger.info(f"Simple CLAM completed: {eval_results['accuracy']:.4f} accuracy")
             
             # Log to wandb
             if use_wandb_logging:
-                log_results_to_wandb('llata_simple', eval_results, args, class_names)
+                log_results_to_wandb('clam_simple', eval_results, args, class_names)
             
         except Exception as e:
-            logger.error(f"Simple LLATA failed: {e}")
-            results['llata_simple'] = {'error': str(e)}
+            logger.error(f"Simple CLAM failed: {e}")
+            results['clam_simple'] = {'error': str(e)}
     
     # Test DINOV2 Linear Probe
     if 'dinov2_linear' in args.models:
@@ -624,8 +624,8 @@ def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names:
         "quick_test": args.quick_test
     }
     
-    # Add LLATA t-SNE specific metrics
-    if model_name == 'llata_tsne':
+    # Add CLAM t-SNE specific metrics
+    if model_name == 'clam_tsne':
         config = eval_results.get('config', {})
         metrics.update({
             f"{model_name}/use_3d_tsne": config.get('use_3d_tsne', False),
@@ -644,8 +644,8 @@ def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names:
             metrics[f"{model_name}/visualizations_saved"] = True
             metrics[f"{model_name}/output_directory"] = eval_results.get('output_directory', 'unknown')
     
-    # Add Simple LLATA specific metrics
-    elif model_name == 'llata_simple':
+    # Add Simple CLAM specific metrics
+    elif model_name == 'clam_simple':
         config = eval_results.get('config', {})
         metrics.update({
             f"{model_name}/use_pca": config.get('use_pca', False),
@@ -726,7 +726,7 @@ def save_results(results: dict, output_dir: str, args):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Test image classification datasets with LLATA and baselines")
+    parser = argparse.ArgumentParser(description="Test image classification datasets with CLAM and baselines")
     
     # Dataset options
     dataset_group = parser.add_argument_group('dataset options')
@@ -785,8 +785,8 @@ def parse_args():
         help="DINOv2 model variant"
     )
     
-    # LLATA t-SNE options
-    tsne_group = parser.add_argument_group('LLATA t-SNE options')
+    # CLAM t-SNE options
+    tsne_group = parser.add_argument_group('CLAM t-SNE options')
     tsne_group.add_argument(
         "--use_pca_backend",
         action="store_true",
@@ -884,7 +884,7 @@ def parse_args():
     wandb_group.add_argument(
         "--wandb_project",
         type=str,
-        default="image-llata",
+        default="image-clam",
         help="Weights & Biases project name"
     )
     wandb_group.add_argument(
@@ -930,7 +930,7 @@ def run_all_image_tests(args):
                         feature_suffix += f"_knn{args.knn_k}"
                     if args.use_pca_backend:
                         feature_suffix += "_pca"
-                    run_name = f"{dataset_name}_llata_{timestamp}{feature_suffix}"
+                    run_name = f"{dataset_name}_clam_{timestamp}{feature_suffix}"
                 else:
                     run_name = f"{args.wandb_name}_{dataset_name}"
                 

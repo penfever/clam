@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 # Global cache to store dataset IDs that have failed to load
 _FAILED_DATASET_CACHE: Set[int] = set()
-_CACHE_FILE_PATH = os.path.expanduser("~/.llata_failed_datasets.json")
+_CACHE_FILE_PATH = os.path.expanduser("~/.clam_failed_datasets.json")
 
 # Load the cache if it exists
 def _load_failed_dataset_cache() -> Set[int]:
@@ -63,7 +63,7 @@ _load_failed_dataset_cache()
 def list_available_datasets() -> Dict[str, int]:
     """
     Returns a dictionary of predefined OpenML dataset names and their IDs.
-    These datasets are known to work well with LLATA.
+    These datasets are known to work well with CLAM.
     
     Returns:
         Dictionary mapping dataset names to their OpenML IDs

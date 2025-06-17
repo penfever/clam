@@ -279,8 +279,8 @@ def analyze_class_separability(embeddings_dict, dataset_type, max_datasets=3):
 
 def main():
     # Define paths
-    real_path = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/llata/embeddings/realdata"
-    syn_path = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/llata/embeddings/syndata"
+    real_path = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/embeddings/realdata"
+    syn_path = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/embeddings/syndata"
     
     print("Loading embeddings...")
     

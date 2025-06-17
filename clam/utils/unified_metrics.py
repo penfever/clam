@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """
-Unified metrics logging and naming scheme for LLATA.
+Unified metrics logging and naming scheme for CLAM.
 
-This module provides a consistent interface for logging metrics across all LLATA scripts,
+This module provides a consistent interface for logging metrics across all CLAM scripts,
 ensuring that metric names are standardized and compatible with the failure_as_random 
 functionality in analyze_cc18_results_wandb.py.
 
@@ -27,7 +27,7 @@ Usage:
     from clam.utils.unified_metrics import MetricsLogger
     
     # Initialize for a specific model and dataset
-    metrics = MetricsLogger(model_name="llata", dataset_name="har", use_wandb=True)
+    metrics = MetricsLogger(model_name="clam", dataset_name="har", use_wandb=True)
     
     # Log core metrics
     metrics.log_core_metrics(accuracy=0.85, balanced_accuracy=0.84)
@@ -65,7 +65,7 @@ logger = logging.getLogger(__name__)
 
 class MetricsLogger:
     """
-    Unified metrics logger that standardizes metric names and logging across LLATA scripts.
+    Unified metrics logger that standardizes metric names and logging across CLAM scripts.
     """
     
     # Standard metric names (these should match what analyze_cc18_results_wandb.py expects)

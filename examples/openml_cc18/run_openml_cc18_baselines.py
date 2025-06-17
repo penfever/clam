@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Script to evaluate non-LLM, non-LLATA baselines on the OpenML CC18 collection.
+Script to evaluate non-LLM, non-CLAM baselines on the OpenML CC18 collection.
 
 This script:
 1. Retrieves the OpenML CC18 collection (study_id=99)
@@ -13,24 +13,24 @@ using the evaluate_on_dataset script with --run_all_baselines and --baselines_on
 
 Requirements:
 - OpenML installed (pip install openml)
-- LLATA installed and configured (for baseline evaluation utilities)
+- CLAM installed and configured (for baseline evaluation utilities)
 - W&B account for logging results
 
 Usage:
     # Basic usage - evaluate all baselines on all CC18 tasks
-    python run_openml_cc18_baselines.py --llata_repo_path /path/to/llata --output_dir ./baseline_results
+    python run_openml_cc18_baselines.py --clam_repo_path /path/to/clam --output_dir ./baseline_results
     
     # Test on specific tasks
-    python run_openml_cc18_baselines.py --llata_repo_path /path/to/llata --task_ids "3573,3902,3903" --output_dir ./test_results
+    python run_openml_cc18_baselines.py --clam_repo_path /path/to/clam --task_ids "3573,3902,3903" --output_dir ./test_results
     
     # Run with limited test samples for quick testing
-    python run_openml_cc18_baselines.py --llata_repo_path /path/to/llata --max_test_samples 1000 --output_dir ./quick_test
+    python run_openml_cc18_baselines.py --clam_repo_path /path/to/clam --max_test_samples 1000 --output_dir ./quick_test
     
     # Run with both training and test sample limits
-    python run_openml_cc18_baselines.py --llata_repo_path /path/to/llata --max_train_samples 5000 --max_test_samples 1000 --output_dir ./limited_test
+    python run_openml_cc18_baselines.py --clam_repo_path /path/to/clam --max_train_samples 5000 --max_test_samples 1000 --output_dir ./limited_test
     
     # Run without W&B logging
-    python run_openml_cc18_baselines.py --llata_repo_path /path/to/llata --no_wandb --output_dir ./local_results
+    python run_openml_cc18_baselines.py --clam_repo_path /path/to/clam --no_wandb --output_dir ./local_results
 """
 
 import os
@@ -63,10 +63,10 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Evaluate baseline models on OpenML CC18 collection")
     
     parser.add_argument(
-        "--llata_repo_path",
+        "--clam_repo_path",
         type=str,
         required=True,
-        help="Path to the LLATA repository"
+        help="Path to the CLAM repository"
     )
     parser.add_argument(
         "--output_dir",
@@ -89,7 +89,7 @@ def parse_args():
     parser.add_argument(
         "--wandb_project",
         type=str,
-        default="llata-openml-cc18-baselines",
+        default="clam-openml-cc18-baselines",
         help="W&B project name"
     )
     parser.add_argument(
@@ -224,14 +224,14 @@ def evaluate_baselines_on_task(task, split_idx, args):
     wandb_project = f"{args.wandb_project}-{version_by_date}"
     
     # Build evaluation command
-    eval_script = os.path.join(args.llata_repo_path, "examples", "evaluate_on_dataset.py")
+    eval_script = os.path.join(args.clam_repo_path, "examples", "evaluate_on_dataset.py")
     
     cmd = [
         "python", eval_script,
         "--dataset_name", str(dataset_id),  # Pass dataset_id as dataset_name
         "--output_dir", eval_output_dir,
         "--run_all_baselines",  # Run all baseline models
-        "--baselines_only",  # Skip LLATA model evaluation
+        "--baselines_only",  # Skip CLAM model evaluation
         "--only_ground_truth_classes",  # Only use ground truth classes
         "--seed", str(args.seed + split_idx)  # Use different seed for each split
     ]

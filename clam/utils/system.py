@@ -1,5 +1,5 @@
 """
-System utilities for LLATA.
+System utilities for CLAM.
 """
 
 import signal

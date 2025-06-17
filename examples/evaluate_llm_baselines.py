@@ -24,7 +24,7 @@ Usage examples:
     python evaluate_llm_baselines.py --num_datasets 5 --output_dir ./llm_baseline_results
     
     # Evaluating only specific LLM models
-    python evaluate_llm_baselines.py --dataset_name har --models tabula_8b,jolt,llata_tsne --output_dir ./results
+    python evaluate_llm_baselines.py --dataset_name har --models tabula_8b,jolt,clam_tsne --output_dir ./results
     
     # Using Weights & Biases for experiment tracking
     python evaluate_llm_baselines.py --dataset_ids 1590,40975 --use_wandb --wandb_project llm_baselines
@@ -33,22 +33,22 @@ Usage examples:
     python evaluate_llm_baselines.py --dataset_name adult --models tabllm
     
     # Using 3D t-SNE with multiple viewing angles for LlaTa-T-SNe
-    python evaluate_llm_baselines.py --dataset_name diabetes --models llata_tsne --use_3d_tsne --output_dir ./results
+    python evaluate_llm_baselines.py --dataset_name diabetes --models clam_tsne --use_3d_tsne --output_dir ./results
     
     # Custom viewing angles for 3D t-SNE
-    python evaluate_llm_baselines.py --dataset_name har --models llata_tsne --use_3d_tsne --viewing_angles "20,45;0,0;90,0" --output_dir ./results
+    python evaluate_llm_baselines.py --dataset_name har --models clam_tsne --use_3d_tsne --viewing_angles "20,45;0,0;90,0" --output_dir ./results
     
     # Using KNN connections to show nearest neighbors in embedding space
-    python evaluate_llm_baselines.py --dataset_name adult --models llata_tsne --use_knn_connections --knn_k 7 --output_dir ./results
+    python evaluate_llm_baselines.py --dataset_name adult --models clam_tsne --use_knn_connections --knn_k 7 --output_dir ./results
     
     # Combining 3D t-SNE with KNN connections for maximum information
-    python evaluate_llm_baselines.py --dataset_name diabetes --models llata_tsne --use_3d_tsne --use_knn_connections --knn_k 5 --output_dir ./results
+    python evaluate_llm_baselines.py --dataset_name diabetes --models clam_tsne --use_3d_tsne --use_knn_connections --knn_k 5 --output_dir ./results
     
     # Customizing image size and DPI for VLM compatibility
-    python evaluate_llm_baselines.py --dataset_name adult --models llata_tsne --max_vlm_image_size 1024 --image_dpi 72 --output_dir ./results
+    python evaluate_llm_baselines.py --dataset_name adult --models clam_tsne --max_vlm_image_size 1024 --image_dpi 72 --output_dir ./results
     
     # Disable RGB conversion if needed (keeping RGBA mode)
-    python evaluate_llm_baselines.py --dataset_name diabetes --models llata_tsne --no-force_rgb_mode --output_dir ./results
+    python evaluate_llm_baselines.py --dataset_name diabetes --models clam_tsne --no-force_rgb_mode --output_dir ./results
 """
 
 import os
@@ -90,7 +90,7 @@ from clam.utils import (
 from llm_baselines.tabllm_baseline import evaluate_tabllm
 from llm_baselines.tabula_8b_baseline import evaluate_tabula_8b
 from llm_baselines.jolt_baseline import evaluate_jolt
-from llm_baselines.llata_tsne_baseline import evaluate_llata_tsne
+from llm_baselines.clam_tsne_baseline import evaluate_clam_tsne
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluate LLM baselines (TabLLM, Tabula-8B, JOLT, LlaTa-T-SNe) on tabular datasets")
@@ -99,8 +99,8 @@ def parse_args():
     parser.add_argument(
         "--models",
         type=str,
-        default="tabllm,tabula_8b,jolt,llata_tsne",
-        help="Comma-separated list of models to evaluate: 'tabllm', 'tabula_8b', 'jolt', 'llata_tsne'"
+        default="tabllm,tabula_8b,jolt,clam_tsne",
+        help="Comma-separated list of models to evaluate: 'tabllm', 'tabula_8b', 'jolt', 'clam_tsne'"
     )
     
     # Dataset source options (mutually exclusive)
@@ -574,8 +574,8 @@ def main():
                         result = evaluate_tabula_8b(dataset, args)
                     elif model_name.lower() == 'jolt':
                         result = evaluate_jolt(dataset, args)
-                    elif model_name.lower() == 'llata_tsne':
-                        result = evaluate_llata_tsne(dataset, args)
+                    elif model_name.lower() == 'clam_tsne':
+                        result = evaluate_clam_tsne(dataset, args)
                     else:
                         logger.warning(f"Unknown model: {model_name}. Skipping.")
                         continue
@@ -614,7 +614,7 @@ def main():
                 # Add explicit dataset_id to the result before logging
                 result_with_dataset_id = result.copy()
                 result_with_dataset_id['dataset_id'] = dataset['id']
-                result_with_dataset_id['task_id'] = dataset['id']  # For LLATA compatibility, task_id = dataset_id
+                result_with_dataset_id['task_id'] = dataset['id']  # For CLAM compatibility, task_id = dataset_id
                 
                 # Log all metrics using unified system
                 metrics_logger.log_all_metrics(result_with_dataset_id)

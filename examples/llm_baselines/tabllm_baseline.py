@@ -84,7 +84,7 @@ def load_tabllm_config_by_openml_id(openml_task_id, original_feature_count=None)
             logger.info(f"Found TabLLM config for OpenML task {openml_task_id} (dataset: {dataset_name})")
             
             # Load semantic information for feature count validation
-            semantic_dir = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/llata/llata/data/cc18_semantic_complete"
+            semantic_dir = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/clam/data/cc18_semantic_complete"
             semantic_file = os.path.join(semantic_dir, f"{openml_task_id}.json")
             
             if os.path.exists(semantic_file) and original_feature_count is not None:
@@ -328,12 +328,12 @@ def evaluate_tabllm(dataset, args):
         
         # Try to load semantic information for better feature descriptions
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        # Go up two levels from examples to llata root
-        llata_root = os.path.dirname(os.path.dirname(current_dir))
+        # Go up two levels from examples to clam root
+        clam_root = os.path.dirname(os.path.dirname(current_dir))
         # Try both cc18_semantic_complete and cc18_semantic directories
         semantic_dirs = [
-            os.path.join(llata_root, "data", "cc18_semantic_complete"),
-            os.path.join(llata_root, "data", "cc18_semantic")
+            os.path.join(clam_root, "data", "cc18_semantic_complete"),
+            os.path.join(clam_root, "data", "cc18_semantic")
         ]
         semantic_dir = None
         for dir_path in semantic_dirs:
@@ -791,7 +791,7 @@ def evaluate_tabllm(dataset, args):
             'model_name': 'TabLLM',
             'dataset_name': dataset['name'],
             'dataset_id': dataset['id'],
-            'task_id': dataset['id'],  # For consistency with LLATA extraction logic
+            'task_id': dataset['id'],  # For consistency with CLAM extraction logic
             'accuracy': float(accuracy),
             'balanced_accuracy': float(balanced_acc),
             'prediction_time': float(prediction_time),  # Time for inference (includes model loading for LLMs)

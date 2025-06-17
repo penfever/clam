@@ -399,7 +399,7 @@ def prepare_qwen_with_prefix_embedding(embedding_size=192, model_id="Qwen/Qwen2.
 
 def load_pretrained_model(model_path, device_map="auto", embedding_size=1000, model_id=None):
     """
-    Load a pretrained LLATA model from a checkpoint directory.
+    Load a pretrained CLAM model from a checkpoint directory.
     This function handles different model loading scenarios:
     1. Models saved with model_info.pt (saved using QwenWithPrefixEmbedding.save_pretrained)
     2. Custom models requiring initialization using prepare_qwen_with_prefix_embedding

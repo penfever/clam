@@ -1,17 +1,17 @@
-# OpenML CC18 Experiments with LLATA
+# OpenML CC18 Experiments with CLAM
 
-This directory contains scripts to run LLATA models on the OpenML CC18 collection of datasets. The OpenML CC18 collection consists of 72 classification tasks curated for benchmarking machine learning algorithms.
+This directory contains scripts to run CLAM models on the OpenML CC18 collection of datasets. The OpenML CC18 collection consists of 72 classification tasks curated for benchmarking machine learning algorithms.
 
 ## Scripts
 
-- `run_openml_cc18.py`: Main Python script that trains and evaluates LLATA models on OpenML CC18 datasets
+- `run_openml_cc18.py`: Main Python script that trains and evaluates CLAM models on OpenML CC18 datasets
 - `run_cc18_batch.sh`: Helper bash script to run the Python script with different configurations
 
 ## Requirements
 
 - Python 3.7+
 - OpenML (`pip install openml`)
-- LLATA repository and its dependencies
+- CLAM repository and its dependencies
 - Weights & Biases account
 
 ## Usage
@@ -19,19 +19,19 @@ This directory contains scripts to run LLATA models on the OpenML CC18 collectio
 ### Running all tasks
 
 ```bash
-./run_cc18_batch.sh /path/to/llata/repo
+./run_cc18_batch.sh /path/to/clam/repo
 ```
 
 ### Running a subset of tasks by index
 
 ```bash
-./run_cc18_batch.sh /path/to/llata/repo 0 10  # Run first 10 tasks
+./run_cc18_batch.sh /path/to/clam/repo 0 10  # Run first 10 tasks
 ```
 
 ### Running specific tasks by task ID
 
 ```bash
-./run_cc18_batch.sh /path/to/llata/repo 0 0 "3573,3902,3903"  # Run tasks with specific IDs
+./run_cc18_batch.sh /path/to/clam/repo 0 0 "3573,3902,3903"  # Run tasks with specific IDs
 ```
 
 ### Advanced usage with Python script directly
@@ -39,7 +39,7 @@ This directory contains scripts to run LLATA models on the OpenML CC18 collectio
 For more control, you can use the Python script directly:
 
 ```bash
-python run_openml_cc18.py --llata_repo_path /path/to/llata/repo --output_dir ./results --seed 42
+python run_openml_cc18.py --clam_repo_path /path/to/clam/repo --output_dir ./results --seed 42
 ```
 
 Additional options:
@@ -47,7 +47,7 @@ Additional options:
 - `--skip_evaluation`: Only train models without evaluation
 - `--model_id`: Specify a different model ID (default: "Qwen/Qwen2.5-3B-Instruct")
 - `--num_splits`: Number of splits to use for each task (default: 3)
-- `--wandb_project`: W&B project name (default: "llata-openml-cc18")
+- `--wandb_project`: W&B project name (default: "clam-openml-cc18")
 
 ## Output Structure
 

@@ -12,8 +12,8 @@ from pathlib import Path
 from typing import Dict, List, Any, Tuple
 
 # Define paths
-SEMANTIC_DIR = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/llata/llata/data/tabarena_semantic"
-OUTPUT_DIR = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/llata/llata/examples/llm_baselines/jolt"
+SEMANTIC_DIR = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/clam/data/tabarena_semantic"
+OUTPUT_DIR = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/clam/examples/llm_baselines/jolt"
 
 
 def extract_column_descriptions(semantic_info: Dict[str, Any]) -> Dict[str, str]:

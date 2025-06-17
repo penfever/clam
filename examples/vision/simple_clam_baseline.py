@@ -1,5 +1,5 @@
 """
-Simple LLATA baseline for image classification using DINOV2 embeddings directly.
+Simple CLAM baseline for image classification using DINOV2 embeddings directly.
 
 This version skips t-SNE due to numerical instability and uses embeddings directly.
 """
@@ -15,7 +15,7 @@ from sklearn.decomposition import PCA
 import time
 import os
 
-# Import LLATA utilities
+# Import CLAM utilities
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 class SimpleClamImageClassifier:
     """
-    Simple LLATA classifier for image classification using DINOV2 embeddings directly.
+    Simple CLAM classifier for image classification using DINOV2 embeddings directly.
     
     This approach:
     1. Extracts DINOV2 embeddings from images
@@ -46,7 +46,7 @@ class SimpleClamImageClassifier:
         device: Optional[str] = None
     ):
         """
-        Initialize simple LLATA image classifier.
+        Initialize simple CLAM image classifier.
         
         Args:
             dinov2_model: DINOV2 model variant to use
@@ -91,7 +91,7 @@ class SimpleClamImageClassifier:
         class_names: Optional[List[str]] = None
     ) -> 'SimpleClamImageClassifier':
         """
-        Fit the simple LLATA image classifier.
+        Fit the simple CLAM image classifier.
         
         Args:
             train_image_paths: List of training image paths
@@ -101,7 +101,7 @@ class SimpleClamImageClassifier:
         Returns:
             Self for method chaining
         """
-        logger.info(f"Fitting simple LLATA image classifier on {len(train_image_paths)} training images")
+        logger.info(f"Fitting simple CLAM image classifier on {len(train_image_paths)} training images")
         start_time = time.time()
         
         # Store class names
@@ -138,7 +138,7 @@ class SimpleClamImageClassifier:
         
         self.is_fitted = True
         elapsed_time = time.time() - start_time
-        logger.info(f"Simple LLATA image classifier fitted in {elapsed_time:.2f} seconds")
+        logger.info(f"Simple CLAM image classifier fitted in {elapsed_time:.2f} seconds")
         
         return self
     
@@ -262,7 +262,7 @@ class SimpleClamImageClassifier:
                 'true_labels': test_labels
             })
         
-        logger.info(f"Simple LLATA image classifier accuracy: {accuracy:.4f}")
+        logger.info(f"Simple CLAM image classifier accuracy: {accuracy:.4f}")
         
         return results
     

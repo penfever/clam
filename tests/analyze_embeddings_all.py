@@ -284,8 +284,8 @@ def create_statistics_heatmap(real_embeddings, syn_embeddings):
 
 def main():
     # Define paths
-    real_path = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/llata/embeddings/realdata"
-    syn_path = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/llata/embeddings/syndata"
+    real_path = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/embeddings/realdata"
+    syn_path = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/embeddings/syndata"
     
     print("Loading embeddings...")
     

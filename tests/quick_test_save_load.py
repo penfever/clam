@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Quick test script to verify model saving and loading functionality for LLATA.
+Quick test script to verify model saving and loading functionality for CLAM.
 This is a simplified version of the full test_model_save_load.py, designed
 to run quickly with minimal dependencies and resources.
 """
@@ -12,7 +12,7 @@ import tempfile
 import numpy as np
 import torch
 
-# Add parent directory to path to import llata
+# Add parent directory to path to import clam
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from clam.models import prepare_qwen_with_prefix_embedding

@@ -50,7 +50,7 @@ def create_test_audio_files():
     return audio_paths, labels, ["class_0", "class_1"]
 
 def test_minimal_audio():
-    """Test LLATA audio classifier with minimal synthetic data."""
+    """Test CLAM audio classifier with minimal synthetic data."""
     logger.info("Creating synthetic test audio...")
     audio_paths, labels, class_names = create_test_audio_files()
     

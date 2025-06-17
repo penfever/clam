@@ -1,10 +1,10 @@
 """
-LLATA t-SNE baseline for audio classification.
+CLAM t-SNE baseline for audio classification.
 
-This implements the LLATA pipeline for audio:
+This implements the CLAM pipeline for audio:
 Whisper embeddings → t-SNE visualization → VLM classification
 
-Based on the image implementation in examples/vision/llata_tsne_image_baseline.py
+Based on the image implementation in examples/vision/clam_tsne_image_baseline.py
 """
 
 import os
@@ -19,7 +19,7 @@ from typing import Dict, Any, Optional, List, Tuple, Union
 import matplotlib.pyplot as plt
 from PIL import Image
 
-# Import LLATA utilities
+# Import CLAM utilities
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -52,7 +52,7 @@ logger = logging.getLogger(__name__)
 
 class ClamAudioTsneClassifier:
     """
-    LLATA t-SNE classifier for audio classification.
+    CLAM t-SNE classifier for audio classification.
     
     Pipeline: Audio files → Audio embeddings (Whisper/CLAP) → t-SNE visualization → VLM classification
     """
@@ -83,7 +83,7 @@ class ClamAudioTsneClassifier:
         seed: int = 42
     ):
         """
-        Initialize LLATA audio t-SNE classifier.
+        Initialize CLAM audio t-SNE classifier.
         
         Args:
             embedding_model: Audio embedding model to use ('whisper' or 'clap')
@@ -159,7 +159,7 @@ class ClamAudioTsneClassifier:
             test_paths: Optional list of test audio paths for visualization
             class_names: Optional list of class names
         """
-        logger.info(f"Fitting LLATA audio classifier with {len(train_paths)} training samples")
+        logger.info(f"Fitting CLAM audio classifier with {len(train_paths)} training samples")
         
         self.train_paths = train_paths
         self.train_labels = np.array(train_labels)
@@ -236,7 +236,7 @@ class ClamAudioTsneClassifier:
                 random_state=self.seed
             )
             
-        logger.info("LLATA audio classifier fitted successfully")
+        logger.info("CLAM audio classifier fitted successfully")
         
     def predict(self, test_paths: List[str], batch_size: int = 1, 
                 save_outputs: bool = False, output_dir: Optional[str] = None) -> Tuple[np.ndarray, List[Dict]]:
@@ -568,7 +568,7 @@ class ClamAudioTsneClassifier:
     def _load_vlm_model(self):
         """Load the Vision Language Model using standardized model loader."""
         try:
-            # Use the centralized model loader from LLATA
+            # Use the centralized model loader from CLAM
             from examples.llm_baselines.model_loader import model_loader
             
             # Get platform-compatible kwargs

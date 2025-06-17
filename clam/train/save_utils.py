@@ -1,5 +1,5 @@
 """
-Model saving utilities for LLATA models.
+Model saving utilities for CLAM models.
 """
 
 import os
@@ -33,7 +33,7 @@ def save_checkpoint(
         optimizer: Optional optimizer to save state
         scheduler: Optional scheduler to save state
         training_state: Optional dictionary with additional training state to save
-        class_token_ids: Optional list of class token IDs used by the model (for LLATA)
+        class_token_ids: Optional list of class token IDs used by the model (for CLAM)
         is_best: Whether this is the best checkpoint so far
         save_optimizer: Whether to save optimizer state
     """

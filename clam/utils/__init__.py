@@ -1,7 +1,7 @@
 """
-Utility functions for LLATA.
+Utility functions for CLAM.
 
-This module provides various utilities for LLATA model work:
+This module provides various utilities for CLAM model work:
 - Logging setup and configuration
 - Model loading with path resolution
 - Checkpoint finding and management

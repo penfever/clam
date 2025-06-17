@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Script for evaluating a pretrained LLATA model on one or more tabular datasets with explanations.
+Script for evaluating a pretrained CLAM model on one or more tabular datasets with explanations.
 This script enhances standard evaluation by leveraging the language modeling capabilities:
 1. First predicts the class token like the standard evaluator
 2. Then generates an explanation of why that class was chosen
@@ -14,22 +14,22 @@ Datasets can be specified in multiple ways:
 
 Usage examples:
     # Basic usage with a single dataset
-    python evaluate_with_explanations.py --model_path ./models/llata_output --dataset_name har
+    python evaluate_with_explanations.py --model_path ./models/clam_output --dataset_name har
     
     # Generating longer explanations
-    python evaluate_with_explanations.py --model_path ./models/llata_output --dataset_name har --max_explanation_tokens 100
+    python evaluate_with_explanations.py --model_path ./models/clam_output --dataset_name har --max_explanation_tokens 100
     
     # Adding counterfactual explanations
-    python evaluate_with_explanations.py --model_path ./models/llata_output --dataset_name har --explanation_type counterfactual
+    python evaluate_with_explanations.py --model_path ./models/clam_output --dataset_name har --explanation_type counterfactual
     
     # Including feature importance analysis
-    python evaluate_with_explanations.py --model_path ./models/llata_output --dataset_name har --explanation_type feature_importance
+    python evaluate_with_explanations.py --model_path ./models/clam_output --dataset_name har --explanation_type feature_importance
     
     # Evaluating on multiple datasets with W&B tracking
-    python evaluate_with_explanations.py --model_path ./models/llata_output --dataset_ids 1590,40975,37,54 --use_wandb
+    python evaluate_with_explanations.py --model_path ./models/clam_output --dataset_ids 1590,40975,37,54 --use_wandb
     
     # Evaluating on 5 randomly sampled datasets with feature importance analysis
-    python evaluate_with_explanations.py --model_path ./models/llata_output --num_datasets 5 --explanation_type feature_importance
+    python evaluate_with_explanations.py --model_path ./models/clam_output --num_datasets 5 --explanation_type feature_importance
 """
 
 import os
@@ -60,7 +60,7 @@ except ImportError:
     WANDB_AVAILABLE = False
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Evaluate a pretrained LLATA model with explanations")
+    parser = argparse.ArgumentParser(description="Evaluate a pretrained CLAM model with explanations")
     parser.add_argument(
         "--model_path",
         type=str,
@@ -169,7 +169,7 @@ def parse_args():
     parser.add_argument(
         "--wandb_project",
         type=str,
-        default="llata-explanations",
+        default="clam-explanations",
         help="Weights & Biases project name"
     )
     parser.add_argument(

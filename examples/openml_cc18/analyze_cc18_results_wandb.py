@@ -6,7 +6,7 @@ This script:
 1. Retrieves experiment results from W&B using the API
 2. Filters runs that start with 'eval_'
 3. Compiles performance metrics across all tasks and splits
-4. Generates summary statistics and comparisons between LLATA and baselines
+4. Generates summary statistics and comparisons between CLAM and baselines
 5. Creates visualizations of the results
 6. Exports the results to CSV/JSON for further analysis
 
@@ -17,12 +17,12 @@ Variable Distinctions:
 
 Different run types handle these variables differently:
 1. Standard baselines (catboost, etc.): dataset_name and dataset_id from summary
-2. LLM baselines (llata_tsne, etc.): dataset_name from metric keys, task_id from mapping
-3. LLATA training runs: dataset_name from config, task_id from run name
+2. LLM baselines (clam_tsne, etc.): dataset_name from metric keys, task_id from mapping
+3. CLAM training runs: dataset_name from config, task_id from run name
 
 Usage:
-    python analyze_cc18_results_wandb.py --wandb_entity nyu-dice-lab --wandb_project llata-openml-cc18-hero1
-    python analyze_cc18_results_wandb.py --wandb_entity nyu-dice-lab --wandb_project llata-openml-cc18-hero1 --all_algs_behavior impute
+    python analyze_cc18_results_wandb.py --wandb_entity nyu-dice-lab --wandb_project clam-openml-cc18-hero1
+    python analyze_cc18_results_wandb.py --wandb_entity nyu-dice-lab --wandb_project clam-openml-cc18-hero1 --all_algs_behavior impute
 """
 
 import os
@@ -38,7 +38,7 @@ import logging
 import wandb
 import re
 
-# Import W&B extraction utilities from LLATA utils
+# Import W&B extraction utilities from CLAM utils
 from clam.utils.wandb_extractor import (
     fetch_wandb_data,
     fetch_wandb_train_data,
@@ -613,8 +613,8 @@ def create_performance_dataframe(results, aggregated=True):
     
     df = pd.DataFrame(rows)
     
-    # Ensure model names are never empty and "." is replaced with "llata"
-    df["model"] = df["model"].apply(lambda x: "llata" if pd.isna(x) or x == "" or x == "." else x)
+    # Ensure model names are never empty and "." is replaced with "clam"
+    df["model"] = df["model"].apply(lambda x: "clam" if pd.isna(x) or x == "" or x == "." else x)
     
     logger.info(f"Created DataFrame with {len(df)} rows")
     return df
@@ -739,7 +739,7 @@ def create_visualizations(df, summary, win_rate_df, output_dir, plot_format):
         plt.figure(figsize=(12, 8))
         # Make sure all the model names are present and not blank or "."
         plot_df = df.copy()
-        plot_df["model"] = plot_df["model"].apply(lambda x: "llata" if pd.isna(x) or x == "" or x == "." else x)
+        plot_df["model"] = plot_df["model"].apply(lambda x: "clam" if pd.isna(x) or x == "" or x == "." else x)
         sns.boxplot(x="model", y=metric, data=plot_df)
         plt.title(f"{metric.replace('_', ' ').title()} by Model")
         plt.xticks(rotation=45, ha="right")
@@ -760,7 +760,7 @@ def create_visualizations(df, summary, win_rate_df, output_dir, plot_format):
     if timing_metrics_available:
         plt.figure(figsize=(15, 10))
         plot_df = df.copy()
-        plot_df["model"] = plot_df["model"].apply(lambda x: "llata" if pd.isna(x) or x == "" or x == "." else x)
+        plot_df["model"] = plot_df["model"].apply(lambda x: "clam" if pd.isna(x) or x == "" or x == "." else x)
         
         # Create subplots for timing metrics
         n_timing = len(timing_metrics_available)
@@ -818,7 +818,7 @@ def create_visualizations(df, summary, win_rate_df, output_dir, plot_format):
             accuracy_stds = []
             
             for model in summary.index:
-                display_model = "llata" if model == "." else model
+                display_model = "clam" if model == "." else model
                 if ("accuracy", "mean") in summary.columns:
                     mean_acc = summary.loc[model, ("accuracy", "mean")]
                     std_acc = summary.loc[model, ("accuracy", "std")] if ("accuracy", "std") in summary.columns else 0
@@ -1323,7 +1323,7 @@ def main():
     
     for model in summary.index:
         # Ensure model names are properly displayed
-        display_model = "llata" if model == "." else model
+        display_model = "clam" if model == "." else model
         print(f"Model: {display_model}")
         for metric in metric_cols:
             if (metric, "mean") in summary.columns and (metric, "std") in summary.columns:
@@ -1343,7 +1343,7 @@ def main():
             metric_df = win_rate_df[win_rate_df["metric"] == metric].sort_values("win_rate", ascending=False)
             for _, row in metric_df.iterrows():
                 # Ensure model names are properly displayed
-                display_model = "llata" if row['model'] == "." else row['model']
+                display_model = "clam" if row['model'] == "." else row['model']
                 print(f"  {display_model}: {row['wins']} wins ({row['win_rate']:.2%})")
             print("-" * 80)
     
@@ -1354,7 +1354,7 @@ def main():
         print("-" * 80)
         for model, pairs in sorted(failed_pairs.items(), key=lambda x: len(x[1]), reverse=True):
             # Ensure model names are properly displayed
-            display_model = "llata" if model == "." else model
+            display_model = "clam" if model == "." else model
             print(f"Model: {display_model}")
             print(f"  Total failures: {len(pairs)}")
             

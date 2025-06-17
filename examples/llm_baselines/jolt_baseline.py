@@ -491,7 +491,7 @@ def evaluate_jolt_legacy(dataset, args):
             'model_name': 'JOLT',
             'dataset_name': dataset['name'],
             'dataset_id': dataset['id'],
-            'task_id': dataset['id'],  # For consistency with LLATA extraction logic
+            'task_id': dataset['id'],  # For consistency with CLAM extraction logic
             'accuracy': float(accuracy),
             'balanced_accuracy': float(balanced_acc),
             'prediction_time': float(prediction_time),  # Time for inference (includes model loading for LLMs)

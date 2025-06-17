@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Test script to verify model saving and loading functionality for LLATA.
+Test script to verify model saving and loading functionality for CLAM.
 This test ensures that models can be properly saved and loaded 
 with all necessary context for prefix embeddings.
 """
@@ -13,7 +13,7 @@ import unittest
 import numpy as np
 import torch
 
-# Add parent directory to path to import llata
+# Add parent directory to path to import clam
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from clam.models import prepare_qwen_with_prefix_embedding

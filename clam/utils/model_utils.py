@@ -1,5 +1,5 @@
 """
-Model loading utilities for LLATA models.
+Model loading utilities for CLAM models.
 
 This module provides robust functions for loading models with intelligent path
 resolution and error handling.
@@ -71,7 +71,7 @@ def find_best_checkpoint(model_path: str) -> str:
 
 def load_pretrained_model(model_path: str, device_map: str = "auto", embedding_size: int = 1000, model_id: str = None) -> Tuple:
     """
-    Load a pretrained LLATA model with smart path resolution.
+    Load a pretrained CLAM model with smart path resolution.
     
     This function handles finding the best checkpoint in a model directory:
     1. First checks for a "final_model" subdirectory

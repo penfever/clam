@@ -23,8 +23,8 @@ except ImportError:
     print("Warning: OpenML not installed. Will generate synthetic examples only.")
 
 # Define paths
-SEMANTIC_DIR = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/llata/llata/data/cc18_semantic_complete"
-OUTPUT_DIR = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/llata/llata/examples/llm_baselines/tabllm_like"
+SEMANTIC_DIR = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/clam/data/cc18_semantic_complete"
+OUTPUT_DIR = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/clam/examples/llm_baselines/tabllm_like"
 NOTES_PER_DATASET = 100  # Number of example notes to generate per dataset
 
 

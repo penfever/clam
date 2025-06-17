@@ -1,6 +1,6 @@
 # CLAM: CLassify Anything Model
 
-CLAM is a Python library for multi-modal classification using embeddings and Vision Language Models (VLMs). It supports images, audio, and tabular data through a unified interface.
+CLAM (CLassify Anything Model) is a Python library for multi-modal classification using embeddings and Vision Language Models (VLMs). It supports images, audio, and tabular data through a unified interface.
 
 ## Features
 
@@ -99,7 +99,7 @@ train_embeddings, val_embeddings, test_embeddings, tabpfn, y_train_sample = get_
 model, tokenizer, prefix_start_id, prefix_end_id, class_token_ids = prepare_qwen_with_prefix_embedding(embedding_size)
 
 # 4. Create LLM dataset
-output_dir = "./llata_output"
+output_dir = "./clam_output"
 train_dataset, eval_dataset, test_dataset, label_encoder, prefix_data_file = create_llm_dataset(
     X_train, y_train_sample, X_val, y_val, X_test, y_test,
     train_embeddings, val_embeddings, test_embeddings,
@@ -128,7 +128,7 @@ print(f"Test accuracy: {results['accuracy']:.4f}")
 
 ## Command-line Usage
 
-LLATA provides a set of command-line scripts in the `examples` directory for easy training and evaluation:
+CLAM provides a set of command-line scripts in the `examples` directory for easy training and evaluation:
 
 ### Training Models
 
@@ -203,7 +203,7 @@ python examples/evaluate_with_vq.py --model_path ./models/vq_model --compare_wit
 
 ## How It Works
 
-LLATA leverages the power of TabPFN, a foundation model for tabular data, to extract meaningful embeddings from tabular datasets. These embeddings are then used as a prefix for a Large Language Model (LLM) to guide it toward understanding the tabular data patterns.
+CLAM Tabular leverages the power of TabPFN, a foundation model for tabular data, to extract meaningful embeddings from tabular datasets. These embeddings are then used as a prefix for a Large Language Model (LLM) to guide it toward understanding the tabular data patterns.
 
 1. **Embedding Extraction**: TabPFN processes tabular data to generate embeddings that capture the data's statistical properties and patterns.
 
@@ -215,7 +215,7 @@ LLATA leverages the power of TabPFN, a foundation model for tabular data, to ext
 
 ### Vector Quantization Approach
 
-LLATA also supports a Vector Quantization (VQ) approach that provides additional benefits:
+CLAM Tabular also supports a Vector Quantization (VQ) approach that provides additional benefits:
 
 1. **Discrete Representation**: VQ maps continuous embeddings to a discrete codebook, creating a more structured latent space.
 
@@ -292,13 +292,13 @@ This can be particularly useful if a dataset was temporarily unavailable or if t
 
 ## Citation
 
-If you use LLATA in your research, please cite:
+If you use CLAM in your research, please cite:
 
 ```
-@software{feuer_llata_2025,
+@software{feuer_clam_2025,
   author       = {Feuer, Benjamin and Liu, Yurong and Purucker, Lennart and Hegde, Chinmay},
-  title        = {LLATA: LLM-Augmented Tabular Adapter},
-  month        = may,
+  title        = {CLAM: Classify Anything Model},
+  month        = june,
   year         = 2025
 }
 ```

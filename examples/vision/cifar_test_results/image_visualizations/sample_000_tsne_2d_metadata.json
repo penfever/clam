@@ -1,8 +1,0 @@
-{
-  "sample_index": 0,
-  "backend": "tsne",
-  "use_3d": false,
-  "use_knn": false,
-  "prediction": 3,
-  "vlm_model": "Qwen/Qwen2.5-VL-3B-Instruct"
-}

@@ -1,5 +1,5 @@
 """
-Unified VLM prompting utilities for LLATA.
+Unified VLM prompting utilities for CLAM.
 
 This module provides consistent prompting strategies across different modalities
 (tabular, audio, image) for Vision Language Model classification tasks.

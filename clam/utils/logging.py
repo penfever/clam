@@ -1,5 +1,5 @@
 """
-Logging utilities for LLATA.
+Logging utilities for CLAM.
 """
 
 import logging
@@ -30,7 +30,7 @@ def setup_logging(
         log_level = getattr(logging, log_level.upper())
     
     # Get the logger
-    logger = logging.getLogger("llata")
+    logger = logging.getLogger("clam")
     logger.setLevel(log_level)
     logger.propagate = propagate
     
@@ -83,7 +83,7 @@ def setup_notebook_logging(
         log_level = getattr(logging, log_level.upper())
     
     # Get the logger
-    logger = logging.getLogger("llata")
+    logger = logging.getLogger("clam")
     logger.setLevel(log_level)
     logger.propagate = propagate
     

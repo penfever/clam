@@ -1,5 +1,5 @@
 """
-Vector Quantization (VQ) models for LLATA.
+Vector Quantization (VQ) models for CLAM.
 
 This module contains implementations of the vector quantization approach for
 tabular embeddings in language models.

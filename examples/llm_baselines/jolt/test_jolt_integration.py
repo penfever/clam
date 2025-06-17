@@ -10,8 +10,8 @@ import pandas as pd
 from argparse import Namespace
 
 # Add paths
-sys.path.insert(0, '/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/llata/llata/examples/llm_baselines/jolt')
-sys.path.insert(0, '/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/llata/llata')
+sys.path.insert(0, '/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/clam/examples/llm_baselines/jolt')
+sys.path.insert(0, '/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/clam')
 
 def test_jolt_integration():
     """Test that JOLT integration works with a simple dataset."""

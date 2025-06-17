@@ -1,10 +1,10 @@
-# ImageNet Classification with LLATA t-SNE and Computer Vision Baselines
+# ImageNet Classification with CLAM t-SNE and Computer Vision Baselines
 
-This directory contains examples for image classification using DINOV2 embeddings with LLATA t-SNE baseline and standard computer vision approaches.
+This directory contains examples for image classification using DINOV2 embeddings with CLAM t-SNE baseline and standard computer vision approaches.
 
 ## Overview
 
-The goal is to demonstrate that for certain image classification tasks, especially those with long-tail distributions or limited training data, LLATA t-SNE applied to pre-trained image embeddings (DINOV2) can compete with or outperform traditional fine-tuned computer vision models.
+The goal is to demonstrate that for certain image classification tasks, especially those with long-tail distributions or limited training data, CLAM t-SNE applied to pre-trained image embeddings (DINOV2) can compete with or outperform traditional fine-tuned computer vision models.
 
 ## Structure
 
@@ -14,9 +14,9 @@ The goal is to demonstrate that for certain image classification tasks, especial
 
 ## Models Included
 
-### LLATA t-SNE Baseline
+### CLAM t-SNE Baseline
 - Uses DINOV2 embeddings as input features
-- Applies LLATA t-SNE methodology for classification
+- Applies CLAM t-SNE methodology for classification
 
 ### Computer Vision Baselines
 - ResNet-50 (fine-tuned)
@@ -31,7 +31,7 @@ The goal is to demonstrate that for certain image classification tasks, especial
 python run_imagenet_classification.py --dataset_path /path/to/imagenet --num_classes 100 --samples_per_class 100
 
 # Use specific models only
-python run_imagenet_classification.py --models llata_tsne resnet50 --dataset_path /path/to/imagenet
+python run_imagenet_classification.py --models clam_tsne resnet50 --dataset_path /path/to/imagenet
 
 # Specify DINOV2 model variant
 python run_imagenet_classification.py --dinov2_model dinov2_vitl14 --dataset_path /path/to/imagenet
@@ -39,15 +39,15 @@ python run_imagenet_classification.py --dinov2_model dinov2_vitl14 --dataset_pat
 
 ## Expected Use Cases
 
-LLATA t-SNE with DINOV2 embeddings should perform particularly well on:
+CLAM t-SNE with DINOV2 embeddings should perform particularly well on:
 - Long-tail image classification datasets
 - Few-shot learning scenarios
 - Datasets with limited training data per class
 - Domain-specific image classification where fine-tuning data is scarce
 
-# Image Classification with LLATA
+# Image Classification with CLAM
 
-This guide shows how to evaluate LLATA t-SNE on various image datasets and compare it with computer vision baselines.
+This guide shows how to evaluate CLAM t-SNE on various image datasets and compare it with computer vision baselines.
 
 ## Installation
 
@@ -73,7 +73,7 @@ pip install -e ".[vlm,vlm_cuda]"
 # Quick test with CIFAR-10 (recommended for first run)
 python examples/vision/test_all_image.py \
     --dataset cifar10 \
-    --models llata_tsne \
+    --models clam_tsne \
     --quick_test \
     --output_dir ./cifar10_results
 ```
@@ -84,7 +84,7 @@ python examples/vision/test_all_image.py \
 # Test multiple datasets at once
 python examples/vision/test_all_image.py \
     --datasets cifar10 cifar100 \
-    --models llata_tsne dinov2_linear \
+    --models clam_tsne dinov2_linear \
     --output_dir ./multi_dataset_results
 ```
 
@@ -94,7 +94,7 @@ python examples/vision/test_all_image.py \
 # Full CIFAR-100 evaluation
 python examples/vision/test_all_image.py \
     --datasets cifar100 \
-    --models llata_tsne dinov2_linear qwen_vl \
+    --models clam_tsne dinov2_linear qwen_vl \
     --output_dir ./cifar100_results
 ```
 
@@ -104,7 +104,7 @@ python examples/vision/test_all_image.py \
 # ImageNet-1k from HuggingFace (requires authentication)
 python examples/vision/test_all_image.py \
     --datasets imagenet \
-    --models llata_tsne dinov2_linear \
+    --models clam_tsne dinov2_linear \
     --quick_test \
     --output_dir ./imagenet_results
 ```
@@ -117,7 +117,7 @@ python examples/vision/test_all_image.py \
     --datasets custom \
     --dataset_path /path/to/your/dataset \
     --num_classes 50 \
-    --models llata_tsne dinov2_linear \
+    --models clam_tsne dinov2_linear \
     --output_dir ./custom_results
 ```
 
@@ -153,19 +153,19 @@ dataset_path/
 ```
 
 Choose from:
-- **llata_tsne**: DINOV2 → t-SNE → VLM (main method)
-- **llata_simple**: DINOV2 → PCA → k-NN (simpler baseline)
+- **clam_tsne**: DINOV2 → t-SNE → VLM (main method)
+- **clam_simple**: DINOV2 → PCA → k-NN (simpler baseline)
 - **dinov2_linear**: DINOV2 → Linear Probe (traditional CV)
 - **qwen_vl**: Qwen Vision-Language Model (zero-shot)
 
-## Advanced LLATA t-SNE Configuration
+## Advanced CLAM t-SNE Configuration
 
 ### 3D Visualizations
 
 ```bash
 python examples/vision/test_all_image.py \
     --datasets cifar10 \
-    --models llata_tsne \
+    --models clam_tsne \
     --use_3d_tsne \
     --output_dir ./3d_results
 ```
@@ -175,7 +175,7 @@ python examples/vision/test_all_image.py \
 ```bash
 python examples/vision/test_all_image.py \
     --datasets cifar10 \
-    --models llata_tsne \
+    --models clam_tsne \
     --use_knn_connections \
     --knn_k 10 \
     --output_dir ./knn_results
@@ -186,7 +186,7 @@ python examples/vision/test_all_image.py \
 ```bash
 python examples/vision/test_all_image.py \
     --datasets cifar10 \
-    --models llata_tsne \
+    --models clam_tsne \
     --use_pca_backend \
     --output_dir ./pca_results
 ```
@@ -196,7 +196,7 @@ python examples/vision/test_all_image.py \
 ```bash
 python examples/vision/test_all_image.py \
     --datasets cifar10 \
-    --models llata_tsne \
+    --models clam_tsne \
     --use_3d_tsne \
     --use_knn_connections \
     --knn_k 20 \
@@ -223,7 +223,7 @@ Recommendation: Start with `dinov2_vits14` (fastest) or `dinov2_vitb14` (good ba
 ```bash
 python examples/vision/test_all_image.py \
     --dataset cifar10 \
-    --models llata_tsne dinov2_linear qwen_vl \
+    --models clam_tsne dinov2_linear qwen_vl \
     --use_wandb \
     --wandb_project my-image-experiments \
     --output_dir ./wandb_results
@@ -236,7 +236,7 @@ python examples/vision/test_all_image.py \
 ```bash
 python examples/vision/test_all_image.py \
     --dataset cifar10 \
-    --models llata_tsne \
+    --models clam_tsne \
     --dinov2_model dinov2_vits14 \
     --quick_test \
     --device cpu \
@@ -248,7 +248,7 @@ python examples/vision/test_all_image.py \
 ```bash
 python examples/vision/test_all_image.py \
     --dataset cifar100 \
-    --models llata_tsne dinov2_linear \
+    --models clam_tsne dinov2_linear \
     --dinov2_model dinov2_vitl14 \
     --device cuda \
     --max_train_plot_samples 2000
@@ -280,8 +280,8 @@ The script generates:
 ```
 CIFAR10 TEST RESULTS
 ============================================================
-llata_tsne     : ✓ 0.6420 accuracy (train: 45.2s, test: 8.1s)
-llata_simple   : ✓ 0.5890 accuracy (train: 12.1s, test: 3.2s)
+clam_tsne     : ✓ 0.6420 accuracy (train: 45.2s, test: 8.1s)
+clam_simple   : ✓ 0.5890 accuracy (train: 12.1s, test: 3.2s)
 dinov2_linear  : ✓ 0.7150 accuracy (train: 18.3s, test: 2.4s)
 qwen_vl        : ✓ 0.4230 accuracy (train: 0.1s, test: 125.6s)
 
@@ -295,7 +295,7 @@ For specialized biological image classification, use the separate script:
 ```bash
 python examples/vision/test_bioclip2_biological_datasets.py \
     --datasets fishnet awa2 plantdoc \
-    --models llata_tsne_bioclip2 qwen_vl \
+    --models clam_tsne_bioclip2 qwen_vl \
     --output_dir ./biological_results
 ```
 
@@ -316,4 +316,4 @@ python examples/vision/test_bioclip2_biological_datasets.py \
 - For custom datasets, ensure proper directory structure
 - Check that `--num_classes` matches actual number of class directories
 
-This framework provides a comprehensive evaluation suite for comparing LLATA t-SNE with traditional computer vision approaches across various image classification tasks.
+This framework provides a comprehensive evaluation suite for comparing CLAM t-SNE with traditional computer vision approaches across various image classification tasks.

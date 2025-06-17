@@ -42,7 +42,7 @@ def convert_numpy_types(obj):
         return obj
 
 
-def evaluate_llata_tsne(dataset, args):
+def evaluate_clam_tsne(dataset, args):
     """Evaluate LlaTa-T-SNe baseline on a dataset."""
     logger = logging.getLogger(__name__)
     logger.info(f"Evaluating LlaTa-T-SNe on dataset {dataset['name']}")
@@ -484,7 +484,7 @@ def evaluate_llata_tsne(dataset, args):
             'model_name': 'LlaTa-T-SNe',
             'dataset_name': dataset['name'],
             'dataset_id': dataset['id'],
-            'task_id': dataset['id'],  # For consistency with LLATA extraction logic
+            'task_id': dataset['id'],  # For consistency with CLAM extraction logic
             'accuracy': float(accuracy),
             'balanced_accuracy': float(balanced_acc),
             'prediction_time': float(prediction_time),  # Time for inference (includes model loading for LLMs)
@@ -663,7 +663,7 @@ def evaluate_llata_tsne(dataset, args):
                     overview_metadata = {
                         'dataset_name': dataset['name'],
                         'dataset_id': dataset['id'],
-                        'task_id': dataset['id'],  # For consistency with LLATA extraction logic
+                        'task_id': dataset['id'],  # For consistency with CLAM extraction logic
                         'num_train_points': len(train_tsne),
                         'num_test_points': len(test_tsne),
                         'num_classes': len(unique_classes),
@@ -717,7 +717,7 @@ def evaluate_llata_tsne(dataset, args):
                         wandb_data = {
                             'dataset_name': dataset['name'],
                             'dataset_id': dataset['id'],
-                            'task_id': dataset['id'],  # For consistency with LLATA extraction logic
+                            'task_id': dataset['id'],  # For consistency with CLAM extraction logic
                             'model_name': 'LlaTa-T-SNe',
                             'accuracy': float(accuracy),
                             'num_samples': len(example_inputs_outputs),
@@ -733,7 +733,7 @@ def evaluate_llata_tsne(dataset, args):
                         json_temp_path = f.name
                     
                     # Log the JSON file as an artifact
-                    wandb.log_artifact(json_temp_path, name=f"llata_tsne_examples_{dataset['name']}", type="examples")
+                    wandb.log_artifact(json_temp_path, name=f"clam_tsne_examples_{dataset['name']}", type="examples")
                     
                     # Clean up temp file
                     os.unlink(json_temp_path)

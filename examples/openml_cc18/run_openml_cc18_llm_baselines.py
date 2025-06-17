@@ -10,7 +10,7 @@ This script:
 
 Requirements:
 - OpenML installed (pip install openml)
-- LLATA installed and configured
+- CLAM installed and configured
 - W&B account for logging results
 - RTFM package for Tabula-8B (pip install git+https://github.com/penfever/rtfm.git)
 - Transformers and torch for LLM baselines
@@ -18,17 +18,17 @@ Requirements:
 
 Usage:
     # Basic usage with all models
-    python run_openml_cc18_llm_baselines.py --llata_repo_path /path/to/llata --output_dir ./results
+    python run_openml_cc18_llm_baselines.py --clam_repo_path /path/to/clam --output_dir ./results
     
     # Run only LlaTa-T-SNe with 3D t-SNE and KNN connections
-    python run_openml_cc18_llm_baselines.py --llata_repo_path /path/to/llata --output_dir ./results \
-        --models llata_tsne --use_3d_tsne --use_knn_connections --knn_k 7
+    python run_openml_cc18_llm_baselines.py --clam_repo_path /path/to/clam --output_dir ./results \
+        --models clam_tsne --use_3d_tsne --use_knn_connections --knn_k 7
     
     # Run with custom image settings
-    python run_openml_cc18_llm_baselines.py --llata_repo_path /path/to/llata --output_dir ./results \
-        --models llata_tsne --max_vlm_image_size 1024 --image_dpi 72 --no-force_rgb_mode
+    python run_openml_cc18_llm_baselines.py --clam_repo_path /path/to/clam --output_dir ./results \
+        --models clam_tsne --max_vlm_image_size 1024 --image_dpi 72 --no-force_rgb_mode
 
-The script assumes the LLATA repo structure.
+The script assumes the CLAM repo structure.
 """
 
 import os
@@ -61,10 +61,10 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Evaluate LLM baselines on OpenML CC18 collection")
     
     parser.add_argument(
-        "--llata_repo_path",
+        "--clam_repo_path",
         type=str,
         required=True,
-        help="Path to the LLATA repository"
+        help="Path to the CLAM repository"
     )
     parser.add_argument(
         "--output_dir",
@@ -75,8 +75,8 @@ def parse_args():
     parser.add_argument(
         "--models",
         type=str,
-        default="tabllm,tabula_8b,jolt,llata_tsne",
-        help="Comma-separated list of LLM models to evaluate: 'tabllm', 'tabula_8b', 'jolt', 'llata_tsne'"
+        default="tabllm,tabula_8b,jolt,clam_tsne",
+        help="Comma-separated list of LLM models to evaluate: 'tabllm', 'tabula_8b', 'jolt', 'clam_tsne'"
     )
     parser.add_argument(
         "--num_splits",
@@ -93,7 +93,7 @@ def parse_args():
     parser.add_argument(
         "--wandb_project",
         type=str,
-        default="llata-openml-cc18-llm-baselines",
+        default="clam-openml-cc18-llm-baselines",
         help="W&B project name"
     )
     parser.add_argument(
@@ -338,7 +338,7 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
     wandb_project = f"{args.wandb_project}-{version_by_date}"
     
     # Build evaluation command using the LLM baselines script
-    eval_script = os.path.join(args.llata_repo_path, "examples", "evaluate_llm_baselines.py")
+    eval_script = os.path.join(args.clam_repo_path, "examples", "evaluate_llm_baselines.py")
     
     cmd = [
         "python", eval_script,
@@ -448,7 +448,7 @@ def process_task(task, args):
                 "backend": args.backend,
                 "tensor_parallel_size": args.tensor_parallel_size,
                 "gpu_memory_utilization": args.gpu_memory_utilization,
-                "llata_tsne_params": {
+                "clam_tsne_params": {
                     "vlm_model_id": args.vlm_model_id,
                     "embedding_size": args.embedding_size,
                     "tsne_perplexity": args.tsne_perplexity,

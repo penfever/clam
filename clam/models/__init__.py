@@ -1,5 +1,5 @@
 """
-Models for LLATA.
+Models for CLAM.
 
 This module includes both standard embedding approaches and vector-quantized
 versions for improved efficiency and representation.

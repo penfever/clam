@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Script for evaluating a pretrained LLATA model on one or more tabular datasets.
+Script for evaluating a pretrained CLAM model on one or more tabular datasets.
 This script handles:
 1. Loading and preprocessing datasets from multiple sources
 2. Computing TabPFN embeddings
@@ -16,25 +16,25 @@ Datasets can be specified in multiple ways:
 
 Usage examples:
     # Basic usage with a single dataset
-    python evaluate_on_dataset.py --model_path ./models/llata_output --dataset_name har
+    python evaluate_on_dataset.py --model_path ./models/clam_output --dataset_name har
     
     # Using limited training samples with balanced sampling (default)
-    python evaluate_on_dataset.py --model_path ./models/llata_output --dataset_name har --max_train_samples 1000
+    python evaluate_on_dataset.py --model_path ./models/clam_output --dataset_name har --max_train_samples 1000
     
     # Using limited training samples with random sampling
-    python evaluate_on_dataset.py --model_path ./models/llata_output --dataset_name airlines --max_train_samples 500 --sampling_strategy random
+    python evaluate_on_dataset.py --model_path ./models/clam_output --dataset_name airlines --max_train_samples 500 --sampling_strategy random
     
     # Evaluating on multiple specific datasets
-    python evaluate_on_dataset.py --model_path ./models/llata_output --dataset_ids 1590,40975,37,54 --output_dir ./eval_results
+    python evaluate_on_dataset.py --model_path ./models/clam_output --dataset_ids 1590,40975,37,54 --output_dir ./eval_results
     
     # Evaluating on 5 randomly sampled datasets from OpenML
-    python evaluate_on_dataset.py --model_path ./models/llata_output --num_datasets 5 --output_dir ./eval_results
+    python evaluate_on_dataset.py --model_path ./models/clam_output --num_datasets 5 --output_dir ./eval_results
     
     # Evaluating on all CSV files in a directory
-    python evaluate_on_dataset.py --model_path ./models/llata_output --data_dir ./datasets --output_dir ./eval_results
+    python evaluate_on_dataset.py --model_path ./models/clam_output --data_dir ./datasets --output_dir ./eval_results
     
     # Using Weights & Biases for experiment tracking
-    python evaluate_on_dataset.py --model_path ./models/llata_output --dataset_ids 1590,40975 --use_wandb --wandb_project myproject
+    python evaluate_on_dataset.py --model_path ./models/clam_output --dataset_ids 1590,40975 --use_wandb --wandb_project myproject
 """
 
 import os
@@ -1545,8 +1545,8 @@ def main():
         # Normal behavior when not baselines_only
         if args.model_path:
             # Evaluate the model from model_path
-            models_to_evaluate.append(('llata', args.model_path))
-            logger.info(f"Will evaluate LLATA model from path: {args.model_path}")
+            models_to_evaluate.append(('clam', args.model_path))
+            logger.info(f"Will evaluate CLAM model from path: {args.model_path}")
         elif args.model_id:
             # Check if it's a baseline model
             if args.model_id.lower() in baseline_models:
@@ -1592,11 +1592,11 @@ def main():
         
         logger.info(f"Evaluating model {model_identifier} (type: {model_type}) on {len(processed_datasets)} datasets")
         
-        # Load LLATA/LLM models once per model_identifier
-        if model_type == 'llata':
-            cache_key = f"llata_{model_identifier}"
+        # Load CLAM/LLM models once per model_identifier
+        if model_type == 'clam':
+            cache_key = f"clam_{model_identifier}"
             if cache_key not in model_cache:
-                logger.info(f"Loading pretrained LLATA model from {model_identifier}")
+                logger.info(f"Loading pretrained CLAM model from {model_identifier}")
                 model, tokenizer, prefix_start_id, prefix_end_id, class_token_ids, is_vq = load_pretrained_model(
                     model_identifier, 
                     device_map=args.device,
@@ -1605,7 +1605,7 @@ def main():
                 )
                 model_cache[cache_key] = (model, tokenizer, prefix_start_id, prefix_end_id, class_token_ids, is_vq)
             else:
-                logger.info(f"Using cached LLATA model for {model_identifier}")
+                logger.info(f"Using cached CLAM model for {model_identifier}")
                 model, tokenizer, prefix_start_id, prefix_end_id, class_token_ids, is_vq = model_cache[cache_key]
         
         elif model_type == 'llm':
@@ -1633,7 +1633,7 @@ def main():
         
         for dataset in processed_datasets:
             try:
-                if model_type == 'llata':
+                if model_type == 'clam':
                     # Evaluate on dataset using the cached model
                     results = evaluate_dataset(
                         dataset, 
@@ -1643,7 +1643,7 @@ def main():
                     )
                     
                     # Add model type to results
-                    results['model_type'] = 'llata_vq' if is_vq else 'llata'
+                    results['model_type'] = 'clam_vq' if is_vq else 'clam'
                     results['model_id'] = model_identifier
                     results['is_vq'] = is_vq
                     
@@ -1842,7 +1842,7 @@ def main():
             }
             
             # Add VQ information if available
-            if model_type == 'llata' and valid_results and 'is_vq' in valid_results[0]:
+            if model_type == 'clam' and valid_results and 'is_vq' in valid_results[0]:
                 model_summary['is_vq'] = valid_results[0]['is_vq']
             
             # Add balanced accuracy information if available
@@ -1994,7 +1994,7 @@ def main():
             
             model_names = [f"{ms['model_identifier']} ({ms['model_type']})" for ms in all_summaries]
             accuracies = [ms['average_accuracy'] for ms in all_summaries]
-            colors = ['#1f77b4' if ms['model_type'] == 'llata' or ms['model_type'] == 'llm' else
+            colors = ['#1f77b4' if ms['model_type'] == 'clam' or ms['model_type'] == 'llm' else
                      '#ff7f0e' if ms['model_type'] == 'baseline' else '#2ca02c'
                      for ms in all_summaries]
             
