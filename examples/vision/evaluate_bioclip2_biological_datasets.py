@@ -622,27 +622,30 @@ def load_existing_dataset(data_dir: Path, dataset_name: str) -> tuple:
     return train_paths, train_labels, test_paths, test_labels, class_names
 
 
-def run_biological_dataset_test(args):
-    """Run biological dataset classification test."""
+def test_single_dataset(dataset_name: str, args):
+    """Test a single biological dataset."""
+    logger.info(f"\n{'='*60}")
+    logger.info(f"TESTING {dataset_name.upper()}")
+    logger.info(f"{'='*60}")
     
     use_wandb_logging = args.use_wandb and WANDB_AVAILABLE
     results = {}
     
     # Prepare dataset
-    if args.dataset == "fishnet":
+    if dataset_name == "fishnet":
         train_paths, train_labels, test_paths, test_labels, class_names = download_and_prepare_fishnet(
             args.data_dir
         )
-    elif args.dataset == "awa2":
+    elif dataset_name == "awa2":
         train_paths, train_labels, test_paths, test_labels, class_names = download_and_prepare_awa2(
             args.data_dir
         )
-    elif args.dataset == "plantdoc":
+    elif dataset_name == "plantdoc":
         train_paths, train_labels, test_paths, test_labels, class_names = download_and_prepare_plantdoc(
             args.data_dir
         )
     else:
-        raise ValueError(f"Unsupported dataset: {args.dataset}")
+        raise ValueError(f"Unsupported dataset: {dataset_name}")
     
     # Use subset for quick testing
     if args.quick_test:
@@ -675,7 +678,7 @@ def run_biological_dataset_test(args):
             logger.info(f"BioClip2 KNN completed: {eval_results['accuracy']:.4f} accuracy")
             
             if use_wandb_logging:
-                log_results_to_wandb('bioclip2_knn', eval_results, args, class_names)
+                log_results_to_wandb('bioclip2_knn', eval_results, args, class_names, dataset_name)
             
         except Exception as e:
             logger.error(f"BioClip2 KNN failed: {e}")
@@ -699,7 +702,7 @@ def run_biological_dataset_test(args):
                 test_paths, test_labels,
                 save_raw_responses=args.save_outputs,
                 output_dir=args.output_dir if args.save_outputs else None,
-                benchmark_name=f"{args.dataset.lower()}_biological"
+                benchmark_name=f"{dataset_name.lower()}_biological"
             )
             eval_results['training_time'] = training_time
             
@@ -707,7 +710,7 @@ def run_biological_dataset_test(args):
             logger.info(f"Qwen VL completed: {eval_results['accuracy']:.4f} accuracy")
             
             if use_wandb_logging:
-                log_results_to_wandb('qwen_vl', eval_results, args, class_names)
+                log_results_to_wandb('qwen_vl', eval_results, args, class_names, dataset_name)
             
         except Exception as e:
             logger.error(f"Qwen VL failed: {e}")
@@ -756,7 +759,7 @@ def run_biological_dataset_test(args):
             logger.info(f"CLAM t-SNE BioClip2 completed: {eval_results['accuracy']:.4f} accuracy")
             
             if use_wandb_logging:
-                log_results_to_wandb('clam_tsne_bioclip2', eval_results, args, class_names)
+                log_results_to_wandb('clam_tsne_bioclip2', eval_results, args, class_names, dataset_name)
             
         except Exception as e:
             logger.error(f"CLAM t-SNE BioClip2 failed: {e}")
@@ -765,14 +768,80 @@ def run_biological_dataset_test(args):
     return results
 
 
-def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names: list):
+def run_all_biological_tests(args):
+    """Run biological dataset tests on multiple datasets."""
+    all_results = {}
+    
+    # Log platform information
+    from clam.utils.platform_utils import log_platform_info
+    platform_info = log_platform_info(logger)
+    
+    for dataset_name in args.dataset:
+        logger.info(f"\n{'='*60}")
+        logger.info(f"STARTING {dataset_name.upper()} DATASET")
+        logger.info(f"{'='*60}")
+        
+        # Initialize Weights & Biases for this dataset if requested
+        gpu_monitor = None
+        if args.use_wandb:
+            if not WANDB_AVAILABLE:
+                logger.warning("Weights & Biases requested but not installed. Run 'pip install wandb' to install.")
+            else:
+                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                if args.wandb_name is None:
+                    feature_suffix = ""
+                    if args.use_3d_tsne:
+                        feature_suffix += "_3d"
+                    if args.use_knn_connections:
+                        feature_suffix += f"_knn{args.knn_k}"
+                    if args.use_pca_backend:
+                        feature_suffix += "_pca"
+                    run_name = f"{dataset_name}_bioclip2_{timestamp}{feature_suffix}"
+                else:
+                    run_name = f"{args.wandb_name}_{dataset_name}"
+                
+                gpu_monitor = init_wandb_with_gpu_monitoring(
+                    project=args.wandb_project,
+                    entity=args.wandb_entity,
+                    name=run_name,
+                    config=vars(args),
+                    output_dir=args.output_dir,
+                    enable_system_monitoring=True,
+                    gpu_log_interval=30.0,
+                    enable_detailed_gpu_logging=True
+                )
+                logger.info(f"Initialized Weights & Biases run: {run_name}")
+        
+        # Test single dataset
+        dataset_results = test_single_dataset(dataset_name, args)
+        all_results[dataset_name] = dataset_results
+        
+        # Save results for this dataset
+        dataset_output_dir = os.path.join(args.output_dir, dataset_name)
+        os.makedirs(dataset_output_dir, exist_ok=True)
+        
+        # Create a temporary args object with single dataset for save_results
+        import argparse
+        temp_args = argparse.Namespace(**vars(args))
+        temp_args.dataset = dataset_name  # For backward compatibility with save_results
+        save_results(dataset_results, dataset_output_dir, temp_args)
+        
+        # Clean up wandb for this dataset
+        if gpu_monitor is not None:
+            cleanup_gpu_monitoring(gpu_monitor)
+    
+    return all_results
+
+
+def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names: list, dataset_name: str = None):
     """Log evaluation results to Weights & Biases."""
+    dataset = dataset_name or getattr(args, 'dataset', 'unknown')
     if 'error' in eval_results:
         wandb.log({
             f"{model_name}/status": "failed",
             f"{model_name}/error": eval_results['error'],
             "model_name": model_name,
-            "dataset": args.dataset,
+            "dataset": dataset,
             "quick_test": args.quick_test
         })
         return
@@ -783,7 +852,7 @@ def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names:
         f"{model_name}/prediction_time": eval_results.get('prediction_time', 0),
         f"{model_name}/num_test_samples": eval_results.get('num_test_samples', 0),
         "model_name": model_name,
-        "dataset": args.dataset,
+        "dataset": dataset,
         "num_classes": len(class_names),
         "quick_test": args.quick_test
     }
@@ -847,10 +916,10 @@ def parse_args():
     
     parser.add_argument(
         "--dataset",
-        type=str,
-        default="fishnet",
+        nargs="+",
+        default=["fishnet"],
         choices=["fishnet", "awa2", "plantdoc"],
-        help="Biological dataset to test"
+        help="Biological datasets to test"
     )
     parser.add_argument(
         "--data_dir",
@@ -993,51 +1062,42 @@ def parse_args():
 def main():
     args = parse_args()
     
-    logger.info(f"Starting {args.dataset.upper()} biological dataset classification test...")
+    logger.info(f"Starting biological dataset classification tests...")
+    logger.info(f"Configuration:")
+    logger.info(f"  Datasets: {', '.join(args.dataset)}")
+    logger.info(f"  Models: {', '.join(args.models)}")
+    logger.info(f"  Quick test: {args.quick_test}")
+    logger.info(f"  Use PCA: {getattr(args, 'use_pca_backend', False)}")
+    logger.info(f"  3D t-SNE: {getattr(args, 'use_3d_tsne', False)}")
+    logger.info(f"  KNN connections: {getattr(args, 'use_knn_connections', False)}")
+    if getattr(args, 'use_knn_connections', False):
+        logger.info(f"  KNN k: {getattr(args, 'knn_k', 5)}")
     
-    # Initialize Weights & Biases
-    gpu_monitor = None
-    if args.use_wandb:
-        if not WANDB_AVAILABLE:
-            logger.warning("Weights & Biases requested but not installed. Run 'pip install wandb' to install.")
-        else:
-            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            if args.wandb_name is None:
-                feature_suffix = ""
-                if args.use_3d_tsne:
-                    feature_suffix += "_3d"
-                if args.use_knn_connections:
-                    feature_suffix += f"_knn{args.knn_k}"
-                if args.use_pca_backend:
-                    feature_suffix += "_pca"
-                args.wandb_name = f"{args.dataset}_bioclip2_{timestamp}{feature_suffix}"
-            
-            gpu_monitor = init_wandb_with_gpu_monitoring(
-                project=args.wandb_project,
-                entity=args.wandb_entity,
-                name=args.wandb_name,
-                config=vars(args),
-                output_dir=args.output_dir,
-                enable_system_monitoring=True,
-                gpu_log_interval=30.0,
-                enable_detailed_gpu_logging=True
-            )
-            logger.info(f"Initialized Weights & Biases run: {args.wandb_name}")
+    # Run tests on all datasets
+    all_results = run_all_biological_tests(args)
     
-    # Log platform information
-    platform_info = log_platform_info(logger)
+    # Print summary for all datasets
+    logger.info(f"\n{'='*80}")
+    logger.info("ALL DATASETS SUMMARY")
+    logger.info(f"{'='*80}")
     
-    # Run test
-    results = run_biological_dataset_test(args)
+    total_experiments = 0
+    successful_experiments = 0
     
-    # Save results
-    save_results(results, args.output_dir, args)
+    for dataset_name, dataset_results in all_results.items():
+        logger.info(f"\n{dataset_name.upper()}:")
+        for model_name, model_result in dataset_results.items():
+            total_experiments += 1
+            if 'error' not in model_result:
+                successful_experiments += 1
+                accuracy = model_result.get('accuracy', 0)
+                logger.info(f"  {model_name:20s}: ✓ {accuracy:.4f} accuracy")
+            else:
+                logger.info(f"  {model_name:20s}: ✗ ERROR - {model_result['error']}")
     
-    # Clean up wandb
-    if gpu_monitor is not None:
-        cleanup_gpu_monitoring(gpu_monitor)
-    
-    logger.info(f"{args.dataset.upper()} biological dataset test completed!")
+    logger.info(f"\nOverall: {successful_experiments}/{total_experiments} experiments successful")
+    logger.info(f"Results saved to: {args.output_dir}")
+    logger.info(f"Biological dataset tests completed!")
 
 
 if __name__ == "__main__":
