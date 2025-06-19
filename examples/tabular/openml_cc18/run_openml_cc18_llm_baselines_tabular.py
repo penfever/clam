@@ -272,6 +272,26 @@ def parse_args():
         help="Automatically skip tasks with incomplete metadata instead of failing"
     )
     
+    # Add LLM model specific arguments that need to be passed through
+    parser.add_argument(
+        "--tabllm_model",
+        type=str,
+        default="Qwen/Qwen2.5-7B-Instruct",
+        help="TabLLM model identifier"
+    )
+    parser.add_argument(
+        "--tabula_model",
+        type=str,
+        default="mlfoundations/tabula-8b",
+        help="Tabula-8B model identifier"
+    )
+    parser.add_argument(
+        "--jolt_model",
+        type=str,
+        default="Qwen/Qwen2.5-7B-Instruct",
+        help="JOLT baseline model identifier"
+    )
+    
     return parser.parse_args()
 
 def set_seed(seed):
@@ -432,6 +452,13 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
     # Add custom viewing angles if specified
     if args.viewing_angles:
         cmd.extend(["--viewing_angles", args.viewing_angles])
+    
+    # Add model-specific arguments
+    cmd.extend([
+        "--tabllm_model", args.tabllm_model,
+        "--tabula_model", args.tabula_model,
+        "--jolt_model", args.jolt_model,
+    ])
     
     # Add W&B parameters if we want to track (commented out by default to avoid clutter)
     cmd.extend([

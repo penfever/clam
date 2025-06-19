@@ -619,6 +619,12 @@ def add_llm_baseline_args(parser: argparse.ArgumentParser):
         default=500,
         help="Apply feature selection if dataset has more than this many features"
     )
+    parser.add_argument(
+        "--vlm_model_id",
+        type=str,
+        default="Qwen/Qwen2.5-VL-32B-Instruct",
+        help="Vision Language Model ID for CLAM t-SNE evaluation"
+    )
 
 
 def add_dataset_selection_args(parser: argparse.ArgumentParser):
