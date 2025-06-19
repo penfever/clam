@@ -56,7 +56,7 @@ class QwenVLBaseline:
                 torch_dtype = torch.float32
                 device_map = "cpu"
             else:
-                torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+                torch_dtype = torch.bfloat16 if torch.cuda.is_available() else torch.float32
                 device_map = "auto" if torch.cuda.is_available() else "cpu"
             
             self.model = AutoModelForVision2Seq.from_pretrained(

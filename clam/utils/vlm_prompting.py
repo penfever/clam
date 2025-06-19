@@ -276,12 +276,12 @@ def parse_vlm_response(response: str, unique_classes: List, logger_instance: Opt
                 else:
                     # Take everything until newline or reasoning keywords
                     import re
-                    # Split on common reasoning indicators
-                    reasoning_split = re.split(r'\s+(?:reasoning|because|since|explanation|rationale)', after_class, flags=re.IGNORECASE)
+                    # Split on common reasoning indicators (more robust)
+                    reasoning_split = re.split(r'\s*(?:\||reasoning|because|since|explanation|rationale|the\s|this\s)', after_class, flags=re.IGNORECASE)
                     class_part = reasoning_split[0].strip()
                 
                 # Remove quotes if present
-                class_part = class_part.strip('"\'')
+                class_part = class_part.strip('"\'').strip()
                 
                 # If using "Class X" format, extract the number (handle both "class 6" and "class_6")
                 if not use_semantic_names:
@@ -299,9 +299,17 @@ def parse_vlm_response(response: str, unique_classes: List, logger_instance: Opt
                 
                 # Try to match with available classes (semantic names or direct)
                 if use_semantic_names:
+                    # First try exact match
                     for cls in unique_classes:
                         if str(cls).lower() == class_part.lower():
                             logger_instance.debug(f"Parsed structured response: '{class_part}' -> {cls}")
+                            return cls
+                    
+                    # Then try partial match (class name appears at start of response)
+                    for cls in unique_classes:
+                        cls_str = str(cls).lower()
+                        if class_part.lower().startswith(cls_str):
+                            logger_instance.debug(f"Parsed partial match: '{class_part}' -> {cls}")
                             return cls
                         
         except Exception as e:
