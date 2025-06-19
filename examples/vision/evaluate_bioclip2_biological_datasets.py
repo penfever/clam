@@ -823,7 +823,8 @@ def test_single_dataset(dataset_name: str, args):
                 num_classes=len(class_names),
                 class_names=class_names,
                 model_name=model_name,
-                enable_thinking=args.enable_thinking
+                enable_thinking=args.enable_thinking,
+                use_semantic_names=args.use_semantic_names
             )
             
             start_time = time.time()
