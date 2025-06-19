@@ -107,24 +107,29 @@ def validate_tabllm_metadata(openml_task_id: int, feature_count: Optional[int] =
             with open(semantic_file, 'r') as f:
                 semantic_info = json.load(f)
             
-            # Validate feature count if provided
+            # Validate feature count if provided (feature_count includes target)
             if feature_count is not None:
                 config_feature_count = None
                 if 'columns' in semantic_info:
-                    config_feature_count = len([col for col in semantic_info['columns'] if col.get('name') != 'target'])
+                    # Count all columns including target
+                    config_feature_count = len(semantic_info['columns'])
                 elif 'feature_descriptions' in semantic_info:
-                    config_feature_count = len(semantic_info['feature_descriptions'])
+                    # These typically don't include target, so add 1
+                    config_feature_count = len(semantic_info['feature_descriptions']) + 1
                 elif 'feature_description' in semantic_info:
                     if isinstance(semantic_info['feature_description'], dict):
-                        config_feature_count = len(semantic_info['feature_description'])
+                        # These typically don't include target, so add 1
+                        config_feature_count = len(semantic_info['feature_description']) + 1
                     else:
                         # Handle string format with features count
                         config_feature_count = semantic_info.get('features', None)
                         if isinstance(config_feature_count, str):
                             try:
-                                config_feature_count = int(config_feature_count)
+                                config_feature_count = int(config_feature_count) + 1  # Add 1 for target
                             except:
                                 config_feature_count = None
+                        elif config_feature_count is not None:
+                            config_feature_count += 1  # Add 1 for target
                 
                 if config_feature_count is not None and config_feature_count != feature_count:
                     result['valid'] = False
@@ -209,9 +214,12 @@ def validate_jolt_metadata(openml_task_id: int, feature_count: Optional[int] = N
         with open(jolt_config_path, 'r') as f:
             config_data = json.load(f)
         
-        # Validate feature count if provided
+        # Validate feature count if provided (feature_count includes target)
         if feature_count is not None:
+            # JOLT config stores feature count WITHOUT target, so add 1 for comparison
             config_feature_count = config_data.get('num_features')
+            if config_feature_count is not None:
+                config_feature_count += 1  # Add 1 to match our convention of including target
             if config_feature_count is not None and config_feature_count != feature_count:
                 result['valid'] = False
                 result['errors'].append(

@@ -71,7 +71,10 @@ def load_jolt_config_by_openml_id(openml_task_id, original_feature_count=None):
             
             # Validate feature count if provided
             if original_feature_count is not None:
+                # JOLT config stores feature count WITHOUT target, so add 1 for comparison
                 config_feature_count = config_data.get('num_features')
+                if config_feature_count is not None:
+                    config_feature_count += 1  # Add 1 to match our convention of including target
                 if config_feature_count is not None and config_feature_count != original_feature_count:
                     error_msg = (
                         f"Feature count mismatch for OpenML task {openml_task_id}: "
