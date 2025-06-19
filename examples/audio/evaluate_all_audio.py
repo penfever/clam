@@ -558,8 +558,10 @@ def parse_args():
     
     args = parser.parse_args()
     
-    # Convert comma-separated strings to lists for compatibility
-    if hasattr(args, 'datasets') and isinstance(args.datasets, str):
+    # Use audio_datasets if provided, otherwise fall back to datasets
+    if hasattr(args, 'audio_datasets') and args.audio_datasets:
+        args.datasets = args.audio_datasets
+    elif hasattr(args, 'datasets') and isinstance(args.datasets, str):
         args.datasets = args.datasets.split(',')
     
     # models is already a list from nargs="+" so no conversion needed
