@@ -742,8 +742,8 @@ class OpenAIModelWrapper(BaseModelWrapper):
                 
             except Exception as e:
                 logger.error(f"OpenAI API error: {e}")
-                # Fallback to empty string
-                results.append("")
+                # Re-raise the exception instead of returning empty string
+                raise RuntimeError(f"OpenAI API call failed: {e}") from e
         
         return results[0] if single_input else results
     
@@ -842,7 +842,8 @@ class OpenAIVisionModelWrapper(BaseModelWrapper):
             
         except Exception as e:
             logger.error(f"OpenAI Vision API error: {e}")
-            return ""
+            # Re-raise the exception instead of returning empty string
+            raise RuntimeError(f"OpenAI Vision API call failed: {e}") from e
     
     def generate(self, inputs: Union[str, List[str]], config: GenerationConfig) -> Union[str, List[str]]:
         """Standard generate method for text-only inputs."""
