@@ -85,7 +85,7 @@ def load_tabllm_config_by_openml_id(openml_task_id, original_feature_count=None)
             
             # Load semantic information for feature count validation
             # Use relative path from current script location to project root
-            project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..', '..'))
+            project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
             semantic_dir = os.path.join(project_root, "data", "cc18_semantic")
             semantic_file = os.path.join(semantic_dir, f"{openml_task_id}.json")
             
@@ -330,8 +330,8 @@ def evaluate_tabllm(dataset, args):
         
         # Try to load semantic information for better feature descriptions
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        # Go up four levels from examples/tabular/llm_baselines/ to clam root
-        clam_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..', '..'))
+        # Go up three levels from examples/tabular/llm_baselines/ to clam root
+        clam_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
         # Try both cc18_semantic_complete and cc18_semantic directories
         semantic_dirs = [
             os.path.join(clam_root, "data", "cc18_semantic_complete"),
