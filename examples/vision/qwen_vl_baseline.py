@@ -202,7 +202,7 @@ class QwenVLBaseline:
         # Generate response with proper sampling configuration
         # Note: temperature is only used when do_sample=True
         generation_config = {
-            "max_new_tokens": 10,
+            "max_new_tokens": 1024,
             "do_sample": True,  # Enable sampling to use temperature
             "temperature": 0.7,
             "top_p": 0.9,
