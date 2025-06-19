@@ -188,7 +188,31 @@ class UrbanSound8KDataset(AudioDataset):
             dataset = soundata.initialize('urbansound8k', data_home=str(self.root_dir))
             # Try to validate the dataset - this checks if it's properly installed
             dataset.validate()
-            return True
+            
+            # Additional check: make sure we can actually load clips and they have audio files
+            clips = dataset.load_clips()
+            if len(clips) == 0:
+                logger.debug("soundata validation passed but no clips found")
+                return False
+                
+            # Check if at least some audio files exist
+            valid_audio_count = 0
+            for clip_id, clip in list(clips.items())[:10]:  # Check first 10 clips
+                try:
+                    audio_path = clip.get_path('audio')
+                    if audio_path and Path(audio_path).exists():
+                        valid_audio_count += 1
+                except:
+                    continue
+            
+            # If we have some valid audio files, consider it existing
+            if valid_audio_count > 0:
+                logger.debug(f"soundata dataset exists with {valid_audio_count}/10 sample audio files")
+                return True
+            else:
+                logger.debug("soundata validation passed but no audio files found")
+                return False
+                
         except ImportError:
             logger.debug("soundata not available, checking for manual download")
         except Exception as e:
@@ -287,6 +311,7 @@ class UrbanSound8KDataset(AudioDataset):
             
             paths = []
             labels = []
+            missing_files = 0
             
             for clip_id, clip in clips.items():
                 # Filter by fold if specified
@@ -294,14 +319,27 @@ class UrbanSound8KDataset(AudioDataset):
                     continue
                 
                 # Get audio path from soundata using get_path
-                audio_path = clip.get_path('audio')
-                if audio_path and Path(audio_path).exists():
-                    paths.append(str(audio_path))
-                    # Use class_id directly
-                    labels.append(clip.class_id)
+                try:
+                    audio_path = clip.get_path('audio')
+                    if audio_path and Path(audio_path).exists():
+                        paths.append(str(audio_path))
+                        # Use class_id directly
+                        labels.append(clip.class_id)
+                    else:
+                        missing_files += 1
+                except Exception as e:
+                    missing_files += 1
+                    continue
             
-            logger.info(f"Loaded UrbanSound8K samples using soundata API: {len(paths)} samples")
-            return paths, labels, class_names
+            if len(paths) > 0:
+                logger.info(f"Loaded UrbanSound8K samples using soundata API: {len(paths)} samples")
+                if missing_files > 0:
+                    logger.warning(f"Some audio files were missing: {missing_files} files not found")
+                return paths, labels, class_names
+            else:
+                logger.warning(f"No valid audio files found using soundata API (missing: {missing_files}), falling back to CSV-based loading")
+                # Force fallback to CSV
+                raise Exception("No valid audio files found")
             
         except ImportError:
             logger.warning("soundata not available, falling back to CSV-based loading")
