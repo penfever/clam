@@ -378,26 +378,39 @@ class CLAPZeroShotClassifier:
         
         import torch
         
+        # Process in batches to avoid OOM
+        all_predictions = []
+        
         with torch.no_grad():
-            # Get audio embeddings using msclap
-            audio_embeddings = self.model.get_audio_embeddings(test_paths)
-            
-            # Ensure audio embeddings are detached from computation graph
-            if torch.is_tensor(audio_embeddings):
-                audio_embeddings = audio_embeddings.detach()
-            
-            # Compute similarities using msclap
-            similarities = self.model.compute_similarity(audio_embeddings, self.text_embeddings)
-            
-            # Ensure similarities are on CPU for numpy operations and detach from computation graph
-            if torch.is_tensor(similarities):
-                similarities = similarities.detach().cpu().numpy()
-            
-            # Get predictions (argmax along class dimension)
-            predictions = np.argmax(similarities, axis=1)
+            for i in range(0, len(test_paths), self.batch_size):
+                batch_paths = test_paths[i:i + self.batch_size]
+                
+                if i % (self.batch_size * 10) == 0:  # Log every 10 batches
+                    logger.info(f"Processing batch {i//self.batch_size + 1}/{(len(test_paths)-1)//self.batch_size + 1}")
+                
+                # Get audio embeddings for this batch
+                audio_embeddings = self.model.get_audio_embeddings(batch_paths)
+                
+                # Ensure audio embeddings are detached from computation graph
+                if torch.is_tensor(audio_embeddings):
+                    audio_embeddings = audio_embeddings.detach()
+                
+                # Compute similarities using msclap
+                similarities = self.model.compute_similarity(audio_embeddings, self.text_embeddings)
+                
+                # Ensure similarities are on CPU for numpy operations and detach from computation graph
+                if torch.is_tensor(similarities):
+                    similarities = similarities.detach().cpu().numpy()
+                
+                # Get predictions (argmax along class dimension)
+                batch_predictions = np.argmax(similarities, axis=1)
+                all_predictions.extend(batch_predictions)
+                
+                # Clear cache to free memory
+                torch.cuda.empty_cache() if self.use_cuda else None
         
         logger.info("CLAP prediction completed")
-        return predictions
+        return np.array(all_predictions)
         
     def predict_proba(self, test_paths: List[str]) -> np.ndarray:
         """
@@ -417,28 +430,41 @@ class CLAPZeroShotClassifier:
         import torch
         temperature = 0.07  # CLAP default temperature
         
+        # Process in batches to avoid OOM
+        all_probs = []
+        
         with torch.no_grad():
-            # Get audio embeddings using msclap
-            audio_embeddings = self.model.get_audio_embeddings(test_paths)
-            
-            # Ensure audio embeddings are detached from computation graph
-            if torch.is_tensor(audio_embeddings):
-                audio_embeddings = audio_embeddings.detach()
-            
-            # Compute similarities using msclap
-            similarities = self.model.compute_similarity(audio_embeddings, self.text_embeddings)
-            
-            # Ensure similarities are on CPU for numpy conversion and detach from computation graph
-            if torch.is_tensor(similarities):
-                similarities_tensor = similarities.detach().cpu()
-            else:
-                similarities_tensor = torch.tensor(similarities)
-            
-            # Apply temperature scaling and softmax to get probabilities
-            probs = torch.softmax(similarities_tensor / temperature, dim=-1)
+            for i in range(0, len(test_paths), self.batch_size):
+                batch_paths = test_paths[i:i + self.batch_size]
+                
+                if i % (self.batch_size * 10) == 0:  # Log every 10 batches
+                    logger.info(f"Processing batch {i//self.batch_size + 1}/{(len(test_paths)-1)//self.batch_size + 1}")
+                
+                # Get audio embeddings for this batch
+                audio_embeddings = self.model.get_audio_embeddings(batch_paths)
+                
+                # Ensure audio embeddings are detached from computation graph
+                if torch.is_tensor(audio_embeddings):
+                    audio_embeddings = audio_embeddings.detach()
+                
+                # Compute similarities using msclap
+                similarities = self.model.compute_similarity(audio_embeddings, self.text_embeddings)
+                
+                # Ensure similarities are on CPU for numpy conversion and detach from computation graph
+                if torch.is_tensor(similarities):
+                    similarities_tensor = similarities.detach().cpu()
+                else:
+                    similarities_tensor = torch.tensor(similarities)
+                
+                # Apply temperature scaling and softmax to get probabilities
+                batch_probs = torch.softmax(similarities_tensor / temperature, dim=-1)
+                all_probs.append(batch_probs.cpu().numpy())
+                
+                # Clear cache to free memory
+                torch.cuda.empty_cache() if self.use_cuda else None
         
         logger.info("CLAP probability computation completed")
-        return probs.cpu().numpy()
+        return np.vstack(all_probs)
         
     def evaluate(self, test_paths: List[str], test_labels: List[int],
                 return_detailed: bool = False) -> Dict[str, Any]:
