@@ -374,11 +374,18 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
         "python", eval_script,
         "--dataset_name", str(dataset_id),  # Pass dataset_id as dataset_name
         "--output_dir", eval_output_dir,
-        "--models", args.models,
+        "--models"
+    ]
+    
+    # Add models as separate arguments (space-separated, not comma-separated)
+    models_list = [model.strip() for model in args.models.split(',')]
+    cmd.extend(models_list)
+    
+    cmd.extend([
         "--num_few_shot_examples", str(args.num_few_shot_examples),
         "--seed", str(args.seed + split_idx),  # Vary seed for different splits
         "--device", args.device,
-    ]
+    ])
     
     # Add optional parameters
     if args.max_test_samples:
