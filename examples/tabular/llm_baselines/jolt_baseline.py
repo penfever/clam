@@ -166,7 +166,8 @@ def evaluate_jolt_legacy(dataset, args):
     
     # Get original feature count and names before preprocessing
     X, y = dataset["X"], dataset["y"]
-    original_feature_count = X.shape[1] if hasattr(X, 'shape') else len(X[0])
+    # Add 1 to feature count to include target column for metadata validation
+    original_feature_count = (X.shape[1] + 1) if hasattr(X, 'shape') else (len(X[0]) + 1)
     original_feature_names = dataset.get("attribute_names", [])
     
     # Load JOLT configuration by OpenML ID if available

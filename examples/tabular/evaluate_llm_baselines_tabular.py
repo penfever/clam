@@ -629,10 +629,28 @@ def main():
         dataset_results = []
         
         # Validate metadata for models that require it
-        if hasattr(dataset, 'openml_task_id') or 'openml_task_id' in dataset:
-            openml_task_id = dataset.get('openml_task_id') or getattr(dataset, 'openml_task_id', None)
+        # Check if dataset ID is numeric (indicating OpenML dataset)
+        openml_task_id = None
+        try:
+            # Check various ways the task ID might be stored
+            if hasattr(dataset, 'openml_task_id'):
+                openml_task_id = getattr(dataset, 'openml_task_id', None)
+            elif 'openml_task_id' in dataset:
+                openml_task_id = dataset['openml_task_id']
+            elif 'id' in dataset and isinstance(dataset['id'], (int, str)):
+                # Try to parse dataset ID as OpenML task ID
+                try:
+                    openml_task_id = int(dataset['id'])
+                except (ValueError, TypeError):
+                    pass
+            
             if openml_task_id:
-                feature_count = dataset.get('X_train', dataset.get('X', [])).shape[1] if hasattr(dataset.get('X_train', dataset.get('X', [])), 'shape') else None
+                # Calculate feature count including target column for metadata validation
+                X_data = dataset.get('X_train', dataset.get('X', []))
+                if hasattr(X_data, 'shape'):
+                    feature_count = X_data.shape[1] + 1  # Add 1 for target column
+                else:
+                    feature_count = None
                 metadata_results = validate_metadata_for_models(openml_task_id, models_to_evaluate, feature_count)
                 
                 # Log validation results and filter models

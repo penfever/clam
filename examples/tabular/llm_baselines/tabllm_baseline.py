@@ -304,7 +304,8 @@ def evaluate_tabllm(dataset, args):
     
     # Get original feature count and names before preprocessing
     X, y = dataset["X"], dataset["y"]
-    original_feature_count = X.shape[1] if hasattr(X, 'shape') else len(X[0])
+    # Add 1 to feature count to include target column for metadata validation
+    original_feature_count = (X.shape[1] + 1) if hasattr(X, 'shape') else (len(X[0]) + 1)
     original_feature_names = dataset.get("attribute_names", [])
     
     # Load TabLLM configuration by OpenML ID if available
@@ -469,8 +470,7 @@ def evaluate_tabllm(dataset, args):
         else:
             device = torch.device("cpu")
         
-        if args.device == "cpu":
-            model = model.to(device)
+        # Note: model_wrapper handles device placement internally
         
         # Get unique classes and create answer choices
         unique_classes = np.unique(y_train)
@@ -581,9 +581,7 @@ def evaluate_tabllm(dataset, args):
         # Feature dropping mechanism for OOM handling
         dropped_features = set()  # Track which features have been dropped
         
-        # Set model to eval mode for inference
-        if hasattr(model, 'eval'):
-            model.eval()
+        # Note: model_wrapper handles eval mode internally
         
         for i in range(len(X_test)):
             # Clear GPU cache periodically to prevent memory buildup, with error handling
