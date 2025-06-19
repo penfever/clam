@@ -135,6 +135,7 @@ def evaluate_jolt_official(dataset, args):
         )
         
         # Get unique classes for metric calculation
+        import numpy as np
         unique_classes = np.unique(y_train)
         
         # Limit test samples if specified
