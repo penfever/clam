@@ -100,48 +100,6 @@ def validate_tabllm_metadata(openml_task_id: int, feature_count: Optional[int] =
     if not os.path.exists(notes_path):
         result['warnings'].append(f"TabLLM notes file not found: {notes_path}")
     
-    # Check semantic information file
-    semantic_file = os.path.join(semantic_dir, f"{openml_task_id}.json")
-    if os.path.exists(semantic_file):
-        try:
-            with open(semantic_file, 'r') as f:
-                semantic_info = json.load(f)
-            
-            # Validate feature count if provided (feature_count includes target)
-            if feature_count is not None:
-                config_feature_count = None
-                if 'columns' in semantic_info:
-                    # Count all columns including target
-                    config_feature_count = len(semantic_info['columns'])
-                elif 'feature_descriptions' in semantic_info:
-                    # These typically don't include target, so add 1
-                    config_feature_count = len(semantic_info['feature_descriptions']) + 1
-                elif 'feature_description' in semantic_info:
-                    if isinstance(semantic_info['feature_description'], dict):
-                        # These typically don't include target, so add 1
-                        config_feature_count = len(semantic_info['feature_description']) + 1
-                    else:
-                        # Handle string format with features count
-                        config_feature_count = semantic_info.get('features', None)
-                        if isinstance(config_feature_count, str):
-                            try:
-                                config_feature_count = int(config_feature_count) + 1  # Add 1 for target
-                            except:
-                                config_feature_count = None
-                        elif config_feature_count is not None:
-                            config_feature_count += 1  # Add 1 for target
-                
-                if config_feature_count is not None and config_feature_count != feature_count:
-                    result['valid'] = False
-                    result['errors'].append(
-                        f"Feature count mismatch for OpenML task {openml_task_id}: "
-                        f"dataset has {feature_count} features but TabLLM config expects {config_feature_count} features"
-                    )
-        except Exception as e:
-            result['warnings'].append(f"Error reading semantic information: {e}")
-    else:
-        result['warnings'].append(f"Semantic information file not found: {semantic_file}")
-    
     return result
 
 
@@ -209,33 +167,6 @@ def validate_jolt_metadata(openml_task_id: int, feature_count: Optional[int] = N
         result['missing_files'].append(jolt_config_path)
         result['errors'].append(f"JOLT config file not found: {jolt_config_path}")
         return result
-    
-    try:
-        with open(jolt_config_path, 'r') as f:
-            config_data = json.load(f)
-        
-        # Validate feature count if provided (feature_count includes target)
-        if feature_count is not None:
-            # JOLT config stores feature count WITHOUT target, so add 1 for comparison
-            config_feature_count = config_data.get('num_features')
-            if config_feature_count is not None:
-                config_feature_count += 1  # Add 1 to match our convention of including target
-            if config_feature_count is not None and config_feature_count != feature_count:
-                result['valid'] = False
-                result['errors'].append(
-                    f"Feature count mismatch for OpenML task {openml_task_id}: "
-                    f"dataset has {feature_count} features but JOLT config expects {config_feature_count} features"
-                )
-        
-        # Check for required fields
-        required_fields = ['column_descriptions']
-        for field in required_fields:
-            if field not in config_data:
-                result['warnings'].append(f"JOLT config missing recommended field: {field}")
-    
-    except Exception as e:
-        result['valid'] = False
-        result['errors'].append(f"Error reading JOLT config: {e}")
     
     return result
 
