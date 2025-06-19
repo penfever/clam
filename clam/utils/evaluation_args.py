@@ -602,6 +602,23 @@ def add_llm_baseline_args(parser: argparse.ArgumentParser):
         default=None,
         help="Number of training examples per class for few-shot learning"
     )
+    parser.add_argument(
+        "--num_few_shot_examples",
+        type=int,
+        default=32,
+        help="Number of few-shot examples to use for in-context learning"
+    )
+    parser.add_argument(
+        "--balanced_few_shot",
+        action="store_true",
+        help="Use class-balanced few-shot examples in LLM prompts instead of random selection"
+    )
+    parser.add_argument(
+        "--feature_selection_threshold",
+        type=int,
+        default=500,
+        help="Apply feature selection if dataset has more than this many features"
+    )
 
 
 def add_dataset_selection_args(parser: argparse.ArgumentParser):
@@ -734,6 +751,9 @@ def create_tabular_llm_evaluation_parser(description: str = "Evaluate LLM baseli
     # Add dataset arguments
     add_dataset_source_args(parser)
     add_data_processing_args(parser)
+    
+    # Add model arguments for embedding_size and other model params
+    add_model_args(parser)
     
     # Add LLM and t-SNE specific arguments
     add_llm_baseline_args(parser)
