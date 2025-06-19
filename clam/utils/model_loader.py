@@ -71,13 +71,14 @@ class GenerationConfig:
         """Convert to transformers generation kwargs."""
         kwargs = {
             'max_new_tokens': self.max_new_tokens,
-            'temperature': self.temperature,
             'do_sample': self.do_sample,
             'repetition_penalty': self.repetition_penalty
         }
         
+        # Only add sampling parameters if do_sample is True
         if self.do_sample:
             kwargs.update({
+                'temperature': self.temperature,
                 'top_p': self.top_p,
                 'top_k': self.top_k
             })
@@ -458,10 +459,31 @@ class TransformersModelWrapper(BaseModelWrapper):
         gen_kwargs = config.to_transformers_kwargs()
         gen_kwargs['pad_token_id'] = self._tokenizer.eos_token_id
         
+        # Some models (like Qwen2.5) don't support certain generation flags
+        # Use a more conservative approach to avoid warnings
+        safe_kwargs = {
+            'max_new_tokens': gen_kwargs.get('max_new_tokens', 100),
+            'do_sample': gen_kwargs.get('do_sample', True),
+            'pad_token_id': gen_kwargs['pad_token_id']
+        }
+        
+        # Only add sampling parameters if do_sample is True and model supports them
+        if gen_kwargs.get('do_sample', False):
+            # Use a conservative temperature to avoid warnings
+            safe_kwargs['temperature'] = max(0.1, gen_kwargs.get('temperature', 0.1))
+            # Skip top_p and top_k for models that don't support them reliably
+            if 'qwen' not in self.model_name.lower():
+                safe_kwargs['top_p'] = gen_kwargs.get('top_p', 0.9)
+                safe_kwargs['top_k'] = gen_kwargs.get('top_k', 50)
+        
+        # Add repetition penalty if present
+        if 'repetition_penalty' in gen_kwargs:
+            safe_kwargs['repetition_penalty'] = gen_kwargs['repetition_penalty']
+        
         with torch.no_grad():
             outputs = self._model.generate(
                 **tokenized,
-                **gen_kwargs
+                **safe_kwargs
             )
         
         # Decode outputs
