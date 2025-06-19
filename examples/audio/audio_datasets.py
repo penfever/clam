@@ -186,9 +186,9 @@ class UrbanSound8KDataset(AudioDataset):
         try:
             import soundata
             dataset = soundata.initialize('urbansound8k', data_home=str(self.root_dir))
-            clips = dataset.load_clips()
-            # If we can load clips and have some data, consider it exists
-            return len(clips) > 0
+            # Try to validate the dataset - this checks if it's properly installed
+            dataset.validate()
+            return True
         except ImportError:
             logger.debug("soundata not available, checking for manual download")
         except Exception as e:
@@ -196,7 +196,8 @@ class UrbanSound8KDataset(AudioDataset):
         
         # Fallback to checking file structure
         soundata_exists = (
-            (self.root_dir / "urbansound8k" / "audio").exists()
+            (self.root_dir / "UrbanSound8K").exists() and
+            (self.root_dir / "UrbanSound8K" / "audio").exists()
         )
         manual_exists = (
             (self.root_dir / "UrbanSound8K" / "audio").exists() and 
@@ -228,18 +229,21 @@ class UrbanSound8KDataset(AudioDataset):
         try:
             import soundata
             dataset = soundata.initialize('urbansound8k', data_home=str(self.root_dir))
+            
+            # Make sure dataset is validated first
+            dataset.validate()
             clips = dataset.load_clips()
             
             # Convert soundata clips to pandas DataFrame
             metadata_records = []
             for clip_id, clip in clips.items():
-                # Parse clip_id to extract fold and filename info
-                # UrbanSound8K clip IDs typically follow a pattern
+                # Use clip attributes directly from soundata
                 metadata_records.append({
-                    'slice_file_name': f"{clip_id}.wav",
+                    'slice_file_name': clip.slice_file_name,
                     'fold': clip.fold,
-                    'classID': clip.tags.labels[0] if clip.tags.labels else 0,
-                    'class': clip.tags.labels[0] if clip.tags.labels else 'unknown'
+                    'classID': clip.class_id,
+                    'class': clip.class_label,
+                    'fsID': clip.freesound_id
                 })
             
             logger.info(f"Loaded UrbanSound8K metadata using soundata API: {len(metadata_records)} clips")
@@ -252,8 +256,8 @@ class UrbanSound8KDataset(AudioDataset):
         
         # Fallback to CSV files for manual downloads
         possible_paths = [
-            self.root_dir / "urbansound8k" / "UrbanSound8K.csv",  # soundata structure
-            self.root_dir / "UrbanSound8K" / "metadata" / "UrbanSound8K.csv"  # manual structure
+            self.root_dir / "UrbanSound8K" / "metadata" / "UrbanSound8K.csv",  # standard structure
+            self.root_dir / "urbansound8k" / "UrbanSound8K.csv"  # alternate structure
         ]
         
         for meta_path in possible_paths:
@@ -269,17 +273,17 @@ class UrbanSound8KDataset(AudioDataset):
         try:
             import soundata
             dataset = soundata.initialize('urbansound8k', data_home=str(self.root_dir))
+            
+            # Make sure dataset is validated first
+            dataset.validate()
             clips = dataset.load_clips()
             
-            # Get unique class names
-            all_labels = []
-            for clip in clips.values():
-                if clip.tags.labels:
-                    all_labels.extend(clip.tags.labels)
-            class_names = sorted(list(set(all_labels)))
-            
-            # Create class name to ID mapping
-            class_to_id = {name: i for i, name in enumerate(class_names)}
+            # UrbanSound8K class names in order
+            class_names = [
+                'air_conditioner', 'car_horn', 'children_playing', 'dog_bark',
+                'drilling', 'engine_idling', 'gun_shot', 'jackhammer',
+                'siren', 'street_music'
+            ]
             
             paths = []
             labels = []
@@ -289,15 +293,12 @@ class UrbanSound8KDataset(AudioDataset):
                 if split != 'all' and clip.fold != int(split):
                     continue
                 
-                # Get audio path from soundata
-                if hasattr(clip, 'audio_path') and clip.audio_path and Path(clip.audio_path).exists():
-                    paths.append(str(clip.audio_path))
-                    # Convert class name to numeric label
-                    if clip.tags.labels:
-                        class_name = clip.tags.labels[0]  # UrbanSound8K has one label per clip
-                        labels.append(class_to_id.get(class_name, 0))
-                    else:
-                        labels.append(0)
+                # Get audio path from soundata using get_path
+                audio_path = clip.get_path('audio')
+                if audio_path and Path(audio_path).exists():
+                    paths.append(str(audio_path))
+                    # Use class_id directly
+                    labels.append(clip.class_id)
             
             logger.info(f"Loaded UrbanSound8K samples using soundata API: {len(paths)} samples")
             return paths, labels, class_names
@@ -312,8 +313,8 @@ class UrbanSound8KDataset(AudioDataset):
         
         # Try soundata structure first, then fall back to manual structure
         possible_audio_bases = [
-            self.root_dir / "urbansound8k" / "audio",  # soundata structure
-            self.root_dir / "UrbanSound8K" / "audio"    # manual structure
+            self.root_dir / "UrbanSound8K" / "audio",    # standard structure
+            self.root_dir / "urbansound8k" / "audio"     # alternate structure
         ]
         
         audio_base = None
