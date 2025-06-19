@@ -162,6 +162,13 @@ class MetricsLogger:
             value: Value to log
         """
         key = self._get_metric_key(metric_name)
+        
+        # Convert numpy types to Python types for JSON serialization
+        if hasattr(value, 'item'):  # numpy scalar
+            value = value.item()
+        elif hasattr(value, 'tolist') and not isinstance(value, str):  # numpy array
+            value = value.tolist()
+        
         self.logged_metrics[key] = value
         
         if self.use_wandb:
@@ -445,6 +452,12 @@ class MetricsLogger:
         )
         
         for key, value in result_dict.items():
+            # Convert key to string if it's a numpy type
+            if hasattr(key, 'item'):  # numpy scalar
+                key = str(key.item())
+            elif not isinstance(key, str):
+                key = str(key)
+                
             if key not in all_standard_metrics and key not in self.METRIC_ALIASES:
                 # Log unknown metrics with a warning
                 self.logger.debug(f"Logging non-standard metric: {key}")

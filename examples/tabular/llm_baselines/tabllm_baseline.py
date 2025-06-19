@@ -94,17 +94,17 @@ def load_tabllm_config_by_openml_id(openml_task_id, original_feature_count=None)
                     with open(semantic_file, 'r') as f:
                         semantic_info = json.load(f)
                     
-                    # Count features from semantic info INCLUDING target column
+                    # Count features from semantic info NOT including target column
                     config_feature_count = None
                     if 'columns' in semantic_info:
-                        # Count all columns including target
-                        config_feature_count = len(semantic_info['columns'])
+                        # Count only feature columns, not including target
+                        config_feature_count = len(semantic_info['columns']) - 1
                     elif 'feature_descriptions' in semantic_info:
-                        # These typically don't include target, so add 1
-                        config_feature_count = len(semantic_info['feature_descriptions']) + 1
+                        # These typically don't include target
+                        config_feature_count = len(semantic_info['feature_descriptions'])
                     elif 'feature_description' in semantic_info:
-                        # These typically don't include target, so add 1
-                        config_feature_count = len(semantic_info['feature_description']) + 1
+                        # These typically don't include target
+                        config_feature_count = len(semantic_info['feature_description'])
                     
                     if config_feature_count is not None and config_feature_count != original_feature_count:
                         error_msg = (
@@ -307,8 +307,8 @@ def evaluate_tabllm(dataset, args):
     
     # Get original feature count and names before preprocessing
     X, y = dataset["X"], dataset["y"]
-    # Feature count INCLUDING target column for consistent validation
-    original_feature_count = (X.shape[1] + 1) if hasattr(X, 'shape') else (len(X[0]) + 1)
+    # Feature count NOT including target column
+    original_feature_count = X.shape[1] if hasattr(X, 'shape') else len(X[0])
     original_feature_names = dataset.get("attribute_names", [])
     
     # Load TabLLM configuration by OpenML ID if available

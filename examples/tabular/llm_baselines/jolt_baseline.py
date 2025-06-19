@@ -71,10 +71,8 @@ def load_jolt_config_by_openml_id(openml_task_id, original_feature_count=None):
             
             # Validate feature count if provided
             if original_feature_count is not None:
-                # JOLT config stores feature count WITHOUT target, so add 1 for comparison
+                # JOLT config stores feature count WITHOUT target, compare directly
                 config_feature_count = config_data.get('num_features')
-                if config_feature_count is not None:
-                    config_feature_count += 1  # Add 1 to match our convention of including target
                 if config_feature_count is not None and config_feature_count != original_feature_count:
                     error_msg = (
                         f"Feature count mismatch for OpenML task {openml_task_id}: "
@@ -169,8 +167,8 @@ def evaluate_jolt_legacy(dataset, args):
     
     # Get original feature count and names before preprocessing
     X, y = dataset["X"], dataset["y"]
-    # Add 1 to feature count to include target column for metadata validation
-    original_feature_count = (X.shape[1] + 1) if hasattr(X, 'shape') else (len(X[0]) + 1)
+    # Feature count NOT including target column
+    original_feature_count = X.shape[1] if hasattr(X, 'shape') else len(X[0])
     original_feature_names = dataset.get("attribute_names", [])
     
     # Load JOLT configuration by OpenML ID if available

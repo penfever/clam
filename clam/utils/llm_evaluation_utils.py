@@ -403,15 +403,19 @@ def predict_with_jolt_logprobs(full_prompt: str, answer_choices: List[str], toke
         possible_jolt_paths = [
             # Standard path from utils directory
             os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
-                        "examples", "llm_baselines", "jolt", "official_jolt"),
+                        "examples", "tabular", "llm_baselines", "jolt", "official_jolt"),
             # Alternative path for different project structures
             os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 
-                        "examples", "llm_baselines", "jolt", "official_jolt"),
+                        "examples", "tabular", "llm_baselines", "jolt", "official_jolt"),
             # Check if we're in a different working directory
-            os.path.join(os.getcwd(), "examples", "llm_baselines", "jolt", "official_jolt"),
-            os.path.join(os.getcwd(), "clam", "examples", "llm_baselines", "jolt", "official_jolt"),
+            os.path.join(os.getcwd(), "examples", "tabular", "llm_baselines", "jolt", "official_jolt"),
+            os.path.join(os.getcwd(), "clam", "examples", "tabular", "llm_baselines", "jolt", "official_jolt"),
             # Direct path if available in environment
-            os.path.join(os.path.dirname(__file__), "..", "..", "examples", "llm_baselines", "jolt", "official_jolt")
+            os.path.join(os.path.dirname(__file__), "..", "..", "examples", "tabular", "llm_baselines", "jolt", "official_jolt"),
+            # Legacy paths for backward compatibility
+            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
+                        "examples", "llm_baselines", "jolt", "official_jolt"),
+            os.path.join(os.getcwd(), "examples", "llm_baselines", "jolt", "official_jolt")
         ]
         
         jolt_path = None

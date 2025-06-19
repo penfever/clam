@@ -645,10 +645,10 @@ def main():
                     pass
             
             if openml_task_id:
-                # Calculate feature count including target column for metadata validation
+                # Calculate feature count NOT including target column for metadata validation
                 X_data = dataset.get('X_train', dataset.get('X', []))
                 if hasattr(X_data, 'shape'):
-                    feature_count = X_data.shape[1] + 1  # Add 1 for target column
+                    feature_count = X_data.shape[1]  # Feature count without target
                 else:
                     feature_count = None
                 metadata_results = validate_metadata_for_models(openml_task_id, models_to_evaluate, feature_count)

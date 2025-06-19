@@ -412,6 +412,25 @@ def load_dataset(dataset_name: str, bypass_size_check: bool = False) -> Tuple[np
             # Convert to numpy array
             X = X_df.values
             
+            # Adjust categorical_indicator and attribute_names to match the features (exclude target column)
+            if categorical_indicator is not None and len(categorical_indicator) > X.shape[1]:
+                # Find the target column index in the original dataframe
+                target_index = data_df.columns.get_loc(target_column)
+                # Remove the categorical indicator for the target column
+                categorical_indicator = [categorical_indicator[i] for i in range(len(categorical_indicator)) if i != target_index]
+                logger.debug(f"Adjusted categorical_indicator length from {len(categorical_indicator)+1} to {len(categorical_indicator)}")
+            
+            # Update attribute_names to exclude target column 
+            if attribute_names is not None and len(attribute_names) > X.shape[1]:
+                # Find the target column index in attribute_names
+                if target_column in attribute_names:
+                    attribute_names = [name for name in attribute_names if name != target_column]
+                    logger.debug(f"Removed target column '{target_column}' from attribute_names")
+                elif len(attribute_names) == len(data_df.columns):
+                    # If target is last column, remove last item
+                    attribute_names = attribute_names[:-1]
+                    logger.debug(f"Removed last column from attribute_names (assuming it was target)")
+            
         except Exception as e:
             logger.warning(f"Error getting data in dataframe format: {e}. Trying alternative approach.")
             
