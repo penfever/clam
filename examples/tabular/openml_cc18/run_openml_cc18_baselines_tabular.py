@@ -8,7 +8,7 @@ This script:
    a. Evaluates all traditional ML baselines (Random Forest, XGBoost, TabPFN, etc.) on 3 different splits
 3. Logs the results to Weights & Biases with version control by date
 
-This is a simplified version of run_openml_cc18.py that focuses only on baseline evaluation,
+This is a simplified version of run_openml_cc18_tabular.py that focuses only on baseline evaluation,
 using the evaluate_on_dataset script with --run_all_baselines and --baselines_only flags.
 
 Requirements:
@@ -18,19 +18,19 @@ Requirements:
 
 Usage:
     # Basic usage - evaluate all baselines on all CC18 tasks
-    python run_openml_cc18_baselines.py --clam_repo_path /path/to/clam --output_dir ./baseline_results
+    python run_openml_cc18_baselines_tabular.py --clam_repo_path /path/to/clam --output_dir ./baseline_results
     
     # Test on specific tasks
-    python run_openml_cc18_baselines.py --clam_repo_path /path/to/clam --task_ids "3573,3902,3903" --output_dir ./test_results
+    python run_openml_cc18_baselines_tabular.py --clam_repo_path /path/to/clam --task_ids "3573,3902,3903" --output_dir ./test_results
     
     # Run with limited test samples for quick testing
-    python run_openml_cc18_baselines.py --clam_repo_path /path/to/clam --max_test_samples 1000 --output_dir ./quick_test
+    python run_openml_cc18_baselines_tabular.py --clam_repo_path /path/to/clam --max_test_samples 1000 --output_dir ./quick_test
     
     # Run with both training and test sample limits
-    python run_openml_cc18_baselines.py --clam_repo_path /path/to/clam --max_train_samples 5000 --max_test_samples 1000 --output_dir ./limited_test
+    python run_openml_cc18_baselines_tabular.py --clam_repo_path /path/to/clam --max_train_samples 5000 --max_test_samples 1000 --output_dir ./limited_test
     
     # Run without W&B logging
-    python run_openml_cc18_baselines.py --clam_repo_path /path/to/clam --no_wandb --output_dir ./local_results
+    python run_openml_cc18_baselines_tabular.py --clam_repo_path /path/to/clam --no_wandb --output_dir ./local_results
 """
 
 import os
@@ -115,6 +115,12 @@ def parse_args():
         type=int,
         default=None,
         help="Maximum number of training samples to use for baseline training (for testing)"
+    )
+    parser.add_argument(
+        "--feature_selection_threshold",
+        type=int,
+        default=500,
+        help="Apply feature selection if dataset has more than this many features"
     )
     parser.add_argument(
         "--max_test_samples",
@@ -224,7 +230,7 @@ def evaluate_baselines_on_task(task, split_idx, args):
     wandb_project = f"{args.wandb_project}-{version_by_date}"
     
     # Build evaluation command
-    eval_script = os.path.join(args.clam_repo_path, "examples", "evaluate_on_dataset.py")
+    eval_script = os.path.join(args.clam_repo_path, "examples", "tabular", "evaluate_on_dataset_tabular.py")
     
     cmd = [
         "python", eval_script,
@@ -250,6 +256,9 @@ def evaluate_baselines_on_task(task, split_idx, args):
         cmd.extend(["--max_test_samples", str(args.max_test_samples)])
     if args.max_train_samples:
         cmd.extend(["--max_train_samples", str(args.max_train_samples)])
+    
+    # Add feature selection parameter
+    cmd.extend(["--feature_selection_threshold", str(args.feature_selection_threshold)])
     
     # Run evaluation command
     logger.info(f"Running command: {' '.join(cmd)}")

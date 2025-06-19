@@ -15,7 +15,7 @@ Requirements:
 - W&B account for logging results
 
 Usage:
-    python run_openml_cc18.py --clam_repo_path /path/to/clam --output_dir ./results
+    python run_openml_cc18_tabular.py --clam_repo_path /path/to/clam --output_dir ./results
 
 The script assumes the CLAM repo structure.
 """
@@ -112,6 +112,12 @@ def parse_args():
         type=int,
         default=None,
         help="End at this task index in the CC18 collection (exclusive)"
+    )
+    parser.add_argument(
+        "--feature_selection_threshold",
+        type=int,
+        default=500,
+        help="Apply feature selection if dataset has more than this many features"
     )
     
     return parser.parse_args()
@@ -210,7 +216,7 @@ def train_on_task(task, split_idx, args):
     wandb_project = f"{args.wandb_project}-{version_by_date}"
     
     # Build training command
-    train_script = os.path.join(args.clam_repo_path, "examples", "train_tabular_dataset.py")
+    train_script = os.path.join(args.clam_repo_path, "examples", "tabular", "train_tabular_dataset_tabular.py")
     
     cmd = [
         "python", train_script,
@@ -233,7 +239,8 @@ def train_on_task(task, split_idx, args):
         "--wandb_entity", "nyu-dice-lab",
         "--wandb_project", wandb_project,
         "--wandb_name", f"train_task{task_id}_split{split_idx}",
-        "--seed", str(args.seed + split_idx)  # Vary seed for different splits
+        "--seed", str(args.seed + split_idx),  # Vary seed for different splits
+        "--feature_selection_threshold", str(args.feature_selection_threshold)
     ]
     
     # Run training command
@@ -280,7 +287,7 @@ def evaluate_model(task, split_idx, model_dir, args):
     wandb_project = f"{args.wandb_project}-{version_by_date}"
     
     # Build evaluation command
-    eval_script = os.path.join(args.clam_repo_path, "examples", "evaluate_on_dataset.py")
+    eval_script = os.path.join(args.clam_repo_path, "examples", "tabular", "evaluate_on_dataset_tabular.py")
     
     cmd = [
         "python", eval_script,
@@ -294,7 +301,8 @@ def evaluate_model(task, split_idx, model_dir, args):
         "--wandb_name", f"eval_task{task_id}_split{split_idx}",
         "--only_ground_truth_classes",
         "--run_all_baselines",  # Add run_all_baselines option
-        "--seed", str(args.seed + split_idx)  # Use same seed as training
+        "--seed", str(args.seed + split_idx),  # Use same seed as training
+        "--feature_selection_threshold", str(args.feature_selection_threshold)
     ]
     
     # Run evaluation command

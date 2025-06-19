@@ -65,6 +65,12 @@ import logging
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional, Any, Union
 
+# Add project root to Python path for imports
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, '..', '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 from clam.data import load_datasets
 from sklearn.model_selection import train_test_split
 from clam.utils import setup_logging, timeout_context, MetricsLogger
@@ -92,10 +98,10 @@ from clam.utils.evaluation_args import create_tabular_llm_evaluation_parser
 # Import metadata validation utilities
 from clam.utils.metadata_validation import validate_metadata_for_models
 
-# Import LLM baseline evaluation functions
-from .llm_baselines.tabllm_baseline import evaluate_tabllm
-from .llm_baselines.tabula_8b_baseline import evaluate_tabula_8b
-from .llm_baselines.jolt_baseline import evaluate_jolt
+# Import LLM baseline evaluation functions  
+from examples.tabular.llm_baselines.tabllm_baseline import evaluate_tabllm
+from examples.tabular.llm_baselines.tabula_8b_baseline import evaluate_tabula_8b
+from examples.tabular.llm_baselines.jolt_baseline import evaluate_jolt
 from clam.models.clam_tsne import evaluate_clam_tsne
 
 def parse_args():
