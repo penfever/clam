@@ -688,8 +688,8 @@ def main():
             else:
                 logger.warning(f"No OpenML task ID found for dataset {dataset['name']}, skipping metadata validation")
                 models_to_evaluate_filtered = models_to_evaluate
-        else:
-            logger.info(f"Dataset {dataset['name']} is not an OpenML dataset, skipping metadata validation")
+        except Exception as e:
+            logger.error(f"Error during metadata validation: {e}")
             models_to_evaluate_filtered = models_to_evaluate
 
         for model_name in models_to_evaluate_filtered:
