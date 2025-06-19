@@ -573,7 +573,8 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
             classifier = QwenVLBaseline(
                 num_classes=len(class_names),
                 class_names=class_names,
-                model_name="Qwen/Qwen2.5-VL-3B-Instruct"
+                model_name="Qwen/Qwen2.5-VL-3B-Instruct",
+                use_semantic_names=args.use_semantic_names
             )
             
             start_time = time.time()
