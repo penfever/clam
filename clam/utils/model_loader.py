@@ -727,23 +727,41 @@ class OpenAIModelWrapper(BaseModelWrapper):
         generation_kwargs = config.to_openai_kwargs()
         
         for text_input in inputs:
-            try:
-                # Use chat completions for all models
-                messages = [{"role": "user", "content": text_input}]
-                
-                response = self._client.chat.completions.create(
-                    model=self.model_name,
-                    messages=messages,
-                    **generation_kwargs
-                )
-                
-                generated_text = response.choices[0].message.content
-                results.append(generated_text)
-                
-            except Exception as e:
-                logger.error(f"OpenAI API error: {e}")
-                # Re-raise the exception instead of returning empty string
-                raise RuntimeError(f"OpenAI API call failed: {e}") from e
+            # Retry delays: 15s, 15s, 30s, 30s, 60s
+            retry_delays = [15, 15, 30, 30, 60]
+            max_retries = 5
+            
+            for attempt in range(max_retries + 1):
+                try:
+                    # Use chat completions for all models
+                    messages = [{"role": "user", "content": text_input}]
+                    
+                    response = self._client.chat.completions.create(
+                        model=self.model_name,
+                        messages=messages,
+                        **generation_kwargs
+                    )
+                    
+                    generated_text = response.choices[0].message.content
+                    results.append(generated_text)
+                    break  # Success, exit retry loop
+                    
+                except Exception as e:
+                    # Check if it's a rate limit error (429)
+                    is_rate_limit = (
+                        hasattr(e, 'status_code') and e.status_code == 429
+                    ) or '429' in str(e) or 'rate limit' in str(e).lower()
+                    
+                    if is_rate_limit and attempt < max_retries:
+                        delay = retry_delays[attempt]
+                        logger.warning(f"Rate limit error (attempt {attempt + 1}/{max_retries + 1}). Retrying in {delay}s...")
+                        import time
+                        time.sleep(delay)
+                        continue
+                    else:
+                        # Either not a rate limit error, or we've exhausted retries
+                        logger.error(f"OpenAI API error: {e}")
+                        raise RuntimeError(f"OpenAI API call failed: {e}") from e
         
         return results[0] if single_input else results
     
@@ -832,13 +850,36 @@ class OpenAIVisionModelWrapper(BaseModelWrapper):
             
             generation_kwargs = config.to_openai_kwargs()
             
-            response = self._client.chat.completions.create(
-                model=self.model_name,
-                messages=messages,
-                **generation_kwargs
-            )
+            # Retry logic for rate limits
+            retry_delays = [15, 15, 30, 30, 60]
+            max_retries = 5
             
-            return response.choices[0].message.content
+            for attempt in range(max_retries + 1):
+                try:
+                    response = self._client.chat.completions.create(
+                        model=self.model_name,
+                        messages=messages,
+                        **generation_kwargs
+                    )
+                    
+                    return response.choices[0].message.content
+                    
+                except Exception as e:
+                    # Check if it's a rate limit error (429)
+                    is_rate_limit = (
+                        hasattr(e, 'status_code') and e.status_code == 429
+                    ) or '429' in str(e) or 'rate limit' in str(e).lower()
+                    
+                    if is_rate_limit and attempt < max_retries:
+                        delay = retry_delays[attempt]
+                        logger.warning(f"Rate limit error (attempt {attempt + 1}/{max_retries + 1}). Retrying in {delay}s...")
+                        import time
+                        time.sleep(delay)
+                        continue
+                    else:
+                        # Either not a rate limit error, or we've exhausted retries
+                        logger.error(f"OpenAI Vision API error: {e}")
+                        raise RuntimeError(f"OpenAI Vision API call failed: {e}") from e
             
         except Exception as e:
             logger.error(f"OpenAI Vision API error: {e}")
