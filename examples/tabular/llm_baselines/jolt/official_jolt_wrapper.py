@@ -134,6 +134,9 @@ def evaluate_jolt_official(dataset, args):
             X, y, test_size=0.2, random_state=args.seed
         )
         
+        # Get unique classes for metric calculation
+        unique_classes = np.unique(y_train)
+        
         # Limit test samples if specified
         if args.max_test_samples and args.max_test_samples < len(X_test):
             X_test = X_test[:args.max_test_samples]
@@ -688,7 +691,6 @@ def evaluate_jolt_official(dataset, args):
                 os.unlink(temp_csv_path)
         
         training_time = time.time() - start_time
-        unique_classes = np.unique(y_train)
         
         # Convert all results to JSON-serializable types
         def convert_to_serializable(obj):
