@@ -412,60 +412,81 @@ def evaluate_tabllm(dataset, args):
     
     try:
         # Use modern model instead of T0
-        model_name = args.tabllm_model if hasattr(args, 'tabllm_model') else "Qwen/QwQ-32B-Preview"
+        # Determine which model to use based on API arguments
+        if hasattr(args, 'openai_model') and args.openai_model:
+            model_name = args.openai_model
+            backend = "openai"
+            logger.info(f"Using OpenAI API model: {model_name}")
+        elif hasattr(args, 'gemini_model') and args.gemini_model:
+            model_name = args.gemini_model
+            backend = "gemini"
+            logger.info(f"Using Gemini API model: {model_name}")
+        else:
+            model_name = args.tabllm_model if hasattr(args, 'tabllm_model') else "Qwen/QwQ-32B-Preview"
+            backend = "auto"
+            logger.info(f"Using local/HF model: {model_name}")
         
-        # Load model using centralized model loader with VLLM support
+        # Load model using centralized model loader
         try:
-            # Configure model loading parameters
-            model_kwargs = {
-                'low_cpu_mem_usage': True,
-                'use_cache': False  # Disable KV cache to save memory
-            }
-            
-            # Configure device and dtype
-            if torch.cuda.is_available() and args.device != "cpu":
-                model_kwargs.update({
-                    'torch_dtype': torch.float16,
-                    'device_map': "auto" if args.gpu_index == 0 else None
-                })
+            if backend in ["openai", "gemini"]:
+                # API models don't need device/dtype configuration
+                model_kwargs = {}
             else:
-                model_kwargs.update({
-                    'torch_dtype': torch.float32
-                })
+                # Configure model loading parameters for local models
+                model_kwargs = {
+                    'low_cpu_mem_usage': True,
+                    'use_cache': False  # Disable KV cache to save memory
+                }
+                
+                # Configure device and dtype for local models
+                if torch.cuda.is_available() and args.device != "cpu":
+                    model_kwargs.update({
+                        'torch_dtype': torch.float16,
+                        'device_map': "auto" if args.gpu_index == 0 else None
+                    })
+                else:
+                    model_kwargs.update({
+                        'torch_dtype': torch.float32
+                    })
+                
+                # For VLLM, add tensor parallel size if using multiple GPUs
+                if hasattr(args, 'tensor_parallel_size'):
+                    model_kwargs['tensor_parallel_size'] = args.tensor_parallel_size
             
-            # For VLLM, add tensor parallel size if using multiple GPUs
-            if hasattr(args, 'tensor_parallel_size'):
-                model_kwargs['tensor_parallel_size'] = args.tensor_parallel_size
-            
-            # Load using model loader (prefers VLLM for speed)
+            # Load using model loader
             model_wrapper = model_loader.load_llm(
                 model_name, 
-                backend="auto",  # Will choose VLLM if available, fallback to transformers
-                device=args.device,
+                backend=backend,
+                device=args.device if backend not in ["openai", "gemini"] else None,
                 **model_kwargs
             )
             
         except Exception as e:
             logger.warning(f"Failed to load {model_name}: {e}")
-            # Try without hyphen for backward compatibility
-            if "Qwen-2.5" in model_name:
+            # Try without hyphen for backward compatibility (only for local models)
+            if backend == "auto" and "Qwen-2.5" in model_name:
                 model_name = model_name.replace("Qwen-2.5", "Qwen2.5")
                 logger.info(f"Retrying with corrected model name: {model_name}")
                 
                 model_wrapper = model_loader.load_llm(
                     model_name, 
-                    backend="auto",
+                    backend=backend,
                     device=args.device,
                     **model_kwargs
                 )
             else:
                 raise
         
-        # For backward compatibility, still load tokenizer separately for prompt formatting
-        # (VLLM handles tokenization internally, but we need it for prompt construction)
-        tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-        if tokenizer.pad_token is None:
-            tokenizer.pad_token = tokenizer.eos_token
+        # Load tokenizer for prompt formatting (not needed for API models)
+        if backend in ["openai", "gemini"]:
+            tokenizer = None  # API models handle tokenization internally
+            logger.info("Skipping tokenizer loading for API model")
+        else:
+            # For local models, load tokenizer separately for prompt formatting
+            # (VLLM handles tokenization internally, but we need it for prompt construction)
+            tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+            if tokenizer.pad_token is None:
+                tokenizer.pad_token = tokenizer.eos_token
         
         # Set up device with GPU index
         if torch.cuda.is_available() and args.device != "cpu":
@@ -657,22 +678,53 @@ def evaluate_tabllm(dataset, args):
                 # Get few-shot examples in the right format for the unified function
                 selected_examples = few_shot_examples[:num_shots]
                 
-                # Use unified prediction function
-                # For now, pass the underlying model for compatibility with existing prediction functions
-                # TODO: Update unified_llm_predict to work with model wrappers directly
-                underlying_model = model_wrapper.get_model()
-                
-                prediction_result = unified_llm_predict(
-                    full_prompt=full_prompt.replace(" Answer:", ""),  # Remove " Answer:" as unified function adds it
-                    answer_choices=answer_choices,
-                    tokenizer=tokenizer,
-                    model=underlying_model,  # Pass the underlying model for compatibility
-                    args=args,
-                    logger=logger,
-                    selected_examples=selected_examples,
-                    question=question,
-                    test_first_sample=(i == 0)  # Only test methods on the first sample
-                )
+                # Use model wrapper for prediction (supports both local and API models)
+                if backend in ["openai", "gemini"]:
+                    # For API models, use the wrapper's generate method directly
+                    generation_config = GenerationConfig(
+                        max_new_tokens=16384,  # Generous limit for thinking and classification
+                        temperature=0.0,    # Deterministic for classification
+                        top_p=1.0,
+                        do_sample=False,
+                        enable_thinking=getattr(args, 'enable_thinking', True)
+                    )
+                    
+                    # Generate response using API model
+                    generated_text = model_wrapper.generate(
+                        full_prompt, 
+                        generation_config
+                    )
+                    
+                    # Parse response to get predicted class
+                    predicted_class_name = generated_text.strip()
+                    
+                    # Clean up the response (remove any extra text)
+                    for choice in answer_choices:
+                        if choice.lower() in predicted_class_name.lower():
+                            predicted_class_name = choice
+                            break
+                    
+                    prediction_result = {
+                        'predicted_class': predicted_class_name,
+                        'method': f'{backend}_api',
+                        'class_log_probs': {},  # API models don't provide log probs
+                        'generated_text': generated_text
+                    }
+                else:
+                    # For local models, use unified prediction function
+                    underlying_model = model_wrapper.get_model()
+                    
+                    prediction_result = unified_llm_predict(
+                        full_prompt=full_prompt.replace(" Answer:", ""),  # Remove " Answer:" as unified function adds it
+                        answer_choices=answer_choices,
+                        tokenizer=tokenizer,
+                        model=underlying_model,  # Pass the underlying model for compatibility
+                        args=args,
+                        logger=logger,
+                        selected_examples=selected_examples,
+                        question=question,
+                        test_first_sample=(i == 0)  # Only test methods on the first sample
+                    )
                 
                 predicted_class_name = prediction_result['predicted_class']
                 prediction_method = prediction_result['method']

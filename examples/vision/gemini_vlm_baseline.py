@@ -63,7 +63,7 @@ class GeminiVLMBaseline(APIVLMBaseline):
         
         # Create Gemini-optimized generation config
         generation_config = GenerationConfig(
-            max_new_tokens=30,  # Slightly longer for thinking models
+            max_new_tokens=16384,  # Generous limit for thinking and classification
             temperature=0.1,
             top_p=0.9,
             do_sample=True,

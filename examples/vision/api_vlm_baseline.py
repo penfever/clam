@@ -185,7 +185,7 @@ class APIVLMBaseline:
         
         # Create generation config optimized for classification
         generation_config = GenerationConfig(
-            max_new_tokens=20,  # Short response for classification
+            max_new_tokens=16384,  # Generous limit for thinking and classification
             temperature=0.1,    # Low temperature for consistent results
             top_p=0.9,
             do_sample=True,
