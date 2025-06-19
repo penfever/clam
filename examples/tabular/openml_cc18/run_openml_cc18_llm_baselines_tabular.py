@@ -48,7 +48,7 @@ from tqdm import tqdm
 # Import centralized argument parser
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
-from clam.utils.evaluation_args import create_multimodal_evaluation_parser
+from clam.utils.evaluation_args import create_tabular_llm_evaluation_parser
 from clam.utils.metadata_validation import generate_metadata_coverage_report, print_metadata_coverage_report
 
 # Configure logging
@@ -64,11 +64,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def parse_args():
-    """Parse command line arguments for OpenML CC18 LLM baseline evaluation."""
-    parser = argparse.ArgumentParser(description="Evaluate LLM baselines on OpenML CC18 collection")
+    """Parse command line arguments using centralized tabular LLM evaluation parser."""
+    parser = create_tabular_llm_evaluation_parser("Evaluate LLM baselines on OpenML CC18 collection")
     
-    # Add common arguments that orchestration scripts need
-    
+    # Add OpenML CC18 orchestration-specific arguments
     parser.add_argument(
         "--clam_repo_path",
         type=str,
@@ -76,34 +75,10 @@ def parse_args():
         help="Path to the CLAM repository"
     )
     parser.add_argument(
-        "--output_dir",
-        type=str,
-        default="./openml_cc18_llm_baselines_results",
-        help="Directory to save all results"
-    )
-    parser.add_argument(
-        "--models",
-        type=str,
-        default="tabllm,tabula_8b,jolt,clam_tsne",
-        help="Comma-separated list of LLM models to evaluate: 'tabllm', 'tabula_8b', 'jolt', 'clam_tsne'"
-    )
-    parser.add_argument(
         "--num_splits",
         type=int,
         default=3,
         help="Number of different train/test splits to use for each task"
-    )
-    parser.add_argument(
-        "--seed",
-        type=int,
-        default=42,
-        help="Random seed for reproducibility"
-    )
-    parser.add_argument(
-        "--wandb_project",
-        type=str,
-        default="clam-openml-cc18-llm-baselines",
-        help="W&B project name"
     )
     parser.add_argument(
         "--task_ids",
@@ -124,144 +99,6 @@ def parse_args():
         help="End at this task index in the CC18 collection (exclusive)"
     )
     parser.add_argument(
-        "--max_test_samples",
-        type=int,
-        default=None,
-        help="Maximum number of test samples to use for evaluation (to speed up)"
-    )
-    parser.add_argument(
-        "--feature_selection_threshold",
-        type=int,
-        default=500,
-        help="Apply feature selection if dataset has more than this many features"
-    )
-    parser.add_argument(
-        "--num_few_shot_examples",
-        type=int,
-        default=16,
-        help="Number of few-shot examples to include in prompts"
-    )
-    parser.add_argument(
-        "--device",
-        type=str,
-        default="auto",
-        help="Device to use ('cuda', 'cpu', or 'auto')"
-    )
-    parser.add_argument(
-        "--backend",
-        type=str,
-        default="auto",
-        choices=["auto", "vllm", "transformers"],
-        help="Backend to use for model loading (auto chooses VLLM if available)"
-    )
-    parser.add_argument(
-        "--tensor_parallel_size",
-        type=int,
-        default=1,
-        help="Number of GPUs to use for tensor parallelism in VLLM"
-    )
-    parser.add_argument(
-        "--gpu_memory_utilization",
-        type=float,
-        default=0.9,
-        help="GPU memory utilization for VLLM (0.0-1.0)"
-    )
-    
-    # CLAM-T-SNe specific parameters
-    parser.add_argument(
-        "--vlm_model_id",
-        type=str,
-        default="Qwen/Qwen2.5-VL-32B-Instruct",
-        help="HuggingFace model name for Vision Language Model (CLAM-T-SNe baseline)"
-    )
-    parser.add_argument(
-        "--embedding_size",
-        type=int,
-        default=1000,
-        help="Size of TabPFN embeddings for CLAM-T-SNe baseline"
-    )
-    parser.add_argument(
-        "--tsne_perplexity",
-        type=int,
-        default=30,
-        help="t-SNE perplexity parameter for CLAM-T-SNe baseline"
-    )
-    parser.add_argument(
-        "--tsne_n_iter",
-        type=int,
-        default=1000,
-        help="Number of t-SNE iterations for CLAM-T-SNe baseline"
-    )
-    parser.add_argument(
-        "--max_tabpfn_samples",
-        type=int,
-        default=3000,
-        help="Maximum samples for TabPFN fitting in CLAM-T-SNe baseline"
-    )
-    parser.add_argument(
-        "--use_3d_tsne",
-        action="store_true",
-        help="Use 3D t-SNE with multiple viewing angles instead of 2D (CLAM-T-SNe baseline)"
-    )
-    parser.add_argument(
-        "--viewing_angles",
-        type=str,
-        default=None,
-        help="Custom viewing angles for 3D t-SNE as 'elev1,azim1;elev2,azim2;...' (CLAM-T-SNe baseline)"
-    )
-    parser.add_argument(
-        "--use_knn_connections",
-        action="store_true",
-        help="Show KNN connections from query point to nearest neighbors in embedding space (CLAM-T-SNe baseline)"
-    )
-    parser.add_argument(
-        "--knn_k",
-        type=int,
-        default=5,
-        help="Number of nearest neighbors to show when using KNN connections (CLAM-T-SNe baseline)"
-    )
-    parser.add_argument(
-        "--max_vlm_image_size",
-        type=int,
-        default=2048,
-        help="Maximum image size (width/height) for VLM compatibility (CLAM-T-SNe baseline)"
-    )
-    parser.add_argument(
-        "--image_dpi",
-        type=int,
-        default=100,
-        help="DPI for saving t-SNE visualizations (CLAM-T-SNe baseline)"
-    )
-    parser.add_argument(
-        "--force_rgb_mode",
-        action="store_true",
-        default=True,
-        help="Convert images to RGB mode to improve VLM processing speed (CLAM-T-SNe baseline)"
-    )
-    parser.add_argument(
-        "--no-force_rgb_mode",
-        action="store_false",
-        dest="force_rgb_mode",
-        help="Disable RGB conversion (keep RGBA mode) for CLAM-T-SNe baseline"
-    )
-    parser.add_argument(
-        "--save_sample_visualizations",
-        action="store_true",
-        default=True,
-        help="Save sample t-SNE visualizations for debugging and documentation (CLAM-T-SNe baseline)"
-    )
-    parser.add_argument(
-        "--no-save_sample_visualizations",
-        action="store_false",
-        dest="save_sample_visualizations",
-        help="Disable saving of sample t-SNE visualizations (CLAM-T-SNe baseline)"
-    )
-    parser.add_argument(
-        "--use_semantic_names",
-        action="store_true",
-        help="Use semantic class names in prompts instead of 'Class X' format"
-    )
-    parser.add_argument(
         "--validate_metadata_only",
         action="store_true",
         help="Only validate metadata coverage, don't run evaluations"
@@ -272,27 +109,21 @@ def parse_args():
         help="Automatically skip tasks with incomplete metadata instead of failing"
     )
     
-    # Add LLM model specific arguments that need to be passed through
-    parser.add_argument(
-        "--tabllm_model",
-        type=str,
-        default="Qwen/Qwen2.5-7B-Instruct",
-        help="TabLLM model identifier"
-    )
-    parser.add_argument(
-        "--tabula_model",
-        type=str,
-        default="mlfoundations/tabula-8b",
-        help="Tabula-8B model identifier"
-    )
-    parser.add_argument(
-        "--jolt_model",
-        type=str,
-        default="Qwen/Qwen2.5-7B-Instruct",
-        help="JOLT baseline model identifier"
+    # Override some defaults for OpenML CC18 context
+    parser.set_defaults(
+        output_dir="./openml_cc18_llm_baselines_results",
+        wandb_project="clam-openml-cc18-llm-baselines",
+        num_few_shot_examples=16,
+        models=["tabllm", "tabula_8b", "jolt", "clam_tsne"]
     )
     
-    return parser.parse_args()
+    args = parser.parse_args()
+    
+    # Convert models back to comma-separated string for internal processing
+    if isinstance(args.models, list):
+        args.models = ",".join(args.models)
+    
+    return args
 
 def set_seed(seed):
     """Set random seed for reproducibility."""

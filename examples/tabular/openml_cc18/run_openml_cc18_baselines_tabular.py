@@ -46,6 +46,14 @@ import torch
 import time
 from datetime import datetime
 from tqdm import tqdm
+import sys
+
+# Add project root to path for centralized parser
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
+sys.path.insert(0, project_root)
+
+from clam.utils.evaluation_args import create_dataset_evaluation_parser
 
 # Configure logging
 logging.basicConfig(
@@ -60,8 +68,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Evaluate baseline models on OpenML CC18 collection")
+    """Parse command line arguments using centralized dataset evaluation parser."""
+    parser = create_dataset_evaluation_parser()
+    parser.description = "Evaluate baseline models on OpenML CC18 collection"
     
+    # Add OpenML CC18 orchestration-specific arguments
     parser.add_argument(
         "--clam_repo_path",
         type=str,
@@ -69,28 +80,10 @@ def parse_args():
         help="Path to the CLAM repository"
     )
     parser.add_argument(
-        "--output_dir",
-        type=str,
-        default="./openml_cc18_baseline_results",
-        help="Directory to save all baseline results"
-    )
-    parser.add_argument(
         "--num_splits",
         type=int,
         default=3,
         help="Number of different train/test splits to use for each task"
-    )
-    parser.add_argument(
-        "--seed",
-        type=int,
-        default=42,
-        help="Random seed for reproducibility"
-    )
-    parser.add_argument(
-        "--wandb_project",
-        type=str,
-        default="clam-openml-cc18-baselines",
-        help="W&B project name"
     )
     parser.add_argument(
         "--task_ids",
@@ -111,27 +104,15 @@ def parse_args():
         help="End at this task index in the CC18 collection (exclusive)"
     )
     parser.add_argument(
-        "--max_train_samples",
-        type=int,
-        default=None,
-        help="Maximum number of training samples to use for baseline training (for testing)"
-    )
-    parser.add_argument(
-        "--feature_selection_threshold",
-        type=int,
-        default=500,
-        help="Apply feature selection if dataset has more than this many features"
-    )
-    parser.add_argument(
-        "--max_test_samples",
-        type=int,
-        default=None,
-        help="Maximum number of test samples to use for evaluation (for testing)"
-    )
-    parser.add_argument(
         "--no_wandb",
         action="store_true",
         help="Disable Weights & Biases logging"
+    )
+    
+    # Override some defaults for OpenML CC18 context
+    parser.set_defaults(
+        output_dir="./openml_cc18_baseline_results",
+        wandb_project="clam-openml-cc18-baselines"
     )
     
     return parser.parse_args()

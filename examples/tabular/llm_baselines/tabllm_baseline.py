@@ -330,8 +330,8 @@ def evaluate_tabllm(dataset, args):
         
         # Try to load semantic information for better feature descriptions
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        # Go up two levels from examples to clam root
-        clam_root = os.path.dirname(os.path.dirname(current_dir))
+        # Go up four levels from examples/tabular/llm_baselines/ to clam root
+        clam_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..', '..'))
         # Try both cc18_semantic_complete and cc18_semantic directories
         semantic_dirs = [
             os.path.join(clam_root, "data", "cc18_semantic_complete"),

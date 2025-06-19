@@ -668,6 +668,12 @@ def add_common_evaluation_args(parser: argparse.ArgumentParser):
         default="auto",
         help="Device to use for evaluation (auto, cuda, cpu)"
     )
+    parser.add_argument(
+        "--gpu_index",
+        type=int,
+        default=0,
+        help="GPU index to use when device is cuda"
+    )
 
 
 def create_evaluation_parser(description: str, default_wandb_project: str = "clam-evaluation") -> argparse.ArgumentParser:
