@@ -299,6 +299,17 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
         "--jolt_model", args.jolt_model,
     ])
     
+    # Add API model arguments if specified
+    if hasattr(args, 'openai_model') and args.openai_model:
+        cmd.extend(["--openai_model", args.openai_model])
+    if hasattr(args, 'gemini_model') and args.gemini_model:
+        cmd.extend(["--gemini_model", args.gemini_model])
+    if hasattr(args, 'enable_thinking'):
+        if args.enable_thinking:
+            cmd.append("--enable_thinking")
+        else:
+            cmd.append("--disable_thinking")
+    
     # Add W&B parameters if we want to track (commented out by default to avoid clutter)
     cmd.extend([
         "--use_wandb",

@@ -441,11 +441,34 @@ def add_vision_args(parser: argparse.ArgumentParser):
         default="./vision_data",
         help="Base directory for vision datasets"
     )
+    # API model support arguments
+    parser.add_argument(
+        "--openai_model",
+        type=str,
+        help="OpenAI VLM model to use (e.g., gpt-4.1, gpt-4o, gpt-4o-mini)"
+    )
+    parser.add_argument(
+        "--gemini_model", 
+        type=str,
+        help="Gemini VLM model to use (e.g., gemini-2.5-pro, gemini-2.5-flash)"
+    )
+    parser.add_argument(
+        "--enable_thinking",
+        action="store_true",
+        default=True,
+        help="Enable thinking mode for compatible API models (default: True)"
+    )
+    parser.add_argument(
+        "--disable_thinking",
+        dest="enable_thinking",
+        action="store_false",
+        help="Disable thinking mode for API models"
+    )
     parser.add_argument(
         "--models",
         nargs="+",
         default=["clam_tsne", "dinov2_linear"],
-        choices=["clam_tsne", "clam_simple", "dinov2_linear", "qwen_vl"],
+        choices=["clam_tsne", "clam_simple", "dinov2_linear", "qwen_vl", "openai_vlm", "gemini_vlm", "api_vlm"],
         help="List of models to evaluate (default: clam_tsne and dinov2_linear)"
     )
 
@@ -545,7 +568,7 @@ def add_llm_baseline_args(parser: argparse.ArgumentParser):
         "--models",
         nargs="+",
         default=["tabllm", "tabula_8b", "jolt", "clam_tsne"],
-        choices=["tabllm", "tabula_8b", "jolt", "clam_tsne"],
+        choices=["tabllm", "tabula_8b", "jolt", "clam_tsne", "openai_llm", "gemini_llm", "api_llm"],
         help="List of models to evaluate (default: all models)"
     )
     parser.add_argument(
@@ -565,6 +588,29 @@ def add_llm_baseline_args(parser: argparse.ArgumentParser):
         type=str,
         default="Qwen/Qwen2.5-7B-Instruct",
         help="JOLT baseline model identifier"
+    )
+    # API model support arguments
+    parser.add_argument(
+        "--openai_model",
+        type=str,
+        help="OpenAI LLM model to use (e.g., gpt-4.1, gpt-4o, gpt-4o-mini, gpt-3.5-turbo)"
+    )
+    parser.add_argument(
+        "--gemini_model", 
+        type=str,
+        help="Gemini LLM model to use (e.g., gemini-2.5-pro, gemini-2.5-flash)"
+    )
+    parser.add_argument(
+        "--enable_thinking",
+        action="store_true",
+        default=True,
+        help="Enable thinking mode for compatible API models (default: True)"
+    )
+    parser.add_argument(
+        "--disable_thinking",
+        dest="enable_thinking",
+        action="store_false",
+        help="Disable thinking mode for API models"
     )
     parser.add_argument(
         "--max_tabpfn_samples",

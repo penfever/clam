@@ -795,6 +795,59 @@ def test_single_dataset(dataset_name: str, args):
             logger.error(f"Qwen VL failed: {e}")
             results['qwen_vl'] = {'error': str(e)}
     
+    # Test API VLM models
+    api_models_to_test = []
+    if 'openai_vlm' in args.models or 'api_vlm' in args.models:
+        if args.openai_model:
+            api_models_to_test.append(('openai', args.openai_model))
+        else:
+            logger.warning("openai_vlm model selected but no --openai_model specified")
+    
+    if 'gemini_vlm' in args.models or 'api_vlm' in args.models:
+        if args.gemini_model:
+            api_models_to_test.append(('gemini', args.gemini_model))
+        else:
+            logger.warning("gemini_vlm model selected but no --gemini_model specified")
+    
+    for api_backend, model_name in api_models_to_test:
+        model_key = f"{api_backend}_vlm"
+        logger.info(f"Testing {api_backend.title()} VLM ({model_name})...")
+        try:
+            # Import API baseline classes
+            if api_backend == 'openai':
+                from examples.vision.openai_vlm_baseline import OpenAIVLMBaseline as APIVLMBaseline
+            else:  # gemini
+                from examples.vision.gemini_vlm_baseline import GeminiVLMBaseline as APIVLMBaseline
+            
+            classifier = APIVLMBaseline(
+                num_classes=len(class_names),
+                class_names=class_names,
+                model_name=model_name,
+                enable_thinking=args.enable_thinking
+            )
+            
+            start_time = time.time()
+            classifier.fit()  # API models don't need training data
+            training_time = time.time() - start_time
+            
+            eval_results = classifier.evaluate(
+                test_paths, test_labels,
+                save_raw_responses=args.save_outputs,
+                output_dir=args.output_dir if args.save_outputs else None,
+                benchmark_name=f"{dataset_name.lower()}_biological"
+            )
+            eval_results['training_time'] = training_time
+            
+            results[model_key] = eval_results
+            logger.info(f"{api_backend.title()} VLM completed: {eval_results['accuracy']:.4f} accuracy")
+            
+            if use_wandb_logging:
+                log_results_to_wandb(model_key, eval_results, args, class_names, dataset_name)
+            
+        except Exception as e:
+            logger.error(f"{api_backend.title()} VLM failed: {e}")
+            results[model_key] = {'error': str(e)}
+
     # Test CLAM t-SNE with BioClip2 backend
     if 'clam_tsne_bioclip2' in args.models:
         logger.info("Testing CLAM t-SNE with BioClip2 backend...")
@@ -1022,7 +1075,7 @@ def parse_args():
         "--models",
         nargs="+",
         default=["bioclip2_knn", "qwen_vl", "clam_tsne_bioclip2"],
-        choices=["bioclip2_knn", "qwen_vl", "clam_tsne_bioclip2"],
+        choices=["bioclip2_knn", "qwen_vl", "clam_tsne_bioclip2", "openai_vlm", "gemini_vlm", "api_vlm"],
         help="Models to test"
     )
     parser.add_argument(
@@ -1050,6 +1103,30 @@ def parse_args():
         type=str,
         default="Qwen/Qwen2.5-VL-3B-Instruct",
         help="Vision Language Model to use"
+    )
+    
+    # API model support arguments
+    parser.add_argument(
+        "--openai_model",
+        type=str,
+        help="OpenAI VLM model to use (e.g., gpt-4.1, gpt-4o, gpt-4o-mini)"
+    )
+    parser.add_argument(
+        "--gemini_model", 
+        type=str,
+        help="Gemini VLM model to use (e.g., gemini-2.5-pro, gemini-2.5-flash)"
+    )
+    parser.add_argument(
+        "--enable_thinking",
+        action="store_true",
+        default=True,
+        help="Enable thinking mode for compatible API models (default: True)"
+    )
+    parser.add_argument(
+        "--disable_thinking",
+        dest="enable_thinking",
+        action="store_false",
+        help="Disable thinking mode for API models"
     )
     
     # CLAM t-SNE parameters (matching CIFAR script)

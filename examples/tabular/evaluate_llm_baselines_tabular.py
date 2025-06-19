@@ -708,6 +708,12 @@ def main():
                         result = evaluate_jolt(dataset, args)
                     elif model_name.lower() == 'clam_tsne':
                         result = evaluate_clam_tsne(dataset, args)
+                    elif model_name.lower() in ['openai_llm', 'api_llm'] and hasattr(args, 'openai_model') and args.openai_model:
+                        from examples.tabular.llm_baselines.openai_llm_baseline import evaluate_openai_llm
+                        result = evaluate_openai_llm(dataset, args)
+                    elif model_name.lower() in ['gemini_llm', 'api_llm'] and hasattr(args, 'gemini_model') and args.gemini_model:
+                        from examples.tabular.llm_baselines.gemini_llm_baseline import evaluate_gemini_llm
+                        result = evaluate_gemini_llm(dataset, args)
                     else:
                         logger.warning(f"Unknown model: {model_name}. Skipping.")
                         continue
