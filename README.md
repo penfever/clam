@@ -290,6 +290,303 @@ This can be particularly useful if a dataset was temporarily unavailable or if t
 - tqdm
 - peft
 
+## API Models Support
+
+CLAM now supports the latest OpenAI and Gemini models through their respective APIs, providing access to cutting-edge AI capabilities without requiring local GPU resources.
+
+## Supported Models (2025)
+
+### OpenAI Models
+
+#### LLM Models (for tabular data)
+- **GPT-4.1**: Latest flagship model with 1M token context
+- **GPT-4.1 mini**: 83% cheaper, nearly half the latency
+- **GPT-4.1 nano**: Fastest and cheapest, 1M token context
+- **GPT-4o**: Previous flagship model, still excellent
+- **GPT-3.5 Turbo**: Cost-effective for simpler tasks
+- **o3, o4-mini**: Latest reasoning models
+
+#### VLM Models (for vision tasks)
+- **GPT-4.1**: Vision capabilities with latest improvements
+- **GPT-4o**: Excellent multimodal performance
+
+### Gemini Models
+
+#### LLM/VLM Models (support both text and vision)
+- **Gemini 2.5 Pro**: Highest intelligence, thinking capabilities
+- **Gemini 2.5 Flash**: Workhorse model, fast performance
+- **Gemini 2.5 Flash-Lite**: Lowest latency and cost
+- **Gemini 2.0 Flash**: Previous generation, still capable
+- **Gemini 2.0 Pro Experimental**: Experimental features
+
+All Gemini 2.x models support:
+- Thinking capabilities for enhanced reasoning
+- Thought summaries for transparency
+- Native multimodal processing (text + images)
+
+## Installation
+
+Install the API dependencies:
+
+```bash
+pip install 'clam[api]'
+```
+
+This installs:
+- `openai>=1.15.0` - OpenAI API client
+- `google-generativeai>=0.8.0` - Gemini API client
+- `httpx>=0.26.0` - HTTP client for reliability
+- `tenacity>=8.2.0` - Retry logic for API calls
+- `pydantic>=2.5.0` - Structured API responses
+
+## Setup
+
+### OpenAI Setup
+1. Get an API key from [OpenAI Platform](https://platform.openai.com/)
+2. Set the environment variable:
+   ```bash
+   export OPENAI_API_KEY="your-api-key-here"
+   ```
+
+### Gemini Setup
+1. Get an API key from [Google AI Studio](https://aistudio.google.com/)
+2. Set the environment variable:
+   ```bash
+   export GOOGLE_API_KEY="your-api-key-here"
+   ```
+
+## Usage
+
+### Automatic Model Detection
+
+CLAM automatically detects API models and selects the appropriate backend:
+
+```python
+from clam.utils.model_loader import model_loader
+
+# Automatically detects as OpenAI
+llm = model_loader.load_llm("gpt-4o")
+
+# Automatically detects as Gemini
+llm = model_loader.load_llm("gemini-2.5-flash")
+
+# Automatically detects as OpenAI VLM
+vlm = model_loader.load_vlm("gpt-4.1")
+
+# Automatically detects as Gemini VLM
+vlm = model_loader.load_vlm("gemini-2.5-pro")
+```
+
+### Vision Tasks
+
+#### Unified API VLM Baseline
+```python
+from examples.vision.api_vlm_baseline import APIVLMBaseline
+
+# Works with any supported API model
+model = APIVLMBaseline(
+    num_classes=10,
+    class_names=["cat", "dog", "bird", ...],
+    model_name="gpt-4o",  # or "gemini-2.5-flash"
+    use_semantic_names=True
+)
+
+model.fit(train_data, train_labels)
+predictions = model.predict(test_images)
+```
+
+#### OpenAI-specific VLM
+```python
+from examples.vision.openai_vlm_baseline import OpenAIVLMBaseline
+
+model = OpenAIVLMBaseline(
+    num_classes=1000,
+    model_name="gpt-4.1",  # Latest OpenAI vision model
+    use_semantic_names=True
+)
+```
+
+#### Gemini-specific VLM with Thinking
+```python
+from examples.vision.gemini_vlm_baseline import GeminiVLMBaseline
+
+model = GeminiVLMBaseline(
+    num_classes=1000,
+    model_name="gemini-2.5-pro",
+    enable_thinking=True  # Use thinking capabilities
+)
+```
+
+### Tabular Tasks
+
+#### OpenAI LLM for Tabular Data
+```python
+from examples.tabular.llm_baselines.openai_llm_baseline import OpenAILLMBaseline
+
+model = OpenAILLMBaseline(
+    num_classes=3,
+    class_names=["low", "medium", "high"],
+    model_name="gpt-4.1-mini",  # Cost-effective choice
+    feature_names=["age", "income", "score"]
+)
+
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
+```
+
+#### Gemini LLM for Tabular Data
+```python
+from examples.tabular.llm_baselines.gemini_llm_baseline import GeminiLLMBaseline
+
+model = GeminiLLMBaseline(
+    num_classes=2,
+    model_name="gemini-2.5-flash",
+    enable_thinking=True  # Enhanced reasoning
+)
+```
+
+### Advanced Configuration
+
+#### Custom Generation Settings
+```python
+from clam.utils.model_loader import GenerationConfig
+
+config = GenerationConfig(
+    max_new_tokens=50,
+    temperature=0.1,      # Low for consistency
+    top_p=0.9,
+    enable_thinking=True, # For Gemini models
+    thinking_summary=False
+)
+
+# Use with any model
+response = model_wrapper.generate(prompt, config)
+```
+
+#### Biological Classification
+```python
+from examples.vision.gemini_vlm_baseline import BiologicalGeminiVLMBaseline
+
+# Specialized for biological organisms
+bio_model = BiologicalGeminiVLMBaseline(
+    num_classes=len(species_names),
+    class_names=species_names,
+    model_name="gemini-2.5-pro",
+    use_semantic_names=True,
+    enable_thinking=True
+)
+```
+
+## Model Pricing (2025)
+
+### OpenAI Pricing (per million tokens)
+- **GPT-4.1**: $2 input / $8 output
+- **GPT-4.1 mini**: $0.40 input / $1.60 output
+- **GPT-4.1 nano**: $0.10 input / $0.40 output
+- **GPT-4o**: Variable pricing
+- **GPT-3.5 Turbo**: Lowest cost option
+
+### Gemini Pricing
+- **Gemini 2.5 Pro**: Variable based on thinking usage
+- **Gemini 2.5 Flash**: Single price tier regardless of input size
+- **Gemini 2.5 Flash-Lite**: Lowest cost in the 2.5 family
+
+## Features
+
+### OpenAI Features
+- Up to 1 million token context windows (GPT-4.1)
+- High-quality vision processing
+- Consistent API reliability
+- Advanced reasoning models (o3, o4-mini)
+
+### Gemini Features
+- **Thinking capabilities**: Models reason through problems step-by-step
+- **Thought summaries**: Optional transparency into reasoning process
+- **Adjustable thinking budgets**: Balance performance vs cost
+- **Native multimodal**: Seamless text and image processing
+- **Audio output**: Natural conversational experiences (2.5 models)
+
+## Error Handling
+
+The system includes robust error handling:
+
+```python
+try:
+    model = model_loader.load_llm("gpt-4o")
+except ValueError as e:
+    print(f"API key not set: {e}")
+except ImportError as e:
+    print(f"Install API dependencies: {e}")
+```
+
+## Migration from Local Models
+
+Replace existing model names with API equivalents:
+
+```python
+# Before (local model)
+model = QwenVLBaseline(model_name="Qwen/Qwen2.5-VL-3B-Instruct")
+
+# After (API model)
+model = APIVLMBaseline(model_name="gpt-4o")
+# or
+model = GeminiVLMBaseline(model_name="gemini-2.5-flash")
+```
+
+## Best Practices
+
+1. **Choose the right model**:
+   - GPT-4.1 nano/mini for cost-effective tasks
+   - GPT-4.1/Gemini 2.5 Pro for complex reasoning
+   - Gemini Flash models for balanced performance
+
+2. **Use thinking capabilities**:
+   - Enable for complex classification tasks
+   - Disable for simple, fast classifications
+
+3. **Monitor costs**:
+   - Use shorter `max_new_tokens` for classification
+   - Choose appropriate model tiers
+
+4. **Handle rate limits**:
+   - Built-in retry logic handles temporary failures
+   - Monitor API usage in respective dashboards
+
+## Example: Complete Vision Classification
+
+```python
+import os
+from examples.vision.api_vlm_baseline import APIVLMBaseline
+
+# Set up
+os.environ["OPENAI_API_KEY"] = "your-key"
+
+# Create model
+model = APIVLMBaseline(
+    num_classes=10,
+    class_names=["airplane", "automobile", "bird", "cat", "deer", 
+                "dog", "frog", "horse", "ship", "truck"],
+    model_name="gpt-4o",
+    use_semantic_names=True
+)
+
+# Train (no actual training for API models)
+model.fit(train_loader, train_labels)
+
+# Evaluate
+results = model.evaluate(
+    test_images, 
+    test_labels,
+    save_raw_responses=True,
+    output_dir="./results",
+    benchmark_name="cifar10"
+)
+
+print(f"Accuracy: {results['accuracy']:.3f}")
+```
+
+This provides access to the most advanced AI models available while maintaining the same simple interface as local models.
+
 ## Citation
 
 If you use CLAM in your research, please cite:

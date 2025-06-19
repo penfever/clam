@@ -84,6 +84,15 @@ audio = [
     "audiomentations>=0.30.0",
 ]
 
+api = [
+    # API clients for cloud-based models
+    "openai>=1.15.0",              # Latest OpenAI API client for GPT-4.1 support
+    "google-generativeai>=0.8.0",  # Latest Gemini API client for 2.5 models
+    "httpx>=0.26.0",               # HTTP client for reliability
+    "tenacity>=8.2.0",             # Retry logic for API calls
+    "pydantic>=2.5.0",             # For structured API responses
+]
+
 tabula_8b = [
     "uv>=0.6.0",
     "black==23.11.0",

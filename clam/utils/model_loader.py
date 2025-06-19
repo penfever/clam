@@ -53,6 +53,13 @@ class GenerationConfig:
     repetition_penalty: float = 1.0
     stop_tokens: Optional[List[str]] = None
     
+    # API-specific parameters
+    thinking_budget: Optional[int] = None  # For reasoning models like o3/o4-mini
+    enable_thinking: bool = True  # For Gemini thinking capabilities
+    thinking_summary: bool = False  # Whether to include thought summaries
+    audio_output: bool = False  # For models with native audio output
+    response_format: Optional[str] = None  # For structured outputs
+    
     def to_vllm_sampling_params(self) -> 'SamplingParams':
         """Convert to VLLM SamplingParams."""
         if not VLLM_AVAILABLE:
@@ -82,6 +89,46 @@ class GenerationConfig:
                 'top_p': self.top_p,
                 'top_k': self.top_k
             })
+        
+        return kwargs
+    
+    def to_openai_kwargs(self) -> Dict[str, Any]:
+        """Convert to OpenAI API kwargs."""
+        kwargs = {
+            'max_tokens': self.max_new_tokens,
+            'temperature': self.temperature if self.do_sample else 0,
+            'top_p': self.top_p if self.do_sample else 1,
+            'stop': self.stop_tokens
+        }
+        
+        # Add response format if specified
+        if self.response_format:
+            kwargs['response_format'] = {"type": self.response_format}
+        
+        # Filter out None values
+        return {k: v for k, v in kwargs.items() if v is not None}
+    
+    def to_gemini_kwargs(self) -> Dict[str, Any]:
+        """Convert to Gemini API kwargs."""
+        generation_config = {
+            'max_output_tokens': self.max_new_tokens,
+            'temperature': self.temperature if self.do_sample else 0,
+            'top_p': self.top_p if self.do_sample else 1,
+            'top_k': self.top_k if self.do_sample else None,
+            'stop_sequences': self.stop_tokens
+        }
+        
+        # Gemini-specific features
+        kwargs = {
+            'generation_config': {k: v for k, v in generation_config.items() if v is not None}
+        }
+        
+        # Add thinking controls for Gemini 2.5 models
+        if hasattr(self, 'enable_thinking') and not self.enable_thinking:
+            kwargs['thinking'] = False
+            
+        if hasattr(self, 'thinking_summary') and self.thinking_summary:
+            kwargs['include_thinking_summary'] = True
         
         return kwargs
 
@@ -638,6 +685,347 @@ class VisionLanguageModelWrapper(BaseModelWrapper):
             self._processor = None
 
 
+class OpenAIModelWrapper(BaseModelWrapper):
+    """OpenAI API-based model wrapper for LLM tasks."""
+    
+    def __init__(self, model_name: str, device: str = "auto", **kwargs):
+        super().__init__(model_name, device, **kwargs)
+        self._client = None
+        
+    def load(self) -> None:
+        """Load OpenAI API client."""
+        try:
+            import openai
+            import os
+            
+            api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key:
+                raise ValueError("OPENAI_API_KEY environment variable not set")
+            
+            self._client = openai.OpenAI(api_key=api_key)
+            logger.info(f"Successfully connected to OpenAI API for model: {self.model_name}")
+            
+        except ImportError:
+            raise ImportError("OpenAI package not available. Install with: pip install 'clam[api]'")
+        except Exception as e:
+            logger.error(f"Failed to initialize OpenAI client: {e}")
+            raise
+    
+    def generate(self, inputs: Union[str, List[str]], config: GenerationConfig) -> Union[str, List[str]]:
+        """Generate text using OpenAI API."""
+        if not self.is_loaded():
+            raise RuntimeError("Model not loaded")
+        
+        # Ensure inputs is a list
+        if isinstance(inputs, str):
+            inputs = [inputs]
+            single_input = True
+        else:
+            single_input = False
+        
+        results = []
+        generation_kwargs = config.to_openai_kwargs()
+        
+        for text_input in inputs:
+            try:
+                # Use chat completions for all models
+                messages = [{"role": "user", "content": text_input}]
+                
+                response = self._client.chat.completions.create(
+                    model=self.model_name,
+                    messages=messages,
+                    **generation_kwargs
+                )
+                
+                generated_text = response.choices[0].message.content
+                results.append(generated_text)
+                
+            except Exception as e:
+                logger.error(f"OpenAI API error: {e}")
+                # Fallback to empty string
+                results.append("")
+        
+        return results[0] if single_input else results
+    
+    def is_loaded(self) -> bool:
+        """Check if API client is initialized."""
+        return self._client is not None
+    
+    def unload(self) -> None:
+        """Cleanup API client."""
+        self._client = None
+
+
+class OpenAIVisionModelWrapper(BaseModelWrapper):
+    """OpenAI API-based wrapper for Vision Language Models."""
+    
+    def __init__(self, model_name: str, device: str = "auto", **kwargs):
+        super().__init__(model_name, device, **kwargs)
+        self._client = None
+        
+    def load(self) -> None:
+        """Load OpenAI API client."""
+        try:
+            import openai
+            import os
+            
+            api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key:
+                raise ValueError("OPENAI_API_KEY environment variable not set")
+            
+            self._client = openai.OpenAI(api_key=api_key)
+            logger.info(f"Successfully connected to OpenAI API for VLM: {self.model_name}")
+            
+        except ImportError:
+            raise ImportError("OpenAI package not available. Install with: pip install 'clam[api]'")
+        except Exception as e:
+            logger.error(f"Failed to initialize OpenAI client: {e}")
+            raise
+    
+    def generate_from_conversation(self, conversation: List[Dict], config: GenerationConfig) -> str:
+        """Generate text from a conversation format with image+text input."""
+        if not self.is_loaded():
+            raise RuntimeError("Model not loaded")
+        
+        try:
+            # Convert conversation format to OpenAI format
+            messages = []
+            for message in conversation:
+                if isinstance(message.get('content'), list):
+                    # Handle multimodal content
+                    openai_content = []
+                    for content_item in message['content']:
+                        if content_item.get('type') == 'text':
+                            openai_content.append({
+                                "type": "text",
+                                "text": content_item.get('text', '')
+                            })
+                        elif content_item.get('type') == 'image':
+                            # Handle PIL Image objects
+                            image = content_item.get('image')
+                            if hasattr(image, 'save'):  # PIL Image
+                                import base64
+                                import io
+                                
+                                # Convert PIL Image to base64
+                                buffer = io.BytesIO()
+                                image.save(buffer, format='PNG')
+                                image_data = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                                
+                                openai_content.append({
+                                    "type": "image_url",
+                                    "image_url": {
+                                        "url": f"data:image/png;base64,{image_data}"
+                                    }
+                                })
+                    
+                    messages.append({
+                        "role": message.get('role', 'user'),
+                        "content": openai_content
+                    })
+                else:
+                    # Text-only content
+                    messages.append({
+                        "role": message.get('role', 'user'),
+                        "content": message.get('content', '')
+                    })
+            
+            generation_kwargs = config.to_openai_kwargs()
+            
+            response = self._client.chat.completions.create(
+                model=self.model_name,
+                messages=messages,
+                **generation_kwargs
+            )
+            
+            return response.choices[0].message.content
+            
+        except Exception as e:
+            logger.error(f"OpenAI Vision API error: {e}")
+            return ""
+    
+    def generate(self, inputs: Union[str, List[str]], config: GenerationConfig) -> Union[str, List[str]]:
+        """Standard generate method for text-only inputs."""
+        if isinstance(inputs, str):
+            inputs = [inputs]
+            single_input = True
+        else:
+            single_input = False
+        
+        results = []
+        for text_input in inputs:
+            # Create a simple conversation for text-only input
+            conversation = [{"role": "user", "content": text_input}]
+            result = self.generate_from_conversation(conversation, config)
+            results.append(result)
+        
+        return results[0] if single_input else results
+    
+    def is_loaded(self) -> bool:
+        """Check if API client is initialized."""
+        return self._client is not None
+    
+    def unload(self) -> None:
+        """Cleanup API client."""
+        self._client = None
+
+
+class GeminiModelWrapper(BaseModelWrapper):
+    """Gemini API-based model wrapper for LLM tasks."""
+    
+    def __init__(self, model_name: str, device: str = "auto", **kwargs):
+        super().__init__(model_name, device, **kwargs)
+        self._client = None
+        self._model = None
+        
+    def load(self) -> None:
+        """Load Gemini API client."""
+        try:
+            import google.generativeai as genai
+            import os
+            
+            api_key = os.getenv("GOOGLE_API_KEY")
+            if not api_key:
+                raise ValueError("GOOGLE_API_KEY environment variable not set")
+            
+            genai.configure(api_key=api_key)
+            self._model = genai.GenerativeModel(self.model_name)
+            logger.info(f"Successfully connected to Gemini API for model: {self.model_name}")
+            
+        except ImportError:
+            raise ImportError("Google GenerativeAI package not available. Install with: pip install 'clam[api]'")
+        except Exception as e:
+            logger.error(f"Failed to initialize Gemini client: {e}")
+            raise
+    
+    def generate(self, inputs: Union[str, List[str]], config: GenerationConfig) -> Union[str, List[str]]:
+        """Generate text using Gemini API."""
+        if not self.is_loaded():
+            raise RuntimeError("Model not loaded")
+        
+        # Ensure inputs is a list
+        if isinstance(inputs, str):
+            inputs = [inputs]
+            single_input = True
+        else:
+            single_input = False
+        
+        results = []
+        generation_kwargs = config.to_gemini_kwargs()
+        
+        for text_input in inputs:
+            try:
+                response = self._model.generate_content(
+                    text_input,
+                    **generation_kwargs
+                )
+                
+                generated_text = response.text if response.text else ""
+                results.append(generated_text)
+                
+            except Exception as e:
+                logger.error(f"Gemini API error: {e}")
+                # Fallback to empty string
+                results.append("")
+        
+        return results[0] if single_input else results
+    
+    def is_loaded(self) -> bool:
+        """Check if API client is initialized."""
+        return self._model is not None
+    
+    def unload(self) -> None:
+        """Cleanup API client."""
+        self._model = None
+
+
+class GeminiVisionModelWrapper(BaseModelWrapper):
+    """Gemini API-based wrapper for Vision Language Models."""
+    
+    def __init__(self, model_name: str, device: str = "auto", **kwargs):
+        super().__init__(model_name, device, **kwargs)
+        self._model = None
+        
+    def load(self) -> None:
+        """Load Gemini API client."""
+        try:
+            import google.generativeai as genai
+            import os
+            
+            api_key = os.getenv("GOOGLE_API_KEY")
+            if not api_key:
+                raise ValueError("GOOGLE_API_KEY environment variable not set")
+            
+            genai.configure(api_key=api_key)
+            self._model = genai.GenerativeModel(self.model_name)
+            logger.info(f"Successfully connected to Gemini API for VLM: {self.model_name}")
+            
+        except ImportError:
+            raise ImportError("Google GenerativeAI package not available. Install with: pip install 'clam[api]'")
+        except Exception as e:
+            logger.error(f"Failed to initialize Gemini client: {e}")
+            raise
+    
+    def generate_from_conversation(self, conversation: List[Dict], config: GenerationConfig) -> str:
+        """Generate text from a conversation format with image+text input."""
+        if not self.is_loaded():
+            raise RuntimeError("Model not loaded")
+        
+        try:
+            # Extract content from conversation
+            content_parts = []
+            for message in conversation:
+                if isinstance(message.get('content'), list):
+                    for content_item in message['content']:
+                        if content_item.get('type') == 'text':
+                            content_parts.append(content_item.get('text', ''))
+                        elif content_item.get('type') == 'image':
+                            # Gemini can handle PIL Images directly
+                            image = content_item.get('image')
+                            content_parts.append(image)
+                else:
+                    # Text-only content
+                    content_parts.append(message.get('content', ''))
+            
+            generation_kwargs = config.to_gemini_kwargs()
+            
+            response = self._model.generate_content(
+                content_parts,
+                **generation_kwargs
+            )
+            
+            return response.text if response.text else ""
+            
+        except Exception as e:
+            logger.error(f"Gemini Vision API error: {e}")
+            return ""
+    
+    def generate(self, inputs: Union[str, List[str]], config: GenerationConfig) -> Union[str, List[str]]:
+        """Standard generate method for text-only inputs."""
+        if isinstance(inputs, str):
+            inputs = [inputs]
+            single_input = True
+        else:
+            single_input = False
+        
+        results = []
+        for text_input in inputs:
+            # Create a simple conversation for text-only input
+            conversation = [{"role": "user", "content": text_input}]
+            result = self.generate_from_conversation(conversation, config)
+            results.append(result)
+        
+        return results[0] if single_input else results
+    
+    def is_loaded(self) -> bool:
+        """Check if API client is initialized."""
+        return self._model is not None
+    
+    def unload(self) -> None:
+        """Cleanup API client."""
+        self._model = None
+
+
 class ModelLoader:
     """Central model loading system."""
     
@@ -672,11 +1060,33 @@ class ModelLoader:
         
         # Determine backend
         if backend == "auto":
-            # Prefer VLLM for LLMs if available
-            backend = "vllm" if VLLM_AVAILABLE else "transformers"
+            # Check for API models first
+            openai_llm_models = [
+                "gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano",
+                "gpt-4o", "gpt-3.5-turbo", "o3", "o4-mini"
+            ]
+            gemini_models = [
+                "gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.5-flash-lite",
+                "gemini-2.0-flash", "gemini-2.0-pro-experimental"
+            ]
+            
+            if any(model in model_name for model in openai_llm_models):
+                backend = "openai"
+                logger.info(f"Auto-selected OpenAI backend for LLM: {model_name}")
+            elif any(model in model_name for model in gemini_models):
+                backend = "gemini"
+                logger.info(f"Auto-selected Gemini backend for LLM: {model_name}")
+            else:
+                # Prefer VLLM for local LLMs if available
+                backend = "vllm" if VLLM_AVAILABLE else "transformers"
+                logger.info(f"Auto-selected {backend} backend for local LLM: {model_name}")
         
         # Create wrapper
-        if backend == "vllm":
+        if backend == "openai":
+            wrapper = OpenAIModelWrapper(model_name, device, **kwargs)
+        elif backend == "gemini":
+            wrapper = GeminiModelWrapper(model_name, device, **kwargs)
+        elif backend == "vllm":
             if not VLLM_AVAILABLE:
                 logger.warning("VLLM not available, falling back to transformers")
                 backend = "transformers"
@@ -687,7 +1097,7 @@ class ModelLoader:
             if not TRANSFORMERS_AVAILABLE:
                 raise ImportError("Transformers not available")
             wrapper = TransformersModelWrapper(model_name, device, **kwargs)
-        else:
+        elif backend not in ["openai", "gemini", "vllm"]:
             raise ValueError(f"Unknown backend: {backend}")
         
         # Load the model
@@ -704,7 +1114,7 @@ class ModelLoader:
         device: str = "auto",
         backend: str = "auto",
         **kwargs
-    ) -> Union[VisionLanguageModelWrapper, VLLMVisionModelWrapper]:
+    ) -> Union[VisionLanguageModelWrapper, VLLMVisionModelWrapper, OpenAIVisionModelWrapper, GeminiVisionModelWrapper]:
         """
         Load a Vision Language Model.
         
@@ -719,27 +1129,41 @@ class ModelLoader:
         """
         # Determine backend
         if backend == "auto":
-            # Check if model supports VLLM multimodal
-            vlm_supported_models = [
-                "Qwen/Qwen2.5-VL",
-                "Qwen/Qwen2-VL",
-                "llava-hf/llava",
-                "TIGER-Lab/Mantis",
-                "microsoft/Phi-3.5-vision",
-                "mistral-community/pixtral",
-                "allenai/Molmo",
-                "meta-llama/Llama-3.2-11B-Vision"
+            # Check for API VLM models first
+            openai_vlm_models = ["gpt-4.1", "gpt-4o"]  # Both support vision
+            gemini_vlm_models = [
+                "gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.5-flash-lite",
+                "gemini-2.0-flash", "gemini-2.0-pro-experimental"
             ]
             
-            # Check if model name matches any supported pattern
-            supports_vllm = any(pattern in model_name for pattern in vlm_supported_models)
-            
-            if supports_vllm and VLLM_AVAILABLE:
-                backend = "vllm"
-                logger.info(f"Auto-selected VLLM backend for VLM: {model_name}")
+            if any(model in model_name for model in openai_vlm_models):
+                backend = "openai"
+                logger.info(f"Auto-selected OpenAI backend for VLM: {model_name}")
+            elif any(model in model_name for model in gemini_vlm_models):
+                backend = "gemini"
+                logger.info(f"Auto-selected Gemini backend for VLM: {model_name}")
             else:
-                backend = "transformers"
-                logger.info(f"Auto-selected transformers backend for VLM: {model_name}")
+                # Check if model supports VLLM multimodal
+                vlm_supported_models = [
+                    "Qwen/Qwen2.5-VL",
+                    "Qwen/Qwen2-VL",
+                    "llava-hf/llava",
+                    "TIGER-Lab/Mantis",
+                    "microsoft/Phi-3.5-vision",
+                    "mistral-community/pixtral",
+                    "allenai/Molmo",
+                    "meta-llama/Llama-3.2-11B-Vision"
+                ]
+                
+                # Check if model name matches any supported pattern
+                supports_vllm = any(pattern in model_name for pattern in vlm_supported_models)
+                
+                if supports_vllm and VLLM_AVAILABLE:
+                    backend = "vllm"
+                    logger.info(f"Auto-selected VLLM backend for VLM: {model_name}")
+                else:
+                    backend = "transformers"
+                    logger.info(f"Auto-selected transformers backend for VLM: {model_name}")
         
         cache_key = f"{model_name}_vlm_{backend}_{device}"
         
@@ -749,7 +1173,11 @@ class ModelLoader:
             return self._loaded_models[cache_key]
         
         # Create appropriate wrapper based on backend
-        if backend == "vllm":
+        if backend == "openai":
+            wrapper = OpenAIVisionModelWrapper(model_name, device, **kwargs)
+        elif backend == "gemini":
+            wrapper = GeminiVisionModelWrapper(model_name, device, **kwargs)
+        elif backend == "vllm":
             if not VLLM_AVAILABLE:
                 logger.warning("VLLM not available, falling back to transformers")
                 backend = "transformers"
@@ -760,9 +1188,8 @@ class ModelLoader:
             if not TRANSFORMERS_AVAILABLE:
                 raise ImportError("Transformers not available")
             wrapper = VisionLanguageModelWrapper(model_name, device, **kwargs)
-        else:
-            if backend != "vllm":  # Only raise error if not already handled
-                raise ValueError(f"Unknown backend: {backend}")
+        elif backend not in ["openai", "gemini", "vllm"]:
+            raise ValueError(f"Unknown backend: {backend}")
         
         # Load the model
         wrapper.load()
