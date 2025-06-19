@@ -633,14 +633,23 @@ def evaluate_tabllm(dataset, args):
             # Prepare the test instance (must always be included)
             test_prompt = f"{test_note}\n\n{question}\nAnswer:"
             
-            # Tokenize test prompt to ensure we have room for it
-            test_tokens = tokenizer.encode(test_prompt)
-            answer_tokens_estimate = 10  # Reserve tokens for the answer
-            reserved_tokens = len(test_tokens) + answer_tokens_estimate + 50  # Buffer
-            
-            # Calculate available tokens for few-shot examples including task description
-            task_description_tokens = len(tokenizer.encode(task_description))
-            available_tokens = args.max_context_length - reserved_tokens - task_description_tokens
+            # Tokenize test prompt to ensure we have room for it (skip for API models)
+            if tokenizer is not None:
+                test_tokens = tokenizer.encode(test_prompt)
+                answer_tokens_estimate = 10  # Reserve tokens for the answer
+                reserved_tokens = len(test_tokens) + answer_tokens_estimate + 50  # Buffer
+                
+                # Calculate available tokens for few-shot examples including task description
+                task_description_tokens = len(tokenizer.encode(task_description))
+                available_tokens = args.max_context_length - reserved_tokens - task_description_tokens
+            else:
+                # For API models, use approximate token estimation (4 chars ≈ 1 token)
+                test_tokens_estimate = len(test_prompt) // 4
+                answer_tokens_estimate = 10
+                reserved_tokens = test_tokens_estimate + answer_tokens_estimate + 50
+                
+                task_description_tokens_estimate = len(task_description) // 4
+                available_tokens = args.max_context_length - reserved_tokens - task_description_tokens_estimate
             
             # Add few-shot examples that fit within the limit
             example_parts = []
@@ -651,7 +660,11 @@ def evaluate_tabllm(dataset, args):
             
             for note, label in selected_examples:
                 example_prompt = f"{note}\n\n{question}\nAnswer: {label}"
-                example_tokens = len(tokenizer.encode(example_prompt))
+                if tokenizer is not None:
+                    example_tokens = len(tokenizer.encode(example_prompt))
+                else:
+                    # For API models, use approximate token estimation
+                    example_tokens = len(example_prompt) // 4
                 
                 # Check if adding this example would exceed our limit
                 if total_example_tokens + example_tokens <= available_tokens:
