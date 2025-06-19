@@ -17,7 +17,7 @@ from torch.utils.data import DataLoader
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from clam.utils.vlm_prompting import create_classification_prompt, parse_vlm_response, create_vlm_conversation
+from clam.utils.vlm_prompting import create_direct_classification_prompt, parse_vlm_response, create_vlm_conversation
 
 logger = logging.getLogger(__name__)
 
@@ -181,12 +181,9 @@ class QwenVLBaseline:
         if not self.class_names:
             raise ValueError("Class names must be provided for VLM prediction")
         
-        # Create unified prompt using vlm_prompting utilities
-        prompt_text = create_classification_prompt(
+        # Create direct image classification prompt using centralized function
+        prompt_text = create_direct_classification_prompt(
             class_names=self.class_names,
-            modality=modality,
-            use_knn=False,  # No KNN for direct VLM classification
-            use_3d=False,   # No 3D for direct VLM classification  
             dataset_description=dataset_description,
             use_semantic_names=use_semantic_names
         )

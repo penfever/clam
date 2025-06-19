@@ -359,6 +359,41 @@ def parse_vlm_response(response: str, unique_classes: List, logger_instance: Opt
         return unique_classes[0]
 
 
+def create_direct_classification_prompt(
+    class_names: List[str],
+    dataset_description: Optional[str] = None,
+    use_semantic_names: bool = False
+) -> str:
+    """
+    Create a direct image classification prompt for VLM (not t-SNE visualization).
+    
+    Args:
+        class_names: List of class names/labels
+        dataset_description: Optional description of the dataset/task
+        use_semantic_names: Whether semantic names were used (for consistency)
+        
+    Returns:
+        Formatted prompt string for direct image classification
+    """
+    class_list_str = ", ".join([f'"{name}"' for name in class_names])
+    
+    dataset_context = ""
+    if dataset_description:
+        dataset_context = f"\n\nDataset Context: {dataset_description}"
+    
+    prompt_text = f"""Please classify this image into one of the available categories.
+
+Available classes: {class_list_str}{dataset_context}
+
+Look at the image carefully and determine which class it belongs to based on the visual content you can observe.
+
+Please respond with just the class label followed by a brief explanation of your reasoning based on what you see in the image.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" """
+    
+    return prompt_text
+
+
 def create_vlm_conversation(image, prompt: str) -> List[Dict]:
     """
     Create a conversation structure for VLM input.
