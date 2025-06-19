@@ -625,6 +625,12 @@ def add_llm_baseline_args(parser: argparse.ArgumentParser):
         default="Qwen/Qwen2.5-VL-32B-Instruct",
         help="Vision Language Model ID for CLAM t-SNE evaluation"
     )
+    parser.add_argument(
+        "--max_context_length",
+        type=int,
+        default=4096,
+        help="Maximum context length for LLM models"
+    )
 
 
 def add_dataset_selection_args(parser: argparse.ArgumentParser):

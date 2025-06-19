@@ -67,6 +67,14 @@ def parse_args():
     """Parse command line arguments using centralized tabular LLM evaluation parser."""
     parser = create_tabular_llm_evaluation_parser("Evaluate LLM baselines on OpenML CC18 collection")
     
+    # Remove the dataset source requirement since we automatically fetch CC18
+    # Find the mutually exclusive group and make it not required
+    for action_group in parser._mutually_exclusive_groups:
+        if any(action.dest in ['dataset_name', 'dataset_ids', 'data_dir', 'num_datasets'] 
+               for action in action_group._group_actions):
+            action_group.required = False
+            break
+    
     # Add OpenML CC18 orchestration-specific arguments
     parser.add_argument(
         "--clam_repo_path",
