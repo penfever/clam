@@ -212,18 +212,19 @@ class ClamTsneClassifier:
         
         return self.vlm_wrapper
     
-    def fit(self, X_train, y_train, X_test=None, class_names=None, **kwargs):
+    def fit(self, X_train, y_train, X_test=None, class_names=None, task_type=None, **kwargs):
         """
-        Fit the CLAM t-SNE classifier.
+        Fit the CLAM t-SNE model for both classification and regression.
         
         Args:
             X_train: Training features
-            y_train: Training labels
+            y_train: Training labels/targets
             X_test: Test features (optional, for creating visualizations)
-            class_names: Class names (optional)
+            class_names: Class names (optional, for classification)
+            task_type: 'classification' or 'regression' (auto-detected if None)
             **kwargs: Additional arguments
         """
-        self.logger.info(f"Fitting CLAM t-SNE classifier for {self.modality} data...")
+        self.logger.info(f"Fitting CLAM t-SNE model for {self.modality} data...")
         
         # Handle different input formats
         if hasattr(X_train, 'values'):
@@ -235,6 +236,30 @@ class ClamTsneClassifier:
             y_train_array = y_train.values
         else:
             y_train_array = np.array(y_train)
+        
+        # Detect task type
+        try:
+            from clam.utils.task_detection import detect_task_type, get_target_statistics
+            self.task_type, detection_method = detect_task_type(
+                y=y_train_array, 
+                manual_override=task_type,
+                dataset_info=kwargs.get('dataset_info')
+            )
+            self.logger.info(f"Task type: {self.task_type} (detected via: {detection_method})")
+            
+            # Get target statistics for regression or class info for classification
+            if self.task_type == 'regression':
+                self.target_stats = get_target_statistics(y_train_array)
+                self.logger.info(f"Target statistics: {self.target_stats}")
+            else:
+                self.unique_classes = np.unique(y_train_array)
+                self.target_stats = None
+        except ImportError:
+            # Fallback if task detection is not available
+            self.logger.warning("Task detection not available, assuming classification")
+            self.task_type = 'classification'
+            self.unique_classes = np.unique(y_train_array)
+            self.target_stats = None
         
         # Apply feature reduction for tabular data if needed
         if self.modality == "tabular":
@@ -282,50 +307,78 @@ class ClamTsneClassifier:
         else:
             raise NotImplementedError(f"Embedding generation not implemented for {self.modality}")
         
-        # Create t-SNE visualization
+        # Create t-SNE visualization based on task type
         viz_methods = self._get_tsne_visualization_methods()
         
-        if self.use_3d_tsne:
-            self.logger.info("Creating 3D t-SNE visualization...")
-            self.train_tsne, self.test_tsne, base_fig = viz_methods['create_tsne_3d_visualization'](
-                self.train_embeddings, self.y_train_sample, self.test_embeddings,
-                perplexity=self.tsne_perplexity,
-                n_iter=self.tsne_n_iter,
-                random_state=self.seed
-            )
+        if self.task_type == 'regression':
+            # Use regression-specific visualization methods
+            if self.use_3d_tsne:
+                self.logger.info("Creating 3D regression t-SNE visualization...")
+                self.train_tsne, self.test_tsne, base_fig = viz_methods['create_regression_tsne_3d_visualization'](
+                    self.train_embeddings, self.y_train_sample, self.test_embeddings,
+                    perplexity=self.tsne_perplexity,
+                    n_iter=self.tsne_n_iter,
+                    random_state=self.seed
+                )
+            else:
+                self.logger.info("Creating 2D regression t-SNE visualization...")
+                self.train_tsne, self.test_tsne, base_fig = viz_methods['create_regression_tsne_visualization'](
+                    self.train_embeddings, self.y_train_sample, self.test_embeddings,
+                    perplexity=self.tsne_perplexity,
+                    n_iter=self.tsne_n_iter,
+                    random_state=self.seed
+                )
         else:
-            self.logger.info("Creating 2D t-SNE visualization...")
-            self.train_tsne, self.test_tsne, base_fig = viz_methods['create_tsne_visualization'](
-                self.train_embeddings, self.y_train_sample, self.test_embeddings,
-                perplexity=self.tsne_perplexity,
-                n_iter=self.tsne_n_iter,
-                random_state=self.seed
-            )
+            # Use classification visualization methods
+            if self.use_3d_tsne:
+                self.logger.info("Creating 3D classification t-SNE visualization...")
+                self.train_tsne, self.test_tsne, base_fig = viz_methods['create_tsne_3d_visualization'](
+                    self.train_embeddings, self.y_train_sample, self.test_embeddings,
+                    perplexity=self.tsne_perplexity,
+                    n_iter=self.tsne_n_iter,
+                    random_state=self.seed
+                )
+            else:
+                self.logger.info("Creating 2D classification t-SNE visualization...")
+                self.train_tsne, self.test_tsne, base_fig = viz_methods['create_tsne_visualization'](
+                    self.train_embeddings, self.y_train_sample, self.test_embeddings,
+                    perplexity=self.tsne_perplexity,
+                    n_iter=self.tsne_n_iter,
+                    random_state=self.seed
+                )
         
         # Close base figure to save memory
         plt.close(base_fig)
         
-        # Get unique classes and set up class names
-        self.unique_classes = np.unique(self.y_train_sample)
-        
-        # Extract semantic class names with fallback
-        semantic_class_names, _ = extract_class_names_from_labels(
-            labels=self.unique_classes.tolist(),
-            dataset_name=kwargs.get('dataset_name', None),
-            semantic_data_dir=kwargs.get('semantic_data_dir', None),
-            use_semantic=self.use_semantic_names
-        )
-        
-        # Create mapping from numeric labels to semantic names
-        self.class_to_semantic = {cls: name for cls, name in zip(sorted(self.unique_classes), semantic_class_names)}
-        
-        # Store class names
-        if class_names is not None:
-            self.class_names = class_names
-        else:
-            self.class_names = semantic_class_names
+        # Set up class/target information based on task type
+        if self.task_type == 'classification':
+            # Get unique classes and set up class names
+            if not hasattr(self, 'unique_classes'):
+                self.unique_classes = np.unique(self.y_train_sample)
             
-        self.logger.info("CLAM t-SNE classifier fitted successfully")
+            # Extract semantic class names with fallback
+            semantic_class_names, _ = extract_class_names_from_labels(
+                labels=self.unique_classes.tolist(),
+                dataset_name=kwargs.get('dataset_name', None),
+                semantic_data_dir=kwargs.get('semantic_data_dir', None),
+                use_semantic=self.use_semantic_names
+            )
+            
+            # Create mapping from numeric labels to semantic names
+            self.class_to_semantic = {cls: name for cls, name in zip(sorted(self.unique_classes), semantic_class_names)}
+            
+            # Store class names
+            if class_names is not None:
+                self.class_names = class_names
+            else:
+                self.class_names = semantic_class_names
+        else:
+            # For regression, we don't have class names
+            self.unique_classes = None
+            self.class_to_semantic = None
+            self.class_names = None
+            
+        self.logger.info(f"CLAM t-SNE {self.task_type} model fitted successfully")
     
     def predict(self, X_test, y_test=None, return_detailed=False, save_outputs=False, output_dir=None):
         """
@@ -382,45 +435,87 @@ class ClamTsneClassifier:
         
         for i in range(len(self.test_tsne)):
             try:
-                # Create visualization highlighting current test point
-                if self.use_knn_connections:
-                    # Create visualization with KNN connections
-                    if self.use_3d_tsne:
-                        fig, legend_text, metadata = viz_methods['create_tsne_3d_plot_with_knn'](
-                            self.train_tsne, self.test_tsne, self.y_train_sample,
-                            self.train_embeddings, self.test_embeddings,
-                            highlight_test_idx=i,
-                            k=self.knn_k,
-                            figsize=(12, 9),
-                            viewing_angles=viewing_angles,
-                            zoom_factor=self.tsne_zoom_factor
-                        )
+                # Create visualization highlighting current test point based on task type
+                if self.task_type == 'regression':
+                    # Use regression visualization methods
+                    if self.use_knn_connections:
+                        # Create visualization with KNN connections for regression
+                        if self.use_3d_tsne:
+                            fig, legend_text, metadata = viz_methods['create_regression_tsne_3d_plot_with_knn'](
+                                self.train_tsne, self.test_tsne, self.y_train_sample,
+                                self.train_embeddings, self.test_embeddings,
+                                highlight_test_idx=i,
+                                k=self.knn_k,
+                                figsize=(12, 9),
+                                viewing_angles=viewing_angles,
+                                zoom_factor=self.tsne_zoom_factor
+                            )
+                        else:
+                            fig, legend_text, metadata = viz_methods['create_regression_tsne_plot_with_knn'](
+                                self.train_tsne, self.test_tsne, self.y_train_sample,
+                                self.train_embeddings, self.test_embeddings,
+                                highlight_test_idx=i,
+                                k=self.knn_k,
+                                figsize=(10, 8),
+                                zoom_factor=self.tsne_zoom_factor
+                            )
                     else:
-                        fig, legend_text, metadata = viz_methods['create_tsne_plot_with_knn'](
-                            self.train_tsne, self.test_tsne, self.y_train_sample,
-                            self.train_embeddings, self.test_embeddings,
-                            highlight_test_idx=i,
-                            k=self.knn_k,
-                            figsize=(10, 8),
-                            zoom_factor=self.tsne_zoom_factor
-                        )
+                        # Create standard regression visualization
+                        if self.use_3d_tsne:
+                            fig, legend_text, metadata = viz_methods['create_combined_regression_tsne_3d_plot'](
+                                self.train_tsne, self.test_tsne, self.y_train_sample,
+                                highlight_test_idx=i,
+                                figsize=(12, 9),
+                                viewing_angles=viewing_angles,
+                                zoom_factor=self.tsne_zoom_factor
+                            )
+                        else:
+                            fig, legend_text, metadata = viz_methods['create_combined_regression_tsne_plot'](
+                                self.train_tsne, self.test_tsne, self.y_train_sample,
+                                highlight_test_idx=i,
+                                figsize=(8, 6),
+                                zoom_factor=self.tsne_zoom_factor
+                            )
                 else:
-                    # Create standard visualization
-                    if self.use_3d_tsne:
-                        fig, legend_text, metadata = viz_methods['create_combined_tsne_3d_plot'](
-                            self.train_tsne, self.test_tsne, self.y_train_sample,
-                            highlight_test_idx=i,
-                            figsize=(12, 9),
-                            viewing_angles=viewing_angles,
-                            zoom_factor=self.tsne_zoom_factor
-                        )
+                    # Use classification visualization methods
+                    if self.use_knn_connections:
+                        # Create visualization with KNN connections
+                        if self.use_3d_tsne:
+                            fig, legend_text, metadata = viz_methods['create_tsne_3d_plot_with_knn'](
+                                self.train_tsne, self.test_tsne, self.y_train_sample,
+                                self.train_embeddings, self.test_embeddings,
+                                highlight_test_idx=i,
+                                k=self.knn_k,
+                                figsize=(12, 9),
+                                viewing_angles=viewing_angles,
+                                zoom_factor=self.tsne_zoom_factor
+                            )
+                        else:
+                            fig, legend_text, metadata = viz_methods['create_tsne_plot_with_knn'](
+                                self.train_tsne, self.test_tsne, self.y_train_sample,
+                                self.train_embeddings, self.test_embeddings,
+                                highlight_test_idx=i,
+                                k=self.knn_k,
+                                figsize=(10, 8),
+                                zoom_factor=self.tsne_zoom_factor
+                            )
                     else:
-                        fig, legend_text, metadata = viz_methods['create_combined_tsne_plot'](
-                            self.train_tsne, self.test_tsne, self.y_train_sample,
-                            highlight_test_idx=i,
-                            figsize=(8, 6),
-                            zoom_factor=self.tsne_zoom_factor
-                        )
+                        # Create standard visualization
+                        if self.use_3d_tsne:
+                            fig, legend_text, metadata = viz_methods['create_combined_tsne_3d_plot'](
+                                self.train_tsne, self.test_tsne, self.y_train_sample,
+                                highlight_test_idx=i,
+                                figsize=(12, 9),
+                                viewing_angles=viewing_angles,
+                                zoom_factor=self.tsne_zoom_factor
+                            )
+                        else:
+                            fig, legend_text, metadata = viz_methods['create_combined_tsne_plot'](
+                                self.train_tsne, self.test_tsne, self.y_train_sample,
+                                highlight_test_idx=i,
+                                figsize=(8, 6),
+                                zoom_factor=self.tsne_zoom_factor
+                            )
                 
                 # Convert plot to image
                 img_buffer = io.BytesIO()
@@ -445,45 +540,91 @@ class ClamTsneClassifier:
                     new_height = int(image.height * ratio)
                     image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
                 
-                # Get visible classes
-                visible_classes = set(metadata.get('classes', []))
-                if metadata.get('knn_info') and 'neighbor_classes' in metadata['knn_info']:
-                    visible_classes.update(set(metadata['knn_info']['neighbor_classes']))
-                
-                visible_classes_list = sorted(list(visible_classes))
-                visible_semantic_names = [self.class_to_semantic[cls] for cls in visible_classes_list]
-                
-                # Create prompt
-                prompt = create_classification_prompt(
-                    class_names=visible_semantic_names,
-                    modality=self.modality,
-                    use_knn=self.use_knn_connections,
-                    use_3d=self.use_3d_tsne,
-                    knn_k=self.knn_k if self.use_knn_connections else None,
-                    legend_text=legend_text,
-                    dataset_description=f"{self.modality.title()} data embedded using appropriate features",
-                    use_semantic_names=self.use_semantic_names
-                )
-                
-                # Create conversation
-                conversation = create_vlm_conversation(image, prompt)
-                
-                # Generate response
-                gen_config = GenerationConfig(
-                    max_new_tokens=100,
-                    temperature=0.1,
-                    do_sample=True
-                )
-                
-                response = self.vlm_wrapper.generate_from_conversation(conversation, gen_config)
-                
-                # Parse prediction
-                prediction = parse_vlm_response(response, visible_semantic_names, self.logger, use_semantic_names=True)
-                
-                # Map back to numeric label if needed
-                if prediction in visible_semantic_names:
-                    semantic_to_numeric = {name: cls for cls, name in self.class_to_semantic.items() if cls in visible_classes_list}
-                    prediction = semantic_to_numeric.get(prediction, prediction)
+                # Create prompt based on task type
+                if self.task_type == 'regression':
+                    # Import regression prompt functions
+                    from clam.utils.vlm_prompting import create_regression_prompt, parse_vlm_response
+                    
+                    # Create regression prompt
+                    prompt = create_regression_prompt(
+                        target_stats=self.target_stats,
+                        modality=self.modality,
+                        use_knn=self.use_knn_connections,
+                        use_3d=self.use_3d_tsne,
+                        knn_k=self.knn_k if self.use_knn_connections else None,
+                        legend_text=legend_text,
+                        dataset_description=f"{self.modality.title()} data embedded using appropriate features"
+                    )
+                    
+                    # Create conversation
+                    conversation = create_vlm_conversation(image, prompt)
+                    
+                    # Generate response
+                    gen_config = GenerationConfig(
+                        max_new_tokens=100,
+                        temperature=0.1,
+                        do_sample=True
+                    )
+                    
+                    response = self.vlm_wrapper.generate_from_conversation(conversation, gen_config)
+                    
+                    # Parse prediction for regression
+                    prediction = parse_vlm_response(
+                        response, 
+                        unique_classes=None, 
+                        logger_instance=self.logger, 
+                        use_semantic_names=False,
+                        task_type='regression',
+                        target_stats=self.target_stats
+                    )
+                else:
+                    # Classification logic
+                    # Get visible classes
+                    visible_classes = set(metadata.get('classes', []))
+                    if metadata.get('knn_info') and 'neighbor_classes' in metadata['knn_info']:
+                        visible_classes.update(set(metadata['knn_info']['neighbor_classes']))
+                    
+                    visible_classes_list = sorted(list(visible_classes))
+                    visible_semantic_names = [self.class_to_semantic[cls] for cls in visible_classes_list]
+                    
+                    # Create classification prompt
+                    from clam.utils.vlm_prompting import create_classification_prompt, parse_vlm_response
+                    prompt = create_classification_prompt(
+                        class_names=visible_semantic_names,
+                        modality=self.modality,
+                        use_knn=self.use_knn_connections,
+                        use_3d=self.use_3d_tsne,
+                        knn_k=self.knn_k if self.use_knn_connections else None,
+                        legend_text=legend_text,
+                        dataset_description=f"{self.modality.title()} data embedded using appropriate features",
+                        use_semantic_names=self.use_semantic_names
+                    )
+                    
+                    # Create conversation
+                    conversation = create_vlm_conversation(image, prompt)
+                    
+                    # Generate response
+                    gen_config = GenerationConfig(
+                        max_new_tokens=100,
+                        temperature=0.1,
+                        do_sample=True
+                    )
+                    
+                    response = self.vlm_wrapper.generate_from_conversation(conversation, gen_config)
+                    
+                    # Parse prediction for classification
+                    prediction = parse_vlm_response(
+                        response, 
+                        visible_semantic_names, 
+                        self.logger, 
+                        use_semantic_names=True,
+                        task_type='classification'
+                    )
+                    
+                    # Map back to numeric label if needed
+                    if prediction in visible_semantic_names:
+                        semantic_to_numeric = {name: cls for cls, name in self.class_to_semantic.items() if cls in visible_classes_list}
+                        prediction = semantic_to_numeric.get(prediction, prediction)
                 
                 predictions.append(prediction)
                 

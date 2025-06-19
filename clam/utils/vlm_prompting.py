@@ -243,24 +243,236 @@ Format your response as: "Class: [class_label] | Reasoning: [brief explanation]"
     return prompt
 
 
-def parse_vlm_response(response: str, unique_classes: List, logger_instance: Optional[logging.Logger] = None, use_semantic_names: bool = False) -> Any:
+def create_regression_prompt(
+    target_stats: Dict[str, Any],
+    modality: str = "tabular",
+    use_knn: bool = False,
+    use_3d: bool = False,
+    knn_k: Optional[int] = None,
+    legend_text: Optional[str] = None,
+    include_spectrogram: bool = False,
+    dataset_description: Optional[str] = None
+) -> str:
     """
-    Parse VLM response to extract the predicted class.
+    Create a regression prompt for VLM based on modality and visualization type.
+    
+    Args:
+        target_stats: Statistics about the target variable (min, max, mean, std, etc.)
+        modality: Type of data ("tabular", "audio", "image")
+        use_knn: Whether KNN connections are shown
+        use_3d: Whether 3D visualization is used
+        knn_k: Number of nearest neighbors (if use_knn=True)
+        legend_text: Legend text from the visualization
+        include_spectrogram: Whether spectrogram is included (for audio)
+        dataset_description: Optional description of the dataset/task
+        
+    Returns:
+        Formatted prompt string
+    """
+    # Extract target range and statistics
+    target_min = target_stats.get('min', 0.0)
+    target_max = target_stats.get('max', 1.0)
+    target_mean = target_stats.get('mean', (target_min + target_max) / 2)
+    target_std = target_stats.get('std', (target_max - target_min) / 6)
+    
+    # Format target range description
+    range_desc = f"between {target_min:.3g} and {target_max:.3g}"
+    if target_stats.get('dtype', '').startswith('int'):
+        range_desc = f"between {int(target_min)} and {int(target_max)}"
+    
+    stats_desc = f"(mean: {target_mean:.3g}, std: {target_std:.3g})"
+    
+    # Create modality-specific description
+    if modality == "audio":
+        data_description = f"""Looking at this{'enhanced' if use_knn else ''} {'3D ' if use_3d else ''}t-SNE visualization of audio regression data, you can see:
+
+1. Colored points representing training audio samples, where the color intensity/gradient corresponds to different target values
+2. {'Gray square points representing test audio samples' if not use_knn else 'Test points (if any) shown as gray squares'}
+3. One red star point which is the query audio sample I want you to predict a value for"""
+        
+        if use_3d:
+            data_description += "\n4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)"
+            
+        if use_knn and knn_k:
+            data_description += f"\n{5 if use_3d else 4}. A summary showing the {knn_k} nearest neighbors with their target values and distances"
+            
+        if include_spectrogram:
+            data_description += f"\n{6 if use_knn and use_3d else 5 if use_knn or use_3d else 4}. Audio spectrogram of the query sample shown below the t-SNE plot"
+            
+    elif modality == "tabular":
+        data_description = f"""Looking at this{'enhanced' if use_knn else ''} {'3D ' if use_3d else ''}t-SNE visualization of tabular regression data, you can see:
+
+1. Colored points representing training data, where the color intensity/gradient corresponds to different target values
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to predict a value for"""
+        
+        if use_3d:
+            data_description += "\n4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)"
+            
+        if use_knn and knn_k:
+            data_description += f"\n{5 if use_3d else 4}. A summary showing the {knn_k} nearest neighbors with their target values and distances"
+            
+    else:  # image or other
+        data_description = f"""Looking at this{'enhanced' if use_knn else ''} {'3D ' if use_3d else ''}t-SNE visualization of {modality} regression data, you can see:
+
+1. Colored points representing training samples, where the color intensity/gradient corresponds to different target values
+2. Gray square points representing test samples  
+3. One red star point which is the query sample I want you to predict a value for"""
+        
+        if use_3d:
+            data_description += "\n4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)"
+            
+        if use_knn and knn_k:
+            data_description += f"\n{5 if use_3d else 4}. A summary showing the {knn_k} nearest neighbors with their target values and distances"
+
+    # Add legend text if provided
+    if legend_text:
+        data_description += f"\n\n{legend_text}"
+
+    # Add dataset description if provided
+    dataset_context = ""
+    if dataset_description:
+        dataset_context = f"\n\nDataset Context: {dataset_description}"
+
+    # Create modality-specific important notes
+    if use_knn:
+        important_note = f"\nIMPORTANT: The neighbor analysis shows the target values of the {knn_k} nearest neighbors found in the original {'Whisper ' if modality == 'audio' else ''}{'high-dimensional ' if modality == 'tabular' else ''}embedding space, NOT just based on the {'3D' if use_3d else '2D'} visualization space. Smaller distances indicate higher similarity."
+    else:
+        important_note = f"\nIMPORTANT: The color gradient in the visualization represents the target values, with the colormap typically ranging from low values (cooler colors) to high values (warmer colors)."
+
+    # Create analysis instructions
+    if use_knn:
+        analysis_prompt = f"Based on BOTH the spatial position in the t-SNE visualization AND the target values of the nearest neighbors, what value should I predict for this query {'audio sample' if modality == 'audio' else 'point'}? The target values in this dataset range {range_desc} {stats_desc}."
+        
+        considerations = ["The spatial clustering patterns" + (" across all four 3D views" if use_3d else " in the t-SNE visualization")]
+        considerations.append("The target values of the nearest neighbors (connected by red lines)")
+        considerations.append("The distance-weighted average of the nearest neighbor values")
+        considerations.append("The color intensity/gradient of nearby training points")
+        
+        if include_spectrogram and modality == "audio":
+            considerations.append("The audio spectrogram patterns that might provide additional context")
+    else:
+        analysis_prompt = f"Based on the position of the red star (query {'audio sample' if modality == 'audio' else 'point'}) relative to the colored training points{' across ALL viewing angles' if use_3d else ''}, what value should I predict? The target values in this dataset range {range_desc} {stats_desc}."
+        
+        considerations = [f"The spatial relationships in {'3D space by examining all four views' if use_3d else 'the t-SNE visualization'}"]
+        considerations.append("The color intensity/gradient of the nearby training points")
+        considerations.append("Which areas of the colormap the red star is positioned within or closest to")
+        
+        if include_spectrogram and modality == "audio":
+            considerations.append("The audio spectrogram patterns that might provide additional context")
+
+    consider_text = "\n".join([f"- {consideration}" for consideration in considerations])
+
+    # Create response format instruction
+    if use_knn:
+        analysis_type = "spatial clustering AND the neighbor value analysis"
+    elif use_3d:
+        analysis_type = "3D spatial clustering and color patterns you observe across the multiple views"
+    else:
+        analysis_type = "spatial clustering and color gradient patterns you observe"
+    
+    spectrogram_text = " and spectrogram analysis" if include_spectrogram and modality == "audio" else ""
+    response_format = f'Please respond with just the predicted numerical value followed by a brief explanation of your reasoning based on the {analysis_type}{spectrogram_text}.'
+
+    # Combine all parts
+    prompt = f"""{data_description}{dataset_context}{important_note}
+
+{analysis_prompt}
+
+Consider:
+{consider_text}
+
+{response_format}
+
+Format your response as: "Value: [predicted_value] | Reasoning: [brief explanation]" """
+
+    return prompt
+
+
+def parse_vlm_response(response: str, unique_classes: List = None, logger_instance: Optional[logging.Logger] = None, use_semantic_names: bool = False, task_type: str = "classification", target_stats: Optional[Dict] = None) -> Any:
+    """
+    Parse VLM response to extract the predicted class or value.
     
     Args:
         response: Raw VLM response string
-        unique_classes: List of valid class labels
+        unique_classes: List of valid class labels (for classification)
         logger_instance: Logger for debugging
         use_semantic_names: Whether semantic names were used in the prompt
+        task_type: "classification" or "regression"
+        target_stats: Statistics about target variable (for regression)
         
     Returns:
-        Predicted class (same type as unique_classes elements)
+        Predicted class (for classification) or numerical value (for regression)
     """
     if logger_instance is None:
         logger_instance = logger
         
     response_lower = response.lower().strip()
-    logger_instance.debug(f"Parsing VLM response: '{response}' (use_semantic_names={use_semantic_names})")
+    logger_instance.debug(f"Parsing VLM response: '{response}' (task_type={task_type}, use_semantic_names={use_semantic_names})")
+    
+    # Handle regression tasks
+    if task_type == "regression":
+        # Try to parse structured response format first
+        if "value:" in response_lower:
+            try:
+                # Extract text after "value:" - handle various separators
+                response_parts = response.split(":", 1)
+                if len(response_parts) > 1:
+                    # Split on common separators like |, \n, or just take first part
+                    after_value = response_parts[1]
+                    # Split on | but handle cases where there's no | 
+                    if "|" in after_value:
+                        value_part = after_value.split("|")[0].strip()
+                    else:
+                        # Take everything until newline or reasoning keywords
+                        import re
+                        # Split on common reasoning indicators
+                        reasoning_split = re.split(r'\s*(?:\||reasoning|because|since|explanation|rationale|the\s|this\s)', after_value, flags=re.IGNORECASE)
+                        value_part = reasoning_split[0].strip()
+                    
+                    # Try to parse as float
+                    try:
+                        parsed_value = float(value_part.strip())
+                        logger_instance.debug(f"Parsed structured value: '{value_part}' -> {parsed_value}")
+                        return parsed_value
+                    except ValueError:
+                        pass
+                        
+            except Exception as e:
+                logger_instance.warning(f"Error parsing structured value response: {e}")
+        
+        # Fallback: Use the regression prediction parser
+        try:
+            from .llm_evaluation_utils import parse_regression_prediction
+            parsed_value = parse_regression_prediction(response, target_stats)
+            logger_instance.debug(f"Fallback regression parsing: '{response}' -> {parsed_value}")
+            return parsed_value
+        except ImportError:
+            # If import fails, use a simplified numeric extraction
+            import re
+            numeric_patterns = [
+                r'[-+]?(?:\d+\.?\d*|\d*\.?\d+)(?:[eE][-+]?\d+)?',  # General numeric pattern
+                r'(\d+\.?\d*|\d*\.?\d+)',  # Simple decimal numbers
+                r'[-+]?\d+',  # Integers
+            ]
+            
+            for pattern in numeric_patterns:
+                matches = re.findall(pattern, response)
+                if matches:
+                    try:
+                        parsed_value = float(matches[0])
+                        logger_instance.debug(f"Fallback numeric extraction: '{response}' -> {parsed_value}")
+                        return parsed_value
+                    except ValueError:
+                        continue
+            
+            # Final fallback for regression
+            if target_stats and 'mean' in target_stats:
+                logger_instance.warning(f"Could not parse value from response: '{response}'. Using target mean: {target_stats['mean']}")
+                return float(target_stats['mean'])
+            else:
+                logger_instance.warning(f"Could not parse value from response: '{response}'. Using fallback: 0.0")
+                return 0.0
     
     # Try to parse structured response format first
     if "class:" in response_lower:
@@ -390,6 +602,50 @@ Look at the image carefully and determine which class it belongs to based on the
 Please respond with just the class label followed by a brief explanation of your reasoning based on what you see in the image.
 
 Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" """
+    
+    return prompt_text
+
+
+def create_direct_regression_prompt(
+    target_stats: Dict[str, Any],
+    dataset_description: Optional[str] = None
+) -> str:
+    """
+    Create a direct image regression prompt for VLM (not t-SNE visualization).
+    
+    Args:
+        target_stats: Statistics about the target variable (min, max, mean, std, etc.)
+        dataset_description: Optional description of the dataset/task
+        
+    Returns:
+        Formatted prompt string for direct image regression
+    """
+    # Extract target range and statistics
+    target_min = target_stats.get('min', 0.0)
+    target_max = target_stats.get('max', 1.0)
+    target_mean = target_stats.get('mean', (target_min + target_max) / 2)
+    target_std = target_stats.get('std', (target_max - target_min) / 6)
+    
+    # Format target range description
+    range_desc = f"between {target_min:.3g} and {target_max:.3g}"
+    if target_stats.get('dtype', '').startswith('int'):
+        range_desc = f"between {int(target_min)} and {int(target_max)}"
+    
+    stats_desc = f"(mean: {target_mean:.3g}, std: {target_std:.3g})"
+    
+    dataset_context = ""
+    if dataset_description:
+        dataset_context = f"\n\nDataset Context: {dataset_description}"
+    
+    prompt_text = f"""Please predict a numerical value for this image based on its visual content.
+
+Target value range: {range_desc} {stats_desc}{dataset_context}
+
+Look at the image carefully and predict what numerical value it should have based on the visual patterns, features, or characteristics you can observe.
+
+Please respond with just the predicted numerical value followed by a brief explanation of your reasoning based on what you see in the image.
+
+Format your response as: "Value: [predicted_value] | Reasoning: [brief explanation]" """
     
     return prompt_text
 

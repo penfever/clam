@@ -21,10 +21,17 @@ __all__ = [
     'create_combined_tsne_3d_plot',
     'create_tsne_plot_with_knn',
     'create_tsne_3d_plot_with_knn',
+    'create_regression_tsne_visualization',
+    'create_regression_tsne_3d_visualization',
+    'create_combined_regression_tsne_plot',
+    'create_combined_regression_tsne_3d_plot',
+    'create_regression_tsne_plot_with_knn',
+    'create_regression_tsne_3d_plot_with_knn',
     'encode_plot_as_base64',
     'get_distinct_colors',
     'create_distinct_color_map',
-    'get_class_color_name_map'
+    'get_class_color_name_map',
+    'create_regression_color_map'
 ]
 
 logger = logging.getLogger(__name__)
@@ -1382,3 +1389,533 @@ def save_plot_as_image(fig: plt.Figure, filepath: str, dpi: int = 150) -> None:
     """
     fig.savefig(filepath, dpi=dpi, bbox_inches='tight')
     logger.info(f"Saved plot to {filepath}")
+
+
+def create_regression_color_map(target_values: np.ndarray, colormap: str = 'RdBu_r', n_levels: int = 20) -> Tuple[np.ndarray, mcolors.Colormap, float, float]:
+    """
+    Create a discrete red-blue colormap for regression target values.
+    
+    Blue represents minimum values, red represents maximum values.
+    Uses 20+ discrete levels for fine-grained VLM estimation.
+    
+    Args:
+        target_values: Array of target values
+        colormap: Name of matplotlib colormap to use (default: 'RdBu_r' for red-blue)
+        n_levels: Number of discrete color levels (default: 20)
+        
+    Returns:
+        Tuple of (normalized_values, colormap_object, vmin, vmax)
+    """
+    vmin, vmax = np.min(target_values), np.max(target_values)
+    if vmin == vmax:
+        # Handle constant values
+        vmin -= 0.1
+        vmax += 0.1
+    
+    # Normalize values to [0, 1] range
+    normalized_values = (target_values - vmin) / (vmax - vmin)
+    
+    # Create discrete colormap with specified number of levels
+    base_cmap = plt.get_cmap(colormap)
+    colors = base_cmap(np.linspace(0, 1, n_levels))
+    cmap = mcolors.ListedColormap(colors, name=f'{colormap}_discrete_{n_levels}')
+    
+    return normalized_values, cmap, vmin, vmax
+
+
+def create_regression_tsne_visualization(
+    train_embeddings: np.ndarray,
+    train_targets: np.ndarray,
+    test_embeddings: np.ndarray,
+    test_targets: Optional[np.ndarray] = None,
+    perplexity: int = 30,
+    n_iter: int = 1000,
+    random_state: int = 42,
+    figsize: Tuple[int, int] = (12, 8),
+    colormap: str = 'viridis'
+) -> Tuple[np.ndarray, np.ndarray, plt.Figure]:
+    """
+    Create t-SNE visualization for regression data with continuous color mapping.
+    
+    Args:
+        train_embeddings: Training embeddings [n_train, embedding_dim]
+        train_targets: Training target values [n_train]
+        test_embeddings: Test embeddings [n_test, embedding_dim]
+        test_targets: Optional test target values [n_test]
+        perplexity: t-SNE perplexity parameter
+        n_iter: Number of t-SNE iterations
+        random_state: Random seed for reproducibility
+        figsize: Figure size (width, height)
+        colormap: Matplotlib colormap name for target values
+        
+    Returns:
+        train_tsne: 2D t-SNE coordinates for training data [n_train, 2]
+        test_tsne: 2D t-SNE coordinates for test data [n_test, 2]
+        fig: Matplotlib figure object
+    """
+    logger.info(f"Creating regression t-SNE visualization with {len(train_embeddings)} train and {len(test_embeddings)} test samples")
+    
+    # Combine embeddings for joint t-SNE
+    combined_embeddings = np.vstack([train_embeddings, test_embeddings])
+    n_train = len(train_embeddings)
+    
+    # Adjust perplexity if needed based on data size
+    effective_perplexity = min(perplexity, (len(combined_embeddings) - 1) // 3)
+    if effective_perplexity != perplexity:
+        logger.warning(f"Adjusting perplexity from {perplexity} to {effective_perplexity} due to small dataset size")
+    
+    # Apply t-SNE
+    logger.info(f"Running t-SNE with perplexity={effective_perplexity}, n_iter={n_iter}")
+    tsne = TSNE(
+        n_components=2,
+        perplexity=effective_perplexity,
+        max_iter=n_iter,
+        random_state=random_state,
+        verbose=1
+    )
+    
+    # Suppress numerical warnings during t-SNE computation
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=RuntimeWarning, module="sklearn.utils.extmath")
+        tsne_results = tsne.fit_transform(combined_embeddings)
+    
+    # Split back into train and test
+    train_tsne = tsne_results[:n_train]
+    test_tsne = tsne_results[n_train:]
+    
+    # Create visualization
+    fig, ax = plt.subplots(figsize=figsize)
+    
+    # Create color mapping for target values
+    normalized_values, cmap, vmin, vmax = create_regression_color_map(train_targets, colormap)
+    
+    # Plot training points with color gradient based on target values
+    scatter = ax.scatter(
+        train_tsne[:, 0], train_tsne[:, 1],
+        c=train_targets,
+        cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
+        alpha=0.7,
+        s=50,
+        edgecolors='black',
+        linewidth=0.5,
+        label='Training Data'
+    )
+    
+    # Add colorbar
+    cbar = plt.colorbar(scatter, ax=ax)
+    cbar.set_label('Target Value', rotation=270, labelpad=15)
+    
+    # Plot test points in gray
+    ax.scatter(
+        test_tsne[:, 0], test_tsne[:, 1],
+        c='lightgray',
+        label='Test Points (Light Gray)',
+        alpha=0.8,
+        s=60,
+        edgecolors='black',
+        linewidth=0.8,
+        marker='s'  # Square markers for test points
+    )
+    
+    ax.set_xlabel('t-SNE Dimension 1')
+    ax.set_ylabel('t-SNE Dimension 2')
+    ax.set_title('t-SNE Visualization: Regression Data with Continuous Color Mapping')
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    ax.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    
+    logger.info("Regression t-SNE visualization created successfully")
+    return train_tsne, test_tsne, fig
+
+
+def create_regression_tsne_3d_visualization(
+    train_embeddings: np.ndarray,
+    train_targets: np.ndarray,
+    test_embeddings: np.ndarray,
+    test_targets: Optional[np.ndarray] = None,
+    perplexity: int = 30,
+    n_iter: int = 1000,
+    random_state: int = 42,
+    figsize: Tuple[int, int] = (15, 12),
+    colormap: str = 'viridis'
+) -> Tuple[np.ndarray, np.ndarray, plt.Figure]:
+    """
+    Create 3D t-SNE visualization for regression data with continuous color mapping.
+    
+    Args:
+        train_embeddings: Training embeddings [n_train, embedding_dim]
+        train_targets: Training target values [n_train]
+        test_embeddings: Test embeddings [n_test, embedding_dim]
+        test_targets: Optional test target values [n_test]
+        perplexity: t-SNE perplexity parameter
+        n_iter: Number of t-SNE iterations
+        random_state: Random seed for reproducibility
+        figsize: Figure size (width, height)
+        colormap: Matplotlib colormap name for target values
+        
+    Returns:
+        train_tsne: 3D t-SNE coordinates for training data [n_train, 3]
+        test_tsne: 3D t-SNE coordinates for test data [n_test, 3]
+        fig: Matplotlib figure object with 3D subplots
+    """
+    logger.info(f"Creating 3D regression t-SNE visualization with {len(train_embeddings)} train and {len(test_embeddings)} test samples")
+    
+    # Combine embeddings for joint t-SNE
+    combined_embeddings = np.vstack([train_embeddings, test_embeddings])
+    n_train = len(train_embeddings)
+    
+    # Adjust perplexity if needed based on data size
+    effective_perplexity = min(perplexity, (len(combined_embeddings) - 1) // 3)
+    if effective_perplexity != perplexity:
+        logger.warning(f"Adjusting perplexity from {perplexity} to {effective_perplexity} due to small dataset size")
+    
+    # Apply 3D t-SNE
+    logger.info(f"Running 3D t-SNE with perplexity={effective_perplexity}, n_iter={n_iter}")
+    tsne = TSNE(
+        n_components=3,  # 3D instead of 2D
+        perplexity=effective_perplexity,
+        max_iter=n_iter,
+        random_state=random_state,
+        verbose=1
+    )
+    
+    # Suppress numerical warnings during t-SNE computation
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=RuntimeWarning, module="sklearn.utils.extmath")
+        tsne_results = tsne.fit_transform(combined_embeddings)
+    
+    # Split back into train and test
+    train_tsne = tsne_results[:n_train]
+    test_tsne = tsne_results[n_train:]
+    
+    # Create 3D visualization with multiple views
+    fig = plt.figure(figsize=figsize)
+    
+    # Create color mapping for target values
+    normalized_values, cmap, vmin, vmax = create_regression_color_map(train_targets, colormap)
+    
+    # Define viewing angles: Isometric, Front (XZ), Side (YZ), Top (XY)
+    viewing_angles = [(30, 45), (0, 0), (0, 90), (90, 0)]
+    view_titles = ['Isometric View', 'Front View (XZ)', 'Side View (YZ)', 'Top View (XY)']
+    
+    for i, ((elev, azim), title) in enumerate(zip(viewing_angles, view_titles)):
+        ax = fig.add_subplot(2, 2, i+1, projection='3d')
+        
+        # Plot training points with color gradient
+        scatter = ax.scatter(
+            train_tsne[:, 0], train_tsne[:, 1], train_tsne[:, 2],
+            c=train_targets,
+            cmap=cmap,
+            vmin=vmin,
+            vmax=vmax,
+            alpha=0.7,
+            s=30,
+            edgecolors='black',
+            linewidth=0.3
+        )
+        
+        # Plot test points in gray
+        ax.scatter(
+            test_tsne[:, 0], test_tsne[:, 1], test_tsne[:, 2],
+            c='lightgray',
+            alpha=0.8,
+            s=40,
+            edgecolors='black',
+            linewidth=0.5,
+            marker='s'
+        )
+        
+        ax.set_xlabel('t-SNE Dim 1')
+        ax.set_ylabel('t-SNE Dim 2')
+        ax.set_zlabel('t-SNE Dim 3')
+        ax.set_title(title)
+        ax.view_init(elev=elev, azim=azim)
+        ax.grid(True, alpha=0.3)
+    
+    # Add a single colorbar for all subplots
+    plt.tight_layout()
+    cbar_ax = fig.add_axes([0.92, 0.15, 0.02, 0.7])
+    cbar = fig.colorbar(scatter, cax=cbar_ax)
+    cbar.set_label('Target Value', rotation=270, labelpad=15)
+    
+    # Add overall title
+    fig.suptitle('3D t-SNE Visualization: Regression Data with Continuous Color Mapping', fontsize=14, y=0.95)
+    
+    logger.info("3D regression t-SNE visualization created successfully")
+    return train_tsne, test_tsne, fig
+
+
+def create_combined_regression_tsne_plot(
+    train_tsne: np.ndarray,
+    test_tsne: np.ndarray,
+    train_targets: np.ndarray,
+    highlight_test_idx: int = 0,
+    figsize: Tuple[int, int] = (8, 6),
+    zoom_factor: float = 1.0,
+    colormap: str = 'RdBu_r'
+) -> Tuple[plt.Figure, str, Dict]:
+    """
+    Create a combined t-SNE plot highlighting a specific test point for regression.
+    
+    Args:
+        train_tsne: Training t-SNE coordinates [n_train, 2]
+        test_tsne: Test t-SNE coordinates [n_test, 2]
+        train_targets: Training target values [n_train]
+        highlight_test_idx: Index of test point to highlight
+        figsize: Figure size
+        zoom_factor: Zoom factor for the plot
+        colormap: Matplotlib colormap name
+        
+    Returns:
+        Tuple of (figure, legend_text, metadata)
+    """
+    fig, ax = plt.subplots(figsize=figsize)
+    
+    # Create color mapping
+    normalized_values, cmap, vmin, vmax = create_regression_color_map(train_targets, colormap)
+    
+    # Plot training points with color gradient
+    scatter = ax.scatter(
+        train_tsne[:, 0], train_tsne[:, 1],
+        c=train_targets,
+        cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
+        alpha=0.7,
+        s=50,
+        edgecolors='black',
+        linewidth=0.5,
+        label='Training Data'
+    )
+    
+    # Plot non-highlighted test points
+    if len(test_tsne) > 1:
+        other_test_mask = np.arange(len(test_tsne)) != highlight_test_idx
+        ax.scatter(
+            test_tsne[other_test_mask, 0], test_tsne[other_test_mask, 1],
+            c='lightgray',
+            alpha=0.6,
+            s=60,
+            edgecolors='black',
+            linewidth=0.8,
+            marker='s',
+            label='Other Test Points'
+        )
+    
+    # Highlight the specific test point
+    ax.scatter(
+        test_tsne[highlight_test_idx, 0], test_tsne[highlight_test_idx, 1],
+        c='red',
+        s=200,
+        marker='*',
+        edgecolors='darkred',
+        linewidth=2,
+        label='Query Point',
+        zorder=5
+    )
+    
+    # Add colorbar
+    cbar = plt.colorbar(scatter, ax=ax)
+    cbar.set_label('Target Value', rotation=270, labelpad=15)
+    
+    # Apply zoom
+    if zoom_factor != 1.0:
+        query_x, query_y = test_tsne[highlight_test_idx]
+        
+        # Calculate current axis limits
+        x_range = ax.get_xlim()[1] - ax.get_xlim()[0]
+        y_range = ax.get_ylim()[1] - ax.get_ylim()[0]
+        
+        # Calculate new limits based on zoom factor
+        new_x_range = x_range / zoom_factor
+        new_y_range = y_range / zoom_factor
+        
+        ax.set_xlim(query_x - new_x_range/2, query_x + new_x_range/2)
+        ax.set_ylim(query_y - new_y_range/2, query_y + new_y_range/2)
+    
+    ax.set_xlabel('t-SNE Dimension 1')
+    ax.set_ylabel('t-SNE Dimension 2')
+    ax.set_title('t-SNE: Regression Data with Query Point Highlighted')
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    ax.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    
+    # Create legend text
+    legend_text = f"Legend: Training points colored by target value ({vmin:.3g} to {vmax:.3g}), test points in gray squares, query point as red star."
+    
+    # Create metadata
+    metadata = {
+        'target_range': (vmin, vmax),
+        'colormap': colormap,
+        'query_position': test_tsne[highlight_test_idx].tolist(),
+        'zoom_factor': zoom_factor
+    }
+    
+    return fig, legend_text, metadata
+
+
+# Placeholder functions for KNN-based regression visualizations
+def create_regression_tsne_plot_with_knn(
+    train_tsne: np.ndarray,
+    test_tsne: np.ndarray,
+    train_targets: np.ndarray,
+    train_embeddings: np.ndarray,
+    test_embeddings: np.ndarray,
+    highlight_test_idx: int = 0,
+    k: int = 5,
+    figsize: Tuple[int, int] = (10, 8),
+    zoom_factor: float = 1.0,
+    colormap: str = 'RdBu_r'
+) -> Tuple[plt.Figure, str, Dict]:
+    """
+    Create regression t-SNE plot with KNN connections showing target values.
+    
+    This is a placeholder that calls the base regression plot.
+    Full KNN implementation would require adapting the KNN logic for regression.
+    """
+    logger.warning("KNN regression visualization not fully implemented yet, using base regression plot")
+    return create_combined_regression_tsne_plot(
+        train_tsne, test_tsne, train_targets, highlight_test_idx, figsize, zoom_factor, colormap
+    )
+
+
+def create_combined_regression_tsne_3d_plot(
+    train_tsne: np.ndarray,
+    test_tsne: np.ndarray,
+    train_targets: np.ndarray,
+    highlight_test_idx: int = 0,
+    figsize: Tuple[int, int] = (12, 9),
+    viewing_angles: Optional[List[Tuple[int, int]]] = None,
+    zoom_factor: float = 1.0,
+    colormap: str = 'RdBu_r'
+) -> Tuple[plt.Figure, str, Dict]:
+    """
+    Create a combined 3D t-SNE plot highlighting a specific test point for regression.
+    
+    Args:
+        train_tsne: Training t-SNE coordinates [n_train, 3]
+        test_tsne: Test t-SNE coordinates [n_test, 3]
+        train_targets: Training target values [n_train]
+        highlight_test_idx: Index of test point to highlight
+        figsize: Figure size
+        viewing_angles: List of (elevation, azimuth) tuples for viewing angles
+        zoom_factor: Zoom factor for the plot
+        colormap: Matplotlib colormap name
+        
+    Returns:
+        Tuple of (figure, legend_text, metadata)
+    """
+    fig = plt.figure(figsize=figsize)
+    
+    # Default viewing angles if not provided
+    if viewing_angles is None:
+        viewing_angles = [(30, 45), (0, 0), (0, 90), (90, 0)]
+    
+    view_titles = ['Isometric View', 'Front View (XZ)', 'Side View (YZ)', 'Top View (XY)']
+    
+    # Create color mapping
+    normalized_values, cmap, vmin, vmax = create_regression_color_map(train_targets, colormap)
+    
+    for i, ((elev, azim), title) in enumerate(zip(viewing_angles, view_titles)):
+        ax = fig.add_subplot(2, 2, i+1, projection='3d')
+        
+        # Plot training points with color gradient
+        scatter = ax.scatter(
+            train_tsne[:, 0], train_tsne[:, 1], train_tsne[:, 2],
+            c=train_targets,
+            cmap=cmap,
+            vmin=vmin,
+            vmax=vmax,
+            alpha=0.7,
+            s=30,
+            edgecolors='black',
+            linewidth=0.3
+        )
+        
+        # Plot non-highlighted test points
+        if len(test_tsne) > 1:
+            other_test_mask = np.arange(len(test_tsne)) != highlight_test_idx
+            if np.any(other_test_mask):
+                ax.scatter(
+                    test_tsne[other_test_mask, 0], 
+                    test_tsne[other_test_mask, 1], 
+                    test_tsne[other_test_mask, 2],
+                    c='lightgray',
+                    alpha=0.6,
+                    s=40,
+                    edgecolors='black',
+                    linewidth=0.5,
+                    marker='s'
+                )
+        
+        # Highlight the specific test point
+        ax.scatter(
+            test_tsne[highlight_test_idx, 0], 
+            test_tsne[highlight_test_idx, 1], 
+            test_tsne[highlight_test_idx, 2],
+            c='red',
+            s=200,
+            marker='*',
+            edgecolors='darkred',
+            linewidth=2,
+            zorder=5
+        )
+        
+        ax.set_xlabel('t-SNE Dim 1')
+        ax.set_ylabel('t-SNE Dim 2')
+        ax.set_zlabel('t-SNE Dim 3')
+        ax.set_title(title)
+        ax.view_init(elev=elev, azim=azim)
+        ax.grid(True, alpha=0.3)
+    
+    # Add colorbar
+    plt.tight_layout()
+    cbar_ax = fig.add_axes([0.92, 0.15, 0.02, 0.7])
+    cbar = fig.colorbar(scatter, cax=cbar_ax)
+    cbar.set_label('Target Value', rotation=270, labelpad=15)
+    
+    # Add overall title
+    fig.suptitle('3D t-SNE: Regression Data with Query Point Highlighted', fontsize=14, y=0.95)
+    
+    # Create legend text
+    legend_text = f"Legend: Training points colored by target value ({vmin:.3g} to {vmax:.3g}), test points in gray squares, query point as red star."
+    
+    # Create metadata
+    metadata = {
+        'target_range': (vmin, vmax),
+        'colormap': colormap,
+        'query_position': test_tsne[highlight_test_idx].tolist(),
+        'viewing_angles': viewing_angles,
+        'zoom_factor': zoom_factor
+    }
+    
+    return fig, legend_text, metadata
+
+
+def create_regression_tsne_3d_plot_with_knn(
+    train_tsne: np.ndarray,
+    test_tsne: np.ndarray,
+    train_targets: np.ndarray,
+    train_embeddings: np.ndarray,
+    test_embeddings: np.ndarray,
+    highlight_test_idx: int = 0,
+    k: int = 5,
+    figsize: Tuple[int, int] = (12, 9),
+    viewing_angles: Optional[List[Tuple[int, int]]] = None,
+    zoom_factor: float = 1.0,
+    colormap: str = 'RdBu_r'
+) -> Tuple[plt.Figure, str, Dict]:
+    """
+    Create 3D regression t-SNE plot with KNN connections showing target values.
+    
+    This is a placeholder that calls the base 3D regression plot.
+    Full KNN implementation would require adapting the KNN logic for regression.
+    """
+    logger.warning("3D KNN regression visualization not fully implemented yet, using base 3D regression plot")
+    return create_combined_regression_tsne_3d_plot(
+        train_tsne, test_tsne, train_targets, highlight_test_idx, figsize, viewing_angles, zoom_factor, colormap
+    )

@@ -915,16 +915,79 @@ def _test_prediction_methods(full_prompt: str, answer_choices: List[str], tokeni
     return viable_methods
 
 
-def calculate_llm_metrics(y_test_partial, predictions, unique_classes, all_class_log_probs=None, logger=None):
+def parse_regression_prediction(prediction_text: str, target_stats: Optional[Dict] = None) -> float:
     """
-    Calculate comprehensive metrics for LLM baselines including ROC AUC using log probabilities.
+    Parse a numerical prediction from LLM text response.
+    
+    Args:
+        prediction_text: Text response from LLM
+        target_stats: Statistics about target variable for validation
+        
+    Returns:
+        Parsed numerical value
+    """
+    import re
+    
+    if prediction_text is None:
+        return 0.0
+    
+    # Convert to string if not already
+    text = str(prediction_text).strip()
+    
+    # Try direct float conversion first
+    try:
+        return float(text)
+    except ValueError:
+        pass
+    
+    # Look for numeric patterns in the text
+    # Match integers, floats, scientific notation
+    numeric_patterns = [
+        r'[-+]?(?:\d+\.?\d*|\d*\.?\d+)(?:[eE][-+]?\d+)?',  # General numeric pattern
+        r'(\d+\.?\d*|\d*\.?\d+)',  # Simple decimal numbers
+        r'[-+]?\d+',  # Integers
+    ]
+    
+    for pattern in numeric_patterns:
+        matches = re.findall(pattern, text)
+        if matches:
+            try:
+                # Take the first match
+                value = float(matches[0])
+                
+                # Validate against target statistics if available
+                if target_stats and 'min' in target_stats and 'max' in target_stats:
+                    min_val, max_val = target_stats['min'], target_stats['max']
+                    # Allow some extrapolation beyond the range
+                    range_extension = (max_val - min_val) * 0.5
+                    extended_min = min_val - range_extension
+                    extended_max = max_val + range_extension
+                    
+                    # Clamp to extended range
+                    value = max(extended_min, min(extended_max, value))
+                
+                return value
+            except ValueError:
+                continue
+    
+    # If no numeric value found, return 0 or target mean if available
+    if target_stats and 'mean' in target_stats:
+        return float(target_stats['mean'])
+    
+    return 0.0
+
+
+def calculate_llm_metrics(y_test_partial, predictions, unique_classes, all_class_log_probs=None, logger=None, task_type=None):
+    """
+    Calculate comprehensive metrics for LLM baselines for both classification and regression tasks.
     
     Args:
         y_test_partial: True labels for completed samples
-        predictions: Predicted class labels
-        unique_classes: Array of unique class labels
-        all_class_log_probs: List of class log probability dictionaries (optional)
+        predictions: Predicted values (class labels for classification, continuous values for regression)
+        unique_classes: Array of unique class labels (for classification) or None (for regression)
+        all_class_log_probs: List of class log probability dictionaries (optional, classification only)
         logger: Logger instance
+        task_type: 'classification' or 'regression' (auto-detected if None)
         
     Returns:
         Dictionary containing all calculated metrics
@@ -933,7 +996,8 @@ def calculate_llm_metrics(y_test_partial, predictions, unique_classes, all_class
     import numpy as np
     from sklearn.metrics import (
         accuracy_score, balanced_accuracy_score, roc_auc_score, 
-        f1_score, precision_score, recall_score
+        f1_score, precision_score, recall_score,
+        mean_squared_error, mean_absolute_error, r2_score
     )
     
     if logger is None:
@@ -943,78 +1007,174 @@ def calculate_llm_metrics(y_test_partial, predictions, unique_classes, all_class
     metrics = {}
     completed_samples = len(predictions)
     
-    # Basic metrics
-    metrics['accuracy'] = float(accuracy_score(y_test_partial, predictions))
-    metrics['balanced_accuracy'] = float(balanced_accuracy_score(y_test_partial, predictions))
+    # Auto-detect task type if not provided
+    if task_type is None:
+        try:
+            from .task_detection import detect_task_type
+            task_type, detection_method = detect_task_type(y=y_test_partial)
+            logger.debug(f"Auto-detected task type: {task_type} (method: {detection_method})")
+        except ImportError:
+            # Fallback: use unique_classes to determine task type
+            if unique_classes is not None and len(unique_classes) <= 50:
+                task_type = 'classification'
+            else:
+                task_type = 'regression'
+            logger.debug(f"Fallback task type detection: {task_type}")
     
-    # ROC AUC - use log probabilities if available
-    try:
-        if len(unique_classes) == 2:
-            # Binary classification
-            if all_class_log_probs and len(all_class_log_probs) == completed_samples and all(class_log_probs for class_log_probs in all_class_log_probs):
-                # Convert log probabilities to probabilities for positive class
-                positive_class = unique_classes[1]  # Assume second class is positive
-                y_scores = []
-                for class_log_probs in all_class_log_probs:
-                    if str(positive_class) in class_log_probs or positive_class in class_log_probs:
-                        # Use the log prob for positive class
-                        log_prob = class_log_probs.get(str(positive_class), class_log_probs.get(positive_class, -1e6))
-                        y_scores.append(math.exp(log_prob))
-                    else:
-                        # Fallback if positive class not found in log probs
-                        y_scores.append(0.5)
-                metrics['roc_auc'] = float(roc_auc_score(y_test_partial, y_scores))
+    # Convert predictions and targets to numpy arrays for consistent handling
+    y_true = np.array(y_test_partial)
+    y_pred = np.array(predictions)
+    
+    if task_type == 'classification':
+        # Classification metrics
+        try:
+            metrics['accuracy'] = float(accuracy_score(y_true, y_pred))
+            metrics['balanced_accuracy'] = float(balanced_accuracy_score(y_true, y_pred))
+        except Exception as e:
+            logger.warning(f"Could not calculate accuracy metrics: {e}")
+            metrics['accuracy'] = 0.0
+            metrics['balanced_accuracy'] = 0.0
+    else:
+        # Regression: accuracy doesn't apply, use R² as primary metric
+        try:
+            # For regression, we set accuracy to R² score for consistency with baseline expectations
+            r2 = r2_score(y_true, y_pred)
+            metrics['accuracy'] = float(max(0.0, r2))  # Ensure non-negative for compatibility
+            metrics['balanced_accuracy'] = float(max(0.0, r2))  # Same as accuracy for regression
+            metrics['r2_score'] = float(r2)
+        except Exception as e:
+            logger.warning(f"Could not calculate R² score: {e}")
+            metrics['accuracy'] = 0.0
+            metrics['balanced_accuracy'] = 0.0
+            metrics['r2_score'] = None
+    
+    # ROC AUC - only for classification
+    if task_type == 'classification' and unique_classes is not None:
+        try:
+            if len(unique_classes) == 2:
+                # Binary classification
+                if all_class_log_probs and len(all_class_log_probs) == completed_samples and all(class_log_probs for class_log_probs in all_class_log_probs):
+                    # Convert log probabilities to probabilities for positive class
+                    positive_class = unique_classes[1]  # Assume second class is positive
+                    y_scores = []
+                    for class_log_probs in all_class_log_probs:
+                        if str(positive_class) in class_log_probs or positive_class in class_log_probs:
+                            # Use the log prob for positive class
+                            log_prob = class_log_probs.get(str(positive_class), class_log_probs.get(positive_class, -1e6))
+                            y_scores.append(math.exp(log_prob))
+                        else:
+                            # Fallback if positive class not found in log probs
+                            y_scores.append(0.5)
+                    metrics['roc_auc'] = float(roc_auc_score(y_true, y_scores))
+                else:
+                    # Fallback: use discrete predictions (less accurate but works)
+                    metrics['roc_auc'] = float(roc_auc_score(y_true, y_pred))
             else:
-                # Fallback: use discrete predictions (less accurate but works)
-                metrics['roc_auc'] = float(roc_auc_score(y_test_partial, predictions))
-        else:
-            # Multiclass classification
-            if all_class_log_probs and len(all_class_log_probs) == completed_samples and all(class_log_probs for class_log_probs in all_class_log_probs):
-                # Create probability matrix from log probabilities
-                prob_matrix = []
-                for class_log_probs in all_class_log_probs:
-                    # Get log probs for all classes in order
-                    log_probs = []
-                    for cls in unique_classes:
-                        # Try both string and original class representations
-                        log_prob = class_log_probs.get(str(cls), class_log_probs.get(cls, -1e6))
-                        log_probs.append(log_prob)
+                # Multiclass classification
+                if all_class_log_probs and len(all_class_log_probs) == completed_samples and all(class_log_probs for class_log_probs in all_class_log_probs):
+                    # Create probability matrix from log probabilities
+                    prob_matrix = []
+                    for class_log_probs in all_class_log_probs:
+                        # Get log probs for all classes in order
+                        log_probs = []
+                        for cls in unique_classes:
+                            # Try both string and original class representations
+                            log_prob = class_log_probs.get(str(cls), class_log_probs.get(cls, -1e6))
+                            log_probs.append(log_prob)
+                        
+                        # Convert log probabilities to probabilities using softmax
+                        log_probs = np.array(log_probs)
+                        # Subtract max for numerical stability
+                        log_probs = log_probs - np.max(log_probs)
+                        probs = np.exp(log_probs)
+                        probs = probs / np.sum(probs)  # Normalize to sum to 1
+                        prob_matrix.append(probs)
                     
-                    # Convert log probabilities to probabilities using softmax
-                    log_probs = np.array(log_probs)
-                    # Subtract max for numerical stability
-                    log_probs = log_probs - np.max(log_probs)
-                    probs = np.exp(log_probs)
-                    probs = probs / np.sum(probs)  # Normalize to sum to 1
-                    prob_matrix.append(probs)
-                
-                prob_matrix = np.array(prob_matrix)
-                
-                # Calculate multiclass ROC AUC
-                metrics['roc_auc'] = float(roc_auc_score(y_test_partial, prob_matrix, multi_class='ovr', average='weighted'))
-            else:
-                # Skip ROC AUC if no log probabilities available for multiclass
-                logger.debug(f"No log probabilities available for multiclass ROC AUC calculation")
-                metrics['roc_auc'] = None
-    except Exception as e:
-        logger.warning(f"Could not calculate ROC AUC: {e}")
+                    prob_matrix = np.array(prob_matrix)
+                    
+                    # Calculate multiclass ROC AUC
+                    metrics['roc_auc'] = float(roc_auc_score(y_true, prob_matrix, multi_class='ovr', average='weighted'))
+                else:
+                    # Skip ROC AUC if no log probabilities available for multiclass
+                    logger.debug(f"No log probabilities available for multiclass ROC AUC calculation")
+                    metrics['roc_auc'] = None
+        except Exception as e:
+            logger.warning(f"Could not calculate ROC AUC: {e}")
+            metrics['roc_auc'] = None
+    else:
+        # ROC AUC not applicable for regression
         metrics['roc_auc'] = None
     
-    # F1 scores
-    try:
-        metrics['f1_macro'] = float(f1_score(y_test_partial, predictions, average='macro', zero_division=0))
-        metrics['f1_micro'] = float(f1_score(y_test_partial, predictions, average='micro', zero_division=0))
-        metrics['f1_weighted'] = float(f1_score(y_test_partial, predictions, average='weighted', zero_division=0))
-    except Exception as e:
-        logger.warning(f"Could not calculate F1 scores: {e}")
+    # F1 scores, precision, and recall - only for classification
+    if task_type == 'classification':
+        try:
+            metrics['f1_macro'] = float(f1_score(y_true, y_pred, average='macro', zero_division=0))
+            metrics['f1_micro'] = float(f1_score(y_true, y_pred, average='micro', zero_division=0))
+            metrics['f1_weighted'] = float(f1_score(y_true, y_pred, average='weighted', zero_division=0))
+        except Exception as e:
+            logger.warning(f"Could not calculate F1 scores: {e}")
+            metrics['f1_macro'] = metrics['f1_micro'] = metrics['f1_weighted'] = None
+        
+        # Precision and recall
+        try:
+            metrics['precision_macro'] = float(precision_score(y_true, y_pred, average='macro', zero_division=0))
+            metrics['recall_macro'] = float(recall_score(y_true, y_pred, average='macro', zero_division=0))
+        except Exception as e:
+            logger.warning(f"Could not calculate precision/recall: {e}")
+            metrics['precision_macro'] = metrics['recall_macro'] = None
+    else:
+        # F1 scores and precision/recall not applicable for regression
         metrics['f1_macro'] = metrics['f1_micro'] = metrics['f1_weighted'] = None
-    
-    # Precision and recall
-    try:
-        metrics['precision_macro'] = float(precision_score(y_test_partial, predictions, average='macro', zero_division=0))
-        metrics['recall_macro'] = float(recall_score(y_test_partial, predictions, average='macro', zero_division=0))
-    except Exception as e:
-        logger.warning(f"Could not calculate precision/recall: {e}")
         metrics['precision_macro'] = metrics['recall_macro'] = None
+    
+    # Regression-specific metrics
+    if task_type == 'regression':
+        try:
+            # Convert predictions to numeric values
+            y_pred_numeric = []
+            for pred in y_pred:
+                try:
+                    # Try to extract numeric value from prediction
+                    if isinstance(pred, str):
+                        # Parse potential numeric strings
+                        import re
+                        # Look for numeric patterns in the string
+                        numeric_match = re.search(r'[-+]?(?:\d*\.?\d+)', pred)
+                        if numeric_match:
+                            y_pred_numeric.append(float(numeric_match.group()))
+                        else:
+                            # If no number found, use 0 as fallback
+                            y_pred_numeric.append(0.0)
+                    else:
+                        y_pred_numeric.append(float(pred))
+                except (ValueError, TypeError):
+                    # If conversion fails, use 0 as fallback
+                    y_pred_numeric.append(0.0)
+            
+            y_pred_numeric = np.array(y_pred_numeric)
+            
+            # Calculate regression metrics
+            metrics['mse'] = float(mean_squared_error(y_true, y_pred_numeric))
+            metrics['rmse'] = float(np.sqrt(metrics['mse']))
+            metrics['mae'] = float(mean_absolute_error(y_true, y_pred_numeric))
+            
+            # R² score (already calculated above if not done yet)
+            if 'r2_score' not in metrics or metrics['r2_score'] is None:
+                metrics['r2_score'] = float(r2_score(y_true, y_pred_numeric))
+            
+            # Additional regression metrics
+            metrics['mean_absolute_percentage_error'] = float(np.mean(np.abs((y_true - y_pred_numeric) / np.maximum(np.abs(y_true), 1e-8))) * 100)
+            
+        except Exception as e:
+            logger.warning(f"Could not calculate regression metrics: {e}")
+            metrics['mse'] = metrics['rmse'] = metrics['mae'] = None
+            metrics['mean_absolute_percentage_error'] = None
+    else:
+        # Regression metrics not applicable for classification
+        metrics['mse'] = metrics['rmse'] = metrics['mae'] = None
+        metrics['mean_absolute_percentage_error'] = None
+    
+    # Add task type to metrics for reference
+    metrics['task_type'] = task_type
     
     return metrics

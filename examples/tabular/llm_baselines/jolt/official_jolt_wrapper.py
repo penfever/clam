@@ -27,6 +27,7 @@ from clam.utils import (
     is_oom_error,
     apply_feature_reduction
 )
+from clam.utils.task_detection import detect_task_type
 
 
 def evaluate_jolt_official(dataset, args):
@@ -147,6 +148,11 @@ def evaluate_jolt_official(dataset, args):
         X_train, X_test, dataset, _ = apply_feature_reduction(
             X_train, y_train, X_test, dataset, args, logger
         )
+        
+        # Detect task type (classification vs regression)
+        task_type = detect_task_type(y_train, dataset=dataset, dataset_name=dataset['name'])
+        is_regression = (task_type == 'regression')
+        logger.info(f"JOLT detected task type: {task_type}")
         
         # Convert to DataFrame if needed, using JOLT config column descriptions if available
         def get_jolt_feature_names(original_names, jolt_config):
@@ -317,8 +323,18 @@ def evaluate_jolt_official(dataset, args):
                 logger.info(f"Using max_tokens: {max_tokens} for generative model: {jolt_model_name}")
                 
                 # Create JOLT arguments with memory optimizations
+                # Set mode and column types based on task type
+                if is_regression:
+                    mode = "sampling"  # Use sampling mode for regression
+                    y_column_types = ['numerical']
+                    num_decimal_places_y = 3  # Use 3 decimal places for regression targets
+                else:
+                    mode = "logpy_only"  # Use log probability mode for classification
+                    y_column_types = ['categorical']
+                    num_decimal_places_y = 0  # Categorical targets don't need decimals
+                
                 jolt_args = Namespace(
-                    mode="logpy_only",  # Use log probability mode for classification
+                    mode=mode,
                     experiment_name=f"jolt_{dataset['name']}",
                     data_path=temp_csv_path,
                     llm_path=llm_path,
@@ -326,7 +342,7 @@ def evaluate_jolt_official(dataset, args):
                     output_dir=temp_output_dir,
                     seed=args.seed,
                     num_decimal_places_x=2,
-                    num_decimal_places_y=0,  # Categorical targets don't need decimals
+                    num_decimal_places_y=num_decimal_places_y,
                     batch_size=1,  # Use batch size of 1 to minimize memory usage
                     
                     # Memory optimization parameters
@@ -334,7 +350,7 @@ def evaluate_jolt_official(dataset, args):
                     prefix=jolt_config.get('task_prefix', '') if jolt_config else '',
                     break_str='\n',
                     y_column_names=[target_col_name],
-                    y_column_types=['categorical'],
+                    y_column_types=y_column_types,
                     column_separator=';',
                     name_value_separator=':',
                     
@@ -534,13 +550,51 @@ def evaluate_jolt_official(dataset, args):
                 completed_samples = 0
                 predictions = []
                 example_inputs_outputs = []  # Store example inputs and outputs for debugging
+                jolt_regression_metrics = {}  # Store JOLT's built-in regression metrics
                 
                 # JOLT stores results in a specific format - extract predictions
                 logger.info(f"JOLT results keys: {list(jolt_results.keys()) if isinstance(jolt_results, dict) else 'Not a dict'}")
                 if isinstance(jolt_results, dict) and 'data' in jolt_results:
                     logger.info(f"JOLT data keys: {list(jolt_results['data'].keys()) if isinstance(jolt_results['data'], dict) else 'Data not a dict'}")
                 
-                if 'data' in jolt_results and 'y_pred' in jolt_results['data']:
+                # Handle regression predictions differently from classification
+                if is_regression and isinstance(jolt_results, dict) and 'metrics' in jolt_results and len(jolt_results['metrics']) > 0:
+                    # Extract regression predictions and metrics from JOLT
+                    logger.info("Extracting regression predictions from JOLT metrics...")
+                    try:
+                        metrics = jolt_results['metrics'][0]  # Get first column metrics for regression
+                        
+                        # Extract regression predictions (use median as point prediction)
+                        if 'y_test_median' in metrics and len(metrics['y_test_median']) > 0:
+                            predictions = metrics['y_test_median']
+                            completed_samples = len([p for p in predictions if not np.isnan(p)])
+                            logger.info(f"Successfully extracted {completed_samples} regression predictions from JOLT")
+                            
+                            # Extract JOLT's built-in regression metrics
+                            if 'mae' in metrics:
+                                jolt_regression_metrics['mae'] = float(metrics['mae'])
+                                logger.info(f"JOLT built-in MAE: {jolt_regression_metrics['mae']:.4f}")
+                            
+                            # Store additional regression statistics if available
+                            if 'y_test_mean' in metrics:
+                                jolt_regression_metrics['predictions_mean'] = metrics['y_test_mean']
+                            if 'y_test_std' in metrics:
+                                jolt_regression_metrics['predictions_std'] = metrics['y_test_std']
+                            if 'y_test_lower' in metrics and 'y_test_upper' in metrics:
+                                jolt_regression_metrics['confidence_intervals'] = {
+                                    'lower': metrics['y_test_lower'],
+                                    'upper': metrics['y_test_upper']
+                                }
+                        else:
+                            logger.warning("No y_test_median found in JOLT regression metrics")
+                            predictions = []
+                            completed_samples = 0
+                    except Exception as e:
+                        logger.warning(f"Error extracting regression predictions from JOLT metrics: {e}")
+                        predictions = []
+                        completed_samples = 0
+                
+                elif 'data' in jolt_results and 'y_pred' in jolt_results['data']:
                     raw_predictions = jolt_results['data']['y_pred']
                     if len(raw_predictions.shape) > 1:
                         # Multi-column predictions - take first column
@@ -643,19 +697,58 @@ def evaluate_jolt_official(dataset, args):
                         
                         predictions_partial = converted_predictions
                     
-                    # Import shared metric calculation function
-                    from clam.utils.llm_evaluation_utils import calculate_llm_metrics
-                    
-                    # Calculate all metrics using shared function (no log probabilities available for JOLT official)
-                    calculated_metrics = calculate_llm_metrics(
-                        y_test_partial, predictions_partial, unique_classes, 
-                        all_class_log_probs=None, logger=logger
-                    )
-                    
-                    # Extract individual metrics for backward compatibility
-                    accuracy = calculated_metrics['accuracy']
-                    balanced_acc = calculated_metrics['balanced_accuracy']
-                    logger.info(f"JOLT achieved {accuracy:.4f} accuracy on {completed_samples} samples")
+                    # Calculate metrics based on task type
+                    if is_regression:
+                        # Calculate regression metrics
+                        from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+                        import numpy as np
+                        
+                        # Convert to numpy arrays for metric calculation
+                        y_true = np.array(y_test_partial)
+                        y_pred = np.array(predictions_partial)
+                        
+                        # Calculate regression metrics
+                        r2 = r2_score(y_true, y_pred)
+                        mae = mean_absolute_error(y_true, y_pred)
+                        mse = mean_squared_error(y_true, y_pred)
+                        rmse = np.sqrt(mse)
+                        
+                        # Use JOLT's built-in MAE if available (should be more accurate)
+                        if 'mae' in jolt_regression_metrics:
+                            mae = jolt_regression_metrics['mae']
+                        
+                        logger.info(f"JOLT regression metrics - R²: {r2:.4f}, MAE: {mae:.4f}, RMSE: {rmse:.4f}")
+                        
+                        # Set regression-specific values
+                        calculated_metrics = {
+                            'r2_score': r2,
+                            'mae': mae,
+                            'mse': mse,
+                            'rmse': rmse,
+                            'roc_auc': None,
+                            'f1_macro': None,
+                            'f1_micro': None, 
+                            'f1_weighted': None,
+                            'precision_macro': None,
+                            'recall_macro': None
+                        }
+                        accuracy = None  # Not applicable for regression
+                        balanced_acc = None  # Not applicable for regression
+                        
+                    else:
+                        # Import shared metric calculation function for classification
+                        from clam.utils.llm_evaluation_utils import calculate_llm_metrics
+                        
+                        # Calculate all classification metrics using shared function
+                        calculated_metrics = calculate_llm_metrics(
+                            y_test_partial, predictions_partial, unique_classes, 
+                            all_class_log_probs=None, logger=logger
+                        )
+                        
+                        # Extract individual metrics for backward compatibility
+                        accuracy = calculated_metrics['accuracy']
+                        balanced_acc = calculated_metrics['balanced_accuracy']
+                        logger.info(f"JOLT achieved {accuracy:.4f} accuracy on {completed_samples} samples")
                     
                     # Store example inputs and outputs for first 20 samples
                     num_examples_to_store = min(20, completed_samples)
@@ -711,32 +804,68 @@ def evaluate_jolt_official(dataset, args):
             else:
                 return obj
         
+        # Create base results dictionary
         results = {
             'model_name': 'JOLT',
             'dataset_name': dataset['name'],
             'dataset_id': dataset['id'],
-            'accuracy': float(accuracy),
-            'balanced_accuracy': float(balanced_acc),
+            'task_type': task_type,
             'training_time': float(training_time),
             'num_test_samples': len(X_test),
             'completed_samples': completed_samples,
             'completion_rate': completed_samples / len(X_test) if len(X_test) > 0 else 0.0,
             'num_features': X_train.shape[1],  # Use X_train to get actual feature count after reduction
-            'num_classes': len(unique_classes),
             'predictions': convert_to_serializable(predictions[:completed_samples] if completed_samples > 0 else []),
             'ground_truth': convert_to_serializable((y_test[:completed_samples].tolist() if hasattr(y_test[:completed_samples], 'tolist') 
                            else list(y_test)[:completed_samples]) if completed_samples > 0 else []),
-            # Additional metrics from shared calculation function
-            'roc_auc': float(calculated_metrics['roc_auc']) if calculated_metrics['roc_auc'] is not None else None,
-            'f1_macro': float(calculated_metrics['f1_macro']) if calculated_metrics['f1_macro'] is not None else None,
-            'f1_micro': float(calculated_metrics['f1_micro']) if calculated_metrics['f1_micro'] is not None else None,
-            'f1_weighted': float(calculated_metrics['f1_weighted']) if calculated_metrics['f1_weighted'] is not None else None,
-            'precision_macro': float(calculated_metrics['precision_macro']) if calculated_metrics['precision_macro'] is not None else None,
-            'recall_macro': float(calculated_metrics['recall_macro']) if calculated_metrics['recall_macro'] is not None else None,
             'used_jolt_config': jolt_config is not None,
             'used_official_jolt': True,
             'example_inputs_outputs': convert_to_serializable(example_inputs_outputs)
         }
+        
+        # Add task-specific metrics
+        if is_regression:
+            results.update({
+                'accuracy': None,  # Not applicable for regression
+                'balanced_accuracy': None,  # Not applicable for regression
+                'num_classes': None,  # Not applicable for regression
+                'roc_auc': None,
+                'f1_macro': None,
+                'f1_micro': None,
+                'f1_weighted': None,
+                'precision_macro': None,
+                'recall_macro': None,
+                # Regression-specific metrics
+                'r2_score': float(calculated_metrics['r2_score']) if calculated_metrics['r2_score'] is not None else None,
+                'mae': float(calculated_metrics['mae']) if calculated_metrics['mae'] is not None else None,
+                'mse': float(calculated_metrics['mse']) if calculated_metrics['mse'] is not None else None,
+                'rmse': float(calculated_metrics['rmse']) if calculated_metrics['rmse'] is not None else None,
+                'regression_results': {
+                    'r2_score': float(calculated_metrics['r2_score']) if calculated_metrics['r2_score'] is not None else None,
+                    'mae': float(calculated_metrics['mae']) if calculated_metrics['mae'] is not None else None,
+                    'mse': float(calculated_metrics['mse']) if calculated_metrics['mse'] is not None else None,
+                    'rmse': float(calculated_metrics['rmse']) if calculated_metrics['rmse'] is not None else None,
+                    'jolt_builtin_metrics': convert_to_serializable(jolt_regression_metrics)
+                }
+            })
+        else:
+            results.update({
+                'accuracy': float(accuracy) if accuracy is not None else None,
+                'balanced_accuracy': float(balanced_acc) if balanced_acc is not None else None,
+                'num_classes': len(unique_classes),
+                'roc_auc': float(calculated_metrics['roc_auc']) if calculated_metrics['roc_auc'] is not None else None,
+                'f1_macro': float(calculated_metrics['f1_macro']) if calculated_metrics['f1_macro'] is not None else None,
+                'f1_micro': float(calculated_metrics['f1_micro']) if calculated_metrics['f1_micro'] is not None else None,
+                'f1_weighted': float(calculated_metrics['f1_weighted']) if calculated_metrics['f1_weighted'] is not None else None,
+                'precision_macro': float(calculated_metrics['precision_macro']) if calculated_metrics['precision_macro'] is not None else None,
+                'recall_macro': float(calculated_metrics['recall_macro']) if calculated_metrics['recall_macro'] is not None else None,
+                # Regression metrics (null for classification)
+                'r2_score': None,
+                'mae': None,
+                'mse': None,
+                'rmse': None,
+                'regression_results': None
+            })
         
         return results
         
@@ -748,6 +877,7 @@ def evaluate_jolt_official(dataset, args):
             'model_name': 'JOLT',
             'dataset_name': dataset['name'],
             'dataset_id': dataset['id'],
+            'task_type': 'unknown',
             'error': str(e),
             'timeout': False,
             'completed_samples': 0,

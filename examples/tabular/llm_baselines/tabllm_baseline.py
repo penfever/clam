@@ -15,10 +15,101 @@ import logging
 import math
 from pathlib import Path
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, balanced_accuracy_score, roc_auc_score, f1_score, precision_score, recall_score
+from sklearn.metrics import accuracy_score, balanced_accuracy_score, roc_auc_score, f1_score, precision_score, recall_score, r2_score, mean_absolute_error, mean_squared_error
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from typing import Dict, Any, Optional, List, Tuple
 from clam.utils.model_loader import model_loader, GenerationConfig
+
+
+def create_regression_bins(y_train: np.ndarray, n_bins: int = 10) -> Tuple[np.ndarray, List[str], float, float]:
+    """
+    Create bins for converting regression to classification.
+    
+    Args:
+        y_train: Training target values
+        n_bins: Number of bins to create
+        
+    Returns:
+        Tuple of (bin_edges, bin_labels, min_val, max_val)
+    """
+    min_val, max_val = y_train.min(), y_train.max()
+    if min_val == max_val:
+        # Handle constant values by adding small perturbation
+        min_val -= 0.1
+        max_val += 0.1
+    
+    # Create bin edges
+    bin_edges = np.linspace(min_val, max_val, n_bins + 1)
+    
+    # Create bin labels with range descriptions
+    bin_labels = []
+    for i in range(n_bins):
+        bin_labels.append(f"Range_{i}_{bin_edges[i]:.3g}_to_{bin_edges[i+1]:.3g}")
+    
+    return bin_edges, bin_labels, min_val, max_val
+
+
+def convert_targets_to_bins(y: np.ndarray, bin_edges: np.ndarray, bin_labels: List[str]) -> List[str]:
+    """
+    Convert continuous target values to bin labels.
+    
+    Args:
+        y: Target values to convert
+        bin_edges: Bin edge values
+        bin_labels: Bin label strings
+        
+    Returns:
+        List of bin labels
+    """
+    # Use digitize to assign values to bins (1-indexed)
+    bin_indices = np.digitize(y, bin_edges, right=False)
+    
+    # Handle edge cases
+    bin_indices = np.clip(bin_indices - 1, 0, len(bin_labels) - 1)
+    
+    return [bin_labels[i] for i in bin_indices]
+
+
+def convert_bin_predictions_to_values(predictions: List[str], bin_edges: np.ndarray, bin_labels: List[str]) -> np.ndarray:
+    """
+    Convert bin predictions back to continuous values using bin centers.
+    
+    Args:
+        predictions: List of predicted bin labels
+        bin_edges: Bin edge values
+        bin_labels: Bin label strings
+        
+    Returns:
+        Array of continuous values
+    """
+    values = []
+    
+    # Create mapping from bin labels to bin centers
+    bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+    label_to_center = {label: center for label, center in zip(bin_labels, bin_centers)}
+    
+    for pred in predictions:
+        if pred in label_to_center:
+            values.append(label_to_center[pred])
+        else:
+            # Fallback: try to extract range from label name
+            try:
+                # Look for "Range_X_min_to_max" pattern
+                parts = pred.split('_')
+                if len(parts) >= 4:
+                    min_val = float(parts[2])
+                    max_val = float(parts[4])
+                    center = (min_val + max_val) / 2
+                    values.append(center)
+                else:
+                    # Default to middle of overall range
+                    values.append((bin_edges[0] + bin_edges[-1]) / 2)
+            except (ValueError, IndexError):
+                # Default to middle of overall range
+                values.append((bin_edges[0] + bin_edges[-1]) / 2)
+    
+    return np.array(values)
+
 
 def load_tabllm_config_by_openml_id(openml_task_id, original_feature_count=None):
     """Load TabLLM configuration by OpenML task ID with feature count validation.
@@ -496,11 +587,52 @@ def evaluate_tabllm(dataset, args):
         
         # Note: model_wrapper handles device placement internally
         
-        # Get unique classes and create answer choices
-        unique_classes = np.unique(y_train)
+        # Detect task type (classification vs regression)
+        from clam.utils.task_detection import detect_task_type, get_target_statistics
+        task_type, detection_method = detect_task_type(
+            y=y_train,
+            classification_threshold=getattr(args, 'regression_bins', 10) * 2  # Use 2x bins as threshold
+        )
+        logger.info(f"Detected task type: {task_type} (method: {detection_method})")
         
-        # Create TabLLM-style template
-        if template_data and 'templates' in template_data:
+        # Handle regression vs classification
+        if task_type == 'regression':
+            logger.info("Using regression mode with binned classification strategy")
+            
+            # Get number of bins from args (default: 10)
+            n_bins = getattr(args, 'regression_bins', 10)
+            
+            # Create bins for regression
+            bin_edges, bin_labels, min_val, max_val = create_regression_bins(y_train, n_bins)
+            logger.info(f"Created {n_bins} bins for regression: range [{min_val:.3g}, {max_val:.3g}]")
+            
+            # Convert targets to bins
+            y_train_binned = convert_targets_to_bins(y_train, bin_edges, bin_labels)
+            y_test_binned = convert_targets_to_bins(y_test, bin_edges, bin_labels)
+            
+            # Store original targets for final evaluation
+            y_train_original = y_train.copy()
+            y_test_original = y_test.copy()
+            
+            # Use binned labels as classes
+            answer_choices = bin_labels
+            unique_classes = np.array(bin_labels)
+            
+            # Create simple question for regression
+            question = f"Which range does the target value fall into: {', '.join(answer_choices)}?"
+            
+            # Override y_train and y_test with binned versions for ICL
+            y_train = np.array([bin_labels.index(label) for label in y_train_binned])
+            y_test = np.array([bin_labels.index(label) for label in y_test_binned])
+            
+        else:
+            logger.info("Using classification mode")
+            
+            # Get unique classes and create answer choices
+            unique_classes = np.unique(y_train)
+        
+        # Create TabLLM-style template (skip for regression since we already set question)
+        if task_type == 'classification' and template_data and 'templates' in template_data:
             template_info = next(iter(template_data['templates'].values()))
             answer_choices_str = template_info.get('answer_choices', " ||| ".join([str(cls) for cls in unique_classes]))
             answer_choices = [choice.strip() for choice in answer_choices_str.split('|||')]
@@ -537,10 +669,14 @@ def evaluate_tabllm(dataset, args):
             else:
                 question = f"Which of the following classes does this instance belong to: {', '.join(answer_choices)}?"
         else:
-            # Default format following TabLLM style
-            answer_choices = [str(cls) for cls in unique_classes]
-            class_to_name = {cls: str(cls) for cls in unique_classes}
-            question = f"Which of the following classes does this instance belong to: {', '.join(answer_choices)}?"
+            # Default format for classification or regression already handled above
+            if task_type == 'classification':
+                answer_choices = [str(cls) for cls in unique_classes]
+                class_to_name = {cls: str(cls) for cls in unique_classes}
+                question = f"Which of the following classes does this instance belong to: {', '.join(answer_choices)}?"
+            else:
+                # Regression: answer_choices, question already set above
+                class_to_name = {i: label for i, label in enumerate(answer_choices)}
         
         logger.info(f"Using question: {question}")
         logger.info(f"Answer choices: {answer_choices}")
@@ -826,42 +962,88 @@ def evaluate_tabllm(dataset, args):
         total_time = time.time() - start_time
         prediction_time = total_time  # For LLMs, prediction time includes model loading and inference
         
-        # Calculate metrics on completed samples using shared utility
+        # Calculate metrics on completed samples
         if completed_samples > 0:
             y_test_partial = y_test[:completed_samples] if hasattr(y_test, '__getitem__') else list(y_test)[:completed_samples]
             
-            # Import shared metric calculation function
-            from clam.utils.llm_evaluation_utils import calculate_llm_metrics
-            
-            # Calculate all metrics using shared function
-            calculated_metrics = calculate_llm_metrics(
-                y_test_partial, predictions, unique_classes, 
-                all_class_log_probs, logger
-            )
-            
-            # Extract individual metrics for backward compatibility
-            accuracy = calculated_metrics['accuracy']
-            balanced_acc = calculated_metrics['balanced_accuracy']
-            roc_auc = calculated_metrics['roc_auc']
-            f1_macro = calculated_metrics['f1_macro']
-            f1_micro = calculated_metrics['f1_micro']
-            f1_weighted = calculated_metrics['f1_weighted']
-            precision_macro = calculated_metrics['precision_macro']
-            recall_macro = calculated_metrics['recall_macro']
+            if task_type == 'regression':
+                # For regression: convert bin predictions back to continuous values
+                logger.info("Computing regression metrics from binned predictions")
+                
+                # Convert predictions from bin indices to bin labels
+                predicted_bin_labels = [answer_choices[pred] for pred in predictions]
+                
+                # Convert bin labels back to continuous values
+                predicted_values = convert_bin_predictions_to_values(predicted_bin_labels, bin_edges, bin_labels)
+                
+                # Use original continuous targets for evaluation
+                y_test_continuous = y_test_original[:completed_samples]
+                
+                # Calculate regression metrics
+                r2 = r2_score(y_test_continuous, predicted_values)
+                mae = mean_absolute_error(y_test_continuous, predicted_values)
+                mse = mean_squared_error(y_test_continuous, predicted_values)
+                rmse = np.sqrt(mse)
+                
+                logger.info(f"Regression metrics: R²={r2:.4f}, MAE={mae:.4f}, RMSE={rmse:.4f}")
+                
+                # Set classification metrics to None for regression
+                accuracy = None
+                balanced_acc = None
+                roc_auc = None
+                f1_macro = f1_micro = f1_weighted = None
+                precision_macro = recall_macro = None
+                
+                # Add regression-specific results
+                regression_results = {
+                    'r2_score': float(r2),
+                    'mae': float(mae),
+                    'mse': float(mse),
+                    'rmse': float(rmse),
+                    'predicted_values': predicted_values.tolist(),
+                    'bin_edges': bin_edges.tolist(),
+                    'bin_labels': bin_labels,
+                    'n_bins': n_bins
+                }
+            else:
+                # For classification: use standard metrics
+                # Import shared metric calculation function
+                from clam.utils.llm_evaluation_utils import calculate_llm_metrics
+                
+                # Calculate all metrics using shared function
+                calculated_metrics = calculate_llm_metrics(
+                    y_test_partial, predictions, unique_classes, 
+                    all_class_log_probs, logger
+                )
+                
+                # Extract individual metrics for backward compatibility
+                accuracy = calculated_metrics['accuracy']
+                balanced_acc = calculated_metrics['balanced_accuracy']
+                roc_auc = calculated_metrics['roc_auc']
+                f1_macro = calculated_metrics['f1_macro']
+                f1_micro = calculated_metrics['f1_micro']
+                f1_weighted = calculated_metrics['f1_weighted']
+                precision_macro = calculated_metrics['precision_macro']
+                recall_macro = calculated_metrics['recall_macro']
+                
+                regression_results = {}
         else:
             accuracy = 0.0
             balanced_acc = 0.0
             roc_auc = None
             f1_macro = f1_micro = f1_weighted = None
             precision_macro = recall_macro = None
+            regression_results = {}
         
         results = {
             'model_name': 'TabLLM',
             'dataset_name': dataset['name'],
             'dataset_id': dataset['id'],
             'task_id': dataset['id'],  # For consistency with CLAM extraction logic
-            'accuracy': float(accuracy),
-            'balanced_accuracy': float(balanced_acc),
+            'task_type': task_type,  # Add task type to results
+            'detection_method': detection_method,  # Add detection method
+            'accuracy': float(accuracy) if accuracy is not None else None,
+            'balanced_accuracy': float(balanced_acc) if balanced_acc is not None else None,
             'prediction_time': float(prediction_time),  # Time for inference (includes model loading for LLMs)
             'total_time': float(total_time),  # Same as prediction_time for LLMs (no separate training phase)
             'num_test_samples': len(X_test),
@@ -888,10 +1070,14 @@ def evaluate_tabllm(dataset, args):
             'class_mapping': class_to_name if template_data else None,
             'example_inputs_outputs': example_inputs_outputs,
             'prediction_method': 'unified',
-            'feature_mapping_preserved': processed_feature_mapping is not None
+            'feature_mapping_preserved': processed_feature_mapping is not None,
+            **regression_results  # Add regression-specific results if any
         }
         
-        logger.info(f"TabLLM accuracy on {dataset['name']}: {accuracy:.4f}")
+        if task_type == 'regression':
+            logger.info(f"TabLLM R² on {dataset['name']}: {regression_results.get('r2_score', 'N/A'):.4f}")
+        else:
+            logger.info(f"TabLLM accuracy on {dataset['name']}: {accuracy:.4f}")
         return results
         
     except Exception as e:
