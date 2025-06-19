@@ -265,33 +265,45 @@ def parse_vlm_response(response: str, unique_classes: List, logger_instance: Opt
     # Try to parse structured response format first
     if "class:" in response_lower:
         try:
-            # Extract text after "class:"
-            class_part = response.split(":", 1)[1].split("|")[0].strip()
-            
-            # Remove quotes if present
-            class_part = class_part.strip('"\'')
-            
-            # If using "Class X" format, extract the number (handle both "class 6" and "class_6")
-            if not use_semantic_names:
-                import re
-                # Try to extract number from various class formats
-                class_match = re.search(r'class[_\s]*(\d+)', class_part.lower())
-                if class_match:
-                    try:
-                        class_num = int(class_match.group(1))
-                        if 0 <= class_num < len(unique_classes):
-                            logger_instance.debug(f"Parsed Class {class_num} -> {unique_classes[class_num]}")
-                            return unique_classes[class_num]
-                    except (ValueError, IndexError):
-                        pass
-            
-            # Try to match with available classes (semantic names or direct)
-            if use_semantic_names:
-                for cls in unique_classes:
-                    if str(cls).lower() == class_part.lower():
-                        logger_instance.debug(f"Parsed structured response: '{class_part}' -> {cls}")
-                        return cls
-                    
+            # Extract text after "class:" - handle various separators
+            response_parts = response.split(":", 1)
+            if len(response_parts) > 1:
+                # Split on common separators like |, \n, or just take first part
+                after_class = response_parts[1]
+                # Split on | but handle cases where there's no | 
+                if "|" in after_class:
+                    class_part = after_class.split("|")[0].strip()
+                else:
+                    # Take everything until newline or reasoning keywords
+                    import re
+                    # Split on common reasoning indicators
+                    reasoning_split = re.split(r'\s+(?:reasoning|because|since|explanation|rationale)', after_class, flags=re.IGNORECASE)
+                    class_part = reasoning_split[0].strip()
+                
+                # Remove quotes if present
+                class_part = class_part.strip('"\'')
+                
+                # If using "Class X" format, extract the number (handle both "class 6" and "class_6")
+                if not use_semantic_names:
+                    import re
+                    # Try to extract number from various class formats
+                    class_match = re.search(r'class[_\s]*(\d+)', class_part.lower())
+                    if class_match:
+                        try:
+                            class_num = int(class_match.group(1))
+                            if 0 <= class_num < len(unique_classes):
+                                logger_instance.debug(f"Parsed Class {class_num} -> {unique_classes[class_num]}")
+                                return unique_classes[class_num]
+                        except (ValueError, IndexError):
+                            pass
+                
+                # Try to match with available classes (semantic names or direct)
+                if use_semantic_names:
+                    for cls in unique_classes:
+                        if str(cls).lower() == class_part.lower():
+                            logger_instance.debug(f"Parsed structured response: '{class_part}' -> {cls}")
+                            return cls
+                        
         except Exception as e:
             logger_instance.warning(f"Error parsing structured response: {e}")
     

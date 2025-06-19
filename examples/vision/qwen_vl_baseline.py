@@ -31,13 +31,15 @@ class QwenVLBaseline:
     """
     
     def __init__(self, num_classes: int, class_names: Optional[List[str]] = None,
-                 model_name: str = "Qwen/Qwen2.5-VL-3B-Instruct", device: Optional[str] = None):
+                 model_name: str = "Qwen/Qwen2.5-VL-3B-Instruct", device: Optional[str] = None,
+                 use_semantic_names: bool = False):
         self.num_classes = num_classes
         self.class_names = class_names or []
         self.model_name = model_name
         self.model = None
         self.processor = None
         self.device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
+        self.use_semantic_names = use_semantic_names
         self.is_fitted = False
         self.raw_responses = []  # Store raw VLM responses for analysis
         
@@ -141,7 +143,7 @@ class QwenVLBaseline:
                 if self.model == "mock":
                     prediction = np.random.randint(0, self.num_classes)
                 else:
-                    prediction = self._predict_single_image(image, image_path=f"batch_{i}_sample_{i}")
+                    prediction = self._predict_single_image(image, image_path=f"batch_{i}_sample_{i}", use_semantic_names=self.use_semantic_names)
                 predictions.append(prediction)
         
         return np.array(predictions)
@@ -162,7 +164,7 @@ class QwenVLBaseline:
                     prediction = np.random.randint(0, self.num_classes)
                 else:
                     image = Image.open(image_path).convert('RGB')
-                    prediction = self._predict_single_image(image, image_path=image_path)
+                    prediction = self._predict_single_image(image, image_path=image_path, use_semantic_names=self.use_semantic_names)
                 
                 predictions.append(prediction)
                 
@@ -174,7 +176,7 @@ class QwenVLBaseline:
         return np.array(predictions)
     
     def _predict_single_image(self, image: Image.Image, modality: str = "image", dataset_description: Optional[str] = None, 
-                              image_path: Optional[str] = None) -> int:
+                              image_path: Optional[str] = None, use_semantic_names: bool = False) -> int:
         """Predict single image using VLM with unified prompting strategy."""
         if not self.class_names:
             raise ValueError("Class names must be provided for VLM prediction")
@@ -186,7 +188,7 @@ class QwenVLBaseline:
             use_knn=False,  # No KNN for direct VLM classification
             use_3d=False,   # No 3D for direct VLM classification  
             dataset_description=dataset_description,
-            use_semantic_names=True  # Use actual class names
+            use_semantic_names=use_semantic_names
         )
         
         # Create conversation using vlm_prompting utilities
@@ -231,7 +233,7 @@ class QwenVLBaseline:
             response, 
             unique_classes=self.class_names,
             logger_instance=logger,
-            use_semantic_names=True
+            use_semantic_names=use_semantic_names
         )
         
         # Add parsed result to response entry
@@ -329,5 +331,6 @@ class BiologicalQwenVLBaseline(QwenVLBaseline):
             image, 
             modality="image",
             dataset_description=dataset_description,
-            image_path=image_path
+            image_path=image_path,
+            use_semantic_names=getattr(self, 'use_semantic_names', False)
         )

@@ -769,7 +769,8 @@ def test_single_dataset(dataset_name: str, args):
             classifier = QwenVLBaseline(
                 num_classes=len(class_names),
                 class_names=class_names,
-                model_name=args.vlm_model_id
+                model_name=args.vlm_model_id,
+                use_semantic_names=args.use_semantic_names
             )
             
             start_time = time.time()
