@@ -982,7 +982,15 @@ class GeminiVisionModelWrapper(BaseModelWrapper):
                         elif content_item.get('type') == 'image':
                             # Gemini can handle PIL Images directly
                             image = content_item.get('image')
-                            content_parts.append(image)
+                            if image is not None:
+                                # Debug: log image info
+                                if hasattr(image, 'size') and hasattr(image, 'mode'):
+                                    logger.debug(f"Adding image to Gemini request: size={image.size}, mode={image.mode}")
+                                else:
+                                    logger.warning(f"Image object doesn't have expected PIL attributes: {type(image)}")
+                                content_parts.append(image)
+                            else:
+                                logger.error("Image is None in conversation content")
                 else:
                     # Text-only content
                     content_parts.append(message.get('content', ''))
@@ -994,7 +1002,33 @@ class GeminiVisionModelWrapper(BaseModelWrapper):
                 **generation_kwargs
             )
             
-            return response.text if response.text else ""
+            # Handle response more robustly
+            if hasattr(response, 'candidates') and response.candidates:
+                candidate = response.candidates[0]
+                
+                # Check finish reason
+                if hasattr(candidate, 'finish_reason'):
+                    if candidate.finish_reason == 2:  # MAX_TOKENS
+                        logger.warning(f"Gemini response truncated due to token limit")
+                    elif candidate.finish_reason == 3:  # SAFETY
+                        logger.warning(f"Gemini response blocked for safety reasons")
+                
+                # Try to extract text from parts
+                if hasattr(candidate, 'content') and candidate.content:
+                    if hasattr(candidate.content, 'parts') and candidate.content.parts:
+                        text_parts = []
+                        for part in candidate.content.parts:
+                            if hasattr(part, 'text') and part.text:
+                                text_parts.append(part.text)
+                        if text_parts:
+                            return ' '.join(text_parts)
+            
+            # Fallback to response.text if available
+            try:
+                return response.text if response.text else ""
+            except:
+                logger.error("Failed to extract text from Gemini response")
+                return ""
             
         except Exception as e:
             logger.error(f"Gemini Vision API error: {e}")

@@ -225,6 +225,14 @@ class QwenVLBaseline:
         }
         self.raw_responses.append(response_entry)
         
+        # Log first 10 responses for debugging
+        if len(self.raw_responses) <= 10:
+            logger.info(f"Qwen VL Response #{len(self.raw_responses)} for {image_path}:")
+            logger.info(f"  Prompt: {prompt_text[:200]}...")
+            logger.info(f"  Raw Response: '{response}'")
+            logger.info(f"  Model: {self.model_name}")
+            logger.info("  " + "-"*50)
+        
         # Parse response using vlm_prompting utilities
         predicted_class = parse_vlm_response(
             response, 
