@@ -89,6 +89,9 @@ from clam.utils import (
 # Import centralized argument parser
 from clam.utils.evaluation_args import create_tabular_llm_evaluation_parser
 
+# Import metadata validation utilities
+from clam.utils.metadata_validation import validate_metadata_for_models
+
 # Import LLM baseline evaluation functions
 from .llm_baselines.tabllm_baseline import evaluate_tabllm
 from .llm_baselines.tabula_8b_baseline import evaluate_tabula_8b
@@ -98,6 +101,18 @@ from clam.models.clam_tsne import evaluate_clam_tsne
 def parse_args():
     """Parse command line arguments using centralized tabular LLM evaluation parser."""
     parser = create_tabular_llm_evaluation_parser("Evaluate LLM baselines (TabLLM, Tabula-8B, JOLT, CLAM-T-SNe) on tabular datasets")
+    
+    # Add metadata validation specific arguments
+    parser.add_argument(
+        "--check_metadata",
+        action="store_true",
+        help="Check metadata coverage and exit without running evaluations"
+    )
+    parser.add_argument(
+        "--skip_missing_metadata",
+        action="store_true",
+        help="Skip models with missing metadata instead of failing"
+    )
     
     # Set tabular LLM-specific defaults
     parser.set_defaults(
@@ -520,6 +535,33 @@ def apply_balanced_few_shot_selection(X_train, y_train, num_examples: int, rando
 def main():
     args = parse_args()
     
+    # Handle metadata checking mode
+    if args.check_metadata:
+        from clam.utils.metadata_validation import generate_metadata_coverage_report, print_metadata_coverage_report
+        
+        print("Checking metadata coverage for requested models...")
+        
+        # Get task IDs from datasets if specified
+        task_ids = None
+        if hasattr(args, 'dataset_ids') and args.dataset_ids:
+            task_ids = args.dataset_ids
+        elif hasattr(args, 'dataset_name') and args.dataset_name:
+            # For single dataset, try to resolve to OpenML task ID
+            print(f"Checking metadata for dataset: {args.dataset_name}")
+            # This would need dataset loading logic, for now just show general report
+        
+        report = generate_metadata_coverage_report(task_ids, args.models)
+        print_metadata_coverage_report(report)
+        
+        # Save report
+        report_file = os.path.join(args.output_dir, "metadata_coverage_report.json")
+        os.makedirs(args.output_dir, exist_ok=True)
+        import json
+        with open(report_file, 'w') as f:
+            json.dump(report, f, indent=2)
+        print(f"\nDetailed report saved to: {report_file}")
+        return
+    
     # Set random seed for reproducibility
     random.seed(args.seed)
     np.random.seed(args.seed)
@@ -580,7 +622,53 @@ def main():
         
         dataset_results = []
         
-        for model_name in models_to_evaluate:
+        # Validate metadata for models that require it
+        if hasattr(dataset, 'openml_task_id') or 'openml_task_id' in dataset:
+            openml_task_id = dataset.get('openml_task_id') or getattr(dataset, 'openml_task_id', None)
+            if openml_task_id:
+                feature_count = dataset.get('X_train', dataset.get('X', [])).shape[1] if hasattr(dataset.get('X_train', dataset.get('X', [])), 'shape') else None
+                metadata_results = validate_metadata_for_models(openml_task_id, models_to_evaluate, feature_count)
+                
+                # Log validation results and filter models
+                valid_models = []
+                for model_name in models_to_evaluate:
+                    validation = metadata_results.get(model_name, {'valid': True, 'errors': [], 'warnings': []})
+                    if validation['valid']:
+                        valid_models.append(model_name)
+                        if validation['warnings']:
+                            for warning in validation['warnings']:
+                                logger.warning(f"{model_name} metadata warning: {warning}")
+                    else:
+                        if args.skip_missing_metadata:
+                            logger.warning(f"Skipping {model_name} on {dataset['name']} due to metadata validation failures:")
+                            for error in validation['errors']:
+                                logger.warning(f"  - {error}")
+                            for missing_file in validation['missing_files']:
+                                logger.warning(f"  - Missing file: {missing_file}")
+                        else:
+                            logger.error(f"Skipping {model_name} on {dataset['name']} due to metadata validation failures:")
+                            for error in validation['errors']:
+                                logger.error(f"  - {error}")
+                            for missing_file in validation['missing_files']:
+                                logger.error(f"  - Missing file: {missing_file}")
+                
+                if len(valid_models) < len(models_to_evaluate):
+                    skipped = set(models_to_evaluate) - set(valid_models)
+                    if args.skip_missing_metadata:
+                        logger.warning(f"Skipped models due to missing metadata: {', '.join(skipped)}")
+                    else:
+                        logger.warning(f"Skipped models due to missing metadata: {', '.join(skipped)}")
+                
+                # Update models list to only include valid ones
+                models_to_evaluate_filtered = valid_models
+            else:
+                logger.warning(f"No OpenML task ID found for dataset {dataset['name']}, skipping metadata validation")
+                models_to_evaluate_filtered = models_to_evaluate
+        else:
+            logger.info(f"Dataset {dataset['name']} is not an OpenML dataset, skipping metadata validation")
+            models_to_evaluate_filtered = models_to_evaluate
+
+        for model_name in models_to_evaluate_filtered:
             logger.info(f"Evaluating {model_name} on {dataset['name']}")
             
             try:

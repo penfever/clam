@@ -84,7 +84,9 @@ def load_tabllm_config_by_openml_id(openml_task_id, original_feature_count=None)
             logger.info(f"Found TabLLM config for OpenML task {openml_task_id} (dataset: {dataset_name})")
             
             # Load semantic information for feature count validation
-            semantic_dir = "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/clam/data/cc18_semantic_complete"
+            # Use relative path from current script location to project root
+            project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..', '..'))
+            semantic_dir = os.path.join(project_root, "data", "cc18_semantic")
             semantic_file = os.path.join(semantic_dir, f"{openml_task_id}.json")
             
             if os.path.exists(semantic_file) and original_feature_count is not None:

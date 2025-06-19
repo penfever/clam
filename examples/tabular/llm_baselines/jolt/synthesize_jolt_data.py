@@ -14,7 +14,7 @@ from typing import Dict, List, Any, Tuple
 # Define paths (dynamically resolve based on script location)
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..', '..'))
-SEMANTIC_DIR = os.path.join(project_root, "data", "tabarena_semantic")
+SEMANTIC_DIR = os.path.join(project_root, "data", "cc18_semantic")
 OUTPUT_DIR = current_dir
 
 

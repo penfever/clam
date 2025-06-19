@@ -49,6 +49,7 @@ from tqdm import tqdm
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
 from clam.utils.evaluation_args import create_multimodal_evaluation_parser
+from clam.utils.metadata_validation import generate_metadata_coverage_report, print_metadata_coverage_report
 
 # Configure logging
 logging.basicConfig(
@@ -127,6 +128,12 @@ def parse_args():
         type=int,
         default=None,
         help="Maximum number of test samples to use for evaluation (to speed up)"
+    )
+    parser.add_argument(
+        "--feature_selection_threshold",
+        type=int,
+        default=500,
+        help="Apply feature selection if dataset has more than this many features"
     )
     parser.add_argument(
         "--num_few_shot_examples",
@@ -254,6 +261,16 @@ def parse_args():
         action="store_true",
         help="Use semantic class names in prompts instead of 'Class X' format"
     )
+    parser.add_argument(
+        "--validate_metadata_only",
+        action="store_true",
+        help="Only validate metadata coverage, don't run evaluations"
+    )
+    parser.add_argument(
+        "--skip_missing_metadata",
+        action="store_true",
+        help="Automatically skip tasks with incomplete metadata instead of failing"
+    )
     
     return parser.parse_args()
 
@@ -351,7 +368,7 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
     wandb_project = f"{args.wandb_project}-{version_by_date}"
     
     # Build evaluation command using the LLM baselines script
-    eval_script = os.path.join(args.clam_repo_path, "examples", "evaluate_llm_baselines.py")
+    eval_script = os.path.join(args.clam_repo_path, "examples", "tabular", "evaluate_llm_baselines_tabular.py")
     
     cmd = [
         "python", eval_script,
@@ -366,6 +383,9 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
     # Add optional parameters
     if args.max_test_samples:
         cmd.extend(["--max_test_samples", str(args.max_test_samples)])
+    
+    # Add feature selection parameter
+    cmd.extend(["--feature_selection_threshold", str(args.feature_selection_threshold)])
     
     # Add backend parameters
     cmd.extend([
@@ -617,6 +637,44 @@ def main():
     end_idx = args.end_idx if args.end_idx is not None else len(tasks)
     tasks = tasks[start_idx:end_idx]
     logger.info(f"Processing tasks from index {start_idx} to {end_idx} (total: {len(tasks)})")
+    
+    # Parse models to check
+    models_to_check = [model.strip() for model in args.models.split(',')]
+    
+    # Handle metadata validation
+    if args.validate_metadata_only:
+        logger.info("Running metadata validation only...")
+        task_ids = [task.task_id for task in tasks]
+        report = generate_metadata_coverage_report(task_ids, models_to_check)
+        print_metadata_coverage_report(report)
+        
+        # Save detailed report
+        report_file = os.path.join(args.output_dir, "metadata_coverage_report.json")
+        with open(report_file, 'w') as f:
+            json.dump(report, f, indent=2)
+        logger.info(f"Detailed metadata report saved to: {report_file}")
+        return
+    
+    # Filter tasks based on metadata availability if requested
+    if args.skip_missing_metadata:
+        logger.info("Filtering tasks based on metadata availability...")
+        task_ids = [task.task_id for task in tasks]
+        report = generate_metadata_coverage_report(task_ids, models_to_check)
+        
+        # Keep only tasks where at least one model has valid metadata
+        valid_task_ids = []
+        for task_id, results in report['detailed_results'].items():
+            if any(result['valid'] for result in results.values()):
+                valid_task_ids.append(task_id)
+        
+        # Filter tasks list
+        original_count = len(tasks)
+        tasks = [task for task in tasks if task.task_id in valid_task_ids]
+        logger.info(f"Filtered {original_count} tasks to {len(tasks)} tasks with valid metadata")
+        
+        if len(tasks) == 0:
+            logger.error("No tasks have valid metadata for any of the requested models. Exiting.")
+            return
     
     # Process each task
     for i, task in enumerate(tasks):

@@ -25,7 +25,7 @@ except ImportError:
 # Define paths (dynamically resolve based on script location)
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..', '..'))
-SEMANTIC_DIR = os.path.join(project_root, "data", "cc18_semantic_complete")
+SEMANTIC_DIR = os.path.join(project_root, "data", "cc18_semantic")
 OUTPUT_DIR = current_dir
 NOTES_PER_DATASET = 100  # Number of example notes to generate per dataset
 
