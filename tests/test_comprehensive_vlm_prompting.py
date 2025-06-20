@@ -398,7 +398,7 @@ class VLMPromptingTestSuite:
                     })
                 
                 base_prompt = create_classification_prompt(
-                    class_names=[f"Class {i}" for i in range(len(np.unique(y_train)))],
+                    class_names=[f"Class_{i}" for i in range(len(np.unique(y_train)))],
                     modality='tabular',
                     dataset_description=f"Test dataset with {len(np.unique(y_train))} classes",
                     use_semantic_names=config.get('use_semantic_names', False),
@@ -438,7 +438,7 @@ class VLMPromptingTestSuite:
             else:
                 # Generate single-viz prompt (same for all samples)
                 base_prompt = create_classification_prompt(
-                    class_names=[f"Class {i}" for i in range(len(np.unique(y_train)))],
+                    class_names=[f"Class_{i}" for i in range(len(np.unique(y_train)))],
                     modality='tabular',
                     use_knn=config.get('use_knn_connections', False),
                     use_3d=config.get('use_3d_tsne', False),
@@ -500,7 +500,7 @@ class VLMPromptingTestSuite:
                 json.dump({
                     'test_indices': self.test_indices.tolist(),
                     'ground_truth_labels': ground_truth_labels,
-                    'class_names': [f"Class {i}" for i in range(len(np.unique(y_train)))]
+                    'class_names': [f"Class_{i}" for i in range(len(np.unique(y_train)))]
                 }, f, indent=2)
             
             # Save configuration
@@ -556,23 +556,23 @@ class VLMPromptingTestSuite:
             method_str = ', '.join(methods).upper()
             
             reasoning = f"Based on the multi-visualization analysis across {len(methods)} methods ({method_str}), " \
-                       f"the query point appears most consistently clustered with Class {predicted_class} samples. " \
+                       f"the query point appears most consistently clustered with Class_{predicted_class} samples. " \
                        f"This pattern is particularly evident in the {random.choice(methods).upper()} visualization, " \
                        f"while the other methods provide supporting evidence through similar spatial relationships."
         else:
             if config.get('use_knn_connections', False):
                 reasoning = f"The KNN analysis shows {config.get('knn_k', 5)} nearest neighbors, " \
-                           f"with the majority belonging to Class {predicted_class}. " \
+                           f"with the majority belonging to Class_{predicted_class}. " \
                            f"The spatial clustering in the t-SNE visualization supports this classification."
             elif config.get('use_3d_tsne', False):
                 reasoning = f"Examining all four 3D viewing angles, the query point is consistently " \
-                           f"positioned within the Class {predicted_class} cluster region. " \
+                           f"positioned within the Class_{predicted_class} cluster region. " \
                            f"The spatial relationships are particularly clear in the isometric view."
             else:
                 reasoning = f"The query point is spatially positioned within the Class {predicted_class} " \
                            f"cluster in the t-SNE visualization, showing clear membership based on local neighborhood structure."
         
-        return f"Class: Class {predicted_class} | Reasoning: {reasoning}"
+        return f"Class: Class_{predicted_class} | Reasoning: {reasoning}"
     
     def _create_fallback_visualization(self, X_train, y_train, X_test_sample, viz_path, config):
         """Create a fallback visualization when proper t-SNE fails."""
@@ -613,14 +613,14 @@ class VLMPromptingTestSuite:
             mask = y_train == class_label
             ax.scatter(X_train[mask, 0], 
                       X_train[mask, 1] if X_train.shape[1] > 1 else np.random.randn(np.sum(mask)),
-                      c=[colors[i]], alpha=0.7, label=f'Class {class_label} (Train)', s=50)
+                      c=[colors[i]], alpha=0.7, label=f'Class_{class_label} (Train)', s=50)
         
         # Plot test points with different markers
         for i, (x_test, y_true) in enumerate(zip(X_test, y_test)):
             color_idx = np.where(unique_classes == y_true)[0][0]
             ax.scatter([x_test[0]], [x_test[1] if x_test.shape[0] > 1 else i*0.1],
                       c=[colors[color_idx]], s=150, marker='s', 
-                      label=f'Test {i} (Class {y_true})' if i < 5 else '', 
+                      label=f'Test {i} (Class_{y_true})' if i < 5 else '', 
                       edgecolors='black', linewidth=1, alpha=0.9)
             
             # Add text annotation
