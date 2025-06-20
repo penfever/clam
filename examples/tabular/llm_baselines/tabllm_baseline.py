@@ -236,8 +236,8 @@ def load_tabllm_config_by_openml_id(openml_task_id, original_feature_count=None)
                     # Count features from semantic info NOT including target column
                     config_feature_count = None
                     if 'columns' in semantic_info:
-                        # Count only feature columns, not including target
-                        config_feature_count = len(semantic_info['columns']) - 1
+                        # The 'columns' array contains only feature columns, target is stored separately
+                        config_feature_count = len(semantic_info['columns'])
                     elif 'feature_descriptions' in semantic_info:
                         # These typically don't include target
                         config_feature_count = len(semantic_info['feature_descriptions'])
