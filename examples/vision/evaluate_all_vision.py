@@ -495,8 +495,11 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
                 log_results_to_wandb('clam_tsne', eval_results, args, class_names, dataset_name)
             
         except Exception as e:
-            logger.error(f"CLAM t-SNE failed: {e}")
-            results['clam_tsne'] = {'error': str(e)}
+            import traceback
+            error_msg = f"CLAM t-SNE failed: {e}"
+            logger.error(error_msg)
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            results['clam_tsne'] = {'error': str(e), 'traceback': traceback.format_exc()}
     
     # Test Simple CLAM (DINOV2 → PCA → k-NN)
     if 'clam_simple' in args.models:
@@ -528,8 +531,11 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
                 log_results_to_wandb('clam_simple', eval_results, args, class_names, dataset_name)
             
         except Exception as e:
-            logger.error(f"Simple CLAM failed: {e}")
-            results['clam_simple'] = {'error': str(e)}
+            import traceback
+            error_msg = f"Simple CLAM failed: {e}"
+            logger.error(error_msg)
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            results['clam_simple'] = {'error': str(e), 'traceback': traceback.format_exc()}
     
     # Test DINOV2 Linear Probe
     if 'dinov2_linear' in args.models:
@@ -563,8 +569,11 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
                 log_results_to_wandb('dinov2_linear', eval_results, args, class_names, dataset_name)
             
         except Exception as e:
-            logger.error(f"DINOV2 Linear Probe failed: {e}")
-            results['dinov2_linear'] = {'error': str(e)}
+            import traceback
+            error_msg = f"DINOV2 Linear Probe failed: {e}"
+            logger.error(error_msg)
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            results['dinov2_linear'] = {'error': str(e), 'traceback': traceback.format_exc()}
     
     # Test Qwen VL
     if 'qwen_vl' in args.models:
@@ -597,8 +606,11 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
                 log_results_to_wandb('qwen_vl', eval_results, args, class_names, dataset_name)
             
         except Exception as e:
-            logger.error(f"Qwen VL failed: {e}")
-            results['qwen_vl'] = {'error': str(e)}
+            import traceback
+            error_msg = f"Qwen VL failed: {e}"
+            logger.error(error_msg)
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            results['qwen_vl'] = {'error': str(e), 'traceback': traceback.format_exc()}
     
     return results
 

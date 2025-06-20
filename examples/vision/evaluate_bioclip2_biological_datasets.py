@@ -861,8 +861,11 @@ def test_single_dataset(dataset_name: str, args):
                 log_results_to_wandb('bioclip2_knn', eval_results, args, class_names, dataset_name)
             
         except Exception as e:
-            logger.error(f"BioClip2 KNN failed: {e}")
-            results['bioclip2_knn'] = {'error': str(e)}
+            import traceback
+            error_msg = f"BioClip2 KNN failed: {e}"
+            logger.error(error_msg)
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            results['bioclip2_knn'] = {'error': str(e), 'traceback': traceback.format_exc()}
     
     # Test Qwen VL
     if 'qwen_vl' in args.models:
@@ -894,8 +897,11 @@ def test_single_dataset(dataset_name: str, args):
                 log_results_to_wandb('qwen_vl', eval_results, args, class_names, dataset_name)
             
         except Exception as e:
-            logger.error(f"Qwen VL failed: {e}")
-            results['qwen_vl'] = {'error': str(e)}
+            import traceback
+            error_msg = f"Qwen VL failed: {e}"
+            logger.error(error_msg)
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            results['qwen_vl'] = {'error': str(e), 'traceback': traceback.format_exc()}
     
     # Test API VLM models
     api_models_to_test = []
@@ -947,8 +953,11 @@ def test_single_dataset(dataset_name: str, args):
                 log_results_to_wandb(model_key, eval_results, args, class_names, dataset_name)
             
         except Exception as e:
-            logger.error(f"{api_backend.title()} VLM failed: {e}")
-            results[model_key] = {'error': str(e)}
+            import traceback
+            error_msg = f"{api_backend.title()} VLM failed: {e}"
+            logger.error(error_msg)
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            results[model_key] = {'error': str(e), 'traceback': traceback.format_exc()}
 
     # Test CLAM t-SNE with BioClip2 backend
     if 'clam_tsne_bioclip2' in args.models:
@@ -996,8 +1005,11 @@ def test_single_dataset(dataset_name: str, args):
                 log_results_to_wandb('clam_tsne_bioclip2', eval_results, args, class_names, dataset_name)
             
         except Exception as e:
-            logger.error(f"CLAM t-SNE BioClip2 failed: {e}")
-            results['clam_tsne_bioclip2'] = {'error': str(e)}
+            import traceback
+            error_msg = f"CLAM t-SNE BioClip2 failed: {e}"
+            logger.error(error_msg)
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            results['clam_tsne_bioclip2'] = {'error': str(e), 'traceback': traceback.format_exc()}
     
     return results
 
@@ -1205,6 +1217,12 @@ def parse_args():
         type=str,
         default="Qwen/Qwen2.5-VL-3B-Instruct",
         help="Vision Language Model to use"
+    )
+    parser.add_argument(
+        "--bioclip2_model",
+        type=str,
+        default="hf-hub:imageomics/bioclip-2",
+        help="BioClip2 model to use for embedding extraction"
     )
     
     # API model support arguments

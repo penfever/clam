@@ -158,7 +158,10 @@ class APIVLMBaseline:
                 predictions.append(prediction)
                 
             except Exception as e:
-                logger.warning(f"Error processing image {image_path}: {e}")
+                import traceback
+                error_msg = f"Error processing image {image_path}: {e}"
+                logger.error(error_msg)
+                logger.error(f"Full traceback: {traceback.format_exc()}")
                 # Default to random prediction
                 predictions.append(np.random.randint(0, self.num_classes))
         
@@ -194,7 +197,10 @@ class APIVLMBaseline:
         try:
             response = self.model_wrapper.generate_from_conversation(conversation, generation_config)
         except Exception as e:
-            logger.error(f"API VLM generation error: {e}")
+            import traceback
+            error_msg = f"API VLM generation error for {image_path}: {e}"
+            logger.error(error_msg)
+            logger.error(f"Full traceback: {traceback.format_exc()}")
             response = ""
         
         # Store raw response for analysis

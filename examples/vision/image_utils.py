@@ -48,7 +48,10 @@ class ImageNetDataset(Dataset):
         try:
             image = Image.open(image_path).convert('RGB')
         except Exception as e:
-            logger.warning(f"Failed to load image {image_path}: {e}. Using black image.")
+            import traceback
+            error_msg = f"Failed to load image {image_path}: {e}. Using black image."
+            logger.error(error_msg)
+            logger.error(f"Full traceback: {traceback.format_exc()}")
             image = Image.new('RGB', (224, 224), color='black')
         
         if self.transform:

@@ -583,7 +583,10 @@ class ClamImageTsneClassifier:
                     logger.info(f"Completed {i + 1}/{len(self.test_tsne)} VLM predictions")
                 
             except Exception as e:
-                logger.error(f"VLM prediction failed for test point {i}: {e}")
+                import traceback
+                error_msg = f"VLM prediction failed for test point {i} (image: {test_image_paths[i] if i < len(test_image_paths) else 'N/A'}): {e}"
+                logger.error(error_msg)
+                logger.error(f"Full traceback: {traceback.format_exc()}")
                 # Close figure if it exists
                 if 'fig' in locals():
                     close_figure_safely(fig)

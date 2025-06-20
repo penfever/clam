@@ -169,7 +169,10 @@ class QwenVLBaseline:
                 predictions.append(prediction)
                 
             except Exception as e:
-                logger.warning(f"Error processing image {image_path}: {e}")
+                import traceback
+                error_msg = f"Error processing image {image_path}: {e}"
+                logger.error(error_msg)
+                logger.error(f"Full traceback: {traceback.format_exc()}")
                 # Default to random prediction
                 predictions.append(np.random.randint(0, self.num_classes))
         
