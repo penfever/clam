@@ -96,6 +96,19 @@ class ClamTsneClassifier:
         layout_strategy: str = "adaptive_grid",
         reasoning_focus: str = "classification",
         multi_viz_config: Optional[Dict[str, Any]] = None,
+        # Audio-specific parameters
+        embedding_model: str = "whisper",
+        whisper_model: str = "large-v2",
+        embedding_layer: str = "encoder_last",
+        clap_version: str = "2023",
+        include_spectrogram: bool = True,
+        audio_duration: Optional[float] = None,
+        num_few_shot_examples: int = 32,
+        balanced_few_shot: bool = False,
+        # Vision-specific parameters
+        dinov2_model: str = "dinov2_vitb14",
+        use_pca_backend: bool = False,
+        max_train_plot_samples: int = 1000,
         **kwargs
     ):
         """
@@ -126,11 +139,28 @@ class ClamTsneClassifier:
             gemini_model: Gemini model identifier (e.g., 'gemini-2.5-pro', 'gemini-2.5-flash')
             api_model: Generic API model identifier (auto-detects provider)
             seed: Random seed
+            max_model_len: Maximum model length for VLM engine
             enable_multi_viz: Whether to use multi-visualization framework (default: False for backward compatibility)
             visualization_methods: List of visualization methods to use (e.g., ['tsne', 'pca', 'umap'])
             layout_strategy: Layout strategy for multi-visualization composition
             reasoning_focus: Focus for multi-visualization reasoning (classification, comparison, etc.)
             multi_viz_config: Additional configuration for multi-visualization
+            
+            Audio-specific parameters:
+                embedding_model: Audio embedding model ('whisper' or 'clap')
+                whisper_model: Whisper model variant (if using Whisper)
+                embedding_layer: Which Whisper layer to extract
+                clap_version: CLAP model version (if using CLAP)
+                include_spectrogram: Whether to include spectrogram in prompts
+                audio_duration: Maximum audio duration to process
+                num_few_shot_examples: Number of few-shot examples for audio
+                balanced_few_shot: Whether to balance few-shot examples
+                
+            Vision-specific parameters:
+                dinov2_model: DINOV2 model variant
+                use_pca_backend: Use PCA instead of t-SNE
+                max_train_plot_samples: Maximum training samples to plot
+                
             **kwargs: Additional modality-specific arguments
         """
         self.modality = modality.lower()
@@ -170,8 +200,29 @@ class ClamTsneClassifier:
         self.effective_model_id = self._determine_effective_model()
         self.is_api_model = self._is_api_model(self.effective_model_id)
         
-        # Store additional kwargs for modality-specific parameters
+        # Store modality-specific parameters
         self.modality_kwargs = kwargs
+        
+        # Audio-specific parameters
+        if self.modality == "audio":
+            self.modality_kwargs.update({
+                'embedding_model': embedding_model,
+                'whisper_model': whisper_model,
+                'embedding_layer': embedding_layer,
+                'clap_version': clap_version,
+                'include_spectrogram': include_spectrogram,
+                'audio_duration': audio_duration,
+                'num_few_shot_examples': num_few_shot_examples,
+                'balanced_few_shot': balanced_few_shot
+            })
+        
+        # Vision-specific parameters
+        elif self.modality == "vision":
+            self.modality_kwargs.update({
+                'dinov2_model': dinov2_model,
+                'use_pca_backend': use_pca_backend,
+                'max_train_plot_samples': max_train_plot_samples
+            })
         
         # Initialize logger
         self.logger = logging.getLogger(__name__)
@@ -220,11 +271,20 @@ class ClamTsneClassifier:
             from clam.data.embeddings import get_tabpfn_embeddings
             return get_tabpfn_embeddings
         elif self.modality == "audio":
-            # Audio embeddings will be handled by specific audio classifier implementations
-            raise NotImplementedError("Use ClamAudioTsneClassifier for audio data")
+            # Get audio-specific embedding method
+            embedding_model = self.modality_kwargs.get('embedding_model', 'whisper')
+            if embedding_model == 'whisper':
+                from clam.data.audio_embeddings import get_whisper_embeddings
+                return get_whisper_embeddings
+            elif embedding_model == 'clap':
+                from clam.data.audio_embeddings import get_clap_embeddings
+                return get_clap_embeddings
+            else:
+                raise ValueError(f"Unsupported audio embedding model: {embedding_model}")
         elif self.modality == "vision":
-            # Vision embeddings will be handled by specific vision classifier implementations  
-            raise NotImplementedError("Use ClamImageTsneClassifier for vision data")
+            # Get vision-specific embedding method
+            from clam.data.embeddings import get_dinov2_embeddings
+            return get_dinov2_embeddings
         else:
             raise ValueError(f"Unsupported modality: {self.modality}")
     
@@ -427,9 +487,9 @@ class ClamTsneClassifier:
         )
         
         # Generate embeddings using modality-specific method
+        embedding_method = self._get_embedding_method()
+        
         if self.modality == "tabular":
-            embedding_method = self._get_embedding_method()
-            
             # Prepare test data for embedding
             if X_test is not None:
                 X_test_for_embedding = X_test
@@ -447,8 +507,102 @@ class ClamTsneClassifier:
                 task_type=self.task_type,
                 seed=self.seed
             )
+            
+        elif self.modality == "audio":
+            # Audio embedding generation
+            self.logger.info(f"Generating {self.modality_kwargs.get('embedding_model', 'whisper')} embeddings for audio...")
+            
+            # Prepare test data
+            if X_test is not None:
+                X_test_for_embedding = X_test
+            else:
+                X_test_for_embedding = X_train_fit[:5]
+            
+            # Get embeddings based on embedding model type
+            if self.modality_kwargs.get('embedding_model') == 'whisper':
+                embeddings_dict = embedding_method(
+                    X_train_fit,  # audio files
+                    whisper_model=self.modality_kwargs.get('whisper_model', 'large-v2'),
+                    embedding_layer=self.modality_kwargs.get('embedding_layer', 'encoder_last'),
+                    max_duration=self.modality_kwargs.get('audio_duration'),
+                    cache_dir=self.cache_dir,
+                    device=self.device
+                )
+            else:  # CLAP
+                embeddings_dict = embedding_method(
+                    X_train_fit,  # audio files
+                    model_version=self.modality_kwargs.get('clap_version', '2023'),
+                    cache_dir=self.cache_dir,
+                    device=self.device
+                )
+            
+            self.train_embeddings = embeddings_dict['embeddings']
+            self.val_embeddings = None  # Audio doesn't use validation split for embeddings
+            
+            # Get test embeddings if available
+            if X_test_for_embedding is not None and len(X_test_for_embedding) > 0:
+                if self.modality_kwargs.get('embedding_model') == 'whisper':
+                    test_embeddings_dict = embedding_method(
+                        X_test_for_embedding,
+                        whisper_model=self.modality_kwargs.get('whisper_model', 'large-v2'),
+                        embedding_layer=self.modality_kwargs.get('embedding_layer', 'encoder_last'),
+                        max_duration=self.modality_kwargs.get('audio_duration'),
+                        cache_dir=self.cache_dir,
+                        device=self.device
+                    )
+                else:
+                    test_embeddings_dict = embedding_method(
+                        X_test_for_embedding,
+                        model_version=self.modality_kwargs.get('clap_version', '2023'),
+                        cache_dir=self.cache_dir,
+                        device=self.device
+                    )
+                self.test_embeddings = test_embeddings_dict['embeddings']
+            else:
+                self.test_embeddings = None
+                
+            self.y_train_sample = y_train_fit
+            self.tabpfn = None  # Not used for audio
+            
+        elif self.modality == "vision":
+            # Vision embedding generation
+            self.logger.info(f"Generating DINOv2 embeddings for images...")
+            
+            # Prepare test data
+            if X_test is not None:
+                X_test_for_embedding = X_test
+            else:
+                X_test_for_embedding = X_train_fit[:5]
+            
+            # Get embeddings
+            train_embeddings = embedding_method(
+                X_train_fit,  # image files or arrays
+                model_name=self.modality_kwargs.get('dinov2_model', 'dinov2_vitb14'),
+                batch_size=32,
+                cache_dir=self.cache_dir,
+                device=self.device
+            )
+            
+            self.train_embeddings = train_embeddings
+            self.val_embeddings = None  # Vision doesn't use validation split for embeddings
+            
+            # Get test embeddings if available
+            if X_test_for_embedding is not None and len(X_test_for_embedding) > 0:
+                self.test_embeddings = embedding_method(
+                    X_test_for_embedding,
+                    model_name=self.modality_kwargs.get('dinov2_model', 'dinov2_vitb14'),
+                    batch_size=32,
+                    cache_dir=self.cache_dir,
+                    device=self.device
+                )
+            else:
+                self.test_embeddings = None
+                
+            self.y_train_sample = y_train_fit
+            self.tabpfn = None  # Not used for vision
+            
         else:
-            raise NotImplementedError(f"Embedding generation not implemented for {self.modality}")
+            raise ValueError(f"Unsupported modality: {self.modality}")
         
         # Create t-SNE visualization based on task type
         viz_methods = self._get_tsne_visualization_methods()
@@ -549,6 +703,18 @@ class ClamTsneClassifier:
         if self.train_tsne is None or self.test_tsne is None:
             raise ValueError("Model must be fitted before making predictions")
         
+        # Set up output directory if saving outputs
+        if save_outputs and output_dir:
+            import os
+            os.makedirs(output_dir, exist_ok=True)
+            self.temp_dir = output_dir  # Store for test script access
+        elif save_outputs:
+            # Create a temporary directory
+            import tempfile
+            self.temp_dir = tempfile.mkdtemp(prefix='clam_tsne_')
+        else:
+            self.temp_dir = None
+        
         # Load VLM
         self._load_vlm()
         
@@ -600,6 +766,13 @@ class ClamTsneClassifier:
                     
                     # Convert PIL image to format expected by VLM
                     image = composed_image
+                    
+                    # Save multi-visualization if requested
+                    if save_outputs and self.temp_dir:
+                        viz_filename = f"multi_visualization_test_{i:03d}.png"
+                        viz_path = os.path.join(self.temp_dir, viz_filename)
+                        composed_image.save(viz_path)
+                        self.logger.info(f"Saved multi-visualization to {viz_path}")
                     
                     # Create multi-visualization reasoning prompt using enhanced VLM utilities
                     if self.task_type == 'regression':
@@ -743,6 +916,14 @@ class ClamTsneClassifier:
                     fig.savefig(img_buffer, format='png', dpi=self.image_dpi, bbox_inches='tight', facecolor='white')
                     img_buffer.seek(0)
                     image = Image.open(img_buffer)
+                    
+                    # Save visualization if requested
+                    if save_outputs and self.temp_dir:
+                        viz_filename = f"visualization_test_{i:03d}.png"
+                        viz_path = os.path.join(self.temp_dir, viz_filename)
+                        fig.savefig(viz_path, dpi=self.image_dpi, bbox_inches='tight', facecolor='white')
+                        self.logger.info(f"Saved visualization to {viz_path}")
+                    
                     plt.close(fig)
                 
                 # Convert to RGB if needed
@@ -908,6 +1089,20 @@ class ClamTsneClassifier:
                         )
                 
                 predictions.append(prediction)
+                
+                # Save prompt and response if requested
+                if save_outputs and self.temp_dir:
+                    # Save prompt
+                    prompt_filename = f"prompt_test_{i:03d}.txt"
+                    prompt_path = os.path.join(self.temp_dir, prompt_filename)
+                    with open(prompt_path, 'w') as f:
+                        f.write(prompt)
+                    
+                    # Save response
+                    response_filename = f"response_test_{i:03d}.txt"
+                    response_path = os.path.join(self.temp_dir, response_filename)
+                    with open(response_path, 'w') as f:
+                        f.write(response)
                 
                 # Store details
                 if return_detailed and y_test is not None:
@@ -1162,3 +1357,32 @@ def evaluate_clam_tsne(dataset, args):
             'dataset_name': dataset['name'],
             'error': str(e)
         }
+
+
+# Backward compatibility classes
+class ClamAudioTsneClassifier(ClamTsneClassifier):
+    """
+    CLAM t-SNE classifier for audio classification.
+    
+    This is a convenience wrapper that sets modality="audio" automatically.
+    All functionality is provided by the unified ClamTsneClassifier.
+    """
+    
+    def __init__(self, **kwargs):
+        # Set modality to audio
+        kwargs['modality'] = 'audio'
+        super().__init__(**kwargs)
+
+
+class ClamImageTsneClassifier(ClamTsneClassifier):
+    """
+    CLAM t-SNE classifier for image/vision classification.
+    
+    This is a convenience wrapper that sets modality="vision" automatically.
+    All functionality is provided by the unified ClamTsneClassifier.
+    """
+    
+    def __init__(self, **kwargs):
+        # Set modality to vision
+        kwargs['modality'] = 'vision'
+        super().__init__(**kwargs)
