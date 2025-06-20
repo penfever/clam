@@ -89,12 +89,6 @@ def parse_args():
         help="Number of different train/test splits to use for each task"
     )
     parser.add_argument(
-        "--task_ids",
-        type=str,
-        default=None,
-        help="Comma-separated list of task IDs to run (default: all tasks in CC18)"
-    )
-    parser.add_argument(
         "--start_idx",
         type=int,
         default=0,

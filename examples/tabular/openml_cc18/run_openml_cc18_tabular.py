@@ -83,12 +83,6 @@ def parse_args():
         help="Skip evaluation and only run training"
     )
     parser.add_argument(
-        "--task_ids",
-        type=str,
-        default=None,
-        help="Comma-separated list of task IDs to run (default: all tasks in CC18)"
-    )
-    parser.add_argument(
         "--start_idx",
         type=int,
         default=0,
