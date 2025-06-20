@@ -45,6 +45,11 @@ def add_dataset_source_args(parser: argparse.ArgumentParser):
         help="Comma-separated list of OpenML dataset IDs to evaluate on"
     )
     dataset_group.add_argument(
+        "--task_ids",
+        type=str,
+        help="Comma-separated list of OpenML task IDs to evaluate on"
+    )
+    dataset_group.add_argument(
         "--data_dir",
         type=str,
         help="Directory containing CSV files to use as datasets"

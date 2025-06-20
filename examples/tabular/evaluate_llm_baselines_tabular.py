@@ -653,19 +653,31 @@ def main():
         dataset_results = []
         
         # Validate metadata for models that require it
-        # Check if dataset ID is numeric (indicating OpenML dataset)
+        # Check if dataset has task_id or we need to resolve it
         openml_task_id = None
         try:
             # Check various ways the task ID might be stored
-            if hasattr(dataset, 'openml_task_id'):
+            if hasattr(dataset, 'task_id'):
+                openml_task_id = getattr(dataset, 'task_id', None)
+            elif 'task_id' in dataset:
+                openml_task_id = dataset['task_id']
+            elif hasattr(dataset, 'openml_task_id'):
                 openml_task_id = getattr(dataset, 'openml_task_id', None)
             elif 'openml_task_id' in dataset:
                 openml_task_id = dataset['openml_task_id']
             elif 'id' in dataset and isinstance(dataset['id'], (int, str)):
-                # Try to parse dataset ID as OpenML task ID
+                # We have dataset_id, need to resolve to task_id
                 try:
-                    openml_task_id = int(dataset['id'])
-                except (ValueError, TypeError):
+                    dataset_id = int(dataset['id'])
+                    # Use resource manager to resolve
+                    from clam.utils.resource_manager import get_resource_manager
+                    rm = get_resource_manager()
+                    identifiers = rm.resolve_openml_identifiers(dataset_id=dataset_id)
+                    openml_task_id = identifiers.get('task_id')
+                    if openml_task_id:
+                        logger.debug(f"Resolved dataset_id {dataset_id} to task_id {openml_task_id}")
+                except (ValueError, TypeError) as e:
+                    logger.debug(f"Could not parse dataset ID as int: {e}")
                     pass
             
             if openml_task_id:

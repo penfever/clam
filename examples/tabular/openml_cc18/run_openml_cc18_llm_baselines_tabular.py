@@ -231,7 +231,7 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
     
     cmd = [
         "python", eval_script,
-        "--dataset_name", str(dataset_id),  # Pass dataset_id as dataset_name
+        "--task_ids", str(task_id),  # Pass task_id properly
         "--output_dir", eval_output_dir,
         "--models"
     ]

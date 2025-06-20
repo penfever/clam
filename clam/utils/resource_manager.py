@@ -850,6 +850,67 @@ class ClamResourceManager:
         logger.debug(f"CSV file not found for dataset {dataset_id} in search directories")
         return None
     
+    def resolve_openml_identifiers(self, task_id: Optional[int] = None, 
+                                  dataset_id: Optional[int] = None, 
+                                  dataset_name: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Resolve OpenML identifiers to get complete mapping.
+        
+        Given any one of task_id, dataset_id, or dataset_name, returns all three.
+        
+        Args:
+            task_id: OpenML task ID
+            dataset_id: OpenML dataset ID  
+            dataset_name: Dataset name string
+            
+        Returns:
+            Dictionary with keys: task_id, dataset_id, dataset_name
+            Returns None values for any that couldn't be resolved
+        """
+        from clam.utils.openml_mapping import (
+            get_openml_cc18_mapping, 
+            impute_task_id_from_dataset_id,
+            impute_task_id_from_dataset_name
+        )
+        
+        result = {
+            'task_id': task_id,
+            'dataset_id': dataset_id,
+            'dataset_name': dataset_name
+        }
+        
+        # Get the complete mapping
+        mapping = get_openml_cc18_mapping()
+        
+        # If we have task_id, get the rest from mapping
+        if task_id and task_id in mapping:
+            info = mapping[task_id]
+            result['dataset_id'] = info.get('dataset_id')
+            result['dataset_name'] = info.get('dataset_name')
+            return result
+        
+        # If we have dataset_id, find task_id first
+        if dataset_id and not task_id:
+            imputed_task_id = impute_task_id_from_dataset_id(dataset_id)
+            if imputed_task_id:
+                result['task_id'] = imputed_task_id
+                if imputed_task_id in mapping:
+                    info = mapping[imputed_task_id]
+                    result['dataset_name'] = info.get('dataset_name')
+            return result
+        
+        # If we have dataset_name, find task_id first
+        if dataset_name and not task_id:
+            imputed_task_id = impute_task_id_from_dataset_name(dataset_name)
+            if imputed_task_id:
+                result['task_id'] = imputed_task_id
+                if imputed_task_id in mapping:
+                    info = mapping[imputed_task_id]
+                    result['dataset_id'] = info.get('dataset_id')
+            return result
+        
+        return result
+    
     def validate_model_metadata(self, openml_task_id: int, model_type: str) -> Dict[str, Any]:
         """Validate metadata for a specific model type."""
         result = {

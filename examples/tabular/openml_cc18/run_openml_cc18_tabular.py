@@ -208,7 +208,7 @@ def train_on_task(task, split_idx, args):
     
     cmd = [
         "python", train_script,
-        "--dataset_name", str(dataset_id),  # Pass dataset_id as dataset_name
+        "--task_ids", str(task_id),  # Pass task_id properly
         "--output_dir", model_output_dir,
         "--model_id", args.model_id,
         "--batch_size", "8",
@@ -279,7 +279,7 @@ def evaluate_model(task, split_idx, model_dir, args):
     
     cmd = [
         "python", eval_script,
-        "--dataset_name", str(dataset_id),  # Pass dataset_id as dataset_name
+        "--task_ids", str(task_id),  # Pass task_id properly
         "--output_dir", eval_output_dir,
         "--model_path", model_dir,  # Use model_path parameter instead of model_dir
         "--model_id", args.model_id,  # Add model_id parameter to specify base model architecture

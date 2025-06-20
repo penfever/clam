@@ -78,6 +78,10 @@ class ClamTsneClassifier:
         backend: str = "auto",
         tensor_parallel_size: int = 1,
         gpu_memory_utilization: float = 0.9,
+        enable_thinking: bool = True,
+        openai_model: Optional[str] = None,
+        gemini_model: Optional[str] = None,
+        api_model: Optional[str] = None,
         seed: int = 42,
         **kwargs
     ):
@@ -86,7 +90,7 @@ class ClamTsneClassifier:
         
         Args:
             modality: Data modality ("tabular", "audio", "vision")
-            vlm_model_id: Vision Language Model identifier
+            vlm_model_id: Vision Language Model identifier (for local models)
             embedding_size: Size of embeddings for TabPFN
             tsne_perplexity: t-SNE perplexity parameter
             tsne_n_iter: Number of t-SNE iterations
@@ -104,6 +108,10 @@ class ClamTsneClassifier:
             backend: Backend for VLM loading
             tensor_parallel_size: Tensor parallel size for distributed inference
             gpu_memory_utilization: GPU memory utilization factor
+            enable_thinking: Enable thinking mode for compatible API models
+            openai_model: OpenAI model identifier (e.g., 'gpt-4o', 'gpt-4.1')
+            gemini_model: Gemini model identifier (e.g., 'gemini-2.5-pro', 'gemini-2.5-flash')
+            api_model: Generic API model identifier (auto-detects provider)
             seed: Random seed
             **kwargs: Additional modality-specific arguments
         """
@@ -126,7 +134,15 @@ class ClamTsneClassifier:
         self.backend = backend
         self.tensor_parallel_size = tensor_parallel_size
         self.gpu_memory_utilization = gpu_memory_utilization
+        self.enable_thinking = enable_thinking
+        self.openai_model = openai_model
+        self.gemini_model = gemini_model
+        self.api_model = api_model
         self.seed = seed
+        
+        # Determine the actual model to use (API models take precedence)
+        self.effective_model_id = self._determine_effective_model()
+        self.is_api_model = self._is_api_model(self.effective_model_id)
         
         # Store additional kwargs for modality-specific parameters
         self.modality_kwargs = kwargs
@@ -146,6 +162,28 @@ class ClamTsneClassifier:
         self.class_names = None
         self.unique_classes = None
         self.class_to_semantic = None
+    
+    def _determine_effective_model(self) -> str:
+        """Determine the effective model ID to use based on API model parameters."""
+        # Priority order: api_model > openai_model > gemini_model > vlm_model_id
+        if self.api_model:
+            return self.api_model
+        elif self.openai_model:
+            return self.openai_model
+        elif self.gemini_model:
+            return self.gemini_model
+        else:
+            return self.vlm_model_id
+    
+    def _is_api_model(self, model_id: str) -> bool:
+        """Check if the model ID corresponds to an API model."""
+        api_model_patterns = [
+            # OpenAI models
+            'gpt-4', 'gpt-3.5', 'gpt-4o', 'gpt-4.1',
+            # Gemini models
+            'gemini-', 'gemini-2.', 'gemini-2.5', 'gemini-2.0'
+        ]
+        return any(pattern in model_id.lower() for pattern in api_model_patterns)
         
     def _get_embedding_method(self):
         """Get the appropriate embedding method for the modality."""
@@ -181,32 +219,44 @@ class ClamTsneClassifier:
         }
     
     def _load_vlm(self):
-        """Load the Vision Language Model."""
+        """Load the Vision Language Model (local or API-based)."""
         if self.vlm_wrapper is not None:
             return self.vlm_wrapper
             
-        self.logger.info("Loading Vision Language Model...")
+        model_to_load = self.effective_model_id
+        self.logger.info(f"Loading Vision Language Model: {model_to_load}")
         
-        # Configure VLM loading parameters
-        vlm_kwargs = {}
-        if torch.cuda.is_available() and self.device != "cpu":
-            vlm_kwargs.update({
-                'torch_dtype': torch.float16,
-                'device_map': "auto",
-                'low_cpu_mem_usage': True
-            })
+        if self.is_api_model:
+            # API model - minimal configuration needed
+            self.logger.info("Using API-based VLM (OpenAI/Gemini)")
+            vlm_kwargs = {}
+            
+            # For API models, backend is auto-detected by model_loader
+            backend = "auto"
         else:
-            vlm_kwargs.update({
-                'low_cpu_mem_usage': True
-            })
+            # Local model - configure hardware parameters
+            self.logger.info("Using local VLM")
+            vlm_kwargs = {}
+            if torch.cuda.is_available() and self.device != "cpu":
+                vlm_kwargs.update({
+                    'torch_dtype': torch.float16,
+                    'device_map': "auto",
+                    'low_cpu_mem_usage': True
+                })
+            else:
+                vlm_kwargs.update({
+                    'low_cpu_mem_usage': True
+                })
+            
+            backend = self.backend
         
         # Load VLM using centralized model loader
         self.vlm_wrapper = model_loader.load_vlm(
-            self.vlm_model_id,
-            backend=self.backend,
-            device=self.device,
-            tensor_parallel_size=self.tensor_parallel_size,
-            gpu_memory_utilization=self.gpu_memory_utilization,
+            model_to_load,
+            backend=backend,
+            device=self.device if not self.is_api_model else None,
+            tensor_parallel_size=self.tensor_parallel_size if not self.is_api_model else None,
+            gpu_memory_utilization=self.gpu_memory_utilization if not self.is_api_model else None,
             **vlm_kwargs
         )
         
@@ -561,11 +611,13 @@ class ClamTsneClassifier:
                     # Create conversation
                     conversation = create_vlm_conversation(image, prompt)
                     
-                    # Generate response
+                    # Generate response with API-aware config for regression
                     gen_config = GenerationConfig(
-                        max_new_tokens=100,
+                        max_new_tokens=16384,  # Generous limit for thinking + regression
                         temperature=0.1,
-                        do_sample=True
+                        do_sample=True,
+                        enable_thinking=self.enable_thinking and self.is_api_model,
+                        thinking_summary=False
                     )
                     
                     response = self.vlm_wrapper.generate_from_conversation(conversation, gen_config)
@@ -605,11 +657,13 @@ class ClamTsneClassifier:
                     # Create conversation
                     conversation = create_vlm_conversation(image, prompt)
                     
-                    # Generate response
+                    # Generate response with API-aware config for classification
                     gen_config = GenerationConfig(
-                        max_new_tokens=100,
+                        max_new_tokens=16384,  # Generous limit for thinking + classification
                         temperature=0.1,
-                        do_sample=True
+                        do_sample=True,
+                        enable_thinking=self.enable_thinking and self.is_api_model,
+                        thinking_summary=False
                     )
                     
                     response = self.vlm_wrapper.generate_from_conversation(conversation, gen_config)
@@ -774,6 +828,12 @@ class ClamTsneClassifier:
             'use_semantic_names': self.use_semantic_names,
             'device': self.device,
             'backend': self.backend,
+            'enable_thinking': self.enable_thinking,
+            'openai_model': self.openai_model,
+            'gemini_model': self.gemini_model,
+            'api_model': self.api_model,
+            'effective_model_id': self.effective_model_id,
+            'is_api_model': self.is_api_model,
             'seed': self.seed
         }
 
@@ -827,6 +887,10 @@ def evaluate_clam_tsne(dataset, args):
             backend=getattr(args, 'backend', 'auto'),
             tensor_parallel_size=getattr(args, 'tensor_parallel_size', 1),
             gpu_memory_utilization=getattr(args, 'gpu_memory_utilization', 0.9),
+            enable_thinking=getattr(args, 'enable_thinking', True),
+            openai_model=getattr(args, 'openai_model', None),
+            gemini_model=getattr(args, 'gemini_model', None),
+            api_model=getattr(args, 'api_model', None),
             seed=args.seed,
             # Pass additional args as kwargs
             viewing_angles=getattr(args, 'viewing_angles', None),

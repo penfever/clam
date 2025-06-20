@@ -627,12 +627,16 @@ def load_dataset(dataset_name: str, bypass_size_check: bool = False, preserve_re
             # Check if dataset is already registered
             existing = rm.dataset_registry.find_dataset_by_name(dataset.name)
             if not existing:
+                # Resolve OpenML identifiers to get proper task_id
+                identifiers = rm.resolve_openml_identifiers(dataset_id=dataset_id)
+                resolved_task_id = identifiers.get('task_id')
+                
                 # Create metadata for the dataset
                 metadata = DatasetMetadata(
                     id=str(dataset_id),
                     name=dataset.name,
                     source_type='openml',
-                    openml_task_id=dataset_id if isinstance(dataset_id, int) else None,
+                    openml_task_id=resolved_task_id,  # Use resolved task_id, not dataset_id
                     num_samples=X.shape[0],
                     num_features=X.shape[1],
                     num_classes=len(np.unique(y)),
@@ -978,6 +982,41 @@ def load_datasets(args):
                 datasets.append({
                     "id": dataset_id,
                     "name": dataset_name,
+                    "X": X,
+                    "y": y,
+                    "categorical_indicator": categorical_indicator,
+                    "attribute_names": attribute_names
+                })
+                logger.info(f"Successfully loaded dataset {dataset_name} (ID: {dataset_id})")
+            except Exception as e:
+                logger.error(f"Failed to load dataset {dataset_id}: {e}")
+                
+    # Case 2b: Multiple datasets by task ID
+    elif hasattr(args, 'task_ids') and args.task_ids:
+        task_ids = [int(id.strip()) for id in args.task_ids.split(',')]
+        logger.info(f"Loading datasets with task IDs: {task_ids}")
+        preserve_regression = getattr(args, 'preserve_regression', False)
+        
+        # Get resource manager to resolve task IDs to dataset IDs
+        rm = get_resource_manager()
+        
+        for task_id in task_ids:
+            try:
+                # Resolve task_id to dataset_id
+                identifiers = rm.resolve_openml_identifiers(task_id=task_id)
+                dataset_id = identifiers.get('dataset_id')
+                
+                if dataset_id is None:
+                    logger.error(f"Could not resolve task ID {task_id} to dataset ID")
+                    continue
+                    
+                logger.info(f"Task ID {task_id} resolves to dataset ID {dataset_id}")
+                
+                X, y, categorical_indicator, attribute_names, dataset_name = load_dataset(str(dataset_id), bypass_size_check=True, preserve_regression=preserve_regression)
+                datasets.append({
+                    "id": dataset_id,
+                    "name": dataset_name,
+                    "task_id": task_id,  # Include task_id in the dataset dict
                     "X": X,
                     "y": y,
                     "categorical_indicator": categorical_indicator,

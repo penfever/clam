@@ -74,6 +74,10 @@ class ClamImageTsneClassifier:
         cache_dir: Optional[str] = None,
         device: Optional[str] = None,
         use_semantic_names: bool = False,
+        enable_thinking: bool = True,
+        openai_model: Optional[str] = None,
+        gemini_model: Optional[str] = None,
+        api_model: Optional[str] = None,
         seed: int = 42
     ):
         """
@@ -115,7 +119,15 @@ class ClamImageTsneClassifier:
         self.cache_dir = cache_dir
         self.device = device or get_optimal_device(force_cpu=is_mac_platform())
         self.use_semantic_names = use_semantic_names
+        self.enable_thinking = enable_thinking
+        self.openai_model = openai_model
+        self.gemini_model = gemini_model
+        self.api_model = api_model
         self.seed = seed
+        
+        # Determine the effective model to use (API models take precedence)
+        self.effective_model_id = self._determine_effective_model()
+        self.is_api_model = self._is_api_model(self.effective_model_id)
         
         # State variables
         self.is_fitted = False
@@ -129,6 +141,28 @@ class ClamImageTsneClassifier:
         self.unique_classes = None
         self.vlm_wrapper = None
         self.save_every_n = 1  # Default: save every prediction
+    
+    def _determine_effective_model(self) -> str:
+        """Determine the effective model ID to use based on API model parameters."""
+        # Priority order: api_model > openai_model > gemini_model > vlm_model_id
+        if self.api_model:
+            return self.api_model
+        elif self.openai_model:
+            return self.openai_model
+        elif self.gemini_model:
+            return self.gemini_model
+        else:
+            return self.vlm_model_id
+    
+    def _is_api_model(self, model_id: str) -> bool:
+        """Check if the model ID corresponds to an API model."""
+        api_model_patterns = [
+            # OpenAI models
+            'gpt-4', 'gpt-3.5', 'gpt-4o', 'gpt-4.1',
+            # Gemini models
+            'gemini-', 'gemini-2.', 'gemini-2.5', 'gemini-2.0'
+        ]
+        return any(pattern in model_id.lower() for pattern in api_model_patterns)
         
     def fit(
         self,
@@ -275,24 +309,37 @@ class ClamImageTsneClassifier:
         return self
     
     def _load_vlm_model(self):
-        """Load the Vision Language Model using standardized model loader."""
+        """Load the Vision Language Model (local or API-based) using standardized model loader."""
         try:
             # Use the centralized model loader from CLAM
             from clam.utils.model_loader import model_loader
             
-            # Get platform-compatible kwargs
-            vlm_kwargs = configure_model_kwargs_for_platform(
-                device=self.device,
-                torch_dtype=get_platform_compatible_dtype(self.device)
-            )
+            model_to_load = self.effective_model_id
+            logger.info(f"Loading Vision Language Model: {model_to_load}")
+            
+            if self.is_api_model:
+                # API model - minimal configuration needed
+                logger.info("Using API-based VLM (OpenAI/Gemini)")
+                vlm_kwargs = {}
+                device = None  # API models don't need device specification
+                backend = 'auto'  # Auto-detect API provider
+            else:
+                # Local model - get platform-compatible kwargs
+                logger.info("Using local VLM")
+                vlm_kwargs = configure_model_kwargs_for_platform(
+                    device=self.device,
+                    torch_dtype=get_platform_compatible_dtype(self.device)
+                )
+                device = self.device
+                backend = 'auto'
             
             # Load VLM using centralized model loader
             vlm_wrapper = model_loader.load_vlm(
-                self.vlm_model_id, 
-                backend='auto',
-                device=self.device, 
-                tensor_parallel_size=1,
-                gpu_memory_utilization=0.9,
+                model_to_load, 
+                backend=backend,
+                device=device, 
+                tensor_parallel_size=1 if not self.is_api_model else None,
+                gpu_memory_utilization=0.9 if not self.is_api_model else None,
                 **vlm_kwargs
             )
             
@@ -493,9 +540,11 @@ class ClamImageTsneClassifier:
                 try:
                     from clam.utils.model_loader import GenerationConfig
                     gen_config = GenerationConfig(
-                        max_new_tokens=100,
+                        max_new_tokens=16384,  # Generous limit for thinking + classification
                         temperature=0.1,
-                        do_sample=True
+                        do_sample=True,
+                        enable_thinking=self.enable_thinking and self.is_api_model,
+                        thinking_summary=False
                     )
                 except ImportError:
                     # Fallback to simple config if import fails
@@ -512,7 +561,7 @@ class ClamImageTsneClassifier:
                             }
                     
                     gen_config = SimpleGenConfig(
-                        max_new_tokens=100,
+                        max_new_tokens=16384,  # Use higher limit even for fallback
                         temperature=0.1,
                         do_sample=True
                     )
