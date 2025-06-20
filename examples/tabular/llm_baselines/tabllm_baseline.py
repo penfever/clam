@@ -123,22 +123,39 @@ def load_tabllm_config_by_openml_id(openml_task_id, original_feature_count=None)
     """
     logger = logging.getLogger(__name__)
     
-    # Use relative path from current script location
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    tabllm_dir = os.path.join(current_dir, "tabllm_like")
-    
-    # Load OpenML task mapping
-    mapping_path = os.path.join(tabllm_dir, "openml_task_mapping.json")
-    if not os.path.exists(mapping_path):
-        logger.warning(f"OpenML task mapping not found at {mapping_path}")
-        return None, None
-    
+    # Try to use the new resource manager first
+    task_mapping = None
     try:
-        with open(mapping_path, 'r') as f:
-            task_mapping = json.load(f)
+        from clam.utils.resource_manager import get_resource_manager
+        rm = get_resource_manager()
+        mapping_path = rm.path_resolver.get_configs_dir() / 'tabllm' / 'openml_task_mapping.json'
+        
+        if mapping_path.exists():
+            with open(mapping_path, 'r') as f:
+                task_mapping = json.load(f)
+            logger.debug(f"Loaded OpenML task mapping from managed config")
+        else:
+            logger.debug(f"OpenML task mapping not found in managed config")
     except Exception as e:
-        logger.error(f"Error loading OpenML task mapping: {e}")
-        return None, None
+        logger.debug(f"Could not load from managed config: {e}")
+    
+    # Fallback to legacy method
+    if task_mapping is None:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        tabllm_dir = os.path.join(current_dir, "tabllm_like")
+        
+        # Load OpenML task mapping
+        mapping_path = os.path.join(tabllm_dir, "openml_task_mapping.json")
+        if not os.path.exists(mapping_path):
+            logger.warning(f"OpenML task mapping not found at {mapping_path}")
+            return None, None
+        
+        try:
+            with open(mapping_path, 'r') as f:
+                task_mapping = json.load(f)
+        except Exception as e:
+            logger.error(f"Error loading OpenML task mapping: {e}")
+            return None, None
     
     # Find dataset name that maps to this OpenML task ID
     dataset_name = None
@@ -151,11 +168,28 @@ def load_tabllm_config_by_openml_id(openml_task_id, original_feature_count=None)
         logger.debug(f"No TabLLM config found for OpenML task ID {openml_task_id}")
         return None, None
     
-    # Load the corresponding template file
-    template_path = os.path.join(tabllm_dir, f"templates_{dataset_name}.yaml")
+    # Load the corresponding template file using resource manager
+    template_data = None
+    template_path = None
     
     try:
-        if os.path.exists(template_path):
+        # Try resource manager first
+        if 'rm' in locals():
+            template_path = rm.path_resolver.get_config_path('tabllm', dataset_name)
+    except:
+        pass
+    
+    # Fallback to legacy path
+    if template_path is None or not template_path.exists():
+        # Ensure tabllm_dir is defined for legacy fallback
+        if 'tabllm_dir' not in locals():
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            tabllm_dir = os.path.join(current_dir, "tabllm_like")
+        template_path = os.path.join(tabllm_dir, f"templates_{dataset_name}.yaml")
+    
+    try:
+        if (hasattr(template_path, 'exists') and template_path.exists()) or \
+           (isinstance(template_path, str) and os.path.exists(template_path)):
             import yaml
             
             # Define constructors for custom YAML tags
@@ -175,12 +209,26 @@ def load_tabllm_config_by_openml_id(openml_task_id, original_feature_count=None)
             logger.info(f"Found TabLLM config for OpenML task {openml_task_id} (dataset: {dataset_name})")
             
             # Load semantic information for feature count validation
-            # Use relative path from current script location to project root
-            project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
-            semantic_dir = os.path.join(project_root, "data", "cc18_semantic")
-            semantic_file = os.path.join(semantic_dir, f"{openml_task_id}.json")
+            semantic_file = None
+            try:
+                # Try resource manager first
+                if 'rm' in locals():
+                    semantic_file = rm.path_resolver.get_config_path('cc18_semantic', str(openml_task_id))
+            except:
+                pass
             
-            if os.path.exists(semantic_file) and original_feature_count is not None:
+            # Fallback to legacy path
+            if semantic_file is None or not semantic_file.exists():
+                # Use relative path from current script location to project root
+                current_dir = os.path.dirname(os.path.abspath(__file__))
+                project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
+                semantic_dir = os.path.join(project_root, "data", "cc18_semantic")
+                semantic_file = os.path.join(semantic_dir, f"{openml_task_id}.json")
+            
+            semantic_file_exists = (hasattr(semantic_file, 'exists') and semantic_file.exists()) or \
+                                   (isinstance(semantic_file, str) and os.path.exists(semantic_file))
+            
+            if semantic_file_exists and original_feature_count is not None:
                 try:
                     with open(semantic_file, 'r') as f:
                         semantic_info = json.load(f)

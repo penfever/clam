@@ -102,6 +102,13 @@ from .seeding import (
     create_random_state,
     set_random_seed
 )
+from .resource_manager import (
+    get_resource_manager,
+    ResourceConfig,
+    DatasetMetadata,
+    ClamResourceManager,
+    reset_resource_manager
+)
 
 __all__ = [
     # Logging utilities
@@ -194,5 +201,12 @@ __all__ = [
     "set_seed",
     "set_seed_with_args", 
     "create_random_state",
-    "set_random_seed"
+    "set_random_seed",
+    
+    # Resource management utilities
+    "get_resource_manager",
+    "ResourceConfig",
+    "DatasetMetadata",
+    "ClamResourceManager", 
+    "reset_resource_manager"
 ]

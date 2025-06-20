@@ -25,35 +25,62 @@ def silence_pandas_warning(func, *args, **kwargs):
 
 logger = logging.getLogger(__name__)
 
-# Global cache to store dataset IDs that have failed to load
-_FAILED_DATASET_CACHE: Set[int] = set()
-_CACHE_FILE_PATH = os.path.expanduser("~/.clam_failed_datasets.json")
+# Import the new resource management system
+from ..utils.resource_manager import get_resource_manager, DatasetMetadata
 
-# Load the cache if it exists
+# Global cache to store dataset IDs that have failed to load (legacy)
+_FAILED_DATASET_CACHE: Set[int] = set()
+
 def _load_failed_dataset_cache() -> Set[int]:
-    """Load the cache of failed dataset IDs from disk."""
+    """Load the cache of failed dataset IDs using the new resource manager."""
     global _FAILED_DATASET_CACHE
-    if os.path.exists(_CACHE_FILE_PATH):
+    
+    try:
+        rm = get_resource_manager()
+        cache_key = rm.cache_manager.get_cache_key(type='failed_datasets')
+        cached_data = rm.cache_manager.load_from_cache('system', cache_key, '.json')
+        
+        if cached_data and isinstance(cached_data, list):
+            _FAILED_DATASET_CACHE = set(int(did) for did in cached_data)
+            logger.info(f"Loaded {len(_FAILED_DATASET_CACHE)} failed dataset IDs from managed cache")
+            return _FAILED_DATASET_CACHE
+    except Exception as e:
+        logger.debug(f"Could not load from managed cache: {e}")
+    
+    # Fallback to legacy cache file
+    legacy_cache_path = os.path.expanduser("~/.clam_failed_datasets.json")
+    if os.path.exists(legacy_cache_path):
         try:
-            with open(_CACHE_FILE_PATH, 'r') as f:
+            with open(legacy_cache_path, 'r') as f:
                 cache_data = json.load(f)
                 if isinstance(cache_data, list):
                     _FAILED_DATASET_CACHE = set(int(did) for did in cache_data)
-                    logger.info(f"Loaded {len(_FAILED_DATASET_CACHE)} failed dataset IDs from cache")
+                    logger.info(f"Loaded {len(_FAILED_DATASET_CACHE)} failed dataset IDs from legacy cache")
+                    # Migrate to new cache
+                    _save_failed_dataset_cache()
                     return _FAILED_DATASET_CACHE
         except Exception as e:
-            logger.warning(f"Error loading failed dataset cache: {e}")
+            logger.warning(f"Error loading legacy failed dataset cache: {e}")
     
-    # If we couldn't load the cache or it doesn't exist yet
+    # If we couldn't load any cache
     _FAILED_DATASET_CACHE = set()
     return _FAILED_DATASET_CACHE
 
 def _save_failed_dataset_cache() -> None:
-    """Save the cache of failed dataset IDs to disk."""
+    """Save the cache of failed dataset IDs using the new resource manager."""
     try:
-        with open(_CACHE_FILE_PATH, 'w') as f:
-            json.dump(list(_FAILED_DATASET_CACHE), f)
-        logger.info(f"Saved {len(_FAILED_DATASET_CACHE)} failed dataset IDs to cache")
+        rm = get_resource_manager()
+        cache_key = rm.cache_manager.get_cache_key(type='failed_datasets')
+        success = rm.cache_manager.save_to_cache('system', cache_key, list(_FAILED_DATASET_CACHE), '.json')
+        
+        if success:
+            logger.info(f"Saved {len(_FAILED_DATASET_CACHE)} failed dataset IDs to managed cache")
+        else:
+            # Fallback to legacy file
+            legacy_cache_path = os.path.expanduser("~/.clam_failed_datasets.json")
+            with open(legacy_cache_path, 'w') as f:
+                json.dump(list(_FAILED_DATASET_CACHE), f)
+            logger.info(f"Saved {len(_FAILED_DATASET_CACHE)} failed dataset IDs to legacy cache")
     except Exception as e:
         logger.warning(f"Error saving failed dataset cache: {e}")
 
@@ -592,6 +619,30 @@ def load_dataset(dataset_name: str, bypass_size_check: bool = False, preserve_re
                     suggestion_msg += f"\nUse list_available_datasets() to see all {len(available_datasets)} predefined datasets."
                 
                 raise ValueError(f"Dataset ID {dataset_id} has only {num_samples} samples (minimum 1000 required). {suggestion_msg}")
+        
+        # Register the successfully loaded dataset
+        try:
+            rm = get_resource_manager()
+            
+            # Check if dataset is already registered
+            existing = rm.dataset_registry.find_dataset_by_name(dataset.name)
+            if not existing:
+                # Create metadata for the dataset
+                metadata = DatasetMetadata(
+                    id=str(dataset_id),
+                    name=dataset.name,
+                    source_type='openml',
+                    openml_task_id=dataset_id if isinstance(dataset_id, int) else None,
+                    num_samples=X.shape[0],
+                    num_features=X.shape[1],
+                    num_classes=len(np.unique(y)),
+                    task_type='regression' if preserve_regression and np.issubdtype(y.dtype, np.floating) and len(np.unique(y)) > 10 else 'classification'
+                )
+                
+                rm.dataset_registry.register_dataset(metadata)
+                logger.debug(f"Registered dataset {dataset.name} in resource manager")
+        except Exception as e:
+            logger.debug(f"Could not register dataset in resource manager: {e}")
         
         return X, y, categorical_indicator, attribute_names, dataset.name
     

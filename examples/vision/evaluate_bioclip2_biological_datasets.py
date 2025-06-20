@@ -798,19 +798,29 @@ def test_single_dataset(dataset_name: str, args):
     use_wandb_logging = args.use_wandb and WANDB_AVAILABLE
     results = {}
     
-    # Prepare dataset with dataset-specific subdirectories
+    # Prepare dataset with isolated workspace directories using resource manager
+    try:
+        from clam.utils.resource_manager import get_resource_manager
+        resource_manager = get_resource_manager()
+        dataset_workspace = resource_manager.get_dataset_workspace(dataset_name)
+        dataset_dir = dataset_workspace / "downloads"
+        dataset_dir.mkdir(exist_ok=True)
+        dataset_dir = str(dataset_dir)
+        logger.info(f"Using isolated dataset workspace: {dataset_dir}")
+    except Exception as e:
+        logger.warning(f"Could not use resource manager, falling back to data_dir: {e}")
+        # Fallback to original method with dataset-specific subdirectories
+        dataset_dir = os.path.join(args.data_dir, dataset_name)
+    
     if dataset_name == "fishnet":
-        dataset_dir = os.path.join(args.data_dir, "fishnet")
         train_paths, train_labels, test_paths, test_labels, class_names = download_and_prepare_fishnet(
             dataset_dir
         )
     elif dataset_name == "awa2":
-        dataset_dir = os.path.join(args.data_dir, "awa2")
         train_paths, train_labels, test_paths, test_labels, class_names = download_and_prepare_awa2(
             dataset_dir
         )
     elif dataset_name == "plantdoc":
-        dataset_dir = os.path.join(args.data_dir, "plantdoc")
         train_paths, train_labels, test_paths, test_labels, class_names = download_and_prepare_plantdoc(
             dataset_dir
         )

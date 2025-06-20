@@ -41,6 +41,7 @@ def is_csv_dataset(dataset_id: str) -> bool:
 def find_csv_file(dataset_id: str, search_dirs: List[str]) -> Optional[str]:
     """
     Search for a CSV file in multiple directories.
+    Uses robust resource manager search strategy with fallback to legacy method.
     
     Args:
         dataset_id: The dataset identifier
@@ -49,7 +50,17 @@ def find_csv_file(dataset_id: str, search_dirs: List[str]) -> Optional[str]:
     Returns:
         Path to the CSV file if found, None otherwise
     """
-    # Common filename patterns to try
+    # Try resource manager first for robust search
+    try:
+        from ..utils.resource_manager import get_resource_manager
+        resource_manager = get_resource_manager()
+        csv_path = resource_manager.find_csv_file(dataset_id, search_dirs)
+        if csv_path:
+            return str(csv_path)
+    except Exception as e:
+        logger.debug(f"Resource manager CSV search failed, falling back to legacy method: {e}")
+    
+    # Fallback to legacy search method
     filename_patterns = [
         f"{dataset_id}_X.csv",
         f"{dataset_id}.csv",
@@ -248,6 +259,7 @@ def find_csv_with_fallbacks(dataset_id: str,
                           embed_dir: Optional[str] = None) -> Optional[str]:
     """
     Find a CSV file using multiple fallback directories.
+    Uses the new resource manager for robust path resolution.
     
     Args:
         dataset_id: The dataset identifier
@@ -258,6 +270,31 @@ def find_csv_with_fallbacks(dataset_id: str,
     Returns:
         Path to the CSV file if found, None otherwise
     """
+    try:
+        # Use the new resource manager for robust path resolution
+        from ..utils.resource_manager import get_resource_manager
+        rm = get_resource_manager()
+        
+        # Build additional search directories from the arguments
+        additional_dirs = []
+        for d in [primary_dir, data_dir, embed_dir]:
+            if d:
+                additional_dirs.append(d)
+                # Also add parent directories
+                parent = os.path.dirname(d)
+                if parent and parent != d:
+                    additional_dirs.append(parent)
+        
+        # Use resource manager's robust CSV finding
+        csv_path = rm.find_csv_file(dataset_id, additional_dirs)
+        
+        if csv_path:
+            return str(csv_path)
+    
+    except Exception as e:
+        logger.debug(f"Resource manager CSV search failed: {e}, falling back to legacy method")
+    
+    # Fallback to legacy method
     search_dirs = []
     
     # Add directories in order of preference

@@ -60,20 +60,34 @@ def evaluate_jolt_official(dataset, args):
             logger.info(f"Current CUDA device: {torch.cuda.current_device()}")
             logger.info(f"Device name: {torch.cuda.get_device_name(0)}")  # Should be GPU 2's name
     
-    # Load JOLT configuration if available using relative path
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    jolt_config_path = os.path.join(current_dir, f"jolt_config_{dataset['name']}.json")
+    # Load JOLT configuration using the new resource manager
     jolt_config = None
     try:
-        if os.path.exists(jolt_config_path):
+        from clam.utils.resource_manager import get_resource_manager
+        rm = get_resource_manager()
+        jolt_config_path = rm.path_resolver.get_config_path('jolt', dataset['name'])
+        
+        if jolt_config_path and jolt_config_path.exists():
             import json
             with open(jolt_config_path, 'r') as f:
                 jolt_config = json.load(f)
-            logger.info(f"Using JOLT metadata for {dataset['name']}")
+            logger.info(f"Using JOLT metadata for {dataset['name']} from managed config")
         else:
             logger.info(f"No JOLT metadata found for {dataset['name']}, using default approach")
     except Exception as e:
         logger.debug(f"Could not load JOLT config for {dataset['name']}: {e}")
+        
+        # Fallback to legacy method
+        try:
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            jolt_config_path = os.path.join(current_dir, f"jolt_config_{dataset['name']}.json")
+            if os.path.exists(jolt_config_path):
+                import json
+                with open(jolt_config_path, 'r') as f:
+                    jolt_config = json.load(f)
+                logger.info(f"Using JOLT metadata for {dataset['name']} from legacy location")
+        except Exception as e2:
+            logger.debug(f"Legacy JOLT config loading also failed: {e2}")
     
     start_time = time.time()
     

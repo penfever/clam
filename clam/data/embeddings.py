@@ -142,52 +142,118 @@ def get_tabpfn_embeddings(
     }
 
     if cache_dir:
-        # Generate a unique hash for this dataset configuration
-        dataset_hash = generate_dataset_hash(X_train, y_train, embedding_size, dataset_name)
+        # Try to use the new resource manager for caching
+        try:
+            from ..utils.resource_manager import get_resource_manager
+            rm = get_resource_manager()
+            use_managed_cache = True
+        except Exception:
+            use_managed_cache = False
+        
+        if use_managed_cache:
+            # Generate cache key using resource manager
+            cache_key = rm.cache_manager.get_cache_key(
+                dataset_name=dataset_name or "unknown",
+                embedding_size=embedding_size,
+                max_samples=max_samples,
+                task_type=task_type,
+                n_features=X_train.shape[1],
+                data_hash=generate_dataset_hash(X_train, y_train, embedding_size, dataset_name)
+            )
+        else:
+            # Legacy caching approach
+            # Generate a unique hash for this dataset configuration
+            dataset_hash = generate_dataset_hash(X_train, y_train, embedding_size, dataset_name)
+            # Create cache directory if it doesn't exist
+            os.makedirs(cache_dir, exist_ok=True)
 
-        # Create cache directory if it doesn't exist
-        os.makedirs(cache_dir, exist_ok=True)
+        if use_managed_cache:
+            # Check managed cache
+            if not force_recompute and rm.cache_manager.cache_exists('embeddings', cache_key, '.npz'):
+                logger.info(f"Loading cached TabPFN embeddings from managed cache")
+                try:
+                    cache_data = rm.cache_manager.load_from_cache('embeddings', cache_key, '.npz')
+                    
+                    if cache_data and isinstance(cache_data, dict):
+                        # Extract embeddings and metadata
+                        train_embeddings = cache_data["train_embeddings"]
+                        val_embeddings = cache_data["val_embeddings"]
+                        test_embeddings = cache_data["test_embeddings"]
+                        y_train_sample = cache_data["y_train_sample"]
+                        cache_metadata = cache_data.get("metadata", {})
 
-        # Define cache filename
-        prefix = f"{dataset_name}_" if dataset_name else ""
-        cache_file = os.path.join(cache_dir, f"{prefix}tabpfn_embeddings_{dataset_hash}.npz")
+                        logger.info(f"Loaded embeddings from managed cache - Train: {train_embeddings.shape}, Val: {val_embeddings.shape}, Test: {test_embeddings.shape}")
+                        logger.info(f"Cache metadata: {cache_metadata}")
 
-        # Check if cache file exists and we're not forcing recomputation
-        if os.path.exists(cache_file) and not force_recompute:
-            logger.info(f"Loading cached TabPFN embeddings from {cache_file}")
-            try:
-                cache = np.load(cache_file, allow_pickle=True)
+                        # Create a dummy TabPFN model since we don't need to fit anymore
+                        if task_type == "regression":
+                            tabpfn = TabPFNModel(
+                                device='cuda' if torch.cuda.is_available() else 'cpu',
+                                n_estimators=8,
+                                ignore_pretraining_limits=True
+                            )
+                        else:
+                            tabpfn = TabPFNModel(
+                                device='cuda' if torch.cuda.is_available() else 'cpu',
+                                n_estimators=8,
+                                ignore_pretraining_limits=True
+                            )
 
-                # Extract embeddings and metadata
-                train_embeddings = cache["train_embeddings"]
-                val_embeddings = cache["val_embeddings"]
-                test_embeddings = cache["test_embeddings"]
-                y_train_sample = cache["y_train_sample"]
-                cache_metadata = cache["metadata"].item() if "metadata" in cache else {}
+                        # Check if the loaded embeddings match the expected embedding size
+                        if train_embeddings.shape[1] != embedding_size:
+                            logger.warning(f"Cached embeddings size ({train_embeddings.shape[1]}) doesn't match requested size ({embedding_size}). Resizing...")
+                            # Resize them (using the same resize code as below)
+                            train_embeddings, val_embeddings, test_embeddings = resize_embeddings(
+                                train_embeddings, val_embeddings, test_embeddings, embedding_size
+                            )
 
-                logger.info(f"Loaded embeddings from cache - Train: {train_embeddings.shape}, Val: {val_embeddings.shape}, Test: {test_embeddings.shape}")
-                logger.info(f"Cache metadata: {cache_metadata}")
+                        return train_embeddings, val_embeddings, test_embeddings, tabpfn, y_train_sample
 
-                # Create a dummy TabPFN model since we don't need to fit anymore
-                tabpfn = TabPFNClassifier(
-                    device='cuda' if torch.cuda.is_available() else 'cpu',
-                    n_estimators=8,
-                    ignore_pretraining_limits=True
-                )
+                except Exception as e:
+                    logger.warning(f"Error loading cached embeddings from managed cache: {e}. Recomputing...")
+                    # Continue with normal computation if loading fails
+        else:
+            # Legacy cache approach
+            # Define cache filename
+            prefix = f"{dataset_name}_" if dataset_name else ""
+            cache_file = os.path.join(cache_dir, f"{prefix}tabpfn_embeddings_{dataset_hash}.npz")
 
-                # Check if the loaded embeddings match the expected embedding size
-                if train_embeddings.shape[1] != embedding_size:
-                    logger.warning(f"Cached embeddings size ({train_embeddings.shape[1]}) doesn't match requested size ({embedding_size}). Resizing...")
-                    # Resize them (using the same resize code as below)
-                    train_embeddings, val_embeddings, test_embeddings = resize_embeddings(
-                        train_embeddings, val_embeddings, test_embeddings, embedding_size
+            # Check if cache file exists and we're not forcing recomputation
+            if os.path.exists(cache_file) and not force_recompute:
+                logger.info(f"Loading cached TabPFN embeddings from {cache_file}")
+                try:
+                    cache = np.load(cache_file, allow_pickle=True)
+
+                    # Extract embeddings and metadata
+                    train_embeddings = cache["train_embeddings"]
+                    val_embeddings = cache["val_embeddings"]
+                    test_embeddings = cache["test_embeddings"]
+                    y_train_sample = cache["y_train_sample"]
+                    cache_metadata = cache["metadata"].item() if "metadata" in cache else {}
+
+                    logger.info(f"Loaded embeddings from cache - Train: {train_embeddings.shape}, Val: {val_embeddings.shape}, Test: {test_embeddings.shape}")
+                    logger.info(f"Cache metadata: {cache_metadata}")
+
+                    # Create a dummy TabPFN model since we don't need to fit anymore
+                    tabpfn = TabPFNModel(
+                        device='cuda' if torch.cuda.is_available() else 'cpu',
+                        n_estimators=8,
+                        ignore_pretraining_limits=True
                     )
 
-                return train_embeddings, val_embeddings, test_embeddings, tabpfn, y_train_sample
+                    # Check if the loaded embeddings match the expected embedding size
+                    if train_embeddings.shape[1] != embedding_size:
+                        logger.warning(f"Cached embeddings size ({train_embeddings.shape[1]}) doesn't match requested size ({embedding_size}). Resizing...")
+                        # Resize them (using the same resize code as below)
+                        train_embeddings, val_embeddings, test_embeddings = resize_embeddings(
+                            train_embeddings, val_embeddings, test_embeddings, embedding_size
+                        )
 
-            except Exception as e:
-                logger.warning(f"Error loading cached embeddings: {e}. Recomputing...")
-                # Continue with normal computation if loading fails
+                    return train_embeddings, val_embeddings, test_embeddings, tabpfn, y_train_sample
+
+                except Exception as e:
+                    logger.warning(f"Error loading cached embeddings: {e}. Recomputing...")
+                    # Continue with normal computation if loading fails
 
     logger.info("Fitting TabPFN and extracting embeddings")
 
@@ -347,27 +413,48 @@ def get_tabpfn_embeddings(
         )
 
     # Cache the embeddings if cache_dir is provided
-    if cache_dir and cache_file:
-        logger.info(f"Saving TabPFN embeddings to cache: {cache_file}")
-        try:
-            # Add timestamp to metadata
-            import time
-            cache_metadata.update({
-                "timestamp": time.time(),
-                "date": time.strftime("%Y-%m-%d %H:%M:%S")
-            })
-
-            # Save to cache
-            np.savez(
-                cache_file,
-                train_embeddings=train_embeddings,
-                val_embeddings=val_embeddings,
-                test_embeddings=test_embeddings,
-                y_train_sample=y_train_sample,
-                metadata=cache_metadata
-            )
-        except Exception as e:
-            logger.warning(f"Error saving embeddings to cache: {e}")
+    if cache_dir:
+        # Add timestamp to metadata
+        import time
+        cache_metadata.update({
+            "timestamp": time.time(),
+            "date": time.strftime("%Y-%m-%d %H:%M:%S")
+        })
+        
+        if use_managed_cache:
+            # Save to managed cache
+            logger.info(f"Saving TabPFN embeddings to managed cache")
+            try:
+                cache_data = {
+                    "train_embeddings": train_embeddings,
+                    "val_embeddings": val_embeddings,
+                    "test_embeddings": test_embeddings,
+                    "y_train_sample": y_train_sample,
+                    "metadata": cache_metadata
+                }
+                
+                success = rm.cache_manager.save_to_cache('embeddings', cache_key, cache_data, '.npz')
+                if success:
+                    logger.info(f"Successfully saved embeddings to managed cache")
+                else:
+                    logger.warning(f"Failed to save embeddings to managed cache")
+            except Exception as e:
+                logger.warning(f"Error saving embeddings to managed cache: {e}")
+        else:
+            # Legacy cache saving
+            logger.info(f"Saving TabPFN embeddings to cache: {cache_file}")
+            try:
+                # Save to cache
+                np.savez(
+                    cache_file,
+                    train_embeddings=train_embeddings,
+                    val_embeddings=val_embeddings,
+                    test_embeddings=test_embeddings,
+                    y_train_sample=y_train_sample,
+                    metadata=cache_metadata
+                )
+            except Exception as e:
+                logger.warning(f"Error saving embeddings to cache: {e}")
 
     logger.info(f"Final embedding shapes - Train: {train_embeddings.shape}, Val: {val_embeddings.shape}, Test: {test_embeddings.shape}")
 
