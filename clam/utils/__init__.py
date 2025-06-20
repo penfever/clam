@@ -107,7 +107,8 @@ from .resource_manager import (
     ResourceConfig,
     DatasetMetadata,
     ClamResourceManager,
-    reset_resource_manager
+    reset_resource_manager,
+    prepare_cifar_dataset
 )
 
 __all__ = [
@@ -208,5 +209,6 @@ __all__ = [
     "ResourceConfig",
     "DatasetMetadata",
     "ClamResourceManager", 
-    "reset_resource_manager"
+    "reset_resource_manager",
+    "prepare_cifar_dataset"
 ]

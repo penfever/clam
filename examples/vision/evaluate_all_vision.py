@@ -382,10 +382,11 @@ def test_single_dataset(dataset_name: str, args):
     try:
         # Load dataset
         if dataset_name in ['cifar10', 'cifar100']:
-            # Download and prepare CIFAR dataset
-            data_dir = os.path.join(args.data_dir, f"{dataset_name}_data")
-            train_paths, train_labels, test_paths, test_labels, class_names = download_and_prepare_cifar(
-                data_dir, dataset_name
+            # Use unified resource management for CIFAR datasets
+            from clam.utils.resource_manager import prepare_cifar_dataset
+            train_paths, train_labels, test_paths, test_labels, class_names = prepare_cifar_dataset(
+                dataset_type=dataset_name,
+                force_redownload=False
             )
         elif dataset_name == 'imagenet':
             # Load ImageNet dataset from HuggingFace
@@ -420,6 +421,12 @@ def test_single_dataset(dataset_name: str, args):
 
 def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_paths, test_labels, class_names, args):
     """Run all models on a single dataset."""
+    
+    # Debug: Check models argument
+    logger.info(f"Models to evaluate: {getattr(args, 'models', 'MISSING')}")
+    if not hasattr(args, 'models') or not args.models:
+        logger.error("No models specified for evaluation! Using default models.")
+        args.models = ["clam_tsne", "dinov2_linear"]
     
     # Store wandb availability for logging
     use_wandb_logging = args.use_wandb and WANDB_AVAILABLE
@@ -611,6 +618,143 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
             logger.error(error_msg)
             logger.error(f"Full traceback: {traceback.format_exc()}")
             results['qwen_vl'] = {'error': str(e), 'traceback': traceback.format_exc()}
+    
+    # Test OpenAI VLM
+    if 'openai_vlm' in args.models:
+        logger.info("Testing OpenAI VLM...")
+        try:
+            from examples.vision.api_vlm_baseline import OpenAIVLMBaseline
+            
+            if not hasattr(args, 'openai_model') or not args.openai_model:
+                raise ValueError("--openai_model is required when using openai_vlm")
+            
+            classifier = OpenAIVLMBaseline(
+                num_classes=len(class_names),
+                class_names=class_names,
+                model_name=args.openai_model,
+                use_semantic_names=args.use_semantic_names,
+                enable_thinking=getattr(args, 'enable_thinking', True)
+            )
+            
+            start_time = time.time()
+            classifier.fit(train_paths, train_labels)
+            training_time = time.time() - start_time
+            
+            eval_results = classifier.evaluate(
+                test_paths, test_labels,
+                save_raw_responses=args.save_outputs,
+                output_dir=args.output_dir if args.save_outputs else None,
+                benchmark_name=dataset_name
+            )
+            eval_results['training_time'] = training_time
+            
+            results['openai_vlm'] = eval_results
+            logger.info(f"OpenAI VLM completed: {eval_results['accuracy']:.4f} accuracy")
+            
+            # Log to wandb
+            if use_wandb_logging:
+                log_results_to_wandb('openai_vlm', eval_results, args, class_names, dataset_name)
+            
+        except Exception as e:
+            import traceback
+            error_msg = f"OpenAI VLM failed: {e}"
+            logger.error(error_msg)
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            results['openai_vlm'] = {'error': str(e), 'traceback': traceback.format_exc()}
+    
+    # Test Gemini VLM
+    if 'gemini_vlm' in args.models:
+        logger.info("Testing Gemini VLM...")
+        try:
+            from examples.vision.gemini_vlm_baseline import GeminiVLMBaseline
+            
+            if not hasattr(args, 'gemini_model') or not args.gemini_model:
+                raise ValueError("--gemini_model is required when using gemini_vlm")
+            
+            classifier = GeminiVLMBaseline(
+                num_classes=len(class_names),
+                class_names=class_names,
+                model_name=args.gemini_model,
+                use_semantic_names=args.use_semantic_names,
+                enable_thinking=getattr(args, 'enable_thinking', True)
+            )
+            
+            start_time = time.time()
+            classifier.fit(train_paths, train_labels)
+            training_time = time.time() - start_time
+            
+            eval_results = classifier.evaluate(
+                test_paths, test_labels,
+                save_raw_responses=args.save_outputs,
+                output_dir=args.output_dir if args.save_outputs else None,
+                benchmark_name=dataset_name
+            )
+            eval_results['training_time'] = training_time
+            
+            results['gemini_vlm'] = eval_results
+            logger.info(f"Gemini VLM completed: {eval_results['accuracy']:.4f} accuracy")
+            
+            # Log to wandb
+            if use_wandb_logging:
+                log_results_to_wandb('gemini_vlm', eval_results, args, class_names, dataset_name)
+            
+        except Exception as e:
+            import traceback
+            error_msg = f"Gemini VLM failed: {e}"
+            logger.error(error_msg)
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            results['gemini_vlm'] = {'error': str(e), 'traceback': traceback.format_exc()}
+    
+    # Test API VLM (generic API baseline)
+    if 'api_vlm' in args.models:
+        logger.info("Testing API VLM...")
+        try:
+            from examples.vision.api_vlm_baseline import APIVLMBaseline
+            
+            # Determine which API model to use
+            if hasattr(args, 'openai_model') and args.openai_model:
+                api_model = args.openai_model
+                api_type = 'openai'
+            elif hasattr(args, 'gemini_model') and args.gemini_model:
+                api_model = args.gemini_model
+                api_type = 'gemini'
+            else:
+                raise ValueError("Either --openai_model or --gemini_model is required when using api_vlm")
+            
+            classifier = APIVLMBaseline(
+                num_classes=len(class_names),
+                class_names=class_names,
+                model_name=api_model,
+                api_type=api_type,
+                use_semantic_names=args.use_semantic_names,
+                enable_thinking=getattr(args, 'enable_thinking', True)
+            )
+            
+            start_time = time.time()
+            classifier.fit(train_paths, train_labels)
+            training_time = time.time() - start_time
+            
+            eval_results = classifier.evaluate(
+                test_paths, test_labels,
+                save_raw_responses=args.save_outputs,
+                output_dir=args.output_dir if args.save_outputs else None,
+                benchmark_name=dataset_name
+            )
+            eval_results['training_time'] = training_time
+            
+            results['api_vlm'] = eval_results
+            logger.info(f"API VLM completed: {eval_results['accuracy']:.4f} accuracy")
+            
+            # Log to wandb
+            if use_wandb_logging:
+                log_results_to_wandb('api_vlm', eval_results, args, class_names, dataset_name)
+            
+        except Exception as e:
+            import traceback
+            error_msg = f"API VLM failed: {e}"
+            logger.error(error_msg)
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            results['api_vlm'] = {'error': str(e), 'traceback': traceback.format_exc()}
     
     return results
 

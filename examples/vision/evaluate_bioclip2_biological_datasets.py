@@ -434,17 +434,25 @@ def download_and_prepare_awa2(data_dir: str = "./awa2_data") -> tuple:
             except Exception as e:
                 raise RuntimeError(f"Failed to download {filename} from {url}: {e}")
         
-        # Extract the zip file
-        logger.info(f"Extracting {filename}...")
-        try:
-            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                zip_ref.extractall(data_dir)
-            logger.info(f"Extracted {filename}")
-        except Exception as e:
-            raise RuntimeError(f"Failed to extract {filename}: {e}")
+        # Check if extraction is needed
+        extracted_indicator = data_dir / filename.replace('.zip', '')  # e.g., "AwA2-base", "AwA2-data"
+        if not extracted_indicator.exists():
+            # Extract the zip file
+            logger.info(f"Extracting {filename}...")
+            try:
+                with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                    zip_ref.extractall(data_dir)
+                logger.info(f"Extracted {filename}")
+            except Exception as e:
+                raise RuntimeError(f"Failed to extract {filename}: {e}")
+        else:
+            logger.info(f"{filename} already extracted, skipping extraction...")
     
-    # Organize the extracted data
-    organize_awa2_data(data_dir)
+    # Organize the extracted data (only if not already organized)
+    if not (data_dir / "images").exists() or len(list((data_dir / "images").glob("*/*.jpg"))) < 1000:
+        organize_awa2_data(data_dir)
+    else:
+        logger.info("AwA2 data already organized, skipping organization...")
     
     return load_existing_awa2(data_dir)
 
@@ -524,13 +532,23 @@ def download_and_prepare_fishnet(data_dir: str = "./fishnet_data") -> tuple:
             gdown.download(f"https://drive.google.com/uc?id={file_id}", str(zip_path), quiet=False)
             logger.info("FishNet dataset downloaded")
         
-        # Extract the dataset
-        logger.info("Extracting FishNet dataset...")
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            zip_ref.extractall(data_dir)
+        # Check if extraction is needed (look for any extracted directory besides known ones)
+        extracted_dirs = [d for d in data_dir.iterdir() 
+                         if d.is_dir() and d.name not in ["images", "__pycache__", "train", "test"]]
+        if not extracted_dirs:
+            # Extract the dataset
+            logger.info("Extracting FishNet dataset...")
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                zip_ref.extractall(data_dir)
+            logger.info("FishNet dataset extracted")
+        else:
+            logger.info("FishNet dataset already extracted, skipping extraction...")
         
-        # Organize the extracted data
-        organize_fishnet_data(data_dir)
+        # Organize the extracted data (only if not already organized)
+        if not (data_dir / "images").exists() or len(list((data_dir / "images").glob("*/*.jpg"))) < 1000:
+            organize_fishnet_data(data_dir)
+        else:
+            logger.info("FishNet data already organized, skipping organization...")
         
     except ImportError:
         raise RuntimeError(

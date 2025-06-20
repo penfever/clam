@@ -11,6 +11,27 @@ Key features:
 - Environment variable configuration support
 - Backward compatibility with existing code
 - Centralized config and metadata management
+- Unified dataset preparation with intelligent caching and checking
+
+The DatasetPreparer class provides a unified interface for dataset preparation that:
+- Checks if datasets are already prepared before re-downloading
+- Separates download and organization steps with intelligent caching
+- Provides consistent logging and error handling
+- Integrates with the dataset registry for tracking
+
+Usage examples:
+    # Simple CIFAR preparation using convenience function
+    train_paths, train_labels, test_paths, test_labels, class_names = prepare_cifar_dataset("cifar10")
+    
+    # Custom dataset preparation using the DatasetPreparer
+    resource_manager = get_resource_manager()
+    success = resource_manager.dataset_preparer.prepare_dataset(
+        dataset_id="my_dataset",
+        dataset_type="vision",
+        check_function=my_check_function,
+        download_function=my_download_function,
+        organize_function=my_organize_function
+    )
 """
 
 import os
@@ -386,6 +407,7 @@ class ClamResourceManager:
         self.dataset_registry = DatasetRegistry(self.path_resolver)
         self.config_manager = ConfigManager(self.path_resolver)
         self.cache_manager = CacheManager(self.path_resolver)
+        self.dataset_preparer = DatasetPreparer(self.path_resolver)
         
         logger.debug(f"Initialized CLAM resource manager with base dir: {self.path_resolver.get_base_dir()}")
     
@@ -492,6 +514,286 @@ class ClamResourceManager:
         return result
 
 
+class DatasetPreparer:
+    """Unified dataset preparation with intelligent caching and checking."""
+    
+    def __init__(self, path_resolver: PathResolver):
+        self.path_resolver = path_resolver
+    
+    def prepare_dataset(
+        self,
+        dataset_id: str,
+        dataset_type: str,
+        check_function: callable,
+        download_function: callable,
+        organize_function: callable = None,
+        force_redownload: bool = False,
+        force_reorganize: bool = False,
+        min_samples: int = 100
+    ) -> bool:
+        """
+        Unified dataset preparation with intelligent caching.
+        
+        Args:
+            dataset_id: Unique identifier for the dataset
+            dataset_type: Type of dataset (e.g., 'vision', 'audio', 'tabular')
+            check_function: Function that returns True if dataset is ready
+            download_function: Function that downloads/extracts the dataset
+            organize_function: Optional function that organizes downloaded data
+            force_redownload: Force re-download even if dataset exists
+            force_reorganize: Force re-organization even if already organized
+            min_samples: Minimum number of samples expected in prepared dataset
+            
+        Returns:
+            True if dataset is ready, False otherwise
+        """
+        logger.info(f"Preparing {dataset_type} dataset: {dataset_id}")
+        
+        # Get dataset workspace
+        dataset_dir = self.path_resolver.get_dataset_dir(dataset_id)
+        
+        # Check if dataset is already prepared
+        if not force_redownload and not force_reorganize:
+            try:
+                if check_function(dataset_dir):
+                    logger.info(f"Dataset {dataset_id} already prepared, skipping preparation")
+                    return True
+            except Exception as e:
+                logger.debug(f"Dataset check failed for {dataset_id}: {e}")
+        
+        # Check if we need to download
+        download_needed = force_redownload
+        if not download_needed:
+            try:
+                # Check if raw data exists (but might need organization)
+                download_needed = not self._check_raw_data_exists(dataset_dir, dataset_id)
+            except Exception as e:
+                logger.debug(f"Raw data check failed for {dataset_id}: {e}")
+                download_needed = True
+        
+        # Download if needed
+        if download_needed:
+            try:
+                logger.info(f"Downloading dataset {dataset_id}...")
+                download_function(dataset_dir)
+                logger.info(f"Download completed for {dataset_id}")
+            except Exception as e:
+                logger.error(f"Download failed for {dataset_id}: {e}")
+                return False
+        else:
+            logger.info(f"Raw data for {dataset_id} already exists, skipping download")
+        
+        # Organize if needed and function provided
+        if organize_function:
+            organize_needed = force_reorganize
+            if not organize_needed:
+                try:
+                    organize_needed = not check_function(dataset_dir)
+                except Exception as e:
+                    logger.debug(f"Organization check failed for {dataset_id}: {e}")
+                    organize_needed = True
+            
+            if organize_needed:
+                try:
+                    logger.info(f"Organizing dataset {dataset_id}...")
+                    organize_function(dataset_dir)
+                    logger.info(f"Organization completed for {dataset_id}")
+                except Exception as e:
+                    logger.error(f"Organization failed for {dataset_id}: {e}")
+                    return False
+            else:
+                logger.info(f"Dataset {dataset_id} already organized, skipping organization")
+        
+        # Final check
+        try:
+            if check_function(dataset_dir):
+                logger.info(f"Dataset {dataset_id} successfully prepared")
+                
+                # Register dataset in registry
+                metadata = {
+                    'dataset_id': dataset_id,
+                    'dataset_type': dataset_type,
+                    'status': 'prepared',
+                    'min_samples': min_samples,
+                    'workspace_dir': str(dataset_dir)
+                }
+                
+                dataset_registry = DatasetRegistry(self.path_resolver)
+                dataset_registry.register_dataset(dataset_id, metadata)
+                
+                return True
+            else:
+                logger.error(f"Dataset {dataset_id} preparation verification failed")
+                return False
+        except Exception as e:
+            logger.error(f"Final check failed for {dataset_id}: {e}")
+            return False
+    
+    def _check_raw_data_exists(self, dataset_dir: Path, dataset_id: str) -> bool:
+        """Check if raw downloaded data exists (before organization)."""
+        # Look for common indicators of downloaded data
+        indicators = [
+            # Zip files
+            list(dataset_dir.glob("*.zip")),
+            # Tar files
+            list(dataset_dir.glob("*.tar*")),
+            # Extracted directories (excluding organized structure)
+            [d for d in dataset_dir.iterdir() 
+             if d.is_dir() and d.name not in ['images', 'audio', 'train', 'test', 'val', 'validation', '__pycache__']],
+            # Raw data files
+            list(dataset_dir.glob("*.csv")),
+            list(dataset_dir.glob("*.json")),
+            list(dataset_dir.glob("*.txt")),
+        ]
+        
+        # If any indicator exists, consider raw data present
+        return any(indicator for indicator in indicators)
+    
+    def prepare_cifar_dataset(self, dataset_type: str = "cifar10", force_redownload: bool = False) -> tuple:
+        """
+        Prepare CIFAR-10 or CIFAR-100 dataset using unified management.
+        
+        Args:
+            dataset_type: "cifar10" or "cifar100"
+            force_redownload: Force re-download even if dataset exists
+            
+        Returns:
+            Tuple of (train_paths, train_labels, test_paths, test_labels, class_names)
+        """
+        from pathlib import Path
+        import torchvision
+        import torchvision.transforms as transforms
+        
+        if dataset_type == "cifar10":
+            class_names = [
+                'airplane', 'automobile', 'bird', 'cat', 'deer',
+                'dog', 'frog', 'horse', 'ship', 'truck'
+            ]
+            min_images = 1000
+            dataset_class = torchvision.datasets.CIFAR10
+        elif dataset_type == "cifar100":
+            class_names = [
+                'apple', 'aquarium_fish', 'baby', 'bear', 'beaver', 'bed', 'bee', 'beetle',
+                'bicycle', 'bottle', 'bowl', 'boy', 'bridge', 'bus', 'butterfly', 'camel',
+                'can', 'castle', 'caterpillar', 'cattle', 'chair', 'chimpanzee', 'clock',
+                'cloud', 'cockroach', 'couch', 'crab', 'crocodile', 'cup', 'dinosaur',
+                'dolphin', 'elephant', 'flatfish', 'forest', 'fox', 'girl', 'hamster',
+                'house', 'kangaroo', 'keyboard', 'lamp', 'lawn_mower', 'leopard', 'lion',
+                'lizard', 'lobster', 'man', 'maple_tree', 'motorcycle', 'mountain', 'mouse',
+                'mushroom', 'oak_tree', 'orange', 'orchid', 'otter', 'palm_tree', 'pear',
+                'pickup_truck', 'pine_tree', 'plain', 'plate', 'poppy', 'porcupine',
+                'possum', 'rabbit', 'raccoon', 'ray', 'road', 'rocket', 'rose',
+                'sea', 'seal', 'shark', 'shrew', 'skunk', 'skyscraper', 'snail', 'snake',
+                'spider', 'squirrel', 'streetcar', 'sunflower', 'sweet_pepper', 'table',
+                'tank', 'telephone', 'television', 'tiger', 'tractor', 'train', 'trout',
+                'tulip', 'turtle', 'wardrobe', 'whale', 'willow_tree', 'wolf', 'woman',
+                'worm'
+            ]
+            min_images = 5000
+            dataset_class = torchvision.datasets.CIFAR100
+        else:
+            raise ValueError(f"Unsupported dataset type: {dataset_type}")
+        
+        def check_cifar_prepared(dataset_dir: Path) -> bool:
+            """Check if CIFAR dataset is properly prepared."""
+            images_dir = dataset_dir / "images"
+            if not images_dir.exists():
+                return False
+            
+            # Check that we have train and test directories with images
+            train_count = len(list(images_dir.glob("train/*/*.png")))
+            test_count = len(list(images_dir.glob("test/*/*.png")))
+            return train_count > min_images and test_count > 0
+        
+        def download_and_organize_cifar(dataset_dir: Path):
+            """Download and organize CIFAR dataset in one step."""
+            # Download dataset using torchvision
+            transform = transforms.Compose([transforms.ToTensor()])
+            
+            train_dataset = dataset_class(
+                root=str(dataset_dir), train=True, download=True, transform=transform
+            )
+            test_dataset = dataset_class(
+                root=str(dataset_dir), train=False, download=True, transform=transform
+            )
+            
+            # Organize into ImageNet-style structure
+            images_dir = dataset_dir / "images"
+            
+            # Create directory structure
+            for split in ['train', 'test']:
+                for class_name in class_names:
+                    (images_dir / split / class_name).mkdir(parents=True, exist_ok=True)
+            
+            # Convert and save images
+            def save_cifar_images(dataset, base_dir: Path, class_names: list, split: str) -> tuple:
+                """Save CIFAR images to disk in ImageNet-style structure."""
+                paths = []
+                labels = []
+                
+                logger.info(f"Saving {split} images...")
+                
+                for idx, (image_tensor, label) in enumerate(dataset):
+                    if idx % 10000 == 0:
+                        logger.info(f"Processed {idx}/{len(dataset)} {split} images")
+                    
+                    # Convert tensor to PIL Image
+                    image = transforms.ToPILImage()(image_tensor)
+                    
+                    # Save image
+                    class_name = class_names[label]
+                    image_path = base_dir / class_name / f"{idx:05d}.png"
+                    image.save(image_path)
+                    
+                    paths.append(str(image_path))
+                    labels.append(label)
+                
+                return paths, labels
+            
+            train_paths, train_labels = save_cifar_images(
+                train_dataset, images_dir / 'train', class_names, 'train'
+            )
+            test_paths, test_labels = save_cifar_images(
+                test_dataset, images_dir / 'test', class_names, 'test'
+            )
+            
+            logger.info(f"{dataset_type.upper()} prepared: {len(train_paths)} train, {len(test_paths)} test images")
+        
+        # Use unified preparation (combining download and organize into one step)
+        success = self.prepare_dataset(
+            dataset_id=dataset_type,
+            dataset_type="vision",
+            check_function=check_cifar_prepared,
+            download_function=download_and_organize_cifar,
+            organize_function=None,  # Already handled in download step
+            force_redownload=force_redownload,
+            min_samples=min_images
+        )
+        
+        if not success:
+            raise RuntimeError(f"Failed to prepare {dataset_type} dataset")
+        
+        # Load and return the prepared data
+        def load_existing_cifar(images_dir: Path, class_names: list) -> tuple:
+            """Load existing CIFAR directory structure."""
+            train_paths, train_labels = [], []
+            test_paths, test_labels = [], []
+            
+            for split, (paths_list, labels_list) in [('train', (train_paths, train_labels)), 
+                                                    ('test', (test_paths, test_labels))]:
+                for label, class_name in enumerate(class_names):
+                    class_dir = images_dir / split / class_name
+                    if class_dir.exists():
+                        for img_path in sorted(class_dir.glob("*.png")):
+                            paths_list.append(str(img_path))
+                            labels_list.append(label)
+            
+            return train_paths, train_labels, test_paths, test_labels, class_names
+        
+        dataset_dir = self.path_resolver.get_dataset_dir(dataset_type)
+        return load_existing_cifar(dataset_dir / "images", class_names)
+
+
 # Global resource manager instance
 _resource_manager: Optional[ClamResourceManager] = None
 
@@ -508,3 +810,19 @@ def reset_resource_manager():
     """Reset global resource manager instance (mainly for testing)."""
     global _resource_manager
     _resource_manager = None
+
+
+# Convenience functions for common operations
+def prepare_cifar_dataset(dataset_type: str = "cifar10", force_redownload: bool = False) -> tuple:
+    """
+    Convenience function to prepare CIFAR datasets using unified management.
+    
+    Args:
+        dataset_type: "cifar10" or "cifar100"
+        force_redownload: Force re-download even if dataset exists
+        
+    Returns:
+        Tuple of (train_paths, train_labels, test_paths, test_labels, class_names)
+    """
+    resource_manager = get_resource_manager()
+    return resource_manager.dataset_preparer.prepare_cifar_dataset(dataset_type, force_redownload)
