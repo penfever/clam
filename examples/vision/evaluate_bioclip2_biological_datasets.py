@@ -813,6 +813,12 @@ def test_single_dataset(dataset_name: str, args):
     logger.info(f"TESTING {dataset_name.upper()}")
     logger.info(f"{'='*60}")
     
+    # Debug: Check models argument
+    logger.info(f"Models to evaluate: {getattr(args, 'models', 'MISSING')}")
+    if not hasattr(args, 'models') or not args.models:
+        logger.error("No models specified for evaluation! Using default models.")
+        args.models = ["bioclip2_knn", "qwen_vl", "clam_tsne_bioclip2"]
+    
     use_wandb_logging = args.use_wandb and WANDB_AVAILABLE
     results = {}
     
@@ -953,7 +959,7 @@ def test_single_dataset(dataset_name: str, args):
             )
             
             start_time = time.time()
-            classifier.fit()  # API models don't need training data
+            classifier.fit(class_names=class_names)  # API models don't need training data but need class names
             training_time = time.time() - start_time
             
             eval_results = classifier.evaluate(
