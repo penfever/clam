@@ -212,13 +212,15 @@ class ContextComposer:
     def compose_layout(
         self,
         highlight_indices: Optional[List[int]] = None,
+        highlight_test_indices: Optional[List[int]] = None,
         layout_strategy: Optional[LayoutStrategy] = None
     ) -> Image.Image:
         """
         Create a composed layout of all visualizations.
         
         Args:
-            highlight_indices: Indices of points to highlight across all visualizations
+            highlight_indices: Indices of training points to highlight across all visualizations
+            highlight_test_indices: Indices of test points to highlight with red X markers
             layout_strategy: Override the default layout strategy
             
         Returns:
@@ -247,7 +249,8 @@ class ContextComposer:
                     transformed_data=train_data,
                     y=self._y_train,
                     highlight_indices=highlight_indices,
-                    test_data=test_data
+                    test_data=test_data,
+                    highlight_test_indices=highlight_test_indices
                 )
                 results.append(result)
                 

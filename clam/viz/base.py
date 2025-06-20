@@ -237,6 +237,7 @@ class BaseVisualization(ABC):
         y: Optional[np.ndarray] = None,
         highlight_indices: Optional[List[int]] = None,
         test_data: Optional[np.ndarray] = None,
+        highlight_test_indices: Optional[List[int]] = None,
         **kwargs
     ) -> VisualizationResult:
         """
@@ -245,8 +246,9 @@ class BaseVisualization(ABC):
         Args:
             transformed_data: Transformed coordinates
             y: Optional target values for coloring
-            highlight_indices: Indices of points to highlight
+            highlight_indices: Indices of points to highlight in training data
             test_data: Optional test data coordinates
+            highlight_test_indices: Indices of test points to highlight with red X
             **kwargs: Additional plotting parameters
             
         Returns:
@@ -270,9 +272,9 @@ class BaseVisualization(ABC):
         
         # Plot based on task type
         if self.config.task_type == 'regression' and y is not None:
-            plot_result = self._plot_regression(ax, transformed_data, y, highlight_indices, test_data, use_3d)
+            plot_result = self._plot_regression(ax, transformed_data, y, highlight_indices, test_data, highlight_test_indices, use_3d)
         else:
-            plot_result = self._plot_classification(ax, transformed_data, y, highlight_indices, test_data, use_3d)
+            plot_result = self._plot_classification(ax, transformed_data, y, highlight_indices, test_data, highlight_test_indices, use_3d)
         
         # Apply styling
         self._apply_plot_styling(ax, use_3d)
@@ -334,6 +336,7 @@ class BaseVisualization(ABC):
         y: Optional[np.ndarray],
         highlight_indices: Optional[List[int]],
         test_data: Optional[np.ndarray],
+        highlight_test_indices: Optional[List[int]],
         use_3d: bool
     ) -> Dict[str, Any]:
         """Plot for classification tasks."""
@@ -419,6 +422,26 @@ class BaseVisualization(ABC):
                     marker='^', label='Test points'
                 )
         
+        # Highlight specific test points with red X markers
+        if test_data is not None and highlight_test_indices:
+            highlighted_test_data = test_data[highlight_test_indices]
+            if use_3d:
+                ax.scatter(
+                    highlighted_test_data[:, 0],
+                    highlighted_test_data[:, 1],
+                    highlighted_test_data[:, 2],
+                    c='red', s=self.config.point_size * 3, alpha=1.0,
+                    marker='x', linewidths=4, label='Query point'
+                )
+            else:
+                ax.scatter(
+                    highlighted_test_data[:, 0],
+                    highlighted_test_data[:, 1],
+                    c='red', s=self.config.point_size * 3, alpha=1.0,
+                    marker='x', linewidths=4, label='Query point'
+                )
+            legend_text_parts.append('Query point (red X)')
+        
         return {
             'legend_text': '; '.join(legend_text_parts),
             'metadata': metadata
@@ -431,6 +454,7 @@ class BaseVisualization(ABC):
         y: np.ndarray,
         highlight_indices: Optional[List[int]],
         test_data: Optional[np.ndarray],
+        highlight_test_indices: Optional[List[int]],
         use_3d: bool
     ) -> Dict[str, Any]:
         """Plot for regression tasks."""
@@ -501,7 +525,28 @@ class BaseVisualization(ABC):
                     marker='^', label='Test points'
                 )
         
-        legend_text = f"Target range: [{np.min(y):.2f}, {np.max(y):.2f}]"
+        # Highlight specific test points with red X markers
+        legend_text_parts = [f"Target range: [{np.min(y):.2f}, {np.max(y):.2f}]"]
+        if test_data is not None and highlight_test_indices:
+            highlighted_test_data = test_data[highlight_test_indices]
+            if use_3d:
+                ax.scatter(
+                    highlighted_test_data[:, 0],
+                    highlighted_test_data[:, 1],
+                    highlighted_test_data[:, 2],
+                    c='red', s=self.config.point_size * 3, alpha=1.0,
+                    marker='x', linewidths=4, label='Query point'
+                )
+            else:
+                ax.scatter(
+                    highlighted_test_data[:, 0],
+                    highlighted_test_data[:, 1],
+                    c='red', s=self.config.point_size * 3, alpha=1.0,
+                    marker='x', linewidths=4, label='Query point'
+                )
+            legend_text_parts.append('Query point (red X)')
+        
+        legend_text = '; '.join(legend_text_parts)
         
         return {
             'legend_text': legend_text,

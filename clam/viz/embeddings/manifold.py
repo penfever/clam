@@ -214,7 +214,7 @@ class IsomapVisualization(BaseVisualization):
         """Create Isomap transformer."""
         
         isomap_params = {
-            'n_neighbors': kwargs.get('n_neighbors', 5),
+            'n_neighbors': kwargs.get('n_neighbors', 20),
             'n_components': 3 if self.config.use_3d else 2,
             'eigen_solver': kwargs.get('eigen_solver', 'auto'),
             'tol': kwargs.get('tol', 0),

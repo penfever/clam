@@ -840,11 +840,14 @@ class ClamTsneClassifier:
                 # Choose visualization approach based on multi-viz setting
                 if self.enable_multi_viz and self.context_composer is not None:
                     # Use multi-visualization approach
-                    highlight_indices = [i]  # Highlight current test point
+                    # NOTE: Do not highlight training points when showing test points
+                    # The test point will be shown via the test_data parameter instead
+                    highlight_indices = None  # No training points to highlight
                     
                     # Create composed visualization
                     composed_image = self.context_composer.compose_layout(
                         highlight_indices=highlight_indices,
+                        highlight_test_indices=[i],  # Highlight the current test point
                         layout_strategy=LayoutStrategy[self.layout_strategy.upper()]
                     )
                     
