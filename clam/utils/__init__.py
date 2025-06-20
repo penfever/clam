@@ -16,6 +16,7 @@ This module provides various utilities for CLAM model work:
 - VLM utilities for response parsing and conversation formatting
 - Visualization utilities for saving and processing plots
 - Platform compatibility utilities for device detection and configuration
+- Results management with standardized storage and organization
 """
 
 from .logging import setup_logging, setup_notebook_logging
@@ -109,6 +110,22 @@ from .resource_manager import (
     ClamResourceManager,
     reset_resource_manager,
     prepare_cifar_dataset
+)
+from .results_manager import (
+    get_results_manager,
+    ResultsManager,
+    ExperimentMetadata,
+    EvaluationResults,
+    ResultsArtifacts,
+    reset_results_manager,
+    save_results_unified
+)
+from .results_migration import (
+    migrate_legacy_results,
+    validate_result_file,
+    ResultsFormatDetector,
+    ResultsMigrator,
+    create_migration_adapters
 )
 
 __all__ = [
@@ -210,5 +227,21 @@ __all__ = [
     "DatasetMetadata",
     "ClamResourceManager", 
     "reset_resource_manager",
-    "prepare_cifar_dataset"
+    "prepare_cifar_dataset",
+    
+    # Results management utilities
+    "get_results_manager",
+    "ResultsManager",
+    "ExperimentMetadata",
+    "EvaluationResults",
+    "ResultsArtifacts",
+    "reset_results_manager",
+    "save_results_unified",
+    
+    # Results migration utilities
+    "migrate_legacy_results",
+    "validate_result_file",
+    "ResultsFormatDetector",
+    "ResultsMigrator",
+    "create_migration_adapters"
 ]

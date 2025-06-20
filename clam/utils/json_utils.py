@@ -191,28 +191,83 @@ def validate_json_serializable(obj: Any, logger: logging.Logger = None) -> bool:
 convert_numpy_types = convert_for_json_serialization
 
 
-def save_results(results, output_dir, dataset_name):
-    """Save evaluation results to JSON files using robust serialization."""
+def save_results(results, output_dir, dataset_name, use_unified_manager: bool = False):
+    """
+    Save evaluation results to JSON files using robust serialization.
+    
+    Args:
+        results: List of result dictionaries or single result dictionary
+        output_dir: Output directory for results
+        dataset_name: Name of the dataset
+        use_unified_manager: Whether to use the new unified results manager
+    
+    This function maintains backward compatibility while optionally using
+    the new unified results management system.
+    """
     import os
     
     logger = logging.getLogger(__name__)
+    
+    # Handle single result dictionary
+    if isinstance(results, dict):
+        results = [results]
+    
+    if use_unified_manager:
+        # Use the new unified results manager
+        try:
+            from .results_manager import save_results_unified
+            
+            for result in results:
+                model_name = result.get('model_name', 'unknown_model')
+                modality = result.get('modality', 'tabular')  # Default to tabular for backward compatibility
+                
+                try:
+                    save_results_unified(
+                        results=result,
+                        output_dir=output_dir,
+                        dataset_name=dataset_name,
+                        model_name=model_name,
+                        modality=modality
+                    )
+                    logger.info(f"Successfully saved {model_name} results using unified manager")
+                except Exception as e:
+                    logger.warning(f"Failed to save {model_name} results using unified manager: {e}")
+                    logger.info("Falling back to legacy save method")
+                    # Fall back to legacy method
+                    _save_results_legacy(result, output_dir, dataset_name, model_name, logger)
+        except ImportError:
+            logger.warning("Unified results manager not available, using legacy method")
+            # Fall back to legacy method for all results
+            for result in results:
+                model_name = result.get('model_name', 'unknown_model')
+                _save_results_legacy(result, output_dir, dataset_name, model_name, logger)
+    else:
+        # Use legacy method
+        for result in results:
+            model_name = result.get('model_name', 'unknown_model')
+            _save_results_legacy(result, output_dir, dataset_name, model_name, logger)
+
+
+def _save_results_legacy(result, output_dir, dataset_name, model_name, logger):
+    """Legacy results saving method for backward compatibility."""
+    import os
+    
     dataset_output_dir = os.path.join(output_dir, f"dataset_{dataset_name}")
     os.makedirs(dataset_output_dir, exist_ok=True)
     
-    for result in results:
-        model_name = result['model_name'].lower().replace('-', '_')
-        results_file = os.path.join(dataset_output_dir, f"{model_name}_results.json")
-        
-        # Use robust JSON saving with automatic fallback handling
-        success = safe_json_dump(
-            result, 
-            results_file, 
-            logger=logger,
-            minimal_fallback=True,
-            indent=2
-        )
-        
-        if success:
-            print(f"Successfully saved {model_name} results to {results_file}")
-        else:
-            logger.error(f"Failed to save {model_name} results to {results_file}")
+    model_name_clean = model_name.lower().replace('-', '_')
+    results_file = os.path.join(dataset_output_dir, f"{model_name_clean}_results.json")
+    
+    # Use robust JSON saving with automatic fallback handling
+    success = safe_json_dump(
+        result, 
+        results_file, 
+        logger=logger,
+        minimal_fallback=True,
+        indent=2
+    )
+    
+    if success:
+        print(f"Successfully saved {model_name} results to {results_file}")
+    else:
+        logger.error(f"Failed to save {model_name} results to {results_file}")
