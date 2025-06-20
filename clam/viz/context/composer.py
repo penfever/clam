@@ -1,0 +1,430 @@
+"""
+Context Composer - The core system for combining multiple visualizations.
+
+This module provides the main interface for creating complex, multi-visualization
+contexts that can be consumed by VLM backends for enhanced reasoning.
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+from dataclasses import dataclass, field
+from typing import Dict, List, Any, Optional, Tuple, Union
+from PIL import Image
+import logging
+import time
+
+from ..base import BaseVisualization, VisualizationConfig, VisualizationResult
+from .layouts import LayoutManager, LayoutStrategy
+from .prompts import PromptGenerator
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class CompositionConfig:
+    """Configuration for context composition."""
+    
+    # Layout options
+    layout_strategy: LayoutStrategy = LayoutStrategy.GRID
+    max_visualizations_per_row: int = 2
+    subplot_spacing: float = 0.3
+    
+    # Image output
+    composition_figsize: Tuple[int, int] = (16, 12)
+    composition_dpi: int = 100
+    max_composition_size: int = 4096
+    
+    # Prompt generation
+    include_individual_descriptions: bool = True
+    include_cross_references: bool = True
+    reasoning_focus: str = "comparison"  # "comparison", "consensus", "divergence"
+    
+    # Performance options
+    parallel_processing: bool = False
+    cache_transformations: bool = True
+    
+    # VLM optimization
+    optimize_for_vlm: bool = True
+    vlm_model_type: str = "general"  # "general", "vision_specialist", "reasoning_focused"
+
+
+class ContextComposer:
+    """
+    Compose multiple visualizations into a unified context for VLM reasoning.
+    
+    This class coordinates multiple visualization methods to create rich,
+    multi-perspective views of data that enable more sophisticated reasoning
+    by VLM backends.
+    """
+    
+    def __init__(self, config: Optional[CompositionConfig] = None):
+        """
+        Initialize the context composer.
+        
+        Args:
+            config: Configuration for composition behavior
+        """
+        self.config = config or CompositionConfig()
+        self.logger = logging.getLogger(__name__)
+        
+        # Initialize sub-components
+        self.layout_manager = LayoutManager(self.config)
+        self.prompt_generator = PromptGenerator(self.config)
+        
+        # State
+        self.visualizations: List[BaseVisualization] = []
+        self.visualization_configs: List[Dict[str, Any]] = []
+        self.cached_results: Dict[str, Any] = {}
+        
+        # Data state
+        self._X_train = None
+        self._y_train = None
+        self._X_test = None
+        self._fitted = False
+    
+    def add_visualization(
+        self,
+        viz_type: str,
+        config: Optional[Dict[str, Any]] = None,
+        viz_config: Optional[VisualizationConfig] = None
+    ) -> 'ContextComposer':
+        """
+        Add a visualization method to the composition.
+        
+        Args:
+            viz_type: Type of visualization (e.g., 'tsne', 'umap', 'pca')
+            config: Configuration parameters for the visualization method
+            viz_config: VisualizationConfig object for the visualization
+            
+        Returns:
+            Self for method chaining
+        """
+        # Import visualization classes dynamically
+        viz_class = self._get_visualization_class(viz_type)
+        
+        # Create visualization config
+        if viz_config is None:
+            viz_config = VisualizationConfig()
+            if config:
+                viz_config.extra_params.update(config)
+        
+        # Create visualization instance
+        visualization = viz_class(viz_config)
+        
+        self.visualizations.append(visualization)
+        self.visualization_configs.append({
+            'type': viz_type,
+            'config': config or {},
+            'viz_config': viz_config
+        })
+        
+        self.logger.info(f"Added {viz_type} visualization to composition")
+        return self
+    
+    def _get_visualization_class(self, viz_type: str):
+        """Get the visualization class for a given type string."""
+        from ..embeddings.tsne import TSNEVisualization
+        from ..embeddings.umap import UMAPVisualization
+        from ..embeddings.pca import PCAVisualization
+        from ..embeddings.manifold import (
+            LocallyLinearEmbeddingVisualization,
+            SpectralEmbeddingVisualization,
+            IsomapVisualization,
+            MDSVisualization
+        )
+        from ..decision.regions import DecisionRegionsVisualization
+        from ..patterns.frequent import FrequentPatternsVisualization
+        
+        viz_map = {
+            'tsne': TSNEVisualization,
+            'umap': UMAPVisualization,
+            'pca': PCAVisualization,
+            'lle': LocallyLinearEmbeddingVisualization,
+            'spectral': SpectralEmbeddingVisualization,
+            'isomap': IsomapVisualization,
+            'mds': MDSVisualization,
+            'decision_regions': DecisionRegionsVisualization,
+            'frequent_patterns': FrequentPatternsVisualization,
+        }
+        
+        if viz_type not in viz_map:
+            raise ValueError(f"Unknown visualization type: {viz_type}. "
+                           f"Available types: {list(viz_map.keys())}")
+        
+        return viz_map[viz_type]
+    
+    def fit(
+        self,
+        X_train: np.ndarray,
+        y_train: Optional[np.ndarray] = None,
+        X_test: Optional[np.ndarray] = None
+    ) -> 'ContextComposer':
+        """
+        Fit all visualization methods on the training data.
+        
+        Args:
+            X_train: Training features
+            y_train: Training targets (optional)
+            X_test: Test features (optional)
+            
+        Returns:
+            Self for method chaining
+        """
+        self.logger.info(f"Fitting {len(self.visualizations)} visualizations...")
+        
+        self._X_train = X_train
+        self._y_train = y_train
+        self._X_test = X_test
+        
+        start_time = time.time()
+        
+        # Fit all visualizations
+        for i, viz in enumerate(self.visualizations):
+            viz_start = time.time()
+            
+            try:
+                # Fit and transform training data
+                train_transformed = viz.fit_transform(X_train, y_train)
+                
+                # Cache the result
+                cache_key = f"viz_{i}_train"
+                self.cached_results[cache_key] = train_transformed
+                
+                # Transform test data if available and supported
+                if X_test is not None and viz.supports_new_data:
+                    test_transformed = viz.transform(X_test)
+                    cache_key_test = f"viz_{i}_test"
+                    self.cached_results[cache_key_test] = test_transformed
+                
+                viz_time = time.time() - viz_start
+                self.logger.info(f"Fitted {viz.method_name} in {viz_time:.2f}s")
+                
+            except Exception as e:
+                self.logger.error(f"Failed to fit {viz.method_name}: {e}")
+                # Continue with other visualizations
+                continue
+        
+        total_time = time.time() - start_time
+        self.logger.info(f"Fitted all visualizations in {total_time:.2f}s")
+        
+        self._fitted = True
+        return self
+    
+    def compose_layout(
+        self,
+        highlight_indices: Optional[List[int]] = None,
+        layout_strategy: Optional[LayoutStrategy] = None
+    ) -> Image.Image:
+        """
+        Create a composed layout of all visualizations.
+        
+        Args:
+            highlight_indices: Indices of points to highlight across all visualizations
+            layout_strategy: Override the default layout strategy
+            
+        Returns:
+            Composed image
+        """
+        if not self._fitted:
+            raise ValueError("Must call fit() before compose_layout()")
+        
+        if not self.visualizations:
+            raise ValueError("No visualizations added to compose")
+        
+        strategy = layout_strategy or self.config.layout_strategy
+        
+        # Generate individual visualization results
+        results = []
+        for i, viz in enumerate(self.visualizations):
+            train_data = self.cached_results.get(f"viz_{i}_train")
+            test_data = self.cached_results.get(f"viz_{i}_test")
+            
+            if train_data is None:
+                self.logger.warning(f"No cached data for visualization {i}, skipping")
+                continue
+            
+            try:
+                result = viz.generate_plot(
+                    transformed_data=train_data,
+                    y=self._y_train,
+                    highlight_indices=highlight_indices,
+                    test_data=test_data
+                )
+                results.append(result)
+                
+            except Exception as e:
+                self.logger.error(f"Failed to generate plot for {viz.method_name}: {e}")
+                continue
+        
+        if not results:
+            raise RuntimeError("No visualizations could be generated")
+        
+        # Use layout manager to compose the results
+        composed_image = self.layout_manager.compose_layout(results, strategy)
+        
+        return composed_image
+    
+    def generate_reasoning_prompt(
+        self,
+        highlight_indices: Optional[List[int]] = None,
+        custom_context: Optional[str] = None,
+        task_description: Optional[str] = None
+    ) -> str:
+        """
+        Generate a comprehensive reasoning prompt for VLM consumption.
+        
+        Args:
+            highlight_indices: Indices of points to highlight
+            custom_context: Additional context about the data or task
+            task_description: Description of the specific task
+            
+        Returns:
+            Generated prompt string
+        """
+        if not self._fitted:
+            raise ValueError("Must call fit() before generate_reasoning_prompt()")
+        
+        # Collect information from all visualizations
+        viz_info = []
+        for i, viz in enumerate(self.visualizations):
+            train_data = self.cached_results.get(f"viz_{i}_train")
+            if train_data is not None:
+                description = viz.get_description(self._X_train, self._y_train)
+                viz_info.append({
+                    'method': viz.method_name,
+                    'description': description,
+                    'config': viz.config,
+                    'transformed_shape': train_data.shape
+                })
+        
+        # Generate prompt using prompt generator
+        prompt = self.prompt_generator.generate_prompt(
+            visualizations=viz_info,
+            highlight_indices=highlight_indices,
+            custom_context=custom_context,
+            task_description=task_description,
+            data_shape=self._X_train.shape,
+            n_classes=len(np.unique(self._y_train)) if self._y_train is not None else None
+        )
+        
+        return prompt
+    
+    def reason_over_data(
+        self,
+        X: np.ndarray,
+        y: Optional[np.ndarray] = None,
+        reasoning_chain: Optional[List[str]] = None,
+        highlight_indices: Optional[List[int]] = None
+    ) -> Dict[str, Any]:
+        """
+        Perform multi-visualization reasoning over data.
+        
+        Args:
+            X: Input features
+            y: Optional target values
+            reasoning_chain: Ordered list of reasoning steps/questions
+            highlight_indices: Points to highlight for analysis
+            
+        Returns:
+            Dictionary containing composed image, prompt, and analysis
+        """
+        # Fit if not already fitted
+        if not self._fitted:
+            self.fit(X, y)
+        
+        # Generate composed visualization
+        composed_image = self.compose_layout(highlight_indices=highlight_indices)
+        
+        # Generate reasoning prompt
+        reasoning_prompt = self.generate_reasoning_prompt(
+            highlight_indices=highlight_indices,
+            task_description="Analyze the data patterns across multiple visualization perspectives"
+        )
+        
+        # Add reasoning chain if provided
+        if reasoning_chain:
+            reasoning_prompt += "\n\nSpecific reasoning steps to consider:\n"
+            for i, step in enumerate(reasoning_chain, 1):
+                reasoning_prompt += f"{i}. {step}\n"
+        
+        # Collect metadata from all visualizations
+        metadata = {
+            'n_visualizations': len(self.visualizations),
+            'visualization_methods': [viz.method_name for viz in self.visualizations],
+            'data_shape': X.shape,
+            'n_classes': len(np.unique(y)) if y is not None else None,
+            'highlighted_points': len(highlight_indices) if highlight_indices else 0,
+            'composition_config': self.config
+        }
+        
+        return {
+            'composed_image': composed_image,
+            'reasoning_prompt': reasoning_prompt,
+            'metadata': metadata,
+            'individual_results': [
+                self.cached_results.get(f"viz_{i}_train") 
+                for i in range(len(self.visualizations))
+            ]
+        }
+    
+    def get_visualization_comparison(self) -> Dict[str, Any]:
+        """
+        Get a comparison of all visualization methods.
+        
+        Returns:
+            Dictionary with comparison metrics and insights
+        """
+        if not self._fitted:
+            raise ValueError("Must call fit() before getting comparison")
+        
+        comparison = {
+            'methods': [],
+            'capabilities': {},
+            'performance': {},
+            'recommendations': []
+        }
+        
+        for i, viz in enumerate(self.visualizations):
+            method_info = {
+                'name': viz.method_name,
+                'supports_3d': viz.supports_3d,
+                'supports_regression': viz.supports_regression,
+                'supports_new_data': viz.supports_new_data,
+                'config': viz.config.__dict__
+            }
+            
+            # Add performance metrics if available
+            if hasattr(viz, '_last_fit_time'):
+                method_info['fit_time'] = viz._last_fit_time
+            
+            comparison['methods'].append(method_info)
+        
+        # Generate recommendations based on data characteristics
+        n_samples, n_features = self._X_train.shape
+        
+        if n_samples < 100:
+            comparison['recommendations'].append("Small dataset: Consider PCA or MDS for stable results")
+        if n_features > 1000:
+            comparison['recommendations'].append("High-dimensional data: UMAP or t-SNE may be most effective")
+        if self._y_train is not None and len(np.unique(self._y_train)) > 10:
+            comparison['recommendations'].append("Many classes: Consider spectral embedding or UMAP")
+        
+        return comparison
+    
+    def clear_cache(self):
+        """Clear cached transformation results."""
+        self.cached_results.clear()
+        self.logger.info("Cleared visualization cache")
+    
+    def get_config(self) -> Dict[str, Any]:
+        """Get the current configuration."""
+        return {
+            'composition_config': self.config.__dict__,
+            'visualizations': [
+                {
+                    'type': config['type'],
+                    'config': config['config']
+                }
+                for config in self.visualization_configs
+            ]
+        }

@@ -1,3 +1,167 @@
+CLAM T-SNE Enhanced Reasoning Plan                                                                             │ │
+│ │                                                                                                                │ │
+│ │ Overview                                                                                                       │ │
+│ │                                                                                                                │ │
+│ │ Transform the current clam_tsne model into a flexible, multi-visualization reasoning system with a composable  │ │
+│ │ context framework for VLM backends.                                                                            │ │
+│ │                                                                                                                │ │
+│ │ 1. Core Architecture Design                                                                                    │ │
+│ │                                                                                                                │ │
+│ │ 1.1 Visualization Module Abstraction (clam/viz/)                                                               │ │
+│ │                                                                                                                │ │
+│ │ clam/viz/                                                                                                      │ │
+│ │ ├── __init__.py                                                                                                │ │
+│ │ ├── base.py                 # Abstract base classes                                                            │ │
+│ │ ├── embeddings/             # Dimensionality reduction visualizations                                          │ │
+│ │ │   ├── tsne.py            # Current T-SNE implementation                                                      │ │
+│ │ │   ├── umap.py            # UMAP implementations                                                              │ │
+│ │ │   ├── manifold.py        # sklearn.manifold wrappers                                                         │ │
+│ │ │   └── pca.py             # Enhanced PCA                                                                      │ │
+│ │ ├── decision/               # Decision boundary visualizations                                                 │ │
+│ │ │   ├── regions.py         # mlxtend decision regions                                                          │ │
+│ │ │   └── boundaries.py      # Custom decision boundaries                                                        │ │
+│ │ ├── patterns/               # Pattern analysis visualizations                                                  │ │
+│ │ │   ├── frequent.py        # mlxtend frequent patterns                                                         │ │
+│ │ │   └── associations.py    # Association rule mining                                                           │ │
+│ │ └── context/               # Context composition system                                                        │ │
+│ │     ├── composer.py        # Main context composer                                                             │ │
+│ │     ├── layouts.py         # Multi-viz layout strategies                                                       │ │
+│ │     └── prompts.py         # Text prompt generation                                                            │ │
+│ │                                                                                                                │ │
+│ │ 1.2 Context Composer System                                                                                    │ │
+│ │                                                                                                                │ │
+│ │ - Modular Design: Each visualization as an independent component                                               │ │
+│ │ - Chaining Support: Multiple visualizations in single VLM prompt                                               │ │
+│ │ - Layout Management: Grid, sequential, and hierarchical layouts                                                │ │
+│ │ - Prompt Integration: Automatic text generation for each visualization                                         │ │
+│ │                                                                                                                │ │
+│ │ 2. Implementation Phases                                                                                       │ │
+│ │                                                                                                                │ │
+│ │ Phase 1: Foundation (Weeks 1-2)                                                                                │ │
+│ │                                                                                                                │ │
+│ │ - Create abstract base classes for visualizations                                                              │ │
+│ │ - Implement context composer framework                                                                         │ │
+│ │ - Migrate existing T-SNE functionality                                                                         │ │
+│ │ - Add UMAP support with scikit-learn interface                                                                 │ │
+│ │                                                                                                                │ │
+│ │ Phase 2: Core Visualizations (Weeks 3-4)                                                                       │ │
+│ │                                                                                                                │ │
+│ │ - Implement all sklearn.manifold methods:                                                                      │ │
+│ │   - LocallyLinearEmbedding (standard, modified, Hessian, LTSA)                                                 │ │
+│ │   - SpectralEmbedding                                                                                          │ │
+│ │   - Isomap                                                                                                     │ │
+│ │   - MDS                                                                                                        │ │
+│ │ - Add mlxtend decision regions                                                                                 │ │
+│ │ - Create layout management system                                                                              │ │
+│ │                                                                                                                │ │
+│ │ Phase 3: Advanced Features (Weeks 5-6)                                                                         │ │
+│ │                                                                                                                │ │
+│ │ - Implement mlxtend frequent patterns                                                                          │ │
+│ │ - Add multi-visualization chaining                                                                             │ │
+│ │ - Create intelligent prompt generation                                                                         │ │
+│ │ - Optimize for VLM consumption                                                                                 │ │
+│ │                                                                                                                │ │
+│ │ Phase 4: Integration & Testing (Weeks 7-8)                                                                     │ │
+│ │                                                                                                                │ │
+│ │ - Integrate with existing CLAM pipeline                                                                        │ │
+│ │ - Create comprehensive tests                                                                                   │ │
+│ │ - Performance optimization                                                                                     │ │
+│ │ - Documentation and examples                                                                                   │ │
+│ │                                                                                                                │ │
+│ │ 3. Technical Specifications                                                                                    │ │
+│ │                                                                                                                │ │
+│ │ 3.1 Base Visualization Interface                                                                               │ │
+│ │                                                                                                                │ │
+│ │ class BaseVisualization(ABC):                                                                                  │ │
+│ │     @abstractmethod                                                                                            │ │
+│ │     def fit_transform(self, X: np.ndarray, y: np.ndarray) -> np.ndarray                                        │ │
+│ │                                                                                                                │ │
+│ │     @abstractmethod                                                                                            │ │
+│ │     def generate_plot(self, **kwargs) -> PIL.Image                                                             │ │
+│ │                                                                                                                │ │
+│ │     @abstractmethod                                                                                            │ │
+│ │     def get_description(self) -> str                                                                           │ │
+│ │                                                                                                                │ │
+│ │ 3.2 Context Composer API                                                                                       │ │
+│ │                                                                                                                │ │
+│ │ class ContextComposer:                                                                                         │ │
+│ │     def add_visualization(self, viz_type: str, config: dict)                                                   │ │
+│ │     def compose_layout(self, layout_strategy: str) -> PIL.Image                                                │ │
+│ │     def generate_prompt(self, dataset_context: dict) -> str                                                    │ │
+│ │     def reason_over_data(self, X, y, reasoning_chain: List[str])                                               │ │
+│ │                                                                                                                │ │
+│ │ 3.3 Supported Visualization Types                                                                              │ │
+│ │                                                                                                                │ │
+│ │ - tsne: Enhanced T-SNE with 2D/3D, multiple perplexities                                                       │ │
+│ │ - umap: UMAP with various distance metrics and parameters                                                      │ │
+│ │ - lle: LocallyLinearEmbedding variants (standard, modified, hessian, ltsa)                                     │ │
+│ │ - spectral: SpectralEmbedding with different affinity matrices                                                 │ │
+│ │ - isomap: Isomap with geodesic distance preservation                                                           │ │
+│ │ - mds: Multidimensional Scaling (metric and non-metric)                                                        │ │
+│ │ - decision_regions: mlxtend decision boundary visualization                                                    │ │
+│ │ - frequent_patterns: Pattern mining visualizations                                                             │ │
+│ │                                                                                                                │ │
+│ │ 4. Key Features                                                                                                │ │
+│ │                                                                                                                │ │
+│ │ 4.1 Multi-Visualization Reasoning                                                                              │ │
+│ │                                                                                                                │ │
+│ │ - Chain multiple visualizations to show different data perspectives                                            │ │
+│ │ - Automatic prompt generation explaining each visualization's insights                                         │ │
+│ │ - Cross-reference patterns between different embedding spaces                                                  │ │
+│ │                                                                                                                │ │
+│ │ 4.2 Adaptive Context Generation                                                                                │ │
+│ │                                                                                                                │ │
+│ │ - Dataset-aware prompt customization                                                                           │ │
+│ │ - Visualization-specific reasoning prompts                                                                     │ │
+│ │ - Confidence and uncertainty communication to VLM                                                              │ │
+│ │                                                                                                                │ │
+│ │ 4.3 Performance Optimization                                                                                   │ │
+│ │                                                                                                                │ │
+│ │ - Lazy evaluation of expensive computations                                                                    │ │
+│ │ - Caching of embeddings and visualizations                                                                     │ │
+│ │ - GPU acceleration where available (UMAP, some sklearn methods)                                                │ │
+│ │                                                                                                                │ │
+│ │ 5. Integration Points                                                                                          │ │
+│ │                                                                                                                │ │
+│ │ 5.1 Existing CLAM Pipeline                                                                                     │ │
+│ │                                                                                                                │ │
+│ │ - Maintain backward compatibility with current clam_tsne                                                       │ │
+│ │ - Integrate with model_loader and VLM backends                                                                 │ │
+│ │ - Support both VLLM and transformers backends                                                                  │ │
+│ │                                                                                                                │ │
+│ │ 5.2 Examples Integration                                                                                       │ │
+│ │                                                                                                                │ │
+│ │ - Update examples/tabular/ to showcase new capabilities                                                        │ │
+│ │ - Create demonstration notebooks                                                                               │ │
+│ │ - Add to existing evaluation pipelines                                                                         │ │
+│ │                                                                                                                │ │
+│ │ 6. Expected Benefits                                                                                           │ │
+│ │                                                                                                                │ │
+│ │ 6.1 Enhanced Reasoning Capability                                                                              │ │
+│ │                                                                                                                │ │
+│ │ - Multiple perspectives on the same data                                                                       │ │
+│ │ - Richer context for VLM decision-making                                                                       │ │
+│ │ - Better handling of complex, high-dimensional datasets                                                        │ │
+│ │                                                                                                                │ │
+│ │ 6.2 Research Flexibility                                                                                       │ │
+│ │                                                                                                                │ │
+│ │ - Easy experimentation with different embedding methods                                                        │ │
+│ │ - Rapid prototyping of new visualization combinations                                                          │ │
+│ │ - Systematic evaluation of reasoning approaches                                                                │ │
+│ │                                                                                                                │ │
+│ │ 6.3 Practical Applications                                                                                     │ │
+│ │                                                                                                                │ │
+│ │ - Better performance on challenging tabular datasets                                                           │ │
+│ │ - More interpretable model decisions                                                                           │ │
+│ │ - Improved few-shot learning through richer context                                                            │ │
+│ │                                                                                                                │ │
+│ │ 7. Success Metrics                                                                                             │ │
+│ │                                                                                                                │ │
+│ │ - Maintain or improve accuracy on existing benchmarks                                                          │ │
+│ │ - Demonstrate improved performance on complex datasets                                                         │ │
+│ │ - Show enhanced interpretability through multi-viz reasoning                                                   │ │
+│ │ - Achieve sub-linear scaling with number of visualizations     
+
 Sphinx Documentation Plan for CLAM
 
 Current State Analysis

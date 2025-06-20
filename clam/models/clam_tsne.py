@@ -26,6 +26,11 @@ from clam.utils.model_loader import model_loader, GenerationConfig
 from clam.utils.vlm_prompting import create_classification_prompt, parse_vlm_response, create_vlm_conversation
 from clam.utils.class_name_utils import extract_class_names_from_labels
 
+# Import new multi-visualization framework
+from clam.viz import ContextComposer, VisualizationConfig
+from clam.viz.context.layouts import LayoutStrategy
+from clam.viz.context.composer import CompositionConfig
+
 
 def convert_numpy_types(obj):
     """Convert NumPy data types to Python native types for JSON serialization."""
@@ -83,6 +88,12 @@ class ClamTsneClassifier:
         gemini_model: Optional[str] = None,
         api_model: Optional[str] = None,
         seed: int = 42,
+        # New multi-visualization parameters
+        enable_multi_viz: bool = False,
+        visualization_methods: Optional[List[str]] = None,
+        layout_strategy: str = "adaptive_grid",
+        reasoning_focus: str = "classification",
+        multi_viz_config: Optional[Dict[str, Any]] = None,
         **kwargs
     ):
         """
@@ -113,6 +124,11 @@ class ClamTsneClassifier:
             gemini_model: Gemini model identifier (e.g., 'gemini-2.5-pro', 'gemini-2.5-flash')
             api_model: Generic API model identifier (auto-detects provider)
             seed: Random seed
+            enable_multi_viz: Whether to use multi-visualization framework (default: False for backward compatibility)
+            visualization_methods: List of visualization methods to use (e.g., ['tsne', 'pca', 'umap'])
+            layout_strategy: Layout strategy for multi-visualization composition
+            reasoning_focus: Focus for multi-visualization reasoning (classification, comparison, etc.)
+            multi_viz_config: Additional configuration for multi-visualization
             **kwargs: Additional modality-specific arguments
         """
         self.modality = modality.lower()
@@ -140,6 +156,13 @@ class ClamTsneClassifier:
         self.api_model = api_model
         self.seed = seed
         
+        # New multi-visualization parameters
+        self.enable_multi_viz = enable_multi_viz
+        self.visualization_methods = visualization_methods or ['tsne']
+        self.layout_strategy = layout_strategy
+        self.reasoning_focus = reasoning_focus
+        self.multi_viz_config = multi_viz_config or {}
+        
         # Determine the actual model to use (API models take precedence)
         self.effective_model_id = self._determine_effective_model()
         self.is_api_model = self._is_api_model(self.effective_model_id)
@@ -162,6 +185,9 @@ class ClamTsneClassifier:
         self.class_names = None
         self.unique_classes = None
         self.class_to_semantic = None
+        
+        # Multi-visualization context composer
+        self.context_composer = None
     
     def _determine_effective_model(self) -> str:
         """Determine the effective model ID to use based on API model parameters."""
@@ -261,6 +287,64 @@ class ClamTsneClassifier:
         )
         
         return self.vlm_wrapper
+    
+    def _initialize_multi_viz_composer(self, X_train, y_train, X_test=None):
+        """Initialize the multi-visualization context composer."""
+        if not self.enable_multi_viz:
+            return
+            
+        self.logger.info("Initializing multi-visualization context composer...")
+        
+        # Create composition configuration
+        config = CompositionConfig(
+            layout_strategy=LayoutStrategy[self.layout_strategy.upper()],
+            reasoning_focus=self.reasoning_focus,
+            optimize_for_vlm=True
+        )
+        
+        # Initialize context composer
+        self.context_composer = ContextComposer(config)
+        
+        # Add visualizations based on specified methods
+        for viz_method in self.visualization_methods:
+            viz_config = VisualizationConfig(
+                use_3d=self.use_3d_tsne,
+                title=f"{viz_method.upper()} - {self.modality.title()} Data",
+                random_state=self.seed,
+                figsize=(8, 6),
+                point_size=50
+            )
+            
+            # Get method-specific configuration
+            method_config = self.multi_viz_config.get(viz_method, {})
+            
+            # Add method-specific parameters based on visualization type
+            if viz_method == 'tsne':
+                method_config.update({
+                    'perplexity': min(self.tsne_perplexity, len(X_train) // 4),
+                    'max_iter': self.tsne_n_iter
+                })
+            elif viz_method == 'umap':
+                method_config.setdefault('n_neighbors', 15)
+                method_config.setdefault('min_dist', 0.1)
+            elif viz_method == 'spectral':
+                method_config.update({
+                    'n_neighbors': max(2, len(X_train) // 20),
+                    'affinity': 'nearest_neighbors'
+                })
+            elif viz_method == 'isomap':
+                method_config.setdefault('n_neighbors', 10)
+                
+            self.context_composer.add_visualization(
+                viz_method,
+                config=method_config,
+                viz_config=viz_config
+            )
+        
+        self.logger.info(f"Added {len(self.context_composer.visualizations)} visualization methods")
+        
+        # Fit all visualizations
+        self.context_composer.fit(X_train, y_train, X_test)
     
     def fit(self, X_train, y_train, X_test=None, class_names=None, task_type=None, **kwargs):
         """
@@ -429,6 +513,15 @@ class ClamTsneClassifier:
             self.unique_classes = None
             self.class_to_semantic = None
             self.class_names = None
+        
+        # Initialize multi-visualization framework if enabled
+        if self.enable_multi_viz:
+            # Use the reduced training data for multi-visualization
+            self._initialize_multi_viz_composer(
+                X_train_fit, 
+                y_train_fit, 
+                X_test_for_embedding if X_test is not None else None
+            )
             
         self.logger.info(f"CLAM t-SNE {self.task_type} model fitted successfully")
     
@@ -487,13 +580,68 @@ class ClamTsneClassifier:
         
         for i in range(len(self.test_tsne)):
             try:
-                # Create visualization highlighting current test point based on task type
-                if self.task_type == 'regression':
-                    # Use regression visualization methods
-                    if self.use_knn_connections:
-                        # Create visualization with KNN connections for regression
-                        if self.use_3d_tsne:
-                            fig, legend_text, metadata = viz_methods['create_regression_tsne_3d_plot_with_knn'](
+                # Choose visualization approach based on multi-viz setting
+                if self.enable_multi_viz and self.context_composer is not None:
+                    # Use multi-visualization approach
+                    highlight_indices = [i]  # Highlight current test point
+                    
+                    # Create composed visualization
+                    composed_image = self.context_composer.compose_layout(
+                        highlight_indices=highlight_indices,
+                        layout_strategy=LayoutStrategy[self.layout_strategy.upper()]
+                    )
+                    
+                    # Convert PIL image to format expected by VLM
+                    image = composed_image
+                    
+                    # Create multi-visualization reasoning prompt
+                    if self.task_type == 'regression':
+                        # Import regression prompt functions
+                        from clam.utils.vlm_prompting import create_regression_prompt
+                        
+                        # Generate multi-viz reasoning prompt for regression
+                        reasoning_prompt = self.context_composer.generate_reasoning_prompt(
+                            highlight_indices=highlight_indices,
+                            custom_context=f"This is {self.modality} data with regression targets. "
+                                          f"The highlighted point represents the test sample to predict.",
+                            task_description=f"Predict the target value for the highlighted point based on "
+                                           f"its position across multiple visualization perspectives. "
+                                           f"Target range: {self.target_stats['min']:.3f} to {self.target_stats['max']:.3f}"
+                        )
+                        prompt = reasoning_prompt
+                    else:
+                        # Get visible classes across all visualizations
+                        all_visible_classes = set()
+                        for viz_result in self.context_composer.visualization_results:
+                            if hasattr(viz_result, 'metadata') and 'classes' in viz_result.metadata:
+                                all_visible_classes.update(viz_result.metadata['classes'])
+                        
+                        visible_classes_list = sorted(list(all_visible_classes))
+                        visible_semantic_names = [self.class_to_semantic.get(cls, str(cls)) for cls in visible_classes_list]
+                        
+                        # Generate multi-viz reasoning prompt for classification
+                        reasoning_prompt = self.context_composer.generate_reasoning_prompt(
+                            highlight_indices=highlight_indices,
+                            custom_context=f"This is {self.modality} data with {len(self.unique_classes)} classes: "
+                                          f"{', '.join(visible_semantic_names)}. "
+                                          f"The highlighted point represents the test sample to classify.",
+                            task_description=f"Classify the highlighted point based on its position and "
+                                           f"relationships across multiple visualization perspectives. "
+                                           f"Consider cluster consistency across different methods."
+                        )
+                        prompt = reasoning_prompt
+                        
+                    legend_text = f"Multi-visualization analysis ({len(self.visualization_methods)} methods)"
+                    
+                else:
+                    # Use legacy single visualization approach
+                    # Create visualization highlighting current test point based on task type
+                    if self.task_type == 'regression':
+                        # Use regression visualization methods
+                        if self.use_knn_connections:
+                            # Create visualization with KNN connections for regression
+                            if self.use_3d_tsne:
+                                fig, legend_text, metadata = viz_methods['create_regression_tsne_3d_plot_with_knn'](
                                 self.train_tsne, self.test_tsne, self.y_train_sample,
                                 self.train_embeddings, self.test_embeddings,
                                 highlight_test_idx=i,
@@ -502,8 +650,8 @@ class ClamTsneClassifier:
                                 viewing_angles=viewing_angles,
                                 zoom_factor=self.tsne_zoom_factor
                             )
-                        else:
-                            fig, legend_text, metadata = viz_methods['create_regression_tsne_plot_with_knn'](
+                            else:
+                                fig, legend_text, metadata = viz_methods['create_regression_tsne_plot_with_knn'](
                                 self.train_tsne, self.test_tsne, self.y_train_sample,
                                 self.train_embeddings, self.test_embeddings,
                                 highlight_test_idx=i,
@@ -511,29 +659,29 @@ class ClamTsneClassifier:
                                 figsize=(10, 8),
                                 zoom_factor=self.tsne_zoom_factor
                             )
-                    else:
-                        # Create standard regression visualization
-                        if self.use_3d_tsne:
-                            fig, legend_text, metadata = viz_methods['create_combined_regression_tsne_3d_plot'](
+                        else:
+                            # Create standard regression visualization
+                            if self.use_3d_tsne:
+                                fig, legend_text, metadata = viz_methods['create_combined_regression_tsne_3d_plot'](
                                 self.train_tsne, self.test_tsne, self.y_train_sample,
                                 highlight_test_idx=i,
                                 figsize=(12, 9),
                                 viewing_angles=viewing_angles,
                                 zoom_factor=self.tsne_zoom_factor
                             )
-                        else:
-                            fig, legend_text, metadata = viz_methods['create_combined_regression_tsne_plot'](
+                            else:
+                                fig, legend_text, metadata = viz_methods['create_combined_regression_tsne_plot'](
                                 self.train_tsne, self.test_tsne, self.y_train_sample,
                                 highlight_test_idx=i,
                                 figsize=(8, 6),
                                 zoom_factor=self.tsne_zoom_factor
                             )
-                else:
-                    # Use classification visualization methods
-                    if self.use_knn_connections:
-                        # Create visualization with KNN connections
-                        if self.use_3d_tsne:
-                            fig, legend_text, metadata = viz_methods['create_tsne_3d_plot_with_knn'](
+                    else:
+                        # Use classification visualization methods
+                        if self.use_knn_connections:
+                            # Create visualization with KNN connections
+                            if self.use_3d_tsne:
+                                fig, legend_text, metadata = viz_methods['create_tsne_3d_plot_with_knn'](
                                 self.train_tsne, self.test_tsne, self.y_train_sample,
                                 self.train_embeddings, self.test_embeddings,
                                 highlight_test_idx=i,
@@ -542,8 +690,8 @@ class ClamTsneClassifier:
                                 viewing_angles=viewing_angles,
                                 zoom_factor=self.tsne_zoom_factor
                             )
-                        else:
-                            fig, legend_text, metadata = viz_methods['create_tsne_plot_with_knn'](
+                            else:
+                                fig, legend_text, metadata = viz_methods['create_tsne_plot_with_knn'](
                                 self.train_tsne, self.test_tsne, self.y_train_sample,
                                 self.train_embeddings, self.test_embeddings,
                                 highlight_test_idx=i,
@@ -551,30 +699,31 @@ class ClamTsneClassifier:
                                 figsize=(10, 8),
                                 zoom_factor=self.tsne_zoom_factor
                             )
-                    else:
-                        # Create standard visualization
-                        if self.use_3d_tsne:
-                            fig, legend_text, metadata = viz_methods['create_combined_tsne_3d_plot'](
+                        else:
+                            # Create standard visualization
+                            if self.use_3d_tsne:
+                                fig, legend_text, metadata = viz_methods['create_combined_tsne_3d_plot'](
                                 self.train_tsne, self.test_tsne, self.y_train_sample,
                                 highlight_test_idx=i,
                                 figsize=(12, 9),
                                 viewing_angles=viewing_angles,
                                 zoom_factor=self.tsne_zoom_factor
                             )
-                        else:
-                            fig, legend_text, metadata = viz_methods['create_combined_tsne_plot'](
+                            else:
+                                fig, legend_text, metadata = viz_methods['create_combined_tsne_plot'](
                                 self.train_tsne, self.test_tsne, self.y_train_sample,
                                 highlight_test_idx=i,
                                 figsize=(8, 6),
                                 zoom_factor=self.tsne_zoom_factor
                             )
                 
-                # Convert plot to image
-                img_buffer = io.BytesIO()
-                fig.savefig(img_buffer, format='png', dpi=self.image_dpi, bbox_inches='tight', facecolor='white')
-                img_buffer.seek(0)
-                image = Image.open(img_buffer)
-                plt.close(fig)
+                # Convert plot to image (only for legacy single visualization)
+                if not self.enable_multi_viz or self.context_composer is None:
+                    img_buffer = io.BytesIO()
+                    fig.savefig(img_buffer, format='png', dpi=self.image_dpi, bbox_inches='tight', facecolor='white')
+                    img_buffer.seek(0)
+                    image = Image.open(img_buffer)
+                    plt.close(fig)
                 
                 # Convert to RGB if needed
                 if self.force_rgb_mode and image.mode != 'RGB':
@@ -592,74 +741,108 @@ class ClamTsneClassifier:
                     new_height = int(image.height * ratio)
                     image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
                 
-                # Create prompt based on task type
-                if self.task_type == 'regression':
-                    # Import regression prompt functions
-                    from clam.utils.vlm_prompting import create_regression_prompt, parse_vlm_response
-                    
-                    # Create regression prompt
-                    prompt = create_regression_prompt(
-                        target_stats=self.target_stats,
-                        modality=self.modality,
-                        use_knn=self.use_knn_connections,
-                        use_3d=self.use_3d_tsne,
-                        knn_k=self.knn_k if self.use_knn_connections else None,
-                        legend_text=legend_text,
-                        dataset_description=f"{self.modality.title()} data embedded using appropriate features"
-                    )
-                    
-                    # Create conversation
-                    conversation = create_vlm_conversation(image, prompt)
-                    
-                    # Generate response with API-aware config for regression
-                    gen_config = GenerationConfig(
-                        max_new_tokens=16384,  # Generous limit for thinking + regression
-                        temperature=0.1,
-                        do_sample=True,
-                        enable_thinking=self.enable_thinking and self.is_api_model,
-                        thinking_summary=False
-                    )
-                    
-                    response = self.vlm_wrapper.generate_from_conversation(conversation, gen_config)
-                    
-                    # Parse prediction for regression
-                    prediction = parse_vlm_response(
-                        response, 
-                        unique_classes=None, 
-                        logger_instance=self.logger, 
-                        use_semantic_names=False,
-                        task_type='regression',
-                        target_stats=self.target_stats
-                    )
+                # Create prompt based on task type and visualization approach
+                if self.enable_multi_viz and self.context_composer is not None:
+                    # Multi-viz prompt already created above
+                    pass
                 else:
-                    # Classification logic
-                    # Get visible classes
-                    visible_classes = set(metadata.get('classes', []))
-                    if metadata.get('knn_info') and 'neighbor_classes' in metadata['knn_info']:
-                        visible_classes.update(set(metadata['knn_info']['neighbor_classes']))
-                    
-                    visible_classes_list = sorted(list(visible_classes))
-                    visible_semantic_names = [self.class_to_semantic[cls] for cls in visible_classes_list]
-                    
-                    # Create classification prompt
-                    from clam.utils.vlm_prompting import create_classification_prompt, parse_vlm_response
-                    prompt = create_classification_prompt(
-                        class_names=visible_semantic_names,
-                        modality=self.modality,
-                        use_knn=self.use_knn_connections,
-                        use_3d=self.use_3d_tsne,
-                        knn_k=self.knn_k if self.use_knn_connections else None,
-                        legend_text=legend_text,
-                        dataset_description=f"{self.modality.title()} data embedded using appropriate features",
-                        use_semantic_names=self.use_semantic_names
-                    )
-                    
-                    # Create conversation
+                    # Create legacy single visualization prompt
+                    if self.task_type == 'regression':
+                        # Import regression prompt functions
+                        from clam.utils.vlm_prompting import create_regression_prompt, parse_vlm_response
+                        
+                        # Create regression prompt
+                        prompt = create_regression_prompt(
+                            target_stats=self.target_stats,
+                            modality=self.modality,
+                            use_knn=self.use_knn_connections,
+                            use_3d=self.use_3d_tsne,
+                            knn_k=self.knn_k if self.use_knn_connections else None,
+                            legend_text=legend_text,
+                            dataset_description=f"{self.modality.title()} data embedded using appropriate features"
+                        )
+                        
+                        # Create conversation
+                        conversation = create_vlm_conversation(image, prompt)
+                        
+                        # Generate response with API-aware config for regression
+                        gen_config = GenerationConfig(
+                            max_new_tokens=16384,  # Generous limit for thinking + regression
+                            temperature=0.1,
+                            do_sample=True,
+                            enable_thinking=self.enable_thinking and self.is_api_model,
+                            thinking_summary=False
+                        )
+                        
+                        response = self.vlm_wrapper.generate_from_conversation(conversation, gen_config)
+                        
+                        # Parse prediction for regression
+                        prediction = parse_vlm_response(
+                            response, 
+                            unique_classes=None, 
+                            logger_instance=self.logger, 
+                            use_semantic_names=False,
+                            task_type='regression',
+                            target_stats=self.target_stats
+                        )
+                    else:
+                        # Classification logic
+                        # Get visible classes
+                        visible_classes = set(metadata.get('classes', []))
+                        if metadata.get('knn_info') and 'neighbor_classes' in metadata['knn_info']:
+                            visible_classes.update(set(metadata['knn_info']['neighbor_classes']))
+                        
+                        visible_classes_list = sorted(list(visible_classes))
+                        visible_semantic_names = [self.class_to_semantic[cls] for cls in visible_classes_list]
+                        
+                        # Create classification prompt
+                        from clam.utils.vlm_prompting import create_classification_prompt, parse_vlm_response
+                        prompt = create_classification_prompt(
+                            class_names=visible_semantic_names,
+                            modality=self.modality,
+                            use_knn=self.use_knn_connections,
+                            use_3d=self.use_3d_tsne,
+                            knn_k=self.knn_k if self.use_knn_connections else None,
+                            legend_text=legend_text,
+                            dataset_description=f"{self.modality.title()} data embedded using appropriate features",
+                            use_semantic_names=self.use_semantic_names
+                        )
+                        
+                        # Create conversation
+                        conversation = create_vlm_conversation(image, prompt)
+                        
+                        # Generate response with API-aware config for classification
+                        gen_config = GenerationConfig(
+                            max_new_tokens=16384,  # Generous limit for thinking + classification
+                            temperature=0.1,
+                            do_sample=True,
+                            enable_thinking=self.enable_thinking and self.is_api_model,
+                            thinking_summary=False
+                        )
+                        
+                        response = self.vlm_wrapper.generate_from_conversation(conversation, gen_config)
+                        
+                        # Parse prediction for classification
+                        prediction = parse_vlm_response(
+                            response, 
+                            visible_semantic_names, 
+                            self.logger, 
+                            use_semantic_names=True,
+                            task_type='classification'
+                        )
+                        
+                        # Map back to numeric label if needed
+                        if prediction in visible_semantic_names:
+                            semantic_to_numeric = {name: cls for cls, name in self.class_to_semantic.items() if cls in visible_classes_list}
+                            prediction = semantic_to_numeric.get(prediction, prediction)
+                
+                # For multi-visualization, handle VLM response generation
+                if self.enable_multi_viz and self.context_composer is not None:
+                    # Create conversation and generate response for multi-viz
                     conversation = create_vlm_conversation(image, prompt)
                     
-                    # Generate response with API-aware config for classification
                     gen_config = GenerationConfig(
-                        max_new_tokens=16384,  # Generous limit for thinking + classification
+                        max_new_tokens=16384,
                         temperature=0.1,
                         do_sample=True,
                         enable_thinking=self.enable_thinking and self.is_api_model,
@@ -668,19 +851,41 @@ class ClamTsneClassifier:
                     
                     response = self.vlm_wrapper.generate_from_conversation(conversation, gen_config)
                     
-                    # Parse prediction for classification
-                    prediction = parse_vlm_response(
-                        response, 
-                        visible_semantic_names, 
-                        self.logger, 
-                        use_semantic_names=True,
-                        task_type='classification'
-                    )
+                    # Parse response based on task type
+                    from clam.utils.vlm_prompting import parse_vlm_response
                     
-                    # Map back to numeric label if needed
-                    if prediction in visible_semantic_names:
-                        semantic_to_numeric = {name: cls for cls, name in self.class_to_semantic.items() if cls in visible_classes_list}
-                        prediction = semantic_to_numeric.get(prediction, prediction)
+                    if self.task_type == 'classification':
+                        # Get all visible classes across visualizations
+                        all_visible_classes = set()
+                        for viz_result in self.context_composer.visualization_results:
+                            if hasattr(viz_result, 'metadata') and 'classes' in viz_result.metadata:
+                                all_visible_classes.update(viz_result.metadata['classes'])
+                        
+                        visible_classes_list = sorted(list(all_visible_classes))
+                        visible_semantic_names = [self.class_to_semantic.get(cls, str(cls)) for cls in visible_classes_list]
+                        
+                        prediction = parse_vlm_response(
+                            response, 
+                            visible_semantic_names, 
+                            self.logger, 
+                            use_semantic_names=True,
+                            task_type='classification'
+                        )
+                        
+                        # Map back to numeric label if needed
+                        if prediction in visible_semantic_names:
+                            semantic_to_numeric = {name: cls for cls, name in self.class_to_semantic.items() if cls in visible_classes_list}
+                            prediction = semantic_to_numeric.get(prediction, prediction)
+                    else:
+                        # Regression
+                        prediction = parse_vlm_response(
+                            response, 
+                            unique_classes=None, 
+                            logger_instance=self.logger, 
+                            use_semantic_names=False,
+                            task_type='regression',
+                            target_stats=self.target_stats
+                        )
                 
                 predictions.append(prediction)
                 
@@ -834,7 +1039,13 @@ class ClamTsneClassifier:
             'api_model': self.api_model,
             'effective_model_id': self.effective_model_id,
             'is_api_model': self.is_api_model,
-            'seed': self.seed
+            'seed': self.seed,
+            # Multi-visualization parameters
+            'enable_multi_viz': self.enable_multi_viz,
+            'visualization_methods': self.visualization_methods,
+            'layout_strategy': self.layout_strategy,
+            'reasoning_focus': self.reasoning_focus,
+            'multi_viz_config': self.multi_viz_config
         }
 
 
@@ -892,6 +1103,12 @@ def evaluate_clam_tsne(dataset, args):
             gemini_model=getattr(args, 'gemini_model', None),
             api_model=getattr(args, 'api_model', None),
             seed=args.seed,
+            # Multi-visualization parameters
+            enable_multi_viz=getattr(args, 'enable_multi_viz', False),
+            visualization_methods=getattr(args, 'visualization_methods', ['tsne']),
+            layout_strategy=getattr(args, 'layout_strategy', 'adaptive_grid'),
+            reasoning_focus=getattr(args, 'reasoning_focus', 'classification'),
+            multi_viz_config=getattr(args, 'multi_viz_config', {}),
             # Pass additional args as kwargs
             viewing_angles=getattr(args, 'viewing_angles', None),
             feature_selection_threshold=getattr(args, 'feature_selection_threshold', 500)
