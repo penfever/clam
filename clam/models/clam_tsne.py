@@ -88,6 +88,8 @@ class ClamTsneClassifier:
         gemini_model: Optional[str] = None,
         api_model: Optional[str] = None,
         seed: int = 42,
+        # VLM engine parameters
+        max_model_len: Optional[int] = None,
         # New multi-visualization parameters
         enable_multi_viz: bool = False,
         visualization_methods: Optional[List[str]] = None,
@@ -155,6 +157,7 @@ class ClamTsneClassifier:
         self.gemini_model = gemini_model
         self.api_model = api_model
         self.seed = seed
+        self.max_model_len = max_model_len
         
         # New multi-visualization parameters
         self.enable_multi_viz = enable_multi_viz
@@ -275,6 +278,10 @@ class ClamTsneClassifier:
                 })
             
             backend = self.backend
+        
+        # Add max_model_len if specified and not using API model
+        if self.max_model_len is not None and not self.is_api_model:
+            vlm_kwargs['max_model_len'] = self.max_model_len
         
         # Load VLM using centralized model loader
         self.vlm_wrapper = model_loader.load_vlm(
@@ -594,22 +601,30 @@ class ClamTsneClassifier:
                     # Convert PIL image to format expected by VLM
                     image = composed_image
                     
-                    # Create multi-visualization reasoning prompt
+                    # Create multi-visualization reasoning prompt using enhanced VLM utilities
                     if self.task_type == 'regression':
                         # Import regression prompt functions
                         from clam.utils.vlm_prompting import create_regression_prompt
                         
-                        # Generate multi-viz reasoning prompt for regression
-                        reasoning_prompt = self.context_composer.generate_reasoning_prompt(
-                            highlight_indices=highlight_indices,
-                            custom_context=f"This is {self.modality} data with regression targets. "
-                                          f"The highlighted point represents the test sample to predict.",
-                            task_description=f"Predict the target value for the highlighted point based on "
-                                           f"its position across multiple visualization perspectives. "
-                                           f"Target range: {self.target_stats['min']:.3f} to {self.target_stats['max']:.3f}"
+                        # Prepare multi-viz info for the enhanced prompt
+                        multi_viz_info = []
+                        for viz in self.context_composer.visualizations:
+                            multi_viz_info.append({
+                                'method': viz.method_name,
+                                'description': f"{viz.method_name} visualization of {self.modality} data"
+                            })
+                        
+                        # Generate enhanced multi-viz regression prompt
+                        prompt = create_regression_prompt(
+                            target_stats=self.target_stats,
+                            modality=self.modality,
+                            dataset_description=f"{self.modality.title()} data with {len(highlight_indices)} highlighted test point(s)",
+                            multi_viz_info=multi_viz_info
                         )
-                        prompt = reasoning_prompt
                     else:
+                        # Import classification prompt functions  
+                        from clam.utils.vlm_prompting import create_classification_prompt
+                        
                         # Get visible classes across all visualizations
                         all_visible_classes = set()
                         for viz_result in self.context_composer.visualization_results:
@@ -619,17 +634,22 @@ class ClamTsneClassifier:
                         visible_classes_list = sorted(list(all_visible_classes))
                         visible_semantic_names = [self.class_to_semantic.get(cls, str(cls)) for cls in visible_classes_list]
                         
-                        # Generate multi-viz reasoning prompt for classification
-                        reasoning_prompt = self.context_composer.generate_reasoning_prompt(
-                            highlight_indices=highlight_indices,
-                            custom_context=f"This is {self.modality} data with {len(self.unique_classes)} classes: "
-                                          f"{', '.join(visible_semantic_names)}. "
-                                          f"The highlighted point represents the test sample to classify.",
-                            task_description=f"Classify the highlighted point based on its position and "
-                                           f"relationships across multiple visualization perspectives. "
-                                           f"Consider cluster consistency across different methods."
+                        # Prepare multi-viz info for the enhanced prompt
+                        multi_viz_info = []
+                        for viz in self.context_composer.visualizations:
+                            multi_viz_info.append({
+                                'method': viz.method_name,
+                                'description': f"{viz.method_name} visualization of {self.modality} data"
+                            })
+                        
+                        # Generate enhanced multi-viz classification prompt
+                        prompt = create_classification_prompt(
+                            class_names=visible_semantic_names,
+                            modality=self.modality,
+                            dataset_description=f"{self.modality.title()} data with {len(self.unique_classes)} classes and {len(highlight_indices)} highlighted test point(s)",
+                            use_semantic_names=True,
+                            multi_viz_info=multi_viz_info
                         )
-                        prompt = reasoning_prompt
                         
                     legend_text = f"Multi-visualization analysis ({len(self.visualization_methods)} methods)"
                     

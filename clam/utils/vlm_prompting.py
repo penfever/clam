@@ -96,7 +96,8 @@ def create_classification_prompt(
     legend_text: Optional[str] = None,
     include_spectrogram: bool = False,
     dataset_description: Optional[str] = None,
-    use_semantic_names: bool = False
+    use_semantic_names: bool = False,
+    multi_viz_info: Optional[List[Dict[str, Any]]] = None
 ) -> str:
     """
     Create a classification prompt for VLM based on modality and visualization type.
@@ -111,6 +112,7 @@ def create_classification_prompt(
         include_spectrogram: Whether spectrogram is included (for audio)
         dataset_description: Optional description of the dataset/task
         use_semantic_names: Whether to use semantic class names in prompts (default: False uses "Class X")
+        multi_viz_info: Optional list of visualization method information for multi-viz prompts
         
     Returns:
         Formatted prompt string
@@ -154,7 +156,40 @@ def create_classification_prompt(
             data_description += f"\n{7 if use_knn and use_3d else 6 if use_knn or use_3d else 5}. Audio spectrogram of the query sample shown below the t-SNE plot"
             
     elif modality == "tabular":
-        data_description = f"""Looking at this{'enhanced' if use_knn else ''} {'3D ' if use_3d else ''}t-SNE visualization of tabular data, you can see:
+        if multi_viz_info:
+            # Multi-visualization description
+            viz_names = [viz['method'].upper() for viz in multi_viz_info]
+            data_description = f"""Looking at these {len(multi_viz_info)} different visualizations ({', '.join(viz_names)}) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:"""
+            
+            # Add method-specific descriptions
+            for i, viz in enumerate(multi_viz_info, 1):
+                method = viz['method'].upper()
+                if method == 'PCA':
+                    data_description += f"\n- **{method}**: Shows linear relationships and directions of maximum variance"
+                elif method == 'TSNE':
+                    data_description += f"\n- **{method}**: Preserves local neighborhood structures, excellent for revealing clusters"
+                elif method == 'UMAP':
+                    data_description += f"\n- **{method}**: Preserves both local and global structure with clearer cluster separation"
+                elif 'SPECTRAL' in method:
+                    data_description += f"\n- **{method}**: Reveals manifold structure using graph-based relationships"
+                elif method == 'ISOMAP':
+                    data_description += f"\n- **{method}**: Preserves geodesic distances along the data manifold"
+                elif 'LLE' in method or 'LOCALLY' in method:
+                    data_description += f"\n- **{method}**: Reconstructs local geometry of the data manifold"
+                elif method == 'MDS':
+                    data_description += f"\n- **{method}**: Preserves pairwise distances between data points"
+                else:
+                    data_description += f"\n- **{method}**: {viz.get('description', 'Alternative perspective on data structure')}"
+        else:
+            # Single visualization description
+            data_description = f"""Looking at this{'enhanced' if use_knn else ''} {'3D ' if use_3d else ''}t-SNE visualization of tabular data, you can see:
 
 1. Colored points representing training data, where each color corresponds to a different class
 2. Gray square points representing test data  
@@ -197,7 +232,35 @@ def create_classification_prompt(
         important_note = ""
 
     # Create analysis instructions
-    if use_knn:
+    if multi_viz_info:
+        # Multi-visualization analysis
+        viz_list = ', '.join([viz['method'].upper() for viz in multi_viz_info])
+        analysis_prompt = f"Based on the position of the red star (query {'audio sample' if modality == 'audio' else 'point'}) across ALL {len(multi_viz_info)} visualization methods ({viz_list}), which class should this query {'audio sample' if modality == 'audio' else 'point'} belong to? The available classes are: {class_list_str}"
+        
+        considerations = [
+            f"The spatial relationships across all {len(multi_viz_info)} visualization methods",
+            "Which colored class clusters the red star is consistently closest to across multiple methods",
+            "Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)",
+            "How different visualization methods agree or disagree about the query point's classification"
+        ]
+        
+        # Add method-specific considerations
+        linear_methods = [v for v in multi_viz_info if v['method'].lower() in ['pca']]
+        nonlinear_methods = [v for v in multi_viz_info if v['method'].lower() in ['tsne', 'umap', 'isomap', 'lle']]
+        
+        if linear_methods and nonlinear_methods:
+            considerations.append("Whether linear methods (PCA) and nonlinear methods show consistent or different cluster assignments")
+        
+        local_methods = [v for v in multi_viz_info if v['method'].lower() in ['tsne', 'lle']]
+        global_methods = [v for v in multi_viz_info if v['method'].lower() in ['umap', 'isomap', 'mds']]
+        
+        if local_methods and global_methods:
+            considerations.append("How local structure methods (t-SNE, LLE) compare with global structure methods (UMAP, Isomap)")
+            
+        if include_spectrogram and modality == "audio":
+            considerations.append("The audio spectrogram patterns that might provide additional context")
+            
+    elif use_knn:
         analysis_prompt = f"Based on BOTH the spatial position in the t-SNE visualization AND the explicit nearest neighbor connections, which class should this query {'audio sample' if modality == 'audio' else 'point'} belong to? The available classes are: {class_list_str}"
         
         considerations = ["The spatial clustering patterns" + (" across all four 3D views" if use_3d else " in the t-SNE visualization")]
@@ -218,7 +281,10 @@ def create_classification_prompt(
     consider_text = "\n".join([f"- {consideration}" for consideration in considerations])
 
     # Create response format instruction
-    if use_knn:
+    if multi_viz_info:
+        viz_list = ', '.join([viz['method'].upper() for viz in multi_viz_info])
+        analysis_type = f"multi-visualization analysis across {len(multi_viz_info)} methods ({viz_list})"
+    elif use_knn:
         analysis_type = "spatial clustering AND the pie chart neighbor analysis"
     elif use_3d:
         analysis_type = "3D spatial clustering patterns you observe across the multiple views"
@@ -251,7 +317,8 @@ def create_regression_prompt(
     knn_k: Optional[int] = None,
     legend_text: Optional[str] = None,
     include_spectrogram: bool = False,
-    dataset_description: Optional[str] = None
+    dataset_description: Optional[str] = None,
+    multi_viz_info: Optional[List[Dict[str, Any]]] = None
 ) -> str:
     """
     Create a regression prompt for VLM based on modality and visualization type.
@@ -265,6 +332,7 @@ def create_regression_prompt(
         legend_text: Legend text from the visualization
         include_spectrogram: Whether spectrogram is included (for audio)
         dataset_description: Optional description of the dataset/task
+        multi_viz_info: Optional list of visualization method information for multi-viz prompts
         
     Returns:
         Formatted prompt string
@@ -300,17 +368,50 @@ def create_regression_prompt(
             data_description += f"\n{6 if use_knn and use_3d else 5 if use_knn or use_3d else 4}. Audio spectrogram of the query sample shown below the t-SNE plot"
             
     elif modality == "tabular":
-        data_description = f"""Looking at this{'enhanced' if use_knn else ''} {'3D ' if use_3d else ''}t-SNE visualization of tabular regression data, you can see:
+        if multi_viz_info:
+            # Multi-visualization description for regression
+            viz_names = [viz['method'].upper() for viz in multi_viz_info]
+            data_description = f"""Looking at these {len(multi_viz_info)} different visualizations ({', '.join(viz_names)}) of the same tabular regression data:
+
+Each visualization shows:
+1. Colored points representing training data, where the color intensity/gradient corresponds to different target values
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to predict a value for
+
+The multiple visualizations provide different perspectives on how the target values are distributed in the data structure:"""
+            
+            # Add method-specific descriptions for regression
+            for i, viz in enumerate(multi_viz_info, 1):
+                method = viz['method'].upper()
+                if method == 'PCA':
+                    data_description += f"\n- **{method}**: Shows linear relationships between features and target values"
+                elif method == 'TSNE':
+                    data_description += f"\n- **{method}**: Reveals local patterns in target value distribution"
+                elif method == 'UMAP':
+                    data_description += f"\n- **{method}**: Preserves both local and global target value structure"
+                elif 'SPECTRAL' in method:
+                    data_description += f"\n- **{method}**: Shows manifold-based target value relationships"
+                elif method == 'ISOMAP':
+                    data_description += f"\n- **{method}**: Preserves geodesic relationships in target space"
+                elif 'LLE' in method or 'LOCALLY' in method:
+                    data_description += f"\n- **{method}**: Reconstructs local target value geometry"
+                elif method == 'MDS':
+                    data_description += f"\n- **{method}**: Preserves target value distances between points"
+                else:
+                    data_description += f"\n- **{method}**: {viz.get('description', 'Alternative perspective on target distribution')}"
+        else:
+            # Single visualization description for regression
+            data_description = f"""Looking at this{'enhanced' if use_knn else ''} {'3D ' if use_3d else ''}t-SNE visualization of tabular regression data, you can see:
 
 1. Colored points representing training data, where the color intensity/gradient corresponds to different target values
 2. Gray square points representing test data  
 3. One red star point which is the query point I want you to predict a value for"""
-        
-        if use_3d:
-            data_description += "\n4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)"
             
-        if use_knn and knn_k:
-            data_description += f"\n{5 if use_3d else 4}. A summary showing the {knn_k} nearest neighbors with their target values and distances"
+            if use_3d:
+                data_description += "\n4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)"
+                
+            if use_knn and knn_k:
+                data_description += f"\n{5 if use_3d else 4}. A summary showing the {knn_k} nearest neighbors with their target values and distances"
             
     else:  # image or other
         data_description = f"""Looking at this{'enhanced' if use_knn else ''} {'3D ' if use_3d else ''}t-SNE visualization of {modality} regression data, you can see:
@@ -341,7 +442,35 @@ def create_regression_prompt(
         important_note = f"\nIMPORTANT: The color gradient in the visualization represents the target values, with the colormap typically ranging from low values (cooler colors) to high values (warmer colors)."
 
     # Create analysis instructions
-    if use_knn:
+    if multi_viz_info:
+        # Multi-visualization analysis for regression
+        viz_list = ', '.join([viz['method'].upper() for viz in multi_viz_info])
+        analysis_prompt = f"Based on the position of the red star (query {'audio sample' if modality == 'audio' else 'point'}) across ALL {len(multi_viz_info)} visualization methods ({viz_list}), what value should I predict? The target values in this dataset range {range_desc} {stats_desc}."
+        
+        considerations = [
+            f"The spatial relationships and color patterns across all {len(multi_viz_info)} visualization methods",
+            "The color intensity/gradient patterns that are consistent across multiple visualizations",
+            "How different visualization methods represent the target value distribution in their respective spaces",
+            "Target value trends that appear reliable across multiple methods (these are more trustworthy than method-specific patterns)"
+        ]
+        
+        # Add method-specific considerations for regression
+        linear_methods = [v for v in multi_viz_info if v['method'].lower() in ['pca']]
+        nonlinear_methods = [v for v in multi_viz_info if v['method'].lower() in ['tsne', 'umap', 'isomap', 'lle']]
+        
+        if linear_methods and nonlinear_methods:
+            considerations.append("Whether linear methods (PCA) and nonlinear methods show similar target value predictions")
+        
+        local_methods = [v for v in multi_viz_info if v['method'].lower() in ['tsne', 'lle']]
+        global_methods = [v for v in multi_viz_info if v['method'].lower() in ['umap', 'isomap', 'mds']]
+        
+        if local_methods and global_methods:
+            considerations.append("How local structure methods (t-SNE, LLE) compare with global methods (UMAP, Isomap) for target value estimation")
+            
+        if include_spectrogram and modality == "audio":
+            considerations.append("The audio spectrogram patterns that might provide additional context")
+            
+    elif use_knn:
         analysis_prompt = f"Based on BOTH the spatial position in the t-SNE visualization AND the target values of the nearest neighbors, what value should I predict for this query {'audio sample' if modality == 'audio' else 'point'}? The target values in this dataset range {range_desc} {stats_desc}."
         
         considerations = ["The spatial clustering patterns" + (" across all four 3D views" if use_3d else " in the t-SNE visualization")]
@@ -364,7 +493,10 @@ def create_regression_prompt(
     consider_text = "\n".join([f"- {consideration}" for consideration in considerations])
 
     # Create response format instruction
-    if use_knn:
+    if multi_viz_info:
+        viz_list = ', '.join([viz['method'].upper() for viz in multi_viz_info])
+        analysis_type = f"multi-visualization analysis across {len(multi_viz_info)} methods ({viz_list})"
+    elif use_knn:
         analysis_type = "spatial clustering AND the neighbor value analysis"
     elif use_3d:
         analysis_type = "3D spatial clustering and color patterns you observe across the multiple views"

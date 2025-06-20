@@ -39,7 +39,7 @@ class PromptGenerator:
         n_classes: Optional[int] = None
     ) -> str:
         """
-        Generate a comprehensive reasoning prompt.
+        Generate a comprehensive reasoning prompt using enhanced VLM utilities.
         
         Args:
             visualizations: List of visualization information dictionaries
@@ -52,40 +52,66 @@ class PromptGenerator:
         Returns:
             Generated prompt string
         """
-        prompt_parts = []
+        # Import the enhanced VLM prompting utilities
+        from clam.utils.vlm_prompting import create_classification_prompt, create_regression_prompt
         
-        # Introduction
-        prompt_parts.append(self._generate_introduction(
-            len(visualizations), data_shape, n_classes
-        ))
+        # Prepare multi_viz_info for the enhanced utilities
+        multi_viz_info = []
+        for viz in visualizations:
+            multi_viz_info.append({
+                'method': viz.get('method', 'Unknown'),
+                'description': viz.get('description', f"Visualization of data using {viz.get('method', 'unknown')} method")
+            })
         
-        # Visualization descriptions
-        if self.config.include_individual_descriptions:
-            prompt_parts.append(self._generate_visualization_descriptions(visualizations))
+        # Determine if this is classification or regression
+        is_regression = any(viz.get('config', {}).get('task_type') == 'regression' for viz in visualizations)
         
-        # Cross-references between visualizations
-        if self.config.include_cross_references:
-            prompt_parts.append(self._generate_cross_references(visualizations))
+        # Build dataset description
+        dataset_description = ""
+        if data_shape:
+            dataset_description += f"Dataset with {data_shape[0]} samples and {data_shape[1]} features. "
         
-        # Highlighted points analysis
-        if highlight_indices:
-            prompt_parts.append(self._generate_highlight_analysis(highlight_indices))
-        
-        # Custom context
         if custom_context:
-            prompt_parts.append(f"\n**Additional Context:**\n{custom_context}")
-        
-        # Reasoning guidance based on focus
-        prompt_parts.append(self._generate_reasoning_guidance())
-        
-        # Task-specific instructions
+            dataset_description += f"{custom_context} "
+            
         if task_description:
-            prompt_parts.append(f"\n**Specific Task:**\n{task_description}")
+            dataset_description += f"Task: {task_description}"
         
-        # Final instructions
-        prompt_parts.append(self._generate_final_instructions(visualizations))
-        
-        return "\n\n".join(prompt_parts)
+        if is_regression:
+            # For regression, we need target stats - use dummy values if not available
+            target_stats = {
+                'min': 0.0,
+                'max': 1.0, 
+                'mean': 0.5,
+                'std': 0.3
+            }
+            
+            # Try to extract target stats from visualizations
+            for viz in visualizations:
+                if 'target_stats' in viz:
+                    target_stats = viz['target_stats']
+                    break
+            
+            return create_regression_prompt(
+                target_stats=target_stats,
+                modality="tabular",  # Default to tabular
+                dataset_description=dataset_description,
+                multi_viz_info=multi_viz_info
+            )
+        else:
+            # For classification
+            if n_classes:
+                class_names = [f"Class {i}" for i in range(n_classes)]
+            else:
+                class_names = ["Class 0", "Class 1", "Class 2"]  # Default
+            
+            return create_classification_prompt(
+                class_names=class_names,
+                modality="tabular",  # Default to tabular
+                dataset_description=dataset_description,
+                use_semantic_names=False,  # Use Class X format for consistency
+                multi_viz_info=multi_viz_info
+            )
     
     def _generate_introduction(
         self,
