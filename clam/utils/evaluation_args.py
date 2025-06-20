@@ -677,6 +677,28 @@ def add_llm_baseline_args(parser: argparse.ArgumentParser):
         default=4096,
         help="Maximum context length for LLM models"
     )
+    # Regression-specific arguments
+    parser.add_argument(
+        "--skip_classification",
+        action="store_true",
+        help="Skip evaluation on classification datasets (only evaluate regression)"
+    )
+    parser.add_argument(
+        "--skip_regression",
+        action="store_true",
+        help="Skip evaluation on regression datasets (only evaluate classification)"
+    )
+    parser.add_argument(
+        "--regression_bins",
+        type=int,
+        default=10,
+        help="Number of bins for regression to classification conversion in TabLLM"
+    )
+    parser.add_argument(
+        "--preserve_regression",
+        action="store_true",
+        help="Preserve continuous targets for regression tasks instead of converting to classification"
+    )
 
 
 def add_dataset_selection_args(parser: argparse.ArgumentParser):
@@ -749,6 +771,7 @@ def create_evaluation_parser(description: str, default_wandb_project: str = "cla
     add_embedding_args(parser)
     add_baseline_model_args(parser)
     add_tabpfn_args(parser)
+    add_llm_baseline_args(parser)  # Add LLM baseline args including preserve_regression
     add_evaluation_wandb_args(parser, default_wandb_project)
     add_label_fitting_args(parser)
     add_calibration_args(parser)

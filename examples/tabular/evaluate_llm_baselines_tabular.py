@@ -626,6 +626,33 @@ def main():
     for dataset in datasets:
         logger.info(f"\\n{'='*50}\\nEvaluating dataset: {dataset['name']}\\n{'='*50}")
         
+        # Detect task type and apply filtering if requested
+        from clam.utils.task_detection import detect_task_type
+        try:
+            # Get target values for task detection
+            y_data = dataset.get('y_train', dataset.get('y', []))
+            if len(y_data) == 0:
+                # If no y_train, try to get from combined data
+                if 'X_train' in dataset and 'y_train' in dataset:
+                    y_data = dataset['y_train']
+                elif 'X' in dataset and 'y' in dataset:
+                    y_data = dataset['y']
+            
+            task_type, detection_method = detect_task_type(y=y_data, dataset=dataset)
+            logger.info(f"Detected task type: {task_type}")
+            
+            # Apply task type filtering
+            if args.skip_classification and task_type == 'classification':
+                logger.info(f"Skipping classification dataset {dataset['name']} (--skip_classification enabled)")
+                continue
+            elif args.skip_regression and task_type == 'regression':
+                logger.info(f"Skipping regression dataset {dataset['name']} (--skip_regression enabled)")
+                continue
+                
+        except Exception as e:
+            logger.warning(f"Could not detect task type for {dataset['name']}: {e}. Proceeding with evaluation.")
+            task_type = 'unknown'
+        
         dataset_results = []
         
         # Validate metadata for models that require it
@@ -778,7 +805,12 @@ def main():
     # Log model-level aggregation metrics using unified system
     if args.use_wandb and WANDB_AVAILABLE:
         for model_name in models_to_evaluate:
-            model_results = [r for r in all_results if r.get('model_name') == model_name and 'accuracy' in r and not r.get('timeout', False)]
+            # Include results that have either accuracy (classification) or R² score (regression)
+            model_results = [r for r in all_results if (
+                r.get('model_name') == model_name and 
+                ('accuracy' in r or 'r2_score' in r) and 
+                not r.get('timeout', False)
+            )]
             if model_results:
                 # Initialize aggregation metrics logger
                 agg_metrics_logger = MetricsLogger(
@@ -800,15 +832,36 @@ def main():
     for model_name in models_to_evaluate:
         model_results = [r for r in all_results if r.get('model_name') == model_name]
         if model_results:
-            accuracies = [r['accuracy'] for r in model_results if 'accuracy' in r]
+            # Separate classification and regression results
+            classification_results = [r for r in model_results if 'accuracy' in r and r['accuracy'] is not None]
+            regression_results = [r for r in model_results if 'r2_score' in r and r['r2_score'] is not None]
+            
             completion_rates = [r.get('completion_rate', 1.0) for r in model_results]
             timeouts = len([r for r in model_results if r.get('timeout', False)])
             errors = len([r for r in model_results if 'error' in r and not r.get('timeout', False)])
             
-            if accuracies:
+            # Report metrics based on task types present
+            if classification_results:
+                accuracies = [r['accuracy'] for r in classification_results]
                 avg_accuracy = np.mean(accuracies)
                 avg_completion = np.mean(completion_rates)
-                logger.info(f"{model_name}: Average accuracy = {avg_accuracy:.4f}, completion rate = {avg_completion:.1%} ({len(accuracies)} datasets)")
+                logger.info(f"{model_name}: Average accuracy = {avg_accuracy:.4f} ({len(classification_results)} classification datasets)")
+            
+            if regression_results:
+                r2_scores = [r['r2_score'] for r in regression_results]
+                avg_r2 = np.mean(r2_scores)
+                logger.info(f"{model_name}: Average R² = {avg_r2:.4f} ({len(regression_results)} regression datasets)")
+                
+                # Also report MAE if available
+                mae_scores = [r['mae'] for r in regression_results if 'mae' in r and r['mae'] is not None]
+                if mae_scores:
+                    avg_mae = np.mean(mae_scores)
+                    logger.info(f"{model_name}: Average MAE = {avg_mae:.4f}")
+            
+            if classification_results or regression_results:
+                avg_completion = np.mean(completion_rates)
+                total_valid = len(classification_results) + len(regression_results)
+                logger.info(f"{model_name}: Completion rate = {avg_completion:.1%} ({total_valid} total datasets)")
                 if timeouts > 0:
                     logger.info(f"  - {timeouts} timeouts")
                 if errors > 0:

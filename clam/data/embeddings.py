@@ -91,7 +91,8 @@ def get_tabpfn_embeddings(
     embedding_size: int = 1000,
     cache_dir: Optional[str] = None,
     dataset_name: Optional[str] = None,
-    force_recompute: bool = False
+    force_recompute: bool = False,
+    task_type: str = "classification"
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, Any, np.ndarray]:
     """
     Get TabPFN embeddings with improved class balance checking and caching.
@@ -106,6 +107,7 @@ def get_tabpfn_embeddings(
         cache_dir: Directory to store cached embeddings. If None, caching is disabled.
         dataset_name: Optional name of the dataset for the cache filename
         force_recompute: If True, ignore cache and recompute embeddings
+        task_type: Type of task - "classification" or "regression"
 
     Returns:
         train_embeddings: TabPFN embeddings for training set
@@ -115,7 +117,12 @@ def get_tabpfn_embeddings(
         y_train_sample: Labels for the sampled training set
     """
     try:
-        from tabpfn import TabPFNClassifier
+        if task_type == "regression":
+            from tabpfn import TabPFNRegressor
+            TabPFNModel = TabPFNRegressor
+        else:
+            from tabpfn import TabPFNClassifier  
+            TabPFNModel = TabPFNClassifier
     except ImportError:
         raise ImportError("TabPFN package is required to get embeddings. Install it with 'pip install tabpfn'.")
 
@@ -125,6 +132,7 @@ def get_tabpfn_embeddings(
         "dataset_name": dataset_name or "unknown",
         "embedding_size": embedding_size,
         "max_samples": max_samples,
+        "task_type": task_type,
         "n_train": len(X_train),
         "n_val": len(X_val),
         "n_test": len(X_test),
@@ -181,19 +189,24 @@ def get_tabpfn_embeddings(
 
     logger.info("Fitting TabPFN and extracting embeddings")
 
-    # Log original class distribution
-    unique_classes, class_counts = np.unique(y_train, return_counts=True)
-    class_dist = dict(zip(unique_classes, class_counts))
-    logger.info(f"Original train set class distribution: {class_dist}")
-    
-    # Validate class distribution for stratified sampling
-    MIN_SAMPLES_PER_CLASS = 2
-    min_class_count = min(class_counts)
-    if min_class_count < MIN_SAMPLES_PER_CLASS:
-        raise ValueError(f"Minimum class count is {min_class_count}, which is less than {MIN_SAMPLES_PER_CLASS} required for stratified sampling")
-    
-    if len(unique_classes) < 2:
-        raise ValueError(f"Only {len(unique_classes)} unique classes found, need at least 2 classes")
+    # Log original target distribution
+    if task_type == "classification":
+        unique_classes, class_counts = np.unique(y_train, return_counts=True)
+        class_dist = dict(zip(unique_classes, class_counts))
+        logger.info(f"Original train set class distribution: {class_dist}")
+        
+        # Validate class distribution for stratified sampling
+        MIN_SAMPLES_PER_CLASS = 2
+        min_class_count = min(class_counts)
+        if min_class_count < MIN_SAMPLES_PER_CLASS:
+            raise ValueError(f"Minimum class count is {min_class_count}, which is less than {MIN_SAMPLES_PER_CLASS} required for stratified sampling")
+        
+        if len(unique_classes) < 2:
+            raise ValueError(f"Only {len(unique_classes)} unique classes found, need at least 2 classes")
+    else:
+        # For regression, log target statistics
+        logger.info(f"Original train set target statistics: min={y_train.min():.3f}, max={y_train.max():.3f}, mean={y_train.mean():.3f}, std={y_train.std():.3f}")
+        unique_classes = None  # Not needed for regression
 
     # Handle dimensionality reduction if feature count is very high
     MAX_FEATURES_FOR_TABPFN = 1000  # TabPFN typically works well with less than 1000 features
@@ -207,47 +220,62 @@ def get_tabpfn_embeddings(
         X_val = X_val[:, selected_features]
         X_test = X_test[:, selected_features]
 
-    # Sample if dataset is too large, ensuring class balance
+    # Sample if dataset is too large
     if len(X_train) > max_samples:
-        # Stratified sampling to preserve class distribution
         from sklearn.model_selection import train_test_split
-
-        # Check if we need to adjust sample size to ensure at least 2 samples per class
-        sample_ratio = max_samples/len(X_train)
-        min_expected_samples = int(min_class_count * sample_ratio)
         
-        if min_expected_samples < MIN_SAMPLES_PER_CLASS:
-            # Adjust sample size to ensure minimum class representation
-            required_ratio = MIN_SAMPLES_PER_CLASS / min_class_count
-            adjusted_max_samples = min(len(X_train), int(len(X_train) * required_ratio * 1.1))  # Add 10% buffer
-            logger.warning(f"Adjusting sample size from {max_samples} to {adjusted_max_samples} to ensure minimum class representation")
-            sample_ratio = adjusted_max_samples/len(X_train)
+        sample_ratio = max_samples / len(X_train)
         
-        try:
-            # Split with stratification to maintain class distribution
+        if task_type == "classification":
+            # Check if we need to adjust sample size to ensure at least 2 samples per class
+            min_expected_samples = int(min_class_count * sample_ratio)
+            
+            if min_expected_samples < MIN_SAMPLES_PER_CLASS:
+                # Adjust sample size to ensure minimum class representation
+                required_ratio = MIN_SAMPLES_PER_CLASS / min_class_count
+                adjusted_max_samples = min(len(X_train), int(len(X_train) * required_ratio * 1.1))  # Add 10% buffer
+                logger.warning(f"Adjusting sample size from {max_samples} to {adjusted_max_samples} to ensure minimum class representation")
+                sample_ratio = adjusted_max_samples/len(X_train)
+            
+            try:
+                # Split with stratification to maintain class distribution
+                _, X_train_sample, _, y_train_sample = train_test_split(
+                    X_train, y_train,
+                    test_size=sample_ratio,
+                    stratify=y_train,
+                    random_state=42
+                )
+            except ValueError as e:
+                # If stratified sampling fails, fall back to random sampling
+                logger.warning(f"Stratified sampling failed: {e}. Using random sampling.")
+                _, X_train_sample, _, y_train_sample = train_test_split(
+                    X_train, y_train,
+                    test_size=sample_ratio,
+                    random_state=42
+                )
+        else:
+            # For regression, use simple random sampling
             _, X_train_sample, _, y_train_sample = train_test_split(
                 X_train, y_train,
                 test_size=sample_ratio,
-                stratify=y_train,
                 random_state=42
             )
-        except ValueError as e:
-            # If stratified sampling fails, fall back to using all data
-            logger.warning(f"Stratified sampling failed: {e}. Using full dataset.")
-            X_train_sample = X_train
-            y_train_sample = y_train
-
-        # Verify the sampled distribution
-        sampled_classes, sampled_counts = np.unique(y_train_sample, return_counts=True)
-        logger.info(f"Sampled train set class distribution: {dict(zip(sampled_classes, sampled_counts))}")
+            
+        logger.info(f"Sampled {len(X_train_sample)} training samples from {len(X_train)} total samples")
     else:
         X_train_sample = X_train
         y_train_sample = y_train
-        logger.info(f"Using all {len(X_train)} training samples")
+
+    # Verify the sampled distribution for classification
+    if task_type == "classification":
+        sampled_classes, sampled_counts = np.unique(y_train_sample, return_counts=True)
+        logger.info(f"Sampled train set class distribution: {dict(zip(sampled_classes, sampled_counts))}")
+    else:
+        logger.info(f"Sampled train set target statistics: min={y_train_sample.min():.3f}, max={y_train_sample.max():.3f}, mean={y_train_sample.mean():.3f}")
 
     # Initialize and fit TabPFN
     N_ensemble = 8
-    tabpfn = TabPFNClassifier(
+    tabpfn = TabPFNModel(
         device='cuda' if torch.cuda.is_available() else 'cpu',
         n_estimators=N_ensemble,
         ignore_pretraining_limits=True

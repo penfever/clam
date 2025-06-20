@@ -78,9 +78,13 @@ class MetricsLogger:
         'roc_auc', 'log_loss', 'confusion_matrix'
     }
     
+    REGRESSION_METRICS = {
+        'r2_score', 'mae', 'mse', 'rmse', 'mean_absolute_percentage_error'
+    }
+    
     DATASET_INFO_METRICS = {
         'num_features', 'num_samples', 'num_classes', 'num_test_samples',
-        'dataset_name', 'dataset_id', 'task_id'
+        'dataset_name', 'dataset_id', 'task_id', 'task_type'
     }
     
     EXECUTION_METRICS = {
@@ -237,12 +241,43 @@ class MetricsLogger:
             if value is not None:
                 self._log_metric(name, value)
     
+    def log_regression_metrics(
+        self,
+        r2_score: Optional[float] = None,
+        mae: Optional[float] = None,
+        mse: Optional[float] = None,
+        rmse: Optional[float] = None,
+        mean_absolute_percentage_error: Optional[float] = None
+    ) -> None:
+        """
+        Log regression-specific metrics.
+        
+        Args:
+            r2_score: R-squared (coefficient of determination)
+            mae: Mean Absolute Error
+            mse: Mean Squared Error
+            rmse: Root Mean Squared Error
+            mean_absolute_percentage_error: MAPE
+        """
+        metrics = {
+            'r2_score': r2_score,
+            'mae': mae,
+            'mse': mse,
+            'rmse': rmse,
+            'mean_absolute_percentage_error': mean_absolute_percentage_error
+        }
+        
+        for name, value in metrics.items():
+            if value is not None:
+                self._log_metric(name, value)
+    
     def log_dataset_info(
         self,
         num_features: Optional[int] = None,
         num_samples: Optional[int] = None,
         num_classes: Optional[int] = None,
-        num_test_samples: Optional[int] = None
+        num_test_samples: Optional[int] = None,
+        task_type: Optional[str] = None
     ) -> None:
         """
         Log dataset information metrics.
@@ -250,14 +285,16 @@ class MetricsLogger:
         Args:
             num_features: Number of features in the dataset
             num_samples: Total number of samples
-            num_classes: Number of target classes
+            num_classes: Number of target classes (None for regression)
             num_test_samples: Number of test samples
+            task_type: Type of task ('classification' or 'regression')
         """
         metrics = {
             'num_features': num_features,
             'num_samples': num_samples,
             'num_classes': num_classes,
-            'num_test_samples': num_test_samples
+            'num_test_samples': num_test_samples,
+            'task_type': task_type
         }
         
         for name, value in metrics.items():
@@ -409,12 +446,22 @@ class MetricsLogger:
             log_loss=result_dict.get('log_loss')
         )
         
+        # Regression metrics
+        self.log_regression_metrics(
+            r2_score=result_dict.get('r2_score'),
+            mae=result_dict.get('mae'),
+            mse=result_dict.get('mse'),
+            rmse=result_dict.get('rmse'),
+            mean_absolute_percentage_error=result_dict.get('mean_absolute_percentage_error')
+        )
+        
         # Dataset info
         self.log_dataset_info(
             num_features=result_dict.get('num_features'),
             num_samples=result_dict.get('num_samples'),
             num_classes=result_dict.get('num_classes'),
-            num_test_samples=result_dict.get('num_test_samples')
+            num_test_samples=result_dict.get('num_test_samples'),
+            task_type=result_dict.get('task_type')
         )
         
         # Timing
@@ -444,7 +491,7 @@ class MetricsLogger:
         
         # Log any additional metrics not covered above
         all_standard_metrics = (
-            self.CORE_METRICS | self.OPTIONAL_METRICS | 
+            self.CORE_METRICS | self.OPTIONAL_METRICS | self.REGRESSION_METRICS |
             self.DATASET_INFO_METRICS | self.EXECUTION_METRICS | 
             self.STATUS_METRICS | self.EXPLANATION_METRICS | {'confusion_matrix'}
         )
@@ -542,6 +589,7 @@ def get_standard_metric_names() -> Dict[str, set]:
     return {
         'core_metrics': MetricsLogger.CORE_METRICS,
         'optional_metrics': MetricsLogger.OPTIONAL_METRICS,
+        'regression_metrics': MetricsLogger.REGRESSION_METRICS,
         'dataset_info_metrics': MetricsLogger.DATASET_INFO_METRICS,
         'execution_metrics': MetricsLogger.EXECUTION_METRICS,
         'status_metrics': MetricsLogger.STATUS_METRICS,

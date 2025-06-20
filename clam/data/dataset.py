@@ -177,7 +177,7 @@ def get_dataset_info(dataset_id_or_name: Union[str, int]) -> Dict[str, Any]:
         logger.error(f"Error getting dataset info for ID {dataset_id}: {e}")
         raise ValueError(f"Failed to get dataset info for ID {dataset_id}: {e}")
 
-def load_dataset(dataset_name: str, bypass_size_check: bool = False) -> Tuple[np.ndarray, np.ndarray, List[bool], List[str], str]:
+def load_dataset(dataset_name: str, bypass_size_check: bool = False, preserve_regression: bool = False) -> Tuple[np.ndarray, np.ndarray, List[bool], List[str], str]:
     """
     Load a dataset from OpenML. Can load datasets by name or ID.
 
@@ -187,6 +187,8 @@ def load_dataset(dataset_name: str, bypass_size_check: bool = False) -> Tuple[np
                     or any other OpenML dataset name. If using an ID, it should be a string representation
                     of the OpenML dataset ID (e.g., '1169' for Airlines).
         bypass_size_check: If True, bypasses the minimum 1000 samples requirement. Default is False.
+        preserve_regression: If True, preserves continuous targets for regression tasks instead of 
+                           converting them to classification. Default is False.
 
     Returns:
         X: Features
@@ -545,7 +547,8 @@ def load_dataset(dataset_name: str, bypass_size_check: bool = False) -> Tuple[np
                 raise ValueError(f"Could not load dataset {dataset_id} in either dataframe or array format")
         
         # Check if target is continuous (regression) and convert to classification by binning
-        if np.issubdtype(y.dtype, np.floating) and len(np.unique(y)) > 10:
+        # Only do this if preserve_regression is False
+        if not preserve_regression and np.issubdtype(y.dtype, np.floating) and len(np.unique(y)) > 10:
             logger.info(f"Converting continuous target to classification by binning")
             from sklearn.preprocessing import KBinsDiscretizer
             # Use quantile binning to create balanced classes
@@ -553,6 +556,8 @@ def load_dataset(dataset_name: str, bypass_size_check: bool = False) -> Tuple[np
             discretizer = KBinsDiscretizer(n_bins=n_bins, encode='ordinal', strategy='quantile')
             y = discretizer.fit_transform(y.reshape(-1, 1)).flatten().astype(int)
             logger.info(f"Binned continuous target into {n_bins} classes")
+        elif preserve_regression and np.issubdtype(y.dtype, np.floating) and len(np.unique(y)) > 10:
+            logger.info(f"Preserving continuous target for regression task (preserve_regression=True)")
         
         # Log basic dataset information
         num_features = X.shape[1]
@@ -896,7 +901,8 @@ def load_datasets(args):
     if hasattr(args, 'dataset_name') and args.dataset_name:
         logger.info(f"Loading single dataset: {args.dataset_name}")
         try:
-            X, y, categorical_indicator, attribute_names, dataset_name = load_dataset(args.dataset_name, bypass_size_check=True)
+            preserve_regression = getattr(args, 'preserve_regression', False)
+            X, y, categorical_indicator, attribute_names, dataset_name = load_dataset(args.dataset_name, bypass_size_check=True, preserve_regression=preserve_regression)
             datasets.append({
                 "id": args.dataset_name,
                 "name": dataset_name,
@@ -913,10 +919,11 @@ def load_datasets(args):
     elif hasattr(args, 'dataset_ids') and args.dataset_ids:
         dataset_ids = [id.strip() for id in args.dataset_ids.split(',')]
         logger.info(f"Loading datasets with IDs: {dataset_ids}")
+        preserve_regression = getattr(args, 'preserve_regression', False)
         
         for dataset_id in dataset_ids:
             try:
-                X, y, categorical_indicator, attribute_names, dataset_name = load_dataset(dataset_id, bypass_size_check=True)
+                X, y, categorical_indicator, attribute_names, dataset_name = load_dataset(dataset_id, bypass_size_check=True, preserve_regression=preserve_regression)
                 datasets.append({
                     "id": dataset_id,
                     "name": dataset_name,
@@ -1000,9 +1007,10 @@ def load_datasets(args):
                 logger.warning(f"Using all {len(dataset_ids)} benchmark datasets (less than requested {args.num_datasets})")
             
             # Now try to load each dataset
+            preserve_regression = getattr(args, 'preserve_regression', False)
             for dataset_id in dataset_ids:
                 try:
-                    X, y, categorical_indicator, attribute_names, dataset_name = load_dataset(str(dataset_id), bypass_size_check=True)
+                    X, y, categorical_indicator, attribute_names, dataset_name = load_dataset(str(dataset_id), bypass_size_check=True, preserve_regression=preserve_regression)
                     datasets.append({
                         "id": dataset_id,
                         "name": dataset_name,
