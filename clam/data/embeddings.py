@@ -92,7 +92,8 @@ def get_tabpfn_embeddings(
     cache_dir: Optional[str] = None,
     dataset_name: Optional[str] = None,
     force_recompute: bool = False,
-    task_type: str = "classification"
+    task_type: str = "classification",
+    seed: int = 42
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, Any, np.ndarray]:
     """
     Get TabPFN embeddings with improved class balance checking and caching.
@@ -108,6 +109,7 @@ def get_tabpfn_embeddings(
         dataset_name: Optional name of the dataset for the cache filename
         force_recompute: If True, ignore cache and recompute embeddings
         task_type: Type of task - "classification" or "regression"
+        seed: Random seed for reproducible feature selection and sampling
 
     Returns:
         train_embeddings: TabPFN embeddings for training set
@@ -213,9 +215,9 @@ def get_tabpfn_embeddings(
     if X_train.shape[1] > MAX_FEATURES_FOR_TABPFN:
         # As a last resort, just select a random subset of features
         n_components = min(MAX_FEATURES_FOR_TABPFN, X_train.shape[1])
-        import random
-        random.seed(42)
-        selected_features = random.sample(range(X_train.shape[1]), n_components)
+        from ..utils import create_random_state
+        rng = create_random_state(seed)
+        selected_features = rng.choice(range(X_train.shape[1]), n_components, replace=False)
         X_train = X_train[:, selected_features]
         X_val = X_val[:, selected_features]
         X_test = X_test[:, selected_features]

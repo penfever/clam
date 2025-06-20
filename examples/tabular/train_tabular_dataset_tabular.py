@@ -78,13 +78,8 @@ def main():
     gpu_monitor = None
     
     # Set random seed for reproducibility
-    random.seed(args.seed)
-    np.random.seed(args.seed)
-    torch.manual_seed(args.seed)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(args.seed)
+    from clam.utils import set_seed
+    set_seed(args.seed, deterministic=True)
     
     # Create output directory
     os.makedirs(args.output_dir, exist_ok=True)
@@ -222,7 +217,8 @@ def main():
         embedding_size=args.embedding_size,
         cache_dir=cache_dir,
         dataset_name=args.dataset_name,
-        force_recompute=args.force_recompute_embeddings
+        force_recompute=args.force_recompute_embeddings,
+        seed=args.seed
     )
 
     # 3. Prepare Qwen model with prefix embedding

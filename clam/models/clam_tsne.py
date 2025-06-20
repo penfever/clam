@@ -303,7 +303,8 @@ class ClamTsneClassifier:
                 cache_dir=self.cache_dir,
                 dataset_name='training_data',
                 force_recompute=getattr(self, 'force_recompute_embeddings', False),
-                task_type=self.task_type
+                task_type=self.task_type,
+                seed=self.seed
             )
         else:
             raise NotImplementedError(f"Embedding generation not implemented for {self.modality}")

@@ -18,6 +18,7 @@ import sys
 import time
 import json
 import datetime
+import random
 import urllib.request
 import zipfile
 import shutil
@@ -35,7 +36,8 @@ from sklearn.preprocessing import StandardScaler
 # Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from clam.utils.class_name_utils import get_semantic_class_names_or_fallback
-from sklearn.preprocessing import StandardScaler
+from clam.utils.vlm_prompting import validate_and_clean_class_names
+from clam.utils import set_seed
 
 # Import wandb conditionally
 try:
@@ -546,17 +548,79 @@ def organize_fishnet_data(data_dir: Path):
     """Organize extracted FishNet data into train/test structure."""
     logger.info("Organizing FishNet data...")
     
-    # FishNet likely has its own organization - this function should be adapted
-    # based on the actual structure of the downloaded dataset
-    # For now, assume it already has the correct structure or implement as needed
+    # Create images directory structure
     images_dir = data_dir / "images"
-    if not images_dir.exists():
-        # Look for other possible directory structures in the extracted data
-        extracted_dirs = [d for d in data_dir.iterdir() if d.is_dir() and d.name != "__pycache__"]
-        if extracted_dirs:
-            logger.info(f"Found extracted directories: {[d.name for d in extracted_dirs]}")
-            # Move or symlink the data as needed
-            # This would need to be customized based on actual FishNet structure
+    train_dir = images_dir / "train"
+    test_dir = images_dir / "test"
+    train_dir.mkdir(parents=True, exist_ok=True)
+    test_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Find the FishNet data directory
+    fishnet_dirs = []
+    for item in data_dir.iterdir():
+        if item.is_dir() and item.name not in ["images", "__pycache__", "train", "test"]:
+            fishnet_dirs.append(item)
+    
+    if not fishnet_dirs:
+        raise RuntimeError("No FishNet data directories found after extraction")
+    
+    # Assume the first directory contains the fish images
+    source_dir = fishnet_dirs[0]
+    logger.info(f"Processing FishNet data from: {source_dir}")
+    
+    # Look for subdirectories that represent fish species
+    class_dirs = [d for d in source_dir.iterdir() if d.is_dir()]
+    if not class_dirs:
+        # If no subdirectories, look for images directly
+        image_files = list(source_dir.glob("*.jpg")) + list(source_dir.glob("*.png")) + list(source_dir.glob("*.jpeg"))
+        if image_files:
+            logger.warning("FishNet data appears to be flat structure. Creating single class.")
+            # Create a single class directory
+            fish_class_train = train_dir / "fish"
+            fish_class_test = test_dir / "fish"
+            fish_class_train.mkdir(exist_ok=True)
+            fish_class_test.mkdir(exist_ok=True)
+            
+            # Split 80/20 train/test
+            set_seed(42)  # Ensure reproducible splits
+            random.shuffle(image_files)
+            split_idx = int(len(image_files) * 0.8)
+            
+            for idx, img_path in enumerate(image_files):
+                if idx < split_idx:
+                    shutil.copy2(img_path, fish_class_train / img_path.name)
+                else:
+                    shutil.copy2(img_path, fish_class_test / img_path.name)
+        else:
+            raise RuntimeError("No image files found in FishNet data")
+    else:
+        # Process each fish species directory
+        logger.info(f"Found {len(class_dirs)} fish species classes")
+        for class_dir in class_dirs:
+            if not class_dir.is_dir():
+                continue
+                
+            class_name = validate_and_clean_class_names([class_dir.name])[0]
+            train_class_dir = train_dir / class_name
+            test_class_dir = test_dir / class_name
+            train_class_dir.mkdir(exist_ok=True)
+            test_class_dir.mkdir(exist_ok=True)
+            
+            # Collect all images from this class
+            image_files = list(class_dir.glob("*.jpg")) + list(class_dir.glob("*.png")) + list(class_dir.glob("*.jpeg"))
+            if image_files:
+                # Split 80/20 train/test
+                set_seed(42)  # Ensure reproducible splits
+                random.shuffle(image_files)
+                split_idx = int(len(image_files) * 0.8)
+                
+                for idx, img_path in enumerate(image_files):
+                    if idx < split_idx:
+                        shutil.copy2(img_path, train_class_dir / img_path.name)
+                    else:
+                        shutil.copy2(img_path, test_class_dir / img_path.name)
+    
+    logger.info("FishNet data organized successfully")
 
 
 def organize_awa2_data(data_dir: Path):
@@ -592,10 +656,13 @@ def organize_awa2_data(data_dir: Path):
         class_dirs = [d for d in jpeg_dir.iterdir() if d.is_dir()]
         
         for class_dir in class_dirs:
-            class_name = class_dir.name
+            class_name = validate_and_clean_class_names([class_dir.name])[0]
             images = list(class_dir.glob("*.jpg"))
             
             if images:
+                # Shuffle for random split
+                set_seed(42)  # Ensure reproducible splits
+                random.shuffle(images)
                 # Split 80/20 train/test
                 split_idx = int(0.8 * len(images))
                 train_images = images[:split_idx]
@@ -628,6 +695,8 @@ def load_existing_awa2(data_dir: Path) -> tuple:
     return load_existing_dataset(data_dir, "AwA2")
 
 
+
+
 def load_existing_plantdoc(data_dir: Path) -> tuple:
     """Load existing PlantDoc data."""
     train_paths, train_labels = [], []
@@ -641,19 +710,29 @@ def load_existing_plantdoc(data_dir: Path) -> tuple:
     if not (train_dir.exists() and test_dir.exists()):
         raise RuntimeError(f"PlantDoc data not found in {data_dir}. Expected train/ and test/ directories.")
     
-    # Get class names from train directory structure
+    # Get class names from train directory structure and normalize them
+    raw_class_names = []
     for class_dir in sorted(train_dir.iterdir()):
         if class_dir.is_dir():
-            class_names.append(class_dir.name)
+            raw_class_names.append(class_dir.name)
+    
+    # Normalize all class names at once using the existing utility
+    class_names = validate_and_clean_class_names(raw_class_names)
+    
+    # Create a mapping from original directory names to normalized class names
+    dir_name_to_class_idx = {}
+    for i, class_dir in enumerate(sorted(train_dir.iterdir())):
+        if class_dir.is_dir():
+            dir_name_to_class_idx[class_dir.name] = i
     
     # Load train and test data
     for split, split_dir, (paths_list, labels_list) in [
         ("train", train_dir, (train_paths, train_labels)), 
         ("test", test_dir, (test_paths, test_labels))
     ]:
-        for class_idx, class_name in enumerate(class_names):
-            class_dir = split_dir / class_name
-            if class_dir.exists():
+        for class_dir in sorted(split_dir.iterdir()):
+            if class_dir.is_dir() and class_dir.name in dir_name_to_class_idx:
+                class_idx = dir_name_to_class_idx[class_dir.name]
                 # Support multiple image formats
                 for pattern in ["*.jpg", "*.jpeg", "*.png"]:
                     for img_path in sorted(class_dir.glob(pattern)):
@@ -677,19 +756,29 @@ def load_existing_dataset(data_dir: Path, dataset_name: str) -> tuple:
     if not (train_dir.exists() and test_dir.exists()):
         raise RuntimeError(f"{dataset_name} data not found in {data_dir}. Expected images/train/ and images/test/ directories.")
     
-    # Get class names from directory structure
+    # Get class names from directory structure and normalize them
+    raw_class_names = []
     for class_dir in sorted(train_dir.iterdir()):
         if class_dir.is_dir():
-            class_names.append(class_dir.name)
+            raw_class_names.append(class_dir.name)
+    
+    # Normalize all class names at once using the existing utility
+    class_names = validate_and_clean_class_names(raw_class_names)
+    
+    # Create a mapping from original directory names to normalized class names
+    dir_name_to_class_idx = {}
+    for i, class_dir in enumerate(sorted(train_dir.iterdir())):
+        if class_dir.is_dir():
+            dir_name_to_class_idx[class_dir.name] = i
     
     # Load train and test data
     for split, split_dir, (paths_list, labels_list) in [
         ("train", train_dir, (train_paths, train_labels)), 
         ("test", test_dir, (test_paths, test_labels))
     ]:
-        for class_idx, class_name in enumerate(class_names):
-            class_dir = split_dir / class_name
-            if class_dir.exists():
+        for class_dir in sorted(split_dir.iterdir()):
+            if class_dir.is_dir() and class_dir.name in dir_name_to_class_idx:
+                class_idx = dir_name_to_class_idx[class_dir.name]
                 # Support multiple image formats
                 for pattern in ["*.jpg", "*.jpeg", "*.png"]:
                     for img_path in sorted(class_dir.glob(pattern)):
@@ -709,18 +798,21 @@ def test_single_dataset(dataset_name: str, args):
     use_wandb_logging = args.use_wandb and WANDB_AVAILABLE
     results = {}
     
-    # Prepare dataset
+    # Prepare dataset with dataset-specific subdirectories
     if dataset_name == "fishnet":
+        dataset_dir = os.path.join(args.data_dir, "fishnet")
         train_paths, train_labels, test_paths, test_labels, class_names = download_and_prepare_fishnet(
-            args.data_dir
+            dataset_dir
         )
     elif dataset_name == "awa2":
+        dataset_dir = os.path.join(args.data_dir, "awa2")
         train_paths, train_labels, test_paths, test_labels, class_names = download_and_prepare_awa2(
-            args.data_dir
+            dataset_dir
         )
     elif dataset_name == "plantdoc":
+        dataset_dir = os.path.join(args.data_dir, "plantdoc")
         train_paths, train_labels, test_paths, test_labels, class_names = download_and_prepare_plantdoc(
-            args.data_dir
+            dataset_dir
         )
     else:
         raise ValueError(f"Unsupported dataset: {dataset_name}")
@@ -823,7 +915,6 @@ def test_single_dataset(dataset_name: str, args):
                 num_classes=len(class_names),
                 class_names=class_names,
                 model_name=model_name,
-                enable_thinking=args.enable_thinking,
                 use_semantic_names=args.use_semantic_names
             )
             
@@ -854,7 +945,7 @@ def test_single_dataset(dataset_name: str, args):
         logger.info("Testing CLAM t-SNE with BioClip2 backend...")
         try:
             classifier = BioClip2ClamClassifier(
-                bioclip2_model="imageomics/bioclip-2",
+                bioclip2_model=args.bioclip2_model,
                 embedding_size=512,
                 tsne_perplexity=min(30.0, len(train_paths) / 4),
                 tsne_n_iter=1000,
@@ -1218,6 +1309,10 @@ def parse_args():
 
 def main():
     args = parse_args()
+    
+    # Set random seed for reproducibility
+    from clam.utils import set_seed_with_args
+    set_seed_with_args(args)
     
     logger.info(f"Starting biological dataset classification tests...")
     logger.info(f"Configuration:")

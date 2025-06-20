@@ -228,7 +228,8 @@ class TestFullPipeline(unittest.TestCase):
             train_embeddings, val_embeddings, test_embeddings, tabpfn, y_train_sample = get_tabpfn_embeddings(
                 X_train, y_train, X_val, X_test, 
                 embedding_size=embedding_size,
-                max_samples=100
+                max_samples=100,
+                seed=42
             )
             
             # 4. Prepare model

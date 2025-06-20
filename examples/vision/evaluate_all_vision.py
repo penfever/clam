@@ -1021,6 +1021,10 @@ def run_all_image_tests(args):
 def main():
     args = parse_args()
     
+    # Set random seed for reproducibility
+    from clam.utils import set_seed_with_args
+    set_seed_with_args(args)
+    
     logger.info(f"Starting image classification tests...")
     logger.info(f"Configuration:")
     logger.info(f"  Datasets: {', '.join(args.datasets)}")

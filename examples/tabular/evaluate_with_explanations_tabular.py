@@ -958,7 +958,8 @@ def process_dataset(args, model, tokenizer, prefix_start_id, prefix_end_id, clas
         embedding_size=args.embedding_size,
         cache_dir=cache_dir,
         dataset_name=str(dataset_id),
-        force_recompute=args.force_recompute_embeddings
+        force_recompute=args.force_recompute_embeddings,
+        seed=args.seed
     )
     
     # Create dataset-specific output directory
@@ -1134,10 +1135,8 @@ def main():
     args = parse_args()
     
     # Set random seed for reproducibility
-    np.random.seed(args.seed)
-    torch.manual_seed(args.seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(args.seed)
+    from clam.utils import set_seed_with_args
+    set_seed_with_args(args)
     
     # Create output directory
     os.makedirs(args.output_dir, exist_ok=True)

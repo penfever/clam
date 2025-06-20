@@ -96,6 +96,12 @@ from .platform_utils import (
     get_mac_compatible_dinov2_kwargs,
     suppress_platform_warnings
 )
+from .seeding import (
+    set_seed,
+    set_seed_with_args,
+    create_random_state,
+    set_random_seed
+)
 
 __all__ = [
     # Logging utilities
@@ -182,5 +188,11 @@ __all__ = [
     "is_mac_platform",
     "log_platform_info",
     "get_mac_compatible_dinov2_kwargs",
-    "suppress_platform_warnings"
+    "suppress_platform_warnings",
+    
+    # Seeding utilities
+    "set_seed",
+    "set_seed_with_args", 
+    "create_random_state",
+    "set_random_seed"
 ]

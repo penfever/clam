@@ -569,11 +569,8 @@ def main():
         return
     
     # Set random seed for reproducibility
-    random.seed(args.seed)
-    np.random.seed(args.seed)
-    torch.manual_seed(args.seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(args.seed)
+    from clam.utils import set_seed_with_args
+    set_seed_with_args(args)
     
     # Create output directory
     os.makedirs(args.output_dir, exist_ok=True)

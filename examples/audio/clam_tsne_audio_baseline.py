@@ -137,8 +137,8 @@ class ClamAudioTsneClassifier:
         self.seed = seed
         
         # Set random seeds
-        np.random.seed(seed)
-        torch.manual_seed(seed)
+        from clam.utils import set_seed
+        set_seed(seed)
         
         # To be set during fit
         self.train_embeddings = None

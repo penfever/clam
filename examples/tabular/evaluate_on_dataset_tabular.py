@@ -492,7 +492,8 @@ def process_dataset(dataset: Dict[str, Any], args) -> Dict[str, Any]:
                         embedding_size=args.embedding_size,
                         cache_dir=cache_dir,
                         dataset_name=dataset_identifier,
-                        force_recompute=args.force_recompute_embeddings
+                        force_recompute=args.force_recompute_embeddings,
+                        seed=dataset_specific_seed
                     )
             else:
                 # No cache file exists, compute embeddings
@@ -501,7 +502,8 @@ def process_dataset(dataset: Dict[str, Any], args) -> Dict[str, Any]:
                     embedding_size=args.embedding_size,
                     cache_dir=cache_dir,
                     dataset_name=dataset_identifier,
-                    force_recompute=args.force_recompute_embeddings
+                    force_recompute=args.force_recompute_embeddings,
+                    seed=dataset_specific_seed
                 )
         else:
             # No cache dir or force recompute
@@ -510,7 +512,8 @@ def process_dataset(dataset: Dict[str, Any], args) -> Dict[str, Any]:
                 embedding_size=args.embedding_size,
                 cache_dir=cache_dir,
                 dataset_name=dataset_identifier,
-                force_recompute=args.force_recompute_embeddings
+                force_recompute=args.force_recompute_embeddings,
+                seed=dataset_specific_seed
             )
 
         # Add processed data to the dataset dictionary with embeddings
@@ -1482,14 +1485,8 @@ def main():
         parser.error("Either --model_path or --model_id is required when not using --baselines_only")
     
     # Set random seed for reproducibility across all sources
-    random.seed(args.seed)  # Python's random module
-    np.random.seed(args.seed)  # NumPy
-    torch.manual_seed(args.seed)  # PyTorch
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(args.seed)  # CUDA
-    
-    # Setting deterministic behavior for maximum reproducibility
-    torch.backends.cudnn.deterministic = True
+    from clam.utils import set_seed
+    set_seed(args.seed, deterministic=True)
     torch.backends.cudnn.benchmark = False
     
     # Create output directory
