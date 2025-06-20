@@ -379,111 +379,152 @@ class VLMPromptingTestSuite:
                     'knn_k': config.get('knn_k', 5)
                 })
             
-            # Create and fit classifier
             classifier = ClamTsneClassifier(**classifier_config)
+            
+            # Fit the classifier first
             classifier.fit(X_train, y_train, X_test)
             
-            # Test on all samples (now 10 per test)
-            all_responses = []
-            all_prompts = []
-            ground_truth_labels = []
-            
-            if config.get('enable_multi_viz', False):
-                # Generate multi-viz prompt (same for all samples)
-                multi_viz_info = []
-                for viz in classifier.context_composer.visualizations:
-                    multi_viz_info.append({
-                        'method': viz.method_name,
-                        'description': f"{viz.method_name} visualization"
-                    })
-                
-                base_prompt = create_classification_prompt(
-                    class_names=[f"Class_{i}" for i in range(len(np.unique(y_train)))],
-                    modality='tabular',
-                    dataset_description=f"Test dataset with {len(np.unique(y_train))} classes",
-                    use_semantic_names=config.get('use_semantic_names', False),
-                    multi_viz_info=multi_viz_info
+            # Use CLAM's evaluate method to get detailed prediction information
+            try:
+                results = classifier.evaluate(
+                    X_test, 
+                    y_test, 
+                    return_detailed=True
                 )
                 
-                # Create visualizations for each test point
-                for sample_idx in range(len(X_test)):
-                    highlight_indices = [sample_idx]
-                    composed_image = classifier.context_composer.compose_layout(
-                        highlight_indices=highlight_indices
+                # Extract ground truth labels
+                ground_truth_labels = [int(label) for label in y_test]
+                
+                # Extract actual VLM responses and prompts from prediction_details
+                all_responses = []
+                all_prompts = []
+                
+                if 'prediction_details' in results and results['prediction_details']:
+                    prediction_details = results['prediction_details']
+                    
+                    # Extract VLM responses
+                    for detail in prediction_details:
+                        if 'vlm_response' in detail:
+                            all_responses.append(detail['vlm_response'])
+                        else:
+                            # Fallback if vlm_response not available
+                            parsed_pred = detail.get('parsed_prediction', 'UNKNOWN')
+                            all_responses.append(f"Class: Class_{parsed_pred} | Reasoning: Parsed prediction from CLAM")
+                    
+                    logger.info(f"Extracted {len(all_responses)} actual VLM responses from prediction_details")
+                    
+                    # For prompts, we'll generate a representative one since CLAM doesn't store the exact prompts
+                    # in prediction_details, but we know what prompt structure was used
+                    if config.get('enable_multi_viz', False):
+                        # Multi-viz prompt
+                        multi_viz_info = []
+                        if hasattr(classifier, 'context_composer') and classifier.context_composer:
+                            for viz in classifier.context_composer.visualizations:
+                                multi_viz_info.append({
+                                    'method': viz.method_name,
+                                    'description': f"{viz.method_name} visualization"
+                                })
+                        
+                        from clam.utils.vlm_prompting import create_classification_prompt
+                        sample_prompt = create_classification_prompt(
+                            class_names=[f"Class_{i}" for i in range(len(np.unique(y_train)))],
+                            modality='tabular',
+                            dataset_description=f"Test dataset with {len(np.unique(y_train))} classes",
+                            use_semantic_names=config.get('use_semantic_names', False),
+                            multi_viz_info=multi_viz_info
+                        )
+                    else:
+                        # Single viz prompt
+                        from clam.utils.vlm_prompting import create_classification_prompt
+                        sample_prompt = create_classification_prompt(
+                            class_names=[f"Class_{i}" for i in range(len(np.unique(y_train)))],
+                            modality='tabular',
+                            use_knn=config.get('use_knn_connections', False),
+                            use_3d=config.get('use_3d_tsne', False),
+                            knn_k=config.get('knn_k', 5),
+                            dataset_description=f"Test dataset with {len(np.unique(y_train))} classes",
+                            use_semantic_names=config.get('use_semantic_names', False)
+                        )
+                    
+                    # Use the same prompt for all samples (this is typically how CLAM works)
+                    all_prompts = [sample_prompt] * len(all_responses)
+                
+                else:
+                    # Fallback if no prediction_details available
+                    logger.warning("No prediction_details found in results")
+                    predictions = results.get('predictions', [])
+                    if isinstance(predictions, (list, np.ndarray)):
+                        all_responses = [f"Class: Class_{pred} | Reasoning: CLAM prediction (no detailed response)" for pred in predictions]
+                    else:
+                        all_responses = [f"Class: UNKNOWN | Reasoning: No prediction details available" for _ in range(len(X_test))]
+                    
+                    # Generate fallback prompts
+                    from clam.utils.vlm_prompting import create_classification_prompt
+                    sample_prompt = create_classification_prompt(
+                        class_names=[f"Class_{i}" for i in range(len(np.unique(y_train)))],
+                        modality='tabular',
+                        dataset_description=f"Test dataset with {len(np.unique(y_train))} classes"
                     )
-                    
-                    viz_path = test_dir / f"viz_sample_{sample_idx:02d}.png"
-                    composed_image.save(viz_path)
-                    
-                    # Save individual prompt and response
-                    prompt_with_sample = base_prompt + f"\n\nAnalyze the highlighted point (Sample {sample_idx}) marked in red."
-                    all_prompts.append(prompt_with_sample)
-                    ground_truth_labels.append(int(y_test[sample_idx]))
-                    
-                    # Generate mock response
-                    mock_response = self._generate_mock_response(config, len(np.unique(y_train)), y_test[sample_idx])
-                    all_responses.append(mock_response)
-                    
-                    # Save individual files
-                    with open(test_dir / "prompts" / f"prompt_{sample_idx:02d}.txt", 'w') as f:
-                        f.write(prompt_with_sample)
-                    with open(test_dir / "responses" / f"response_{sample_idx:02d}.txt", 'w') as f:
-                        f.write(mock_response)
+                    all_prompts = [sample_prompt] * len(all_responses)
                 
-                # Save main visualization with all points
-                viz_path = self.output_dir / "visualizations" / f"test_{test_idx:02d}_{config['name']}_multi.png"
-                main_viz = classifier.context_composer.compose_layout(highlight_indices=list(range(len(X_test))))
-                main_viz.save(viz_path)
+                # Save the actual outputs manually since CLAM's save_outputs isn't implemented
+                # Save detailed VLM information to the test directory
+                if 'prediction_details' in results and results['prediction_details']:
+                    detailed_output = {
+                        'test_config': config,
+                        'ground_truth': ground_truth_labels,
+                        'prediction_details': results['prediction_details'],
+                        'completion_rate': results.get('completion_rate', 1.0),
+                        'test_indices': self.test_indices.tolist()
+                    }
+                    
+                    detailed_output_path = test_dir / "detailed_vlm_outputs.json"
+                    with open(detailed_output_path, 'w') as f:
+                        json.dump(detailed_output, f, indent=2, default=str)
+                    logger.info(f"Saved detailed VLM outputs to {detailed_output_path}")
                 
-            else:
-                # Generate single-viz prompt (same for all samples)
-                base_prompt = create_classification_prompt(
-                    class_names=[f"Class_{i}" for i in range(len(np.unique(y_train)))],
-                    modality='tabular',
-                    use_knn=config.get('use_knn_connections', False),
-                    use_3d=config.get('use_3d_tsne', False),
-                    knn_k=config.get('knn_k', 5),
-                    dataset_description=f"Test dataset with {len(np.unique(y_train))} classes",
-                    use_semantic_names=config.get('use_semantic_names', False)
-                )
+                # Save individual response and prompt files in test directory
+                for i, (response, prompt) in enumerate(zip(all_responses, all_prompts)):
+                    response_file = test_dir / "responses" / f"response_{i:02d}.txt"
+                    with open(response_file, 'w') as f:
+                        f.write(response)
+                    
+                    prompt_file = test_dir / "prompts" / f"prompt_{i:02d}.txt"
+                    with open(prompt_file, 'w') as f:
+                        f.write(prompt)
                 
-                # For single viz, create proper visualizations using the classifier
-                for sample_idx in range(len(X_test)):
-                    # Use the classifier's prediction method to generate proper visualization
-                    try:
-                        # This should create the proper t-SNE visualization with all features
-                        prediction = classifier.predict([X_test[sample_idx]])
+                # Find and copy CLAM's generated visualizations
+                viz_path = self.output_dir / "visualizations" / f"test_{test_idx:02d}_{config['name']}.png"
+                
+                # CLAM saves visualizations in its temp directory during prediction
+                viz_found = False
+                if hasattr(classifier, 'temp_dir') and classifier.temp_dir and os.path.exists(classifier.temp_dir):
+                    temp_viz_files = list(Path(classifier.temp_dir).glob("*.png"))
+                    if temp_viz_files:
+                        # Copy the most recent visualization file
+                        latest_viz = max(temp_viz_files, key=lambda p: p.stat().st_mtime)
+                        shutil.copy2(latest_viz, viz_path)
+                        logger.info(f"Copied CLAM visualization from {latest_viz} to {viz_path}")
+                        viz_found = True
                         
-                        # The visualization should be saved during prediction
-                        # Copy it to our test directory
-                        if hasattr(classifier, 'last_viz_path') and classifier.last_viz_path and os.path.exists(classifier.last_viz_path):
-                            viz_dest = test_dir / f"viz_sample_{sample_idx:02d}.png"
-                            shutil.copy2(classifier.last_viz_path, viz_dest)
-                        
-                    except Exception as e:
-                        logger.warning(f"Failed to generate proper visualization for sample {sample_idx}: {e}")
-                        # Fall back to simple visualization
-                        self._create_fallback_visualization(X_train, y_train, X_test[sample_idx], 
-                                                           test_dir / f"viz_sample_{sample_idx:02d}.png", config)
-                    
-                    # Save prompt and response
-                    prompt_with_sample = base_prompt + f"\n\nAnalyze the highlighted point (Sample {sample_idx}) marked in red."
-                    all_prompts.append(prompt_with_sample)
-                    ground_truth_labels.append(int(y_test[sample_idx]))
-                    
-                    # Generate mock response
-                    mock_response = self._generate_mock_response(config, len(np.unique(y_train)), y_test[sample_idx])
-                    all_responses.append(mock_response)
-                    
-                    # Save individual files
-                    with open(test_dir / "prompts" / f"prompt_{sample_idx:02d}.txt", 'w') as f:
-                        f.write(prompt_with_sample)
-                    with open(test_dir / "responses" / f"response_{sample_idx:02d}.txt", 'w') as f:
-                        f.write(mock_response)
+                        # Also copy any additional visualizations for multi-viz tests
+                        if len(temp_viz_files) > 1:
+                            for i, viz_file in enumerate(temp_viz_files):
+                                additional_viz_path = test_dir / f"visualization_{i}.png"
+                                shutil.copy2(viz_file, additional_viz_path)
                 
-                # Create main visualization with all test points
-                viz_path = self.output_dir / "visualizations" / f"test_{test_idx:02d}_{config['name']}_single.png"
-                self._create_comprehensive_visualization(X_train, y_train, X_test, y_test, viz_path, config)
+                if not viz_found:
+                    logger.warning(f"No visualization found for test {test_idx + 1}. Check CLAM's temp_dir: {getattr(classifier, 'temp_dir', 'Not set')}")
+                
+                logger.info(f"✓ Test {test_idx + 1} completed successfully using real CLAM pipeline")
+                
+            except Exception as e:
+                logger.error(f"✗ CLAM pipeline failed for test {test_idx + 1}: {e}")
+                # Create fallback data for summary
+                ground_truth_labels = [int(label) for label in y_test]
+                all_responses = [f"Class: FAILED | Reasoning: Pipeline error: {str(e)}"] * len(X_test)
+                all_prompts = ["FAILED"] * len(X_test)
+                viz_path = self.output_dir / "visualizations" / f"test_{test_idx:02d}_{config['name']}_failed.png"
             
             # Save aggregated prompt and responses
             prompt_path = self.output_dir / "prompts" / f"test_{test_idx:02d}_{config['name']}_all.txt"
@@ -541,110 +582,6 @@ class VLMPromptingTestSuite:
             }
             return result
     
-    def _generate_mock_response(self, config: Dict[str, Any], n_classes: int, true_class: Optional[int] = None) -> str:
-        """Generate a realistic mock VLM response."""
-        import random
-        
-        # Choose a class (use true class 70% of the time for realistic accuracy)
-        if true_class is not None and random.random() < 0.7:
-            predicted_class = true_class
-        else:
-            predicted_class = random.randint(0, n_classes - 1)
-        
-        if config.get('enable_multi_viz', False):
-            methods = config.get('visualization_methods', ['tsne'])
-            method_str = ', '.join(methods).upper()
-            
-            reasoning = f"Based on the multi-visualization analysis across {len(methods)} methods ({method_str}), " \
-                       f"the query point appears most consistently clustered with Class_{predicted_class} samples. " \
-                       f"This pattern is particularly evident in the {random.choice(methods).upper()} visualization, " \
-                       f"while the other methods provide supporting evidence through similar spatial relationships."
-        else:
-            if config.get('use_knn_connections', False):
-                reasoning = f"The KNN analysis shows {config.get('knn_k', 5)} nearest neighbors, " \
-                           f"with the majority belonging to Class_{predicted_class}. " \
-                           f"The spatial clustering in the t-SNE visualization supports this classification."
-            elif config.get('use_3d_tsne', False):
-                reasoning = f"Examining all four 3D viewing angles, the query point is consistently " \
-                           f"positioned within the Class_{predicted_class} cluster region. " \
-                           f"The spatial relationships are particularly clear in the isometric view."
-            else:
-                reasoning = f"The query point is spatially positioned within the Class {predicted_class} " \
-                           f"cluster in the t-SNE visualization, showing clear membership based on local neighborhood structure."
-        
-        return f"Class: Class_{predicted_class} | Reasoning: {reasoning}"
-    
-    def _create_fallback_visualization(self, X_train, y_train, X_test_sample, viz_path, config):
-        """Create a fallback visualization when proper t-SNE fails."""
-        import matplotlib.pyplot as plt
-        
-        fig, ax = plt.subplots(figsize=(10, 8))
-        
-        # Plot training data
-        scatter = ax.scatter(X_train[:, 0], X_train[:, 1] if X_train.shape[1] > 1 else np.random.randn(len(X_train)),
-                           c=y_train, alpha=0.7, cmap='viridis', label='Training', s=50)
-        
-        # Plot test sample
-        ax.scatter([X_test_sample[0]], [X_test_sample[1] if X_test_sample.shape[0] > 1 else 0],
-                  c='red', s=200, marker='*', label='Query Point', edgecolors='black', linewidth=2)
-        
-        # Add legend and labels
-        plt.colorbar(scatter, label='Class')
-        ax.set_title(f"{config['name']} - Fallback Visualization", fontsize=14)
-        ax.set_xlabel('Feature 1')
-        ax.set_ylabel('Feature 2' if X_train.shape[1] > 1 else 'Random')
-        ax.legend()
-        ax.grid(True, alpha=0.3)
-        
-        plt.savefig(viz_path, dpi=config.get('image_dpi', 100), bbox_inches='tight')
-        plt.close()
-    
-    def _create_comprehensive_visualization(self, X_train, y_train, X_test, y_test, viz_path, config):
-        """Create a comprehensive visualization showing all test points."""
-        import matplotlib.pyplot as plt
-        
-        fig, ax = plt.subplots(figsize=(12, 10))
-        
-        # Plot training data with proper legend
-        unique_classes = np.unique(y_train)
-        colors = plt.cm.viridis(np.linspace(0, 1, len(unique_classes)))
-        
-        for i, class_label in enumerate(unique_classes):
-            mask = y_train == class_label
-            ax.scatter(X_train[mask, 0], 
-                      X_train[mask, 1] if X_train.shape[1] > 1 else np.random.randn(np.sum(mask)),
-                      c=[colors[i]], alpha=0.7, label=f'Class_{class_label} (Train)', s=50)
-        
-        # Plot test points with different markers
-        for i, (x_test, y_true) in enumerate(zip(X_test, y_test)):
-            color_idx = np.where(unique_classes == y_true)[0][0]
-            ax.scatter([x_test[0]], [x_test[1] if x_test.shape[0] > 1 else i*0.1],
-                      c=[colors[color_idx]], s=150, marker='s', 
-                      label=f'Test {i} (Class_{y_true})' if i < 5 else '', 
-                      edgecolors='black', linewidth=1, alpha=0.9)
-            
-            # Add text annotation
-            ax.annotate(f'T{i}', (x_test[0], x_test[1] if x_test.shape[0] > 1 else i*0.1),
-                       xytext=(5, 5), textcoords='offset points', fontsize=8, fontweight='bold')
-        
-        # Style the plot
-        ax.set_title(f"{config['name']} - All Test Points", fontsize=14, fontweight='bold')
-        ax.set_xlabel('Feature 1')
-        ax.set_ylabel('Feature 2' if X_train.shape[1] > 1 else 'Stacked View')
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-        ax.grid(True, alpha=0.3)
-        
-        # Add configuration info as text
-        config_text = f"Config: {config.get('tsne_perplexity', 'N/A')} perplexity"
-        if config.get('use_knn_connections'):
-            config_text += f", KNN k={config.get('knn_k', 5)}"
-        if config.get('use_3d_tsne'):
-            config_text += ", 3D mode"
-        ax.text(0.02, 0.98, config_text, transform=ax.transAxes, fontsize=8,
-                verticalalignment='top', bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
-        
-        plt.savefig(viz_path, dpi=config.get('image_dpi', 100), bbox_inches='tight')
-        plt.close()
     
     def run_all_tests(self) -> Dict[str, Any]:
         """Run all test configurations."""

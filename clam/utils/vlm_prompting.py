@@ -125,17 +125,19 @@ def create_classification_prompt(
             class_list_str = ", ".join([f'"{name}"' for name in cleaned_class_names])
             class_format_example = f'"{cleaned_class_names[0]}", "{cleaned_class_names[1]}", etc.'
         except ValueError as e:
-            logger.warning(f"Class name validation failed: {e}. Falling back to 'Class X' format.")
-            # Fall back to Class X format
-            class_indices = list(range(len(class_names)))
-            class_list_str = ", ".join([f'"Class {i}"' for i in class_indices])
-            class_format_example = '"Class 0", "Class 1", "Class 2"'
+            logger.warning(f"Class name validation failed: {e}. Falling back to 'Class_X' format.")
+            # Fall back to Class_X format using class_name_utils
+            from .class_name_utils import normalize_class_names_to_class_num
+            fallback_names = normalize_class_names_to_class_num(len(class_names))
+            class_list_str = ", ".join([f'"{name}"' for name in fallback_names])
+            class_format_example = '"Class_0", "Class_1", "Class_2"'
             use_semantic_names = False  # Override to ensure consistent parsing
     else:
-        # Default: Always use "Class X" format for consistency with legends
-        class_indices = list(range(len(class_names)))
-        class_list_str = ", ".join([f'"Class {i}"' for i in class_indices])
-        class_format_example = '"Class 0", "Class 1", "Class 2"'
+        # Default: Always use "Class_X" format for consistency with legends
+        from .class_name_utils import normalize_class_names_to_class_num
+        fallback_names = normalize_class_names_to_class_num(len(class_names))
+        class_list_str = ", ".join([f'"{name}"' for name in fallback_names])
+        class_format_example = '"Class_0", "Class_1", "Class_2"'
     
     # Create modality-specific description
     if modality == "audio":
@@ -780,6 +782,167 @@ Please respond with just the predicted numerical value followed by a brief expla
 Format your response as: "Value: [predicted_value] | Reasoning: [brief explanation]" """
     
     return prompt_text
+
+
+def generate_multi_viz_reasoning_guidance(
+    multi_viz_info: List[Dict[str, Any]], 
+    reasoning_focus: str = "comparison"
+) -> str:
+    """
+    Generate advanced reasoning guidance for multi-visualization contexts.
+    
+    Args:
+        multi_viz_info: List of visualization method information
+        reasoning_focus: Type of reasoning to emphasize ("comparison", "consensus", "divergence")
+        
+    Returns:
+        Formatted reasoning guidance string
+    """
+    if len(multi_viz_info) < 2:
+        return ""
+    
+    guidance_parts = []
+    
+    # Method-specific descriptions
+    guidance_parts.append("**Visualization Method Details:**")
+    for i, viz in enumerate(multi_viz_info, 1):
+        method = viz['method'].lower()
+        desc = f"{i}. **{viz['method'].upper()}**: "
+        
+        if method == 'tsne':
+            desc += "t-SNE preserves local neighborhood structures and is excellent for revealing clusters and local patterns."
+        elif method == 'umap':
+            desc += "UMAP preserves both local and global structure, often showing clearer cluster separation than t-SNE."
+        elif method == 'pca':
+            desc += "PCA shows linear relationships and the directions of maximum variance in the data."
+        elif 'spectral' in method:
+            desc += "Spectral embedding reveals the manifold structure using graph-based relationships."
+        elif 'lle' in method or 'locally' in method:
+            desc += "Locally Linear Embedding reconstructs the local geometry of the data manifold."
+        elif method == 'isomap':
+            desc += "Isomap preserves geodesic distances along the data manifold."
+        elif method == 'mds':
+            desc += "MDS preserves pairwise distances between data points in the reduced space."
+        else:
+            desc += f"Visualization using {viz['method']} method."
+            
+        guidance_parts.append(desc)
+    
+    # Cross-visualization analysis
+    guidance_parts.append("\n**Cross-Visualization Analysis:**")
+    
+    # Method comparison analysis
+    linear_methods = [v for v in multi_viz_info if v['method'].lower() in ['pca']]
+    nonlinear_methods = [v for v in multi_viz_info if v['method'].lower() in ['tsne', 'umap', 'isomap', 'lle']]
+    
+    if linear_methods and nonlinear_methods:
+        guidance_parts.append("- Compare the linear perspective (PCA) with nonlinear methods to understand if the data has inherent nonlinear structure.")
+    
+    local_methods = [v for v in multi_viz_info if v['method'].lower() in ['tsne', 'lle']]
+    global_methods = [v for v in multi_viz_info if v['method'].lower() in ['umap', 'isomap', 'mds']]
+    
+    if local_methods and global_methods:
+        guidance_parts.append("- Local structure preserving methods (t-SNE, LLE) may show different cluster arrangements than global methods (UMAP, Isomap, MDS).")
+    
+    # General cross-method guidance
+    guidance_parts.extend([
+        "- Look for consistent cluster patterns across methods - clusters that appear in multiple visualizations are likely genuine data structures.",
+        "- Points that appear as outliers in multiple visualizations are likely true outliers in the data."
+    ])
+    
+    # Method-specific comparisons
+    methods_present = [v['method'].lower() for v in multi_viz_info]
+    method_pairs = [
+        ('tsne', 'umap', "t-SNE may show tighter clusters while UMAP preserves more global structure"),
+        ('pca', 'tsne', "PCA shows linear separability while t-SNE reveals nonlinear cluster structure"),
+        ('isomap', 'lle', "Isomap preserves geodesic distances while LLE focuses on local linearity"),
+    ]
+    
+    for method1, method2, insight in method_pairs:
+        if method1 in methods_present and method2 in methods_present:
+            guidance_parts.append(f"- {insight}.")
+    
+    # Reasoning focus guidance
+    guidance_parts.append(f"\n**Reasoning Focus - {reasoning_focus.title()}:**")
+    
+    if reasoning_focus == "comparison":
+        guidance_parts.extend([
+            "Compare and contrast the patterns shown in each visualization:",
+            "- Which methods show similar cluster structures?",
+            "- Where do the methods disagree, and what might this indicate?",
+            "- Are there patterns visible in some methods but not others?",
+            "- How do the relative positions of clusters change across methods?"
+        ])
+    elif reasoning_focus == "consensus":
+        guidance_parts.extend([
+            "Look for patterns that are consistent across multiple visualizations:",
+            "- Which clusters appear in most or all visualizations?",
+            "- What data structures are reliably preserved across methods?",
+            "- Which relationships between data points are method-independent?",
+            "- What can you confidently conclude about the data structure?"
+        ])
+    elif reasoning_focus == "divergence":
+        guidance_parts.extend([
+            "Focus on where the visualizations show different patterns:",
+            "- Which methods reveal unique perspectives on the data?",
+            "- Where do visualizations disagree about cluster boundaries or outliers?",
+            "- What might cause these differences (method assumptions, parameter settings)?",
+            "- How can these differences inform our understanding of the data complexity?"
+        ])
+    
+    return "\n".join(guidance_parts)
+
+
+def create_comprehensive_multi_viz_prompt(
+    class_names: List[str],
+    multi_viz_info: List[Dict[str, Any]],
+    modality: str = "tabular",
+    dataset_description: Optional[str] = None,
+    reasoning_focus: str = "comparison",
+    data_shape: Optional[tuple] = None,
+    use_semantic_names: bool = False
+) -> str:
+    """
+    Create a comprehensive prompt for multi-visualization analysis.
+    
+    This function integrates the advanced prompting logic from the removed PromptGenerator
+    into the unified VLM prompting system.
+    
+    Args:
+        class_names: List of class names
+        multi_viz_info: List of visualization method information
+        modality: Data modality
+        dataset_description: Description of the dataset
+        reasoning_focus: Type of reasoning emphasis
+        data_shape: Shape of the original data
+        use_semantic_names: Whether to use semantic class names
+        
+    Returns:
+        Comprehensive multi-visualization prompt
+    """
+    # Use the existing create_classification_prompt as the base
+    base_prompt = create_classification_prompt(
+        class_names=class_names,
+        modality=modality,
+        dataset_description=dataset_description,
+        use_semantic_names=use_semantic_names,
+        multi_viz_info=multi_viz_info
+    )
+    
+    # Add advanced multi-viz reasoning guidance
+    if len(multi_viz_info) >= 2:
+        reasoning_guidance = generate_multi_viz_reasoning_guidance(multi_viz_info, reasoning_focus)
+        
+        # Insert the advanced guidance before the final instructions
+        if "Format your response as:" in base_prompt:
+            parts = base_prompt.split("Format your response as:")
+            enhanced_prompt = parts[0] + "\n\n" + reasoning_guidance + "\n\nFormat your response as:" + parts[1]
+        else:
+            enhanced_prompt = base_prompt + "\n\n" + reasoning_guidance
+            
+        return enhanced_prompt
+    
+    return base_prompt
 
 
 def create_vlm_conversation(image, prompt: str) -> List[Dict]:

@@ -15,7 +15,7 @@ import time
 
 from ..base import BaseVisualization, VisualizationConfig, VisualizationResult
 from .layouts import LayoutManager, LayoutStrategy
-from .prompts import PromptGenerator
+# Removed PromptGenerator - using unified VLM prompting utilities
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +69,6 @@ class ContextComposer:
         
         # Initialize sub-components
         self.layout_manager = LayoutManager(self.config)
-        self.prompt_generator = PromptGenerator(self.config)
         
         # State
         self.visualizations: List[BaseVisualization] = []
@@ -297,14 +296,45 @@ class ContextComposer:
                     'transformed_shape': train_data.shape
                 })
         
-        # Generate prompt using prompt generator
-        prompt = self.prompt_generator.generate_prompt(
-            visualizations=viz_info,
-            highlight_indices=highlight_indices,
-            custom_context=custom_context,
-            task_description=task_description,
-            data_shape=self._X_train.shape,
-            n_classes=len(np.unique(self._y_train)) if self._y_train is not None else None
+        # Generate prompt using unified VLM prompting utilities
+        from clam.utils.vlm_prompting import create_comprehensive_multi_viz_prompt
+        from clam.utils.class_name_utils import normalize_class_names_to_class_num
+        
+        # Prepare multi_viz_info for the unified utilities
+        multi_viz_info = []
+        for viz in viz_info:
+            multi_viz_info.append({
+                'method': viz.get('method', 'Unknown'),
+                'description': viz.get('description', f"Visualization of data using {viz.get('method', 'unknown')} method")
+            })
+        
+        # Generate class names
+        if self._y_train is not None:
+            n_classes = len(np.unique(self._y_train))
+            class_names = normalize_class_names_to_class_num(n_classes)
+        else:
+            class_names = ["Class_0", "Class_1", "Class_2"]  # Default
+        
+        # Build dataset description
+        dataset_description = ""
+        if self._X_train is not None:
+            dataset_description += f"Dataset with {self._X_train.shape[0]} samples and {self._X_train.shape[1]} features. "
+        
+        if custom_context:
+            dataset_description += f"{custom_context} "
+            
+        if task_description:
+            dataset_description += f"Task: {task_description}"
+        
+        # Generate comprehensive multi-viz prompt
+        prompt = create_comprehensive_multi_viz_prompt(
+            class_names=class_names,
+            multi_viz_info=multi_viz_info,
+            modality="tabular",  # Default to tabular
+            dataset_description=dataset_description,
+            reasoning_focus=self.config.reasoning_focus,
+            data_shape=self._X_train.shape if self._X_train is not None else None,
+            use_semantic_names=False  # Use Class_X format for consistency
         )
         
         return prompt
