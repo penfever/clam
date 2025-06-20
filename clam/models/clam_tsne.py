@@ -26,6 +26,9 @@ from clam.utils.model_loader import model_loader, GenerationConfig
 from clam.utils.vlm_prompting import create_classification_prompt, parse_vlm_response, create_vlm_conversation
 from clam.utils.class_name_utils import extract_class_names_from_labels
 
+# Import metadata utilities
+from clam.utils.metadata_loader import load_dataset_metadata, create_metadata_summary, detect_dataset_id_from_path
+
 # Import new multi-visualization framework
 from clam.viz import ContextComposer, VisualizationConfig
 from clam.viz.context.layouts import LayoutStrategy
@@ -69,7 +72,7 @@ class ClamTsneClassifier:
         embedding_size: int = 1000,
         tsne_perplexity: int = 30,
         tsne_n_iter: int = 1000,
-        use_3d_tsne: bool = False,
+        use_3d: bool = False,  # Unified 3D parameter (backward compatibility: use_3d_tsne is deprecated)
         use_knn_connections: bool = False,
         knn_k: int = 5,
         max_vlm_image_size: int = 2048,
@@ -109,6 +112,10 @@ class ClamTsneClassifier:
         dinov2_model: str = "dinov2_vitb14",
         use_pca_backend: bool = False,
         max_train_plot_samples: int = 1000,
+        # Metadata parameters
+        dataset_metadata: Optional[Union[str, Dict[str, Any], Path]] = None,
+        auto_load_metadata: bool = True,
+        metadata_base_dir: Optional[str] = None,
         **kwargs
     ):
         """
@@ -168,7 +175,13 @@ class ClamTsneClassifier:
         self.embedding_size = embedding_size
         self.tsne_perplexity = tsne_perplexity
         self.tsne_n_iter = tsne_n_iter
-        self.use_3d_tsne = use_3d_tsne
+        # Handle backward compatibility for use_3d_tsne -> use_3d
+        if 'use_3d_tsne' in kwargs:
+            # Use a temporary logger for the deprecation warning
+            temp_logger = logging.getLogger(__name__)
+            temp_logger.warning("Parameter 'use_3d_tsne' is deprecated. Use 'use_3d' instead.")
+            use_3d = kwargs.pop('use_3d_tsne', use_3d)
+        self.use_3d = use_3d
         self.use_knn_connections = use_knn_connections
         self.knn_k = knn_k
         self.max_vlm_image_size = max_vlm_image_size
@@ -188,6 +201,12 @@ class ClamTsneClassifier:
         self.api_model = api_model
         self.seed = seed
         self.max_model_len = max_model_len
+        
+        # Metadata parameters
+        self.dataset_metadata = dataset_metadata
+        self.auto_load_metadata = auto_load_metadata
+        self.metadata_base_dir = metadata_base_dir
+        self._loaded_metadata = None  # Cached loaded metadata
         
         # New multi-visualization parameters
         self.enable_multi_viz = enable_multi_viz
@@ -375,7 +394,7 @@ class ClamTsneClassifier:
         # Add visualizations based on specified methods
         for viz_method in self.visualization_methods:
             viz_config = VisualizationConfig(
-                use_3d=self.use_3d_tsne,
+                use_3d=self.use_3d,
                 title=f"{viz_method.upper()} - {self.modality.title()} Data",
                 random_state=self.seed,
                 figsize=(8, 6),
@@ -412,6 +431,66 @@ class ClamTsneClassifier:
         
         # Fit all visualizations
         self.context_composer.fit(X_train, y_train, X_test)
+    
+    def _load_dataset_metadata(self, dataset_info=None):
+        """Load dataset metadata for enhanced VLM prompts."""
+        try:
+            from clam.utils.metadata_loader import load_dataset_metadata, detect_dataset_id_from_path
+            
+            metadata = None
+            
+            # Try to load from explicit metadata parameter
+            if self.dataset_metadata is not None:
+                metadata = load_dataset_metadata(
+                    self.dataset_metadata, 
+                    metadata_base_dir=self.metadata_base_dir
+                )
+                if metadata:
+                    self.logger.info(f"Loaded metadata from explicit parameter: {metadata.dataset_name}")
+            
+            # Try auto-detection if no explicit metadata and auto_load is enabled
+            if metadata is None and self.auto_load_metadata:
+                dataset_id = None
+                
+                # Try to detect from dataset_info if available
+                if dataset_info and isinstance(dataset_info, dict):
+                    dataset_id = dataset_info.get('dataset_id') or dataset_info.get('openml_id') or dataset_info.get('task_id')
+                
+                # Try to load metadata using detected ID
+                if dataset_id:
+                    metadata = load_dataset_metadata(
+                        dataset_id, 
+                        metadata_base_dir=self.metadata_base_dir
+                    )
+                    if metadata:
+                        self.logger.info(f"Auto-loaded metadata for dataset ID '{dataset_id}': {metadata.dataset_name}")
+                
+            # Store loaded metadata
+            self._loaded_metadata = metadata
+            
+            if metadata:
+                self.logger.info(f"Metadata loaded successfully: {len(metadata.columns)} columns, {len(metadata.target_classes)} target classes")
+            else:
+                self.logger.debug("No metadata loaded - will use basic prompts")
+                
+        except ImportError:
+            self.logger.warning("Metadata loading not available - install metadata utilities")
+            self._loaded_metadata = None
+        except Exception as e:
+            self.logger.warning(f"Failed to load metadata: {e}")
+            self._loaded_metadata = None
+    
+    def _get_metadata_for_prompt(self):
+        """Get metadata summary for use in VLM prompts."""
+        if self._loaded_metadata is None:
+            return None
+            
+        try:
+            from clam.utils.metadata_loader import create_metadata_summary
+            return create_metadata_summary(self._loaded_metadata)
+        except Exception as e:
+            self.logger.warning(f"Failed to create metadata summary: {e}")
+            return None
     
     def fit(self, X_train, y_train, X_test=None, class_names=None, task_type=None, **kwargs):
         """
@@ -461,6 +540,10 @@ class ClamTsneClassifier:
             self.task_type = 'classification'
             self.unique_classes = np.unique(y_train_array)
             self.target_stats = None
+        
+        # Load metadata if enabled
+        if self.auto_load_metadata or self.dataset_metadata is not None:
+            self._load_dataset_metadata(kwargs.get('dataset_info'))
         
         # Apply feature reduction for tabular data if needed
         if self.modality == "tabular":
@@ -609,7 +692,7 @@ class ClamTsneClassifier:
         
         if self.task_type == 'regression':
             # Use regression-specific visualization methods
-            if self.use_3d_tsne:
+            if self.use_3d:
                 self.logger.info("Creating 3D regression t-SNE visualization...")
                 self.train_tsne, self.test_tsne, base_fig = viz_methods['create_regression_tsne_3d_visualization'](
                     self.train_embeddings, self.y_train_sample, self.test_embeddings,
@@ -627,7 +710,7 @@ class ClamTsneClassifier:
                 )
         else:
             # Use classification visualization methods
-            if self.use_3d_tsne:
+            if self.use_3d:
                 self.logger.info("Creating 3D classification t-SNE visualization...")
                 self.train_tsne, self.test_tsne, base_fig = viz_methods['create_tsne_3d_visualization'](
                     self.train_embeddings, self.y_train_sample, self.test_embeddings,
@@ -731,7 +814,7 @@ class ClamTsneClassifier:
         
         # Parse custom viewing angles if provided
         viewing_angles = None
-        if self.use_3d_tsne and 'viewing_angles' in self.modality_kwargs:
+        if self.use_3d and 'viewing_angles' in self.modality_kwargs:
             try:
                 # Parse format: "elev1,azim1;elev2,azim2;..."
                 angle_pairs = self.modality_kwargs['viewing_angles'].split(';')
@@ -792,7 +875,8 @@ class ClamTsneClassifier:
                             target_stats=self.target_stats,
                             modality=self.modality,
                             dataset_description=f"{self.modality.title()} data with {len(highlight_indices)} highlighted test point(s)",
-                            multi_viz_info=multi_viz_info
+                            multi_viz_info=multi_viz_info,
+                            dataset_metadata=self._get_metadata_for_prompt()
                         )
                     else:
                         # Import classification prompt functions  
@@ -800,9 +884,12 @@ class ClamTsneClassifier:
                         
                         # Get visible classes across all visualizations
                         all_visible_classes = set()
-                        for viz_result in self.context_composer.visualization_results:
-                            if hasattr(viz_result, 'metadata') and 'classes' in viz_result.metadata:
-                                all_visible_classes.update(viz_result.metadata['classes'])
+                        for viz in self.context_composer.visualizations:
+                            if hasattr(viz, 'metadata') and 'classes' in viz.metadata:
+                                all_visible_classes.update(viz.metadata['classes'])
+                            # Fallback: use all unique classes from training data
+                            elif self.unique_classes is not None:
+                                all_visible_classes.update(self.unique_classes)
                         
                         visible_classes_list = sorted(list(all_visible_classes))
                         visible_semantic_names = [self.class_to_semantic.get(cls, str(cls)) for cls in visible_classes_list]
@@ -821,7 +908,8 @@ class ClamTsneClassifier:
                             modality=self.modality,
                             dataset_description=f"{self.modality.title()} data with {len(self.unique_classes)} classes and {len(highlight_indices)} highlighted test point(s)",
                             use_semantic_names=True,
-                            multi_viz_info=multi_viz_info
+                            multi_viz_info=multi_viz_info,
+                            dataset_metadata=self._get_metadata_for_prompt()
                         )
                         
                     legend_text = f"Multi-visualization analysis ({len(self.visualization_methods)} methods)"
@@ -833,7 +921,7 @@ class ClamTsneClassifier:
                         # Use regression visualization methods
                         if self.use_knn_connections:
                             # Create visualization with KNN connections for regression
-                            if self.use_3d_tsne:
+                            if self.use_3d:
                                 fig, legend_text, metadata = viz_methods['create_regression_tsne_3d_plot_with_knn'](
                                 self.train_tsne, self.test_tsne, self.y_train_sample,
                                 self.train_embeddings, self.test_embeddings,
@@ -854,7 +942,7 @@ class ClamTsneClassifier:
                             )
                         else:
                             # Create standard regression visualization
-                            if self.use_3d_tsne:
+                            if self.use_3d:
                                 fig, legend_text, metadata = viz_methods['create_combined_regression_tsne_3d_plot'](
                                 self.train_tsne, self.test_tsne, self.y_train_sample,
                                 highlight_test_idx=i,
@@ -873,7 +961,7 @@ class ClamTsneClassifier:
                         # Use classification visualization methods
                         if self.use_knn_connections:
                             # Create visualization with KNN connections
-                            if self.use_3d_tsne:
+                            if self.use_3d:
                                 fig, legend_text, metadata = viz_methods['create_tsne_3d_plot_with_knn'](
                                 self.train_tsne, self.test_tsne, self.y_train_sample,
                                 self.train_embeddings, self.test_embeddings,
@@ -894,7 +982,7 @@ class ClamTsneClassifier:
                             )
                         else:
                             # Create standard visualization
-                            if self.use_3d_tsne:
+                            if self.use_3d:
                                 fig, legend_text, metadata = viz_methods['create_combined_tsne_3d_plot'](
                                 self.train_tsne, self.test_tsne, self.y_train_sample,
                                 highlight_test_idx=i,
@@ -957,10 +1045,11 @@ class ClamTsneClassifier:
                             target_stats=self.target_stats,
                             modality=self.modality,
                             use_knn=self.use_knn_connections,
-                            use_3d=self.use_3d_tsne,
+                            use_3d=self.use_3d,
                             knn_k=self.knn_k if self.use_knn_connections else None,
                             legend_text=legend_text,
-                            dataset_description=f"{self.modality.title()} data embedded using appropriate features"
+                            dataset_description=f"{self.modality.title()} data embedded using appropriate features",
+                            dataset_metadata=self._get_metadata_for_prompt()
                         )
                         
                         # Create conversation
@@ -1002,11 +1091,12 @@ class ClamTsneClassifier:
                             class_names=visible_semantic_names,
                             modality=self.modality,
                             use_knn=self.use_knn_connections,
-                            use_3d=self.use_3d_tsne,
+                            use_3d=self.use_3d,
                             knn_k=self.knn_k if self.use_knn_connections else None,
                             legend_text=legend_text,
                             dataset_description=f"{self.modality.title()} data embedded using appropriate features",
-                            use_semantic_names=self.use_semantic_names
+                            use_semantic_names=self.use_semantic_names,
+                            dataset_metadata=self._get_metadata_for_prompt()
                         )
                         
                         # Create conversation
@@ -1058,9 +1148,12 @@ class ClamTsneClassifier:
                     if self.task_type == 'classification':
                         # Get all visible classes across visualizations
                         all_visible_classes = set()
-                        for viz_result in self.context_composer.visualization_results:
-                            if hasattr(viz_result, 'metadata') and 'classes' in viz_result.metadata:
-                                all_visible_classes.update(viz_result.metadata['classes'])
+                        for viz in self.context_composer.visualizations:
+                            if hasattr(viz, 'metadata') and 'classes' in viz.metadata:
+                                all_visible_classes.update(viz.metadata['classes'])
+                            # Fallback: use all unique classes from training data
+                            elif self.unique_classes is not None:
+                                all_visible_classes.update(self.unique_classes)
                         
                         visible_classes_list = sorted(list(all_visible_classes))
                         visible_semantic_names = [self.class_to_semantic.get(cls, str(cls)) for cls in visible_classes_list]
@@ -1237,7 +1330,7 @@ class ClamTsneClassifier:
             'embedding_size': self.embedding_size,
             'tsne_perplexity': self.tsne_perplexity,
             'tsne_n_iter': self.tsne_n_iter,
-            'use_3d_tsne': self.use_3d_tsne,
+            'use_3d': self.use_3d,
             'use_knn_connections': self.use_knn_connections,
             'knn_k': self.knn_k,
             'max_vlm_image_size': self.max_vlm_image_size,
@@ -1299,7 +1392,7 @@ def evaluate_clam_tsne(dataset, args):
             embedding_size=getattr(args, 'embedding_size', 1000),
             tsne_perplexity=getattr(args, 'tsne_perplexity', 30),
             tsne_n_iter=getattr(args, 'tsne_n_iter', 1000),
-            use_3d_tsne=getattr(args, 'use_3d_tsne', False),
+            use_3d=getattr(args, 'use_3d', False),
             use_knn_connections=getattr(args, 'use_knn_connections', False),
             knn_k=getattr(args, 'knn_k', 5),
             max_vlm_image_size=getattr(args, 'max_vlm_image_size', 2048),

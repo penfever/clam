@@ -47,7 +47,8 @@ def create_tsne_visualization(
     random_state: int = 42,
     figsize: Tuple[int, int] = (12, 8),
     class_names: Optional[List[str]] = None,
-    use_semantic_names: bool = False
+    use_semantic_names: bool = False,
+    use_3d: bool = False
 ) -> Tuple[np.ndarray, np.ndarray, plt.Figure]:
     """
     Create t-SNE visualization of train and test embeddings.
@@ -61,11 +62,14 @@ def create_tsne_visualization(
         n_iter: Number of t-SNE iterations
         random_state: Random seed for reproducibility
         figsize: Figure size (width, height)
+        class_names: Optional class names for labeling
+        use_semantic_names: Whether to use semantic class names
+        use_3d: Whether to create 3D visualization (default: False for 2D)
         
     Returns:
-        train_tsne: 2D t-SNE coordinates for training data [n_train, 2]
-        test_tsne: 2D t-SNE coordinates for test data [n_test, 2]
-        fig: Matplotlib figure object
+        train_tsne: t-SNE coordinates for training data [n_train, 2 or 3]
+        test_tsne: t-SNE coordinates for test data [n_test, 2 or 3]
+        fig: Matplotlib figure object (2D or 3D depending on use_3d)
     """
     logger.info(f"Creating t-SNE visualization with {len(train_embeddings)} train and {len(test_embeddings)} test samples")
     
@@ -81,7 +85,7 @@ def create_tsne_visualization(
     # Apply t-SNE
     logger.info(f"Running t-SNE with perplexity={effective_perplexity}, n_iter={n_iter}")
     tsne = TSNE(
-        n_components=2,
+        n_components=3 if use_3d else 2,
         perplexity=effective_perplexity,
         max_iter=n_iter,
         random_state=random_state,
@@ -97,48 +101,98 @@ def create_tsne_visualization(
     train_tsne = tsne_results[:n_train]
     test_tsne = tsne_results[n_train:]
     
-    # Create visualization
-    fig, ax = plt.subplots(figsize=figsize)
-    
-    # Get unique classes and colors
+    # Create visualization - handle both 2D and 3D
     unique_classes = np.unique(train_labels)
     class_color_map = create_distinct_color_map(unique_classes)
-    class_color_names = get_class_color_name_map(unique_classes)
     
-    # Plot training points with colors
-    for i, class_label in enumerate(unique_classes):
-        mask = train_labels == class_label
+    if use_3d:
+        # Create 3D visualization with four different views
+        fig = plt.figure(figsize=(15, 12) if figsize == (12, 8) else figsize)
+        
+        # Create four subplots for different 3D views
+        gs = fig.add_gridspec(2, 2, hspace=0.3, wspace=0.3)
+        
+        # View configurations: (elevation, azimuth, title)
+        views = [
+            (20, -60, "Isometric View"),  # Default 3D view
+            (0, -90, "Front View (XZ)"),   # Front view
+            (0, 0, "Side View (YZ)"),      # Side view  
+            (90, 0, "Top View (XY)")       # Top view
+        ]
+        
+        for i, (elev, azim, title) in enumerate(views):
+            ax = fig.add_subplot(gs[i//2, i%2], projection='3d')
+            
+            # Plot training points with colors
+            for class_label in unique_classes:
+                mask = train_labels == class_label
+                ax.scatter(
+                    train_tsne[mask, 0], train_tsne[mask, 1], train_tsne[mask, 2],
+                    c=[class_color_map[class_label]], 
+                    label=format_class_label(class_label, class_names, use_semantic_names),
+                    alpha=0.7,
+                    s=50
+                )
+            
+            # Plot test points in gray
+            ax.scatter(
+                test_tsne[:, 0], test_tsne[:, 1], test_tsne[:, 2],
+                c='lightgray',
+                label='Test Points' if i == 0 else "",  # Only label once
+                alpha=0.8,
+                s=60,
+                marker='s'  # Square markers for test points
+            )
+            
+            ax.set_xlabel('t-SNE Dimension 1')
+            ax.set_ylabel('t-SNE Dimension 2') 
+            ax.set_zlabel('t-SNE Dimension 3')
+            ax.set_title(title)
+            ax.view_init(elev=elev, azim=azim)
+            
+            # Only show legend on first subplot
+            if i == 0:
+                ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        
+        plt.suptitle('3D t-SNE Visualization: Training (Colored) vs Test (Gray) Data', fontsize=14)
+    else:
+        # Create 2D visualization
+        fig, ax = plt.subplots(figsize=figsize)
+        
+        # Plot training points with colors
+        for class_label in unique_classes:
+            mask = train_labels == class_label
+            ax.scatter(
+                train_tsne[mask, 0], train_tsne[mask, 1],
+                c=[class_color_map[class_label]], 
+                label=format_class_label(class_label, class_names, use_semantic_names),
+                alpha=0.7,
+                s=50,
+                edgecolors='black',
+                linewidth=0.5
+            )
+        
+        # Plot test points in gray
         ax.scatter(
-            train_tsne[mask, 0], train_tsne[mask, 1],
-            c=[class_color_map[class_label]], 
-            label=format_class_label(class_label, class_names, use_semantic_names),
-            alpha=0.7,
-            s=50,
+            test_tsne[:, 0], test_tsne[:, 1],
+            c='lightgray',
+            label='Test Points (Light Gray)',
+            alpha=0.8,
+            s=60,
             edgecolors='black',
-            linewidth=0.5
+            linewidth=0.8,
+            marker='s'  # Square markers for test points
         )
-    
-    # Plot test points in gray
-    ax.scatter(
-        test_tsne[:, 0], test_tsne[:, 1],
-        c='lightgray',
-        label='Test Points (Light Gray)',
-        alpha=0.8,
-        s=60,
-        edgecolors='black',
-        linewidth=0.8,
-        marker='s'  # Square markers for test points
-    )
-    
-    ax.set_xlabel('t-SNE Dimension 1')
-    ax.set_ylabel('t-SNE Dimension 2')
-    ax.set_title('t-SNE Visualization: Training (Colored) vs Test (Gray) Data')
-    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-    ax.grid(True, alpha=0.3)
+        
+        ax.set_xlabel('t-SNE Dimension 1')
+        ax.set_ylabel('t-SNE Dimension 2')
+        ax.set_title('t-SNE Visualization: Training (Colored) vs Test (Gray) Data')
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
     
-    logger.info("t-SNE visualization created successfully")
+    logger.info(f"{'3D' if use_3d else '2D'} t-SNE visualization created successfully")
     return train_tsne, test_tsne, fig
 
 
@@ -435,25 +489,34 @@ def create_combined_tsne_plot(
     figsize: Tuple[int, int] = (10, 8),
     zoom_factor: float = 2.0,
     class_names: Optional[List[str]] = None,
-    use_semantic_names: bool = False
+    use_semantic_names: bool = False,
+    use_3d: bool = False
 ) -> Tuple[plt.Figure, str, Dict]:
     """
     Create a t-SNE plot with optional highlighting of a specific test point.
     
     Args:
-        train_tsne: 2D t-SNE coordinates for training data [n_train, 2]
-        test_tsne: 2D t-SNE coordinates for test data [n_test, 2]
+        train_tsne: t-SNE coordinates for training data [n_train, 2 or 3]
+        test_tsne: t-SNE coordinates for test data [n_test, 2 or 3]
         train_labels: Training labels [n_train]
         highlight_test_idx: Index of test point to highlight (optional)
         figsize: Figure size (width, height)
         zoom_factor: Zoom level (2.0 = 200% zoom, showing 50% of the range)
+        class_names: Optional class names for labeling
+        use_semantic_names: Whether to use semantic class names
+        use_3d: Whether to create 3D visualization (default: False for 2D)
         
     Returns:
-        fig: Matplotlib figure object
+        fig: Matplotlib figure object (2D or 3D depending on use_3d)
         legend_text: Text description of the legend
         metadata: Dictionary with plot metadata
     """
-    fig, ax = plt.subplots(figsize=figsize)
+    # Create figure and axis - handle both 2D and 3D
+    if use_3d:
+        fig = plt.figure(figsize=figsize)
+        ax = fig.add_subplot(111, projection='3d')
+    else:
+        fig, ax = plt.subplots(figsize=figsize)
     
     # Get unique classes and create consistent color mapping
     unique_classes = np.unique(train_labels)
@@ -484,11 +547,26 @@ def create_combined_tsne_plot(
         y_min = target_point[1] - y_window / 2
         y_max = target_point[1] + y_window / 2
         
-        # Filter points to only show those within the zoom window
-        train_mask = ((train_tsne[:, 0] >= x_min) & (train_tsne[:, 0] <= x_max) & 
-                     (train_tsne[:, 1] >= y_min) & (train_tsne[:, 1] <= y_max))
-        test_mask = ((test_tsne[:, 0] >= x_min) & (test_tsne[:, 0] <= x_max) & 
-                    (test_tsne[:, 1] >= y_min) & (test_tsne[:, 1] <= y_max))
+        # For 3D, also handle z-axis
+        if use_3d and train_tsne.shape[1] >= 3:
+            z_range = np.ptp(all_points[:, 2])
+            z_window = z_range * visible_fraction
+            z_min = target_point[2] - z_window / 2
+            z_max = target_point[2] + z_window / 2
+            
+            # Filter points to only show those within the zoom window (3D)
+            train_mask = ((train_tsne[:, 0] >= x_min) & (train_tsne[:, 0] <= x_max) & 
+                         (train_tsne[:, 1] >= y_min) & (train_tsne[:, 1] <= y_max) &
+                         (train_tsne[:, 2] >= z_min) & (train_tsne[:, 2] <= z_max))
+            test_mask = ((test_tsne[:, 0] >= x_min) & (test_tsne[:, 0] <= x_max) & 
+                        (test_tsne[:, 1] >= y_min) & (test_tsne[:, 1] <= y_max) &
+                        (test_tsne[:, 2] >= z_min) & (test_tsne[:, 2] <= z_max))
+        else:
+            # Filter points to only show those within the zoom window (2D)
+            train_mask = ((train_tsne[:, 0] >= x_min) & (train_tsne[:, 0] <= x_max) & 
+                         (train_tsne[:, 1] >= y_min) & (train_tsne[:, 1] <= y_max))
+            test_mask = ((test_tsne[:, 0] >= x_min) & (test_tsne[:, 0] <= x_max) & 
+                        (test_tsne[:, 1] >= y_min) & (test_tsne[:, 1] <= y_max))
         
         train_tsne_visible = train_tsne[train_mask]
         train_labels_visible = train_labels[train_mask]
@@ -497,6 +575,8 @@ def create_combined_tsne_plot(
         # Set axis limits
         ax.set_xlim(x_min, x_max)
         ax.set_ylim(y_min, y_max)
+        if use_3d and hasattr(ax, 'set_zlim'):
+            ax.set_zlim(z_min, z_max)
     else:
         # No zoom, show all points
         train_tsne_visible = train_tsne
@@ -507,44 +587,74 @@ def create_combined_tsne_plot(
     for class_label in unique_classes:
         mask = train_labels_visible == class_label
         if np.any(mask):  # Only plot if there are points of this class in view
-            ax.scatter(
-                train_tsne_visible[mask, 0], train_tsne_visible[mask, 1],
-                c=[class_color_map[class_label]], 
-                label=format_class_label(class_label, class_names, use_semantic_names, "Training Class"),
-                alpha=0.7,
-                s=50,
-                edgecolors='black',
-                linewidth=0.5
-            )
+            if use_3d and train_tsne_visible.shape[1] >= 3:
+                ax.scatter(
+                    train_tsne_visible[mask, 0], train_tsne_visible[mask, 1], train_tsne_visible[mask, 2],
+                    c=[class_color_map[class_label]], 
+                    label=format_class_label(class_label, class_names, use_semantic_names, "Training Class"),
+                    alpha=0.7,
+                    s=50
+                )
+            else:
+                ax.scatter(
+                    train_tsne_visible[mask, 0], train_tsne_visible[mask, 1],
+                    c=[class_color_map[class_label]], 
+                    label=format_class_label(class_label, class_names, use_semantic_names, "Training Class"),
+                    alpha=0.7,
+                    s=50,
+                    edgecolors='black',
+                    linewidth=0.5
+                )
     
     # Plot all test points in gray (only visible ones)
     if len(test_tsne_visible) > 0:
-        ax.scatter(
-            test_tsne_visible[:, 0], test_tsne_visible[:, 1],
-            c='lightgray',
-            alpha=0.6,
-            s=60,
-            edgecolors='gray',
-            linewidth=0.8,
-            marker='s',
-            label='Test Points (Light Gray)'
-        )
+        if use_3d and test_tsne_visible.shape[1] >= 3:
+            ax.scatter(
+                test_tsne_visible[:, 0], test_tsne_visible[:, 1], test_tsne_visible[:, 2],
+                c='lightgray',
+                alpha=0.6,
+                s=60,
+                marker='s',
+                label='Test Points (Light Gray)'
+            )
+        else:
+            ax.scatter(
+                test_tsne_visible[:, 0], test_tsne_visible[:, 1],
+                c='lightgray',
+                alpha=0.6,
+                s=60,
+                edgecolors='gray',
+                linewidth=0.8,
+                marker='s',
+                label='Test Points (Light Gray)'
+            )
     
     # Highlight specific test point if requested
     if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_tsne):
-        ax.scatter(
-            test_tsne[highlight_test_idx, 0], test_tsne[highlight_test_idx, 1],
-            c='red',
-            s=120,
-            edgecolors='darkred',
-            linewidth=2,
-            marker='*',
-            label='Query Point (Red Star)',
-            zorder=10
-        )
+        if use_3d and test_tsne.shape[1] >= 3:
+            ax.scatter(
+                test_tsne[highlight_test_idx, 0], test_tsne[highlight_test_idx, 1], test_tsne[highlight_test_idx, 2],
+                c='red',
+                s=120,
+                marker='*',
+                label='Query Point (Red Star)'
+            )
+        else:
+            ax.scatter(
+                test_tsne[highlight_test_idx, 0], test_tsne[highlight_test_idx, 1],
+                c='red',
+                s=120,
+                edgecolors='darkred',
+                linewidth=2,
+                marker='*',
+                label='Query Point (Red Star)',
+                zorder=10
+            )
     
     ax.set_xlabel('t-SNE Dimension 1')
     ax.set_ylabel('t-SNE Dimension 2')
+    if use_3d and hasattr(ax, 'set_zlabel'):
+        ax.set_zlabel('t-SNE Dimension 3')
     
     if highlight_test_idx is not None:
         if zoom_factor > 1.0:
@@ -1467,7 +1577,7 @@ def create_regression_tsne_visualization(
     # Apply t-SNE
     logger.info(f"Running t-SNE with perplexity={effective_perplexity}, n_iter={n_iter}")
     tsne = TSNE(
-        n_components=2,
+        n_components=3 if use_3d else 2,
         perplexity=effective_perplexity,
         max_iter=n_iter,
         random_state=random_state,

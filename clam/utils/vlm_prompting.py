@@ -97,7 +97,8 @@ def create_classification_prompt(
     include_spectrogram: bool = False,
     dataset_description: Optional[str] = None,
     use_semantic_names: bool = False,
-    multi_viz_info: Optional[List[Dict[str, Any]]] = None
+    multi_viz_info: Optional[List[Dict[str, Any]]] = None,
+    dataset_metadata: Optional[str] = None
 ) -> str:
     """
     Create a classification prompt for VLM based on modality and visualization type.
@@ -113,6 +114,7 @@ def create_classification_prompt(
         dataset_description: Optional description of the dataset/task
         use_semantic_names: Whether to use semantic class names in prompts (default: False uses "Class X")
         multi_viz_info: Optional list of visualization method information for multi-viz prompts
+        dataset_metadata: Optional structured metadata summary for domain context
         
     Returns:
         Formatted prompt string
@@ -222,10 +224,15 @@ The multiple visualizations provide different perspectives on the same underlyin
     if legend_text:
         data_description += f"\n\n{legend_text}"
 
-    # Add dataset description if provided
+    # Add dataset description and metadata if provided
     dataset_context = ""
-    if dataset_description:
-        dataset_context = f"\n\nDataset Context: {dataset_description}"
+    if dataset_description or dataset_metadata:
+        context_parts = []
+        if dataset_description:
+            context_parts.append(dataset_description)
+        if dataset_metadata:
+            context_parts.append(f"\n{dataset_metadata}")
+        dataset_context = f"\n\nDataset Context: {' '.join(context_parts)}"
 
     # Create modality-specific important notes
     if use_knn:
@@ -320,7 +327,8 @@ def create_regression_prompt(
     legend_text: Optional[str] = None,
     include_spectrogram: bool = False,
     dataset_description: Optional[str] = None,
-    multi_viz_info: Optional[List[Dict[str, Any]]] = None
+    multi_viz_info: Optional[List[Dict[str, Any]]] = None,
+    dataset_metadata: Optional[str] = None
 ) -> str:
     """
     Create a regression prompt for VLM based on modality and visualization type.
@@ -432,7 +440,7 @@ The multiple visualizations provide different perspectives on how the target val
     if legend_text:
         data_description += f"\n\n{legend_text}"
 
-    # Add dataset description if provided
+    # Add dataset description and metadata if provided
     dataset_context = ""
     if dataset_description:
         dataset_context = f"\n\nDataset Context: {dataset_description}"

@@ -1,0 +1,37 @@
+Class: FAILED | Reasoning: Pipeline error: Qwen2_5_VLForConditionalGeneration.__init__() got an unexpected keyword argument 'max_model_len'
+
+=== RESPONSE ===
+
+Class: FAILED | Reasoning: Pipeline error: Qwen2_5_VLForConditionalGeneration.__init__() got an unexpected keyword argument 'max_model_len'
+
+=== RESPONSE ===
+
+Class: FAILED | Reasoning: Pipeline error: Qwen2_5_VLForConditionalGeneration.__init__() got an unexpected keyword argument 'max_model_len'
+
+=== RESPONSE ===
+
+Class: FAILED | Reasoning: Pipeline error: Qwen2_5_VLForConditionalGeneration.__init__() got an unexpected keyword argument 'max_model_len'
+
+=== RESPONSE ===
+
+Class: FAILED | Reasoning: Pipeline error: Qwen2_5_VLForConditionalGeneration.__init__() got an unexpected keyword argument 'max_model_len'
+
+=== RESPONSE ===
+
+Class: FAILED | Reasoning: Pipeline error: Qwen2_5_VLForConditionalGeneration.__init__() got an unexpected keyword argument 'max_model_len'
+
+=== RESPONSE ===
+
+Class: FAILED | Reasoning: Pipeline error: Qwen2_5_VLForConditionalGeneration.__init__() got an unexpected keyword argument 'max_model_len'
+
+=== RESPONSE ===
+
+Class: FAILED | Reasoning: Pipeline error: Qwen2_5_VLForConditionalGeneration.__init__() got an unexpected keyword argument 'max_model_len'
+
+=== RESPONSE ===
+
+Class: FAILED | Reasoning: Pipeline error: Qwen2_5_VLForConditionalGeneration.__init__() got an unexpected keyword argument 'max_model_len'
+
+=== RESPONSE ===
+
+Class: FAILED | Reasoning: Pipeline error: Qwen2_5_VLForConditionalGeneration.__init__() got an unexpected keyword argument 'max_model_len'

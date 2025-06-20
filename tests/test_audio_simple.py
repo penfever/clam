@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Simple test to verify audio processing pipeline without VLM.
-Tests Whisper embedding extraction and t-SNE visualization.
+Comprehensive audio testing suite.
+Tests Whisper embeddings, t-SNE visualization, baseline classifiers, and CLAM audio pipeline.
 """
 
 import sys
@@ -179,6 +179,303 @@ def main():
     return passed == len(tests)
 
 
+def create_synthetic_test_data(num_samples_per_class=2, num_classes=3, duration=1.0, sample_rate=16000):
+    """Create synthetic audio test data."""
+    import tempfile
+    import shutil
+    from pathlib import Path
+    from clam.utils.audio_utils import create_synthetic_audio
+    
+    with tempfile.TemporaryDirectory() as temp_dir:
+        audio_paths = []
+        labels = []
+        class_names = [f"class_{i}" for i in range(num_classes)]
+        
+        for class_idx in range(num_classes):
+            for sample_idx in range(num_samples_per_class):
+                # Create synthetic audio with different frequencies for each class
+                base_freq = 200 + class_idx * 100  # 200, 300, 400 Hz
+                audio = create_synthetic_audio(
+                    frequency=base_freq + sample_idx * 50,
+                    duration=duration,
+                    sample_rate=sample_rate
+                )
+                
+                # Save to temporary file
+                audio_path = Path(temp_dir) / f"class_{class_idx}_sample_{sample_idx}.wav"
+                
+                import soundfile as sf
+                sf.write(str(audio_path), audio, sample_rate)
+                
+                audio_paths.append(str(audio_path))
+                labels.append(class_idx)
+        
+        # Convert to absolute paths and copy to persistent location
+        persistent_dir = Path("./temp_test_audio")
+        persistent_dir.mkdir(exist_ok=True)
+        
+        persistent_paths = []
+        for path in audio_paths:
+            dest_path = persistent_dir / Path(path).name
+            shutil.copy2(path, dest_path)
+            persistent_paths.append(str(dest_path))
+        
+        return persistent_paths, labels, class_names
+
+
+def test_whisper_knn_baseline():
+    """Test Whisper KNN baseline classifier."""
+    logger.info("Testing Whisper KNN baseline classifier...")
+    
+    try:
+        from examples.audio.audio_baselines import WhisperKNNClassifier
+        
+        # Create test data
+        audio_paths, labels, class_names = create_synthetic_test_data(num_samples_per_class=3, num_classes=2)
+        
+        # Split into train/test
+        train_paths = audio_paths[:4]  # 2 per class
+        train_labels = labels[:4]
+        test_paths = audio_paths[4:]
+        test_labels = labels[4:]
+        
+        # Initialize classifier
+        classifier = WhisperKNNClassifier(
+            whisper_model="tiny",  # Use tiny for speed
+            n_neighbors=3,
+            metric="cosine",
+            weights="distance",
+            standardize=True,
+            device="cpu",  # Force CPU for compatibility
+            seed=42
+        )
+        
+        # Fit classifier
+        logger.info(f"Fitting on {len(train_paths)} training samples...")
+        classifier.fit(train_paths, train_labels, class_names)
+        
+        # Evaluate
+        logger.info(f"Evaluating on {len(test_paths)} test samples...")
+        results = classifier.evaluate(test_paths, test_labels, return_detailed=True)
+        
+        logger.info(f"✓ Whisper KNN results:")
+        logger.info(f"  Accuracy: {results['accuracy']:.4f}")
+        logger.info(f"  Training time: {results.get('training_time', 0):.2f}s")
+        logger.info(f"  Prediction time: {results['prediction_time']:.2f}s")
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"Whisper KNN baseline test failed: {e}")
+        return False
+
+
+def test_clap_zero_shot_baseline():
+    """Test CLAP zero-shot baseline classifier."""
+    logger.info("Testing CLAP zero-shot baseline classifier...")
+    
+    try:
+        from examples.audio.audio_baselines import CLAPZeroShotClassifier
+        
+        # Create test data
+        audio_paths, labels, class_names = create_synthetic_test_data(num_samples_per_class=2, num_classes=2)
+        
+        # Use all data for testing (zero-shot doesn't need training)
+        test_paths = audio_paths
+        test_labels = labels
+        
+        # Initialize classifier
+        classifier = CLAPZeroShotClassifier(
+            version="2023",  # Use 2023 version
+            use_cuda=False,  # Force CPU for compatibility
+            batch_size=2  # Small batch size
+        )
+        
+        # "Fit" classifier (just sets up class names)
+        logger.info("Setting up CLAP classifier...")
+        classifier.fit([], [], class_names)  # Empty training data for zero-shot
+        
+        # Evaluate
+        logger.info(f"Evaluating on {len(test_paths)} test samples...")
+        results = classifier.evaluate(test_paths, test_labels, return_detailed=True)
+        
+        logger.info(f"✓ CLAP zero-shot results:")
+        logger.info(f"  Accuracy: {results['accuracy']:.4f}")
+        logger.info(f"  Training time: {results.get('training_time', 0):.2f}s")
+        logger.info(f"  Prediction time: {results['prediction_time']:.2f}s")
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"CLAP zero-shot baseline test failed: {e}")
+        return False
+
+
+def test_clam_audio_minimal():
+    """Test CLAM audio classifier with minimal synthetic data."""
+    logger.info("Testing CLAM audio classifier with minimal synthetic data...")
+    
+    try:
+        from examples.audio.clam_tsne_audio_baseline import ClamAudioTsneClassifier
+        from clam.utils.audio_utils import create_synthetic_audio
+        from pathlib import Path
+        import shutil
+        
+        # Create minimal test data
+        temp_dir = Path("./temp_minimal_test")
+        temp_dir.mkdir(exist_ok=True)
+        
+        audio_paths = []
+        labels = []
+        
+        # Create 4 files: 2 classes, 2 samples each
+        for class_idx in range(2):
+            for sample_idx in range(2):
+                # Create synthetic audio
+                frequency = 200 + class_idx * 200  # 200Hz, 400Hz
+                audio = create_synthetic_audio(
+                    frequency=frequency,
+                    duration=1.0,
+                    sample_rate=16000
+                )
+                
+                # Save to file
+                import soundfile as sf
+                audio_path = temp_dir / f"class_{class_idx}_sample_{sample_idx}.wav"
+                sf.write(str(audio_path), audio, 16000)
+                
+                audio_paths.append(str(audio_path))
+                labels.append(class_idx)
+        
+        class_names = ["class_0", "class_1"]
+        
+        # Split into train/test
+        train_paths = audio_paths[:2]  # 1 per class
+        train_labels = labels[:2]
+        test_paths = audio_paths[2:]   # 1 per class for testing
+        test_labels = labels[2:]
+        
+        logger.info(f"Train: {len(train_paths)} samples, Test: {len(test_paths)} samples")
+        
+        # Initialize classifier with minimal settings
+        classifier = ClamAudioTsneClassifier(
+            whisper_model="tiny",  # Fastest model
+            embedding_layer="encoder_last",
+            tsne_perplexity=1.0,  # Very small for 2 points
+            tsne_n_iter=250,      # Minimum
+            vlm_model_id="Qwen/Qwen2.5-VL-3B-Instruct",
+            use_3d_tsne=False,
+            use_knn_connections=True,  # Test the KNN fix
+            knn_k=1,              # Only 1 neighbor available
+            max_vlm_image_size=512,
+            tsne_zoom_factor=2.0,
+            use_pca_backend=False,
+            include_spectrogram=False,
+            audio_duration=1.0,
+            cache_dir="./temp_cache",
+            device="cpu",  # Force CPU for compatibility
+            seed=42
+        )
+        
+        # Fit classifier
+        logger.info("Fitting classifier...")
+        classifier.fit(train_paths, train_labels, test_paths, class_names)
+        
+        # Test prediction on just one sample
+        logger.info("Testing prediction...")
+        prediction = classifier.predict([test_paths[0]])
+        
+        logger.info(f"✓ Prediction successful: {prediction}")
+        
+        # Cleanup
+        shutil.rmtree("./temp_minimal_test", ignore_errors=True)
+        shutil.rmtree("./temp_cache", ignore_errors=True)
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"CLAM audio minimal test failed: {e}")
+        # Cleanup
+        import shutil
+        shutil.rmtree("./temp_minimal_test", ignore_errors=True)
+        shutil.rmtree("./temp_cache", ignore_errors=True)
+        return False
+
+
+def cleanup_test_data():
+    """Clean up temporary test data."""
+    import shutil
+    from pathlib import Path
+    
+    test_dirs = ["./temp_test_audio", "./temp_minimal_test", "./temp_cache"]
+    for test_dir in test_dirs:
+        if Path(test_dir).exists():
+            shutil.rmtree(test_dir)
+    logger.info("Cleaned up test data")
+
+
+def run_comprehensive_tests():
+    """Run comprehensive audio tests including baselines."""
+    logger.info("Running comprehensive audio tests...")
+    
+    # Run original tests
+    original_success = main()
+    
+    # Run baseline tests
+    baseline_tests = [
+        ("Whisper KNN Baseline", test_whisper_knn_baseline),
+        ("CLAP Zero-Shot Baseline", test_clap_zero_shot_baseline),
+        ("CLAM Audio Minimal", test_clam_audio_minimal),
+    ]
+    
+    baseline_results = []
+    for test_name, test_func in baseline_tests:
+        logger.info(f"\n{'='*50}")
+        logger.info(f"Running {test_name}...")
+        try:
+            success = test_func()
+            baseline_results.append((test_name, success))
+        except Exception as e:
+            logger.error(f"{test_name} failed with exception: {e}")
+            baseline_results.append((test_name, False))
+    
+    # Summary
+    logger.info("\n" + "="*60)
+    logger.info("COMPREHENSIVE AUDIO TEST RESULTS")
+    logger.info("="*60)
+    
+    logger.info(f"Original Pipeline Tests: {'✅ PASS' if original_success else '❌ FAIL'}")
+    
+    baseline_passed = 0
+    for test_name, success in baseline_results:
+        status = "✅ PASS" if success else "❌ FAIL"
+        logger.info(f"{test_name}: {status}")
+        if success:
+            baseline_passed += 1
+    
+    total_passed = (1 if original_success else 0) + baseline_passed
+    total_tests = 1 + len(baseline_tests)
+    
+    logger.info(f"\n🏆 Overall: {total_passed}/{total_tests} test suites passed")
+    
+    # Cleanup
+    cleanup_test_data()
+    
+    if total_passed == total_tests:
+        logger.info("🎉 All comprehensive audio tests passed!")
+        return True
+    else:
+        logger.info("⚠️  Some tests failed. Check the errors above.")
+        return False
+
+
 if __name__ == "__main__":
-    success = main()
+    import sys
+    
+    # Check for comprehensive test flag
+    if len(sys.argv) > 1 and sys.argv[1] == "--comprehensive":
+        success = run_comprehensive_tests()
+    else:
+        success = main()
+    
     sys.exit(0 if success else 1)

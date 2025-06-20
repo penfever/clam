@@ -423,6 +423,91 @@ def test_examples_functionality():
         return False
 
 
+def test_tabular_integration_comprehensive():
+    """Comprehensive test of VLLM backend with tabular tasks."""
+    logger.info("Testing comprehensive tabular integration with VLLM...")
+    
+    try:
+        # Create test data specifically for tabular classification
+        import numpy as np
+        np.random.seed(42)
+        
+        n_samples = 30
+        n_features = 4
+        
+        # Generate features with predictive power
+        X = np.random.randn(n_samples, n_features)
+        y = ((X[:, 0] > 0) & (X[:, 1] > 0)).astype(int)
+        
+        feature_names = ['income_score', 'credit_score', 'age_normalized', 'debt_ratio']
+        target_names = ['rejected', 'approved']
+        
+        logger.info(f"Created test dataset: {n_samples} samples, {n_features} features, 2 classes")
+        
+        # Test VLLM with tabular-specific prompts
+        from clam.utils.model_loader import model_loader, GenerationConfig
+        
+        model_name = "microsoft/DialoGPT-small"
+        model_loader.unload_all()
+        
+        # Load with VLLM backend optimized for tabular tasks
+        model_wrapper = model_loader.load_llm(
+            model_name,
+            backend="vllm",
+            device="auto",
+            max_model_len=256,
+            gpu_memory_utilization=0.5
+        )
+        
+        # Test single tabular classification prompt
+        sample_features = X[0]
+        tabular_prompt = f"""Given the following credit application data:
+{feature_names[0]}: {sample_features[0]:.2f}
+{feature_names[1]}: {sample_features[1]:.2f} 
+{feature_names[2]}: {sample_features[2]:.2f}
+{feature_names[3]}: {sample_features[3]:.2f}
+
+Based on this data, classify as: {target_names[0]} or {target_names[1]}
+Classification:"""
+        
+        config = GenerationConfig(
+            max_new_tokens=10,
+            temperature=0.1,
+            do_sample=True
+        )
+        
+        result = model_wrapper.generate(tabular_prompt, config)
+        logger.info(f"✓ Tabular classification result: '{result.strip()}'")
+        
+        # Test batch processing for multiple samples
+        batch_prompts = []
+        for i in range(3):  # Test with 3 samples
+            features = X[i]
+            prompt = f"Data: {feature_names[0]}={features[0]:.2f}, {feature_names[1]}={features[1]:.2f}. Class:"
+            batch_prompts.append(prompt)
+        
+        batch_results = model_wrapper.generate(batch_prompts, config)
+        logger.info(f"✓ Batch processing successful: {len(batch_results)} results")
+        
+        # Test memory efficiency with multiple calls
+        for i in range(5):
+            quick_prompt = f"Feature A: {X[i, 0]:.1f}. Binary classification:"
+            quick_result = model_wrapper.generate(quick_prompt, config)
+            
+        logger.info("✓ Multiple generation calls completed without memory issues")
+        
+        # Cleanup
+        model_wrapper.unload()
+        
+        logger.info("✓ Comprehensive tabular integration test passed")
+        return True
+        
+    except Exception as e:
+        logger.error(f"✗ Tabular integration test failed: {e}")
+        logger.error(traceback.format_exc())
+        return False
+
+
 def run_all_tests():
     """Run all VLLM backend tests."""
     logger.info("="*60)
@@ -437,6 +522,7 @@ def run_all_tests():
         ("Model Loader Backend Selection", test_model_loader_backend_selection),
         ("TabLLM with VLLM", test_tabular_llm_baseline_with_vllm),
         ("Examples Functionality", test_examples_functionality),
+        ("Comprehensive Tabular Integration", test_tabular_integration_comprehensive),
     ]
     
     results = {}

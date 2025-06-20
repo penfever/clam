@@ -660,8 +660,8 @@ def main():
     parser = argparse.ArgumentParser(description="Comprehensive VLM Prompting Test Suite")
     parser.add_argument("--output_dir", type=str, default="./test_vlm_outputs",
                        help="Directory to save test outputs")
-    parser.add_argument("--dataset_id", type=int, default=31,
-                       help="OpenML dataset ID (default: 31 = credit-g, alternatives: 61=iris, 1046=wine, 1461=banknote)")
+    parser.add_argument("--dataset_id", type=int, default=23,
+                       help="OpenML dataset ID (default: 23 = cmc, alternatives: 61=iris, 1046=wine, 1461=banknote)")
     parser.add_argument("--vlm_model", type=str, default="Qwen/Qwen2.5-VL-3B-Instruct",
                        help="VLM model to use")
     parser.add_argument("--seed", type=int, default=42,

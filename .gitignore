@@ -2,6 +2,7 @@
 # IMPORTANT: These patterns exclude the data directories for storing files
 # but do NOT exclude the Python module code in clam/data/
 /results_llm/*
+/results/*
 /models/*
 !/models/.gitkeep
 /data/*
