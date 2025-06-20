@@ -164,7 +164,7 @@ def evaluate_jolt_official(dataset, args):
         )
         
         # Detect task type (classification vs regression)
-        task_type = detect_task_type(y_train, dataset=dataset, dataset_name=dataset['name'])
+        task_type, _ = detect_task_type(dataset=dataset, y=y_train)
         is_regression = (task_type == 'regression')
         logger.info(f"JOLT detected task type: {task_type}")
         
