@@ -389,7 +389,10 @@ class VLMPromptingTestSuite:
                 results = classifier.evaluate(
                     X_test, 
                     y_test, 
-                    return_detailed=True
+                    return_detailed=True,
+                    save_outputs=True,
+                    output_dir=str(test_dir),
+                    visualization_save_cadence=3
                 )
                 
                 # Extract ground truth labels

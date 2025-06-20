@@ -561,6 +561,12 @@ def add_tsne_visualization_args(parser: argparse.ArgumentParser):
         help="Disable saving of sample t-SNE visualizations"
     )
     parser.add_argument(
+        "--visualization_save_cadence",
+        type=int,
+        default=10,
+        help="Save visualizations for every N samples (default: 10, i.e., save every 10th visualization)"
+    )
+    parser.add_argument(
         "--viewing_angles",
         type=str,
         help="Custom viewing angles for 3D t-SNE (format: 'elev1,azim1;elev2,azim2;...')"

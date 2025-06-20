@@ -769,7 +769,7 @@ class ClamTsneClassifier:
             
         self.logger.info(f"CLAM t-SNE {self.task_type} model fitted successfully")
     
-    def predict(self, X_test, y_test=None, return_detailed=False, save_outputs=False, output_dir=None):
+    def predict(self, X_test, y_test=None, return_detailed=False, save_outputs=False, output_dir=None, visualization_save_cadence=10):
         """
         Make predictions using the fitted CLAM t-SNE classifier.
         
@@ -779,6 +779,7 @@ class ClamTsneClassifier:
             return_detailed: Whether to return detailed prediction information
             save_outputs: Whether to save visualizations and outputs
             output_dir: Directory to save outputs
+            visualization_save_cadence: Save visualizations for every N samples (default: 10)
             
         Returns:
             predictions or detailed results dict
@@ -850,8 +851,8 @@ class ClamTsneClassifier:
                     # Convert PIL image to format expected by VLM
                     image = composed_image
                     
-                    # Save multi-visualization if requested
-                    if save_outputs and self.temp_dir:
+                    # Save multi-visualization if requested (respecting cadence)
+                    if save_outputs and self.temp_dir and (i % visualization_save_cadence == 0):
                         viz_filename = f"multi_visualization_test_{i:03d}.png"
                         viz_path = os.path.join(self.temp_dir, viz_filename)
                         composed_image.save(viz_path)
@@ -1005,8 +1006,8 @@ class ClamTsneClassifier:
                     img_buffer.seek(0)
                     image = Image.open(img_buffer)
                     
-                    # Save visualization if requested
-                    if save_outputs and self.temp_dir:
+                    # Save visualization if requested (respecting cadence)
+                    if save_outputs and self.temp_dir and (i % visualization_save_cadence == 0):
                         viz_filename = f"visualization_test_{i:03d}.png"
                         viz_path = os.path.join(self.temp_dir, viz_filename)
                         fig.savefig(viz_path, dpi=self.image_dpi, bbox_inches='tight', facecolor='white')
@@ -1233,7 +1234,7 @@ class ClamTsneClassifier:
         else:
             return predictions
     
-    def evaluate(self, X_test, y_test, return_detailed=False, save_outputs=False, output_dir=None):
+    def evaluate(self, X_test, y_test, return_detailed=False, save_outputs=False, output_dir=None, visualization_save_cadence=10):
         """
         Evaluate the classifier on test data.
         
@@ -1243,6 +1244,7 @@ class ClamTsneClassifier:
             return_detailed: Whether to return detailed results
             save_outputs: Whether to save outputs
             output_dir: Directory to save outputs
+            visualization_save_cadence: Save visualizations for every N samples (default: 10)
             
         Returns:
             Dictionary with evaluation metrics
@@ -1250,7 +1252,7 @@ class ClamTsneClassifier:
         start_time = time.time()
         
         # Make predictions
-        detailed_results = self.predict(X_test, y_test, return_detailed=True, save_outputs=save_outputs, output_dir=output_dir)
+        detailed_results = self.predict(X_test, y_test, return_detailed=True, save_outputs=save_outputs, output_dir=output_dir, visualization_save_cadence=visualization_save_cadence)
         predictions = detailed_results['predictions']
         completed_samples = detailed_results['completed_samples']
         
@@ -1428,7 +1430,8 @@ def evaluate_clam_tsne(dataset, args):
             X_test, y_test, 
             return_detailed=True,
             save_outputs=getattr(args, 'save_sample_visualizations', True),
-            output_dir=getattr(args, 'output_dir', None)
+            output_dir=getattr(args, 'output_dir', None),
+            visualization_save_cadence=getattr(args, 'visualization_save_cadence', 10)
         )
         
         # Add dataset information

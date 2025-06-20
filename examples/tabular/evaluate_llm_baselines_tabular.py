@@ -299,6 +299,12 @@ def parse_args_old():
         default=4.0,
         help="Zoom factor for t-SNE visualizations (2.0 = 200%% zoom, showing 50%% of the range) (CLAM-T-SNe baseline)"
     )
+    parser.add_argument(
+        "--visualization_save_cadence",
+        type=int,
+        default=10,
+        help="Save visualizations for every N samples (default: 10, i.e., save every 10th visualization) (CLAM-T-SNe baseline)"
+    )
     
     # Evaluation parameters
     parser.add_argument(

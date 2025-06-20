@@ -1,0 +1,266 @@
+Installation Guide
+==================
+
+This guide covers the installation of CLAM and its dependencies for different use cases.
+
+Requirements
+------------
+
+**Python Version**: 3.8 or higher (3.9+ recommended)
+
+**System Requirements**:
+
+* **GPU**: NVIDIA GPU with CUDA support (recommended for VLM models)
+* **Memory**: 8GB+ RAM (16GB+ recommended for large models)
+* **Storage**: 5GB+ free space for models and cache
+
+Basic Installation
+------------------
+
+From Source (Recommended)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+   # Clone the repository
+   git clone https://github.com/penfever/clam.git
+   cd clam
+
+   # Install in development mode
+   pip install -e .
+
+This installs the core CLAM package with basic dependencies.
+
+Modality-Specific Installation
+------------------------------
+
+Vision Models
+~~~~~~~~~~~~~
+
+For image classification with DINOV2 embeddings and vision models:
+
+.. code-block:: bash
+
+   pip install -e ".[vision]"
+
+This includes:
+
+* ``torch`` and ``torchvision`` for PyTorch models
+* ``timm`` for pre-trained vision models  
+* ``PIL`` for image processing
+* ``opencv-python`` for advanced image operations
+
+Audio Models
+~~~~~~~~~~~~
+
+For audio classification with Whisper and CLAP embeddings:
+
+.. code-block:: bash
+
+   pip install -e ".[audio]"
+
+This includes:
+
+* ``librosa`` for audio processing
+* ``soundfile`` for audio I/O
+* ``whisper`` for speech embeddings
+* ``transformers`` for CLAP models
+
+API Models  
+~~~~~~~~~~
+
+For integration with commercial API models (OpenAI, Google):
+
+.. code-block:: bash
+
+   pip install -e ".[api]"
+
+This includes:
+
+* ``openai`` client library
+* ``google-generativeai`` for Gemini models
+* ``anthropic`` for Claude models (future support)
+
+Complete Installation
+~~~~~~~~~~~~~~~~~~~~~
+
+To install all optional dependencies:
+
+.. code-block:: bash
+
+   pip install -e ".[vision,audio,api]"
+
+Advanced Installation
+---------------------
+
+VLLM Backend (Optional)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+For faster local VLM inference with VLLM:
+
+.. code-block:: bash
+
+   pip install vllm
+
+.. note::
+   VLLM requires CUDA and may have specific GPU compatibility requirements.
+   See `VLLM installation guide <https://docs.vllm.ai/en/latest/getting_started/installation.html>`_ for details.
+
+Development Installation
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+For contributing to CLAM development:
+
+.. code-block:: bash
+
+   # Install with development dependencies
+   pip install -e ".[vision,audio,api,dev]"
+
+   # Install pre-commit hooks
+   pre-commit install
+
+Documentation Dependencies
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To build documentation locally:
+
+.. code-block:: bash
+
+   pip install -r docs/requirements.txt
+
+Verification
+------------
+
+Test Your Installation
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+   # Test basic import
+   import clam
+   print(f"CLAM version: {clam.__version__}")
+
+   # Test core functionality
+   from clam.models.clam_tsne import ClamTsneClassifier
+   classifier = ClamTsneClassifier(modality="tabular")
+   print("✓ Core CLAM functionality available")
+
+   # Test vision support (if installed)
+   try:
+       import torch
+       import torchvision
+       print("✓ Vision dependencies available")
+   except ImportError:
+       print("✗ Vision dependencies not installed")
+
+   # Test audio support (if installed)
+   try:
+       import librosa
+       import whisper
+       print("✓ Audio dependencies available")
+   except ImportError:
+       print("✗ Audio dependencies not installed")
+
+Quick Functionality Test
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+   # Test with sample data
+   python -c "
+   from clam.models.clam_tsne import ClamTsneClassifier
+   from sklearn.datasets import make_classification
+   import numpy as np
+
+   # Create sample data
+   X, y = make_classification(n_samples=50, n_features=10, n_classes=3, random_state=42)
+   
+   # Test tabular classification
+   classifier = ClamTsneClassifier(
+       modality='tabular',
+       vlm_model_id='Qwen/Qwen2.5-VL-3B-Instruct'
+   )
+   
+   # This should complete without errors
+   print('✓ CLAM installation verified successfully')
+   "
+
+Troubleshooting
+---------------
+
+Common Issues
+~~~~~~~~~~~~~
+
+**ImportError: No module named 'clam'**
+   Make sure you installed with ``pip install -e .`` and are in the correct directory.
+
+**CUDA out of memory**
+   Try using smaller VLM models or reducing batch sizes. See :doc:`../technical-guides/resource-management`.
+
+**Model download failures**
+   Check your internet connection. Models are downloaded from HuggingFace Hub on first use.
+
+**Permission errors during installation**
+   Try using ``pip install --user`` or create a virtual environment.
+
+Virtual Environment Setup
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We recommend using a virtual environment:
+
+.. code-block:: bash
+
+   # Create virtual environment
+   python -m venv clam-env
+   
+   # Activate (Linux/Mac)
+   source clam-env/bin/activate
+   
+   # Activate (Windows)
+   clam-env\\Scripts\\activate
+   
+   # Install CLAM
+   pip install -e ".[vision,audio,api]"
+
+Docker Installation
+~~~~~~~~~~~~~~~~~~~
+
+For a containerized environment:
+
+.. code-block:: bash
+
+   # Build Docker image (Dockerfile needed)
+   docker build -t clam:latest .
+   
+   # Run with GPU support
+   docker run --gpus all -it clam:latest
+
+Platform-Specific Notes
+~~~~~~~~~~~~~~~~~~~~~~~
+
+**macOS**
+   Some audio dependencies may require Homebrew: ``brew install ffmpeg``
+
+**Windows**
+   Make sure to install Visual Studio Build Tools for compiling native extensions.
+
+**Linux**
+   CUDA toolkit installation may be required for GPU support.
+
+Getting Help
+------------
+
+If you encounter installation issues:
+
+1. Check our `GitHub Issues <https://github.com/penfever/clam/issues>`_
+2. Review the :doc:`../troubleshooting` guide
+3. Create a new issue with your system information and error messages
+
+Next Steps
+----------
+
+After successful installation, proceed to:
+
+* :doc:`quick-start` - Learn basic CLAM usage
+* :doc:`configuration` - Configure CLAM for your needs
+* :doc:`../tutorials/basic-classification` - Follow detailed tutorials

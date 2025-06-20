@@ -1,0 +1,785 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CLAM Unified Results Management System &mdash; CLAM 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=b8215cab" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            CLAM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started/installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started/quick-start.html">Quick Start Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started/configuration.html">Configuration Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user-guide/vision/index.html">Vision Classification Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user-guide/audio/index.html">Audio Classification Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user-guide/tabular/index.html">Tabular Data Classification Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user-guide/api-models/index.html">API Models Integration Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/basic-classification.html">Basic Classification Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/multi-modal-pipeline.html">Multi-Modal Pipeline Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/custom-datasets.html">Custom Datasets Tutorial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api-reference/clam.models.html">clam.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api-reference/clam.data.html">clam.data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api-reference/clam.utils.html">clam.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api-reference/clam.viz.html">clam.viz</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Technical Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="technical-guides/resource-management.html">Resource Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technical-guides/caching-system.html">Caching System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technical-guides/evaluation-frameworks.html">Evaluation Frameworks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples &amp; Troubleshooting</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to CLAM</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CLAM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">CLAM Unified Results Management System</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/results_management.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="clam-unified-results-management-system">
+<h1>CLAM Unified Results Management System<a class="headerlink" href="#clam-unified-results-management-system" title="Link to this heading"></a></h1>
+<p>This document describes the new unified results management system for CLAM, which provides standardized, consistent storage and organization of experiment results across all modalities (tabular, vision, audio).</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The unified results management system addresses several issues with the previous approach:</p>
+<ul class="simple">
+<li><p><strong>Inconsistent directory structures</strong> across different evaluation scripts</p></li>
+<li><p><strong>Mixed file naming conventions</strong> and formats</p></li>
+<li><p><strong>Scattered metadata</strong> and experimental parameters</p></li>
+<li><p><strong>Difficulty comparing results</strong> across modalities and datasets</p></li>
+<li><p><strong>Manual result organization</strong> and cleanup</p></li>
+</ul>
+<p>The new system provides:</p>
+<ul class="simple">
+<li><p><strong>Standardized directory structure</strong>: <code class="docutils literal notranslate"><span class="pre">&lt;base&gt;/results/&lt;modality&gt;/&lt;dataset_id&gt;/&lt;model_name&gt;/</span></code></p></li>
+<li><p><strong>Comprehensive metadata tracking</strong> with experimental parameters</p></li>
+<li><p><strong>Unified file formats</strong> with backward compatibility</p></li>
+<li><p><strong>Automatic artifact management</strong> for visualizations and outputs</p></li>
+<li><p><strong>Migration tools</strong> for existing results</p></li>
+<li><p><strong>CLI utilities</strong> for management and reporting</p></li>
+</ul>
+</section>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
+<section id="basic-usage">
+<h3>Basic Usage<a class="headerlink" href="#basic-usage" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">clam.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_results_manager</span><span class="p">,</span> <span class="n">EvaluationResults</span><span class="p">,</span> <span class="n">ExperimentMetadata</span>
+
+<span class="c1"># Get the results manager</span>
+<span class="n">results_manager</span> <span class="o">=</span> <span class="n">get_results_manager</span><span class="p">()</span>
+
+<span class="c1"># Create evaluation results</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">EvaluationResults</span><span class="p">(</span>
+    <span class="n">accuracy</span><span class="o">=</span><span class="mf">0.8542</span><span class="p">,</span>
+    <span class="n">precision_macro</span><span class="o">=</span><span class="mf">0.8234</span><span class="p">,</span>
+    <span class="n">recall_macro</span><span class="o">=</span><span class="mf">0.8456</span><span class="p">,</span>
+    <span class="n">f1_macro</span><span class="o">=</span><span class="mf">0.8344</span><span class="p">,</span>
+    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;completed&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Create experiment metadata</span>
+<span class="n">metadata</span> <span class="o">=</span> <span class="n">ExperimentMetadata</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;tabllm&quot;</span><span class="p">,</span>
+    <span class="n">dataset_id</span><span class="o">=</span><span class="s2">&quot;adult&quot;</span><span class="p">,</span>
+    <span class="n">modality</span><span class="o">=</span><span class="s2">&quot;tabular&quot;</span><span class="p">,</span>
+    <span class="n">num_samples_train</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">num_samples_test</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">k_shot</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">random_seed</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+
+<span class="c1"># Save results</span>
+<span class="n">experiment_dir</span> <span class="o">=</span> <span class="n">results_manager</span><span class="o">.</span><span class="n">save_evaluation_results</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;tabllm&quot;</span><span class="p">,</span>
+    <span class="n">dataset_id</span><span class="o">=</span><span class="s2">&quot;adult&quot;</span><span class="p">,</span>
+    <span class="n">modality</span><span class="o">=</span><span class="s2">&quot;tabular&quot;</span><span class="p">,</span>
+    <span class="n">results</span><span class="o">=</span><span class="n">results</span><span class="p">,</span>
+    <span class="n">experiment_metadata</span><span class="o">=</span><span class="n">metadata</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="loading-results">
+<h3>Loading Results<a class="headerlink" href="#loading-results" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load specific experiment results</span>
+<span class="n">loaded_results</span> <span class="o">=</span> <span class="n">results_manager</span><span class="o">.</span><span class="n">load_evaluation_results</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;tabllm&quot;</span><span class="p">,</span>
+    <span class="n">dataset_id</span><span class="o">=</span><span class="s2">&quot;adult&quot;</span><span class="p">,</span> 
+    <span class="n">modality</span><span class="o">=</span><span class="s2">&quot;tabular&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># List all experiments</span>
+<span class="n">experiments</span> <span class="o">=</span> <span class="n">results_manager</span><span class="o">.</span><span class="n">list_experiments</span><span class="p">()</span>
+
+<span class="c1"># Filter by modality</span>
+<span class="n">tabular_experiments</span> <span class="o">=</span> <span class="n">results_manager</span><span class="o">.</span><span class="n">list_experiments</span><span class="p">(</span><span class="n">modality</span><span class="o">=</span><span class="s2">&quot;tabular&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="backward-compatibility">
+<h3>Backward Compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading"></a></h3>
+<p>The system maintains backward compatibility with existing scripts:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">clam.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">save_results</span>
+
+<span class="c1"># Legacy usage (still works)</span>
+<span class="n">save_results</span><span class="p">(</span><span class="n">results_list</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span>
+
+<span class="c1"># Optionally use unified manager</span>
+<span class="n">save_results</span><span class="p">(</span><span class="n">results_list</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">,</span> <span class="n">use_unified_manager</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="directory-structure">
+<h2>Directory Structure<a class="headerlink" href="#directory-structure" title="Link to this heading"></a></h2>
+<p>The unified system organizes results in a hierarchical structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;base_dir&gt;/results/
+├── tabular/
+│   ├── adult/
+│   │   ├── tabllm/
+│   │   │   ├── results.json           # Main results file
+│   │   │   ├── metadata.json          # Experiment metadata
+│   │   │   ├── metrics_summary.json   # Quick metrics access
+│   │   │   └── artifacts/              # Additional files
+│   │   ├── jolt/
+│   │   └── clam_tsne/
+│   ├── diabetes/
+│   └── wine/
+├── vision/
+│   ├── cifar10/
+│   │   ├── clam_tsne/
+│   │   │   ├── results.json
+│   │   │   ├── metadata.json
+│   │   │   └── artifacts/
+│   │   │       ├── visualizations/
+│   │   │       └── vlm_responses.json
+│   │   └── dinov2_linear/
+│   └── imagenet/
+└── audio/
+    ├── esc50/
+    │   ├── clam_audio/
+    │   └── whisper_knn/
+    └── ravdess/
+</pre></div>
+</div>
+</section>
+<section id="data-structures">
+<h2>Data Structures<a class="headerlink" href="#data-structures" title="Link to this heading"></a></h2>
+<section id="evaluationresults">
+<h3>EvaluationResults<a class="headerlink" href="#evaluationresults" title="Link to this heading"></a></h3>
+<p>Standardized structure for evaluation metrics and outputs:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EvaluationResults</span><span class="p">:</span>
+    <span class="c1"># Core metrics</span>
+    <span class="n">accuracy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">balanced_accuracy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">r2_score</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># For regression</span>
+    <span class="n">mae</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">rmse</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="c1"># Classification metrics</span>
+    <span class="n">precision_macro</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">recall_macro</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">f1_macro</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">classification_report</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">confusion_matrix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="c1"># Performance metrics</span>
+    <span class="n">completion_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">total_prediction_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">prediction_time_per_sample</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="c1"># Outputs</span>
+    <span class="n">predictions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">raw_responses</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># For LLM models</span>
+    <span class="n">visualization_paths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="c1"># Status</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;completed&quot;</span>  <span class="c1"># &quot;completed&quot;, &quot;failed&quot;, &quot;partial&quot;</span>
+    <span class="n">error_message</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</section>
+<section id="experimentmetadata">
+<h3>ExperimentMetadata<a class="headerlink" href="#experimentmetadata" title="Link to this heading"></a></h3>
+<p>Comprehensive metadata for reproducibility:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span> 
+<span class="k">class</span><span class="w"> </span><span class="nc">ExperimentMetadata</span><span class="p">:</span>
+    <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">modality</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">())</span>
+    
+    <span class="c1"># Dataset information</span>
+    <span class="n">num_samples_train</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">num_samples_test</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">num_features</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">num_classes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">class_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="c1"># Model configuration</span>
+    <span class="n">model_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">hyperparameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="c1"># Experiment setup</span>
+    <span class="n">random_seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">k_shot</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">training_time_seconds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</section>
+<section id="resultsartifacts">
+<h3>ResultsArtifacts<a class="headerlink" href="#resultsartifacts" title="Link to this heading"></a></h3>
+<p>Container for additional experiment artifacts:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResultsArtifacts</span><span class="p">:</span>
+    <span class="n">plots</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">visualizations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">raw_outputs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">predictions_csv</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="c1"># Modality-specific</span>
+    <span class="n">audio_files</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">image_files</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="migrating-existing-results">
+<h2>Migrating Existing Results<a class="headerlink" href="#migrating-existing-results" title="Link to this heading"></a></h2>
+<section id="automatic-migration">
+<h3>Automatic Migration<a class="headerlink" href="#automatic-migration" title="Link to this heading"></a></h3>
+<p>Use the CLI tool for batch migration:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Dry run to see what would be migrated</span>
+python<span class="w"> </span>scripts/results_cli.py<span class="w"> </span>migrate<span class="w"> </span>/path/to/legacy/results<span class="w"> </span>--dry-run
+
+<span class="c1"># Actually migrate</span>
+python<span class="w"> </span>scripts/results_cli.py<span class="w"> </span>migrate<span class="w"> </span>/path/to/legacy/results<span class="w"> </span>--no-dry-run
+</pre></div>
+</div>
+</section>
+<section id="programmatic-migration">
+<h3>Programmatic Migration<a class="headerlink" href="#programmatic-migration" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">clam.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">migrate_legacy_results</span>
+
+<span class="c1"># Migrate legacy results</span>
+<span class="n">stats</span> <span class="o">=</span> <span class="n">migrate_legacy_results</span><span class="p">(</span>
+    <span class="n">source_dir</span><span class="o">=</span><span class="s2">&quot;/path/to/legacy/results&quot;</span><span class="p">,</span>
+    <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;*_results.json&quot;</span><span class="p">,</span>
+    <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Migrated </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;successful&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;total_files&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> files&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="manual-conversion">
+<h3>Manual Conversion<a class="headerlink" href="#manual-conversion" title="Link to this heading"></a></h3>
+<p>For custom result formats, use the format detector:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">clam.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResultsFormatDetector</span><span class="p">,</span> <span class="n">ResultsMigrator</span>
+
+<span class="n">detector</span> <span class="o">=</span> <span class="n">ResultsFormatDetector</span><span class="p">()</span>
+<span class="n">migrator</span> <span class="o">=</span> <span class="n">ResultsMigrator</span><span class="p">()</span>
+
+<span class="c1"># Detect format</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;result.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">result_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="n">format_type</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">detect_format</span><span class="p">(</span><span class="n">result_dict</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Detected format: </span><span class="si">{</span><span class="n">format_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Migrate single file</span>
+<span class="n">success</span> <span class="o">=</span> <span class="n">migrator</span><span class="o">.</span><span class="n">migrate_file</span><span class="p">(</span>
+    <span class="s1">&#39;result.json&#39;</span><span class="p">,</span>
+    <span class="n">target_model_name</span><span class="o">=</span><span class="s1">&#39;custom_model&#39;</span><span class="p">,</span>
+    <span class="n">target_dataset_id</span><span class="o">=</span><span class="s1">&#39;custom_dataset&#39;</span><span class="p">,</span>
+    <span class="n">target_modality</span><span class="o">=</span><span class="s1">&#39;tabular&#39;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="integration-with-evaluation-scripts">
+<h2>Integration with Evaluation Scripts<a class="headerlink" href="#integration-with-evaluation-scripts" title="Link to this heading"></a></h2>
+<section id="option-1-direct-integration">
+<h3>Option 1: Direct Integration<a class="headerlink" href="#option-1-direct-integration" title="Link to this heading"></a></h3>
+<p>Update existing scripts to use the unified manager:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">evaluate_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="c1"># ... existing evaluation code ...</span>
+    
+    <span class="c1"># Convert results to standardized format</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">EvaluationResults</span><span class="p">(</span>
+        <span class="n">accuracy</span><span class="o">=</span><span class="n">accuracy</span><span class="p">,</span>
+        <span class="n">f1_macro</span><span class="o">=</span><span class="n">f1_score</span><span class="p">,</span>
+        <span class="n">status</span><span class="o">=</span><span class="s2">&quot;completed&quot;</span>
+    <span class="p">)</span>
+    
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">ExperimentMetadata</span><span class="p">(</span>
+        <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+        <span class="n">dataset_id</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
+        <span class="n">modality</span><span class="o">=</span><span class="s2">&quot;tabular&quot;</span><span class="p">,</span>
+        <span class="n">k_shot</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">k_shot</span><span class="p">,</span>
+        <span class="n">random_seed</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">seed</span>
+    <span class="p">)</span>
+    
+    <span class="c1"># Save using unified manager</span>
+    <span class="n">results_manager</span> <span class="o">=</span> <span class="n">get_results_manager</span><span class="p">()</span>
+    <span class="n">experiment_dir</span> <span class="o">=</span> <span class="n">results_manager</span><span class="o">.</span><span class="n">save_evaluation_results</span><span class="p">(</span>
+        <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+        <span class="n">dataset_id</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
+        <span class="n">modality</span><span class="o">=</span><span class="s2">&quot;tabular&quot;</span><span class="p">,</span>
+        <span class="n">results</span><span class="o">=</span><span class="n">results</span><span class="p">,</span>
+        <span class="n">experiment_metadata</span><span class="o">=</span><span class="n">metadata</span>
+    <span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">experiment_dir</span>
+</pre></div>
+</div>
+</section>
+<section id="option-2-gradual-transition">
+<h3>Option 2: Gradual Transition<a class="headerlink" href="#option-2-gradual-transition" title="Link to this heading"></a></h3>
+<p>Add an option to use the unified manager:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add argument</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--use_unified_results&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+
+<span class="c1"># Use conditionally</span>
+<span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">use_unified_results</span><span class="p">:</span>
+    <span class="n">save_results_unified</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="s2">&quot;tabular&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">save_results</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span>  <span class="c1"># Legacy</span>
+</pre></div>
+</div>
+</section>
+<section id="option-3-adapter-functions">
+<h3>Option 3: Adapter Functions<a class="headerlink" href="#option-3-adapter-functions" title="Link to this heading"></a></h3>
+<p>Use adapter functions for different script patterns:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">clam.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_migration_adapters</span>
+
+<span class="n">adapters</span> <span class="o">=</span> <span class="n">create_migration_adapters</span><span class="p">()</span>
+
+<span class="c1"># Adapt tabular LLM results</span>
+<span class="n">adapted_result</span> <span class="o">=</span> <span class="n">adapters</span><span class="p">[</span><span class="s1">&#39;tabular_llm&#39;</span><span class="p">](</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;tabllm&quot;</span><span class="p">,</span>
+    <span class="n">dataset_name</span><span class="o">=</span><span class="s2">&quot;adult&quot;</span><span class="p">,</span> 
+    <span class="n">results</span><span class="o">=</span><span class="n">raw_results</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="n">args</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="cli-tools">
+<h2>CLI Tools<a class="headerlink" href="#cli-tools" title="Link to this heading"></a></h2>
+<p>The system includes command-line tools for management:</p>
+<section id="list-experiments">
+<h3>List Experiments<a class="headerlink" href="#list-experiments" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># List all experiments</span>
+python<span class="w"> </span>scripts/results_cli.py<span class="w"> </span>list
+
+<span class="c1"># Filter by modality</span>
+python<span class="w"> </span>scripts/results_cli.py<span class="w"> </span>list<span class="w"> </span>--modality<span class="w"> </span>tabular
+
+<span class="c1"># Filter by dataset</span>
+python<span class="w"> </span>scripts/results_cli.py<span class="w"> </span>list<span class="w"> </span>--dataset-id<span class="w"> </span>adult
+</pre></div>
+</div>
+</section>
+<section id="generate-reports">
+<h3>Generate Reports<a class="headerlink" href="#generate-reports" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate summary report</span>
+python<span class="w"> </span>scripts/results_cli.py<span class="w"> </span>report
+
+<span class="c1"># Save detailed report</span>
+python<span class="w"> </span>scripts/results_cli.py<span class="w"> </span>report<span class="w"> </span>--output<span class="w"> </span>summary.json
+
+<span class="c1"># Filter by modality</span>
+python<span class="w"> </span>scripts/results_cli.py<span class="w"> </span>report<span class="w"> </span>--modality<span class="w"> </span>vision
+</pre></div>
+</div>
+</section>
+<section id="cleanup">
+<h3>Cleanup<a class="headerlink" href="#cleanup" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Dry run cleanup (show what would be deleted)</span>
+python<span class="w"> </span>scripts/results_cli.py<span class="w"> </span>cleanup<span class="w"> </span>--days<span class="w"> </span><span class="m">30</span><span class="w"> </span>--dry-run
+
+<span class="c1"># Actually delete old results</span>
+python<span class="w"> </span>scripts/results_cli.py<span class="w"> </span>cleanup<span class="w"> </span>--days<span class="w"> </span><span class="m">30</span><span class="w"> </span>--no-dry-run
+</pre></div>
+</div>
+</section>
+<section id="validation">
+<h3>Validation<a class="headerlink" href="#validation" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Validate a result file</span>
+python<span class="w"> </span>scripts/results_cli.py<span class="w"> </span>validate<span class="w"> </span>result.json
+</pre></div>
+</div>
+</section>
+<section id="system-information">
+<h3>System Information<a class="headerlink" href="#system-information" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Show system info</span>
+python<span class="w"> </span>scripts/results_cli.py<span class="w"> </span>info
+</pre></div>
+</div>
+</section>
+</section>
+<section id="advanced-features">
+<h2>Advanced Features<a class="headerlink" href="#advanced-features" title="Link to this heading"></a></h2>
+<section id="artifact-management">
+<h3>Artifact Management<a class="headerlink" href="#artifact-management" title="Link to this heading"></a></h3>
+<p>Save additional files with experiments:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Save artifacts separately</span>
+<span class="n">artifact_paths</span> <span class="o">=</span> <span class="n">results_manager</span><span class="o">.</span><span class="n">save_artifacts</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;clam_tsne&quot;</span><span class="p">,</span>
+    <span class="n">dataset_id</span><span class="o">=</span><span class="s2">&quot;cifar10&quot;</span><span class="p">,</span>
+    <span class="n">modality</span><span class="o">=</span><span class="s2">&quot;vision&quot;</span><span class="p">,</span>
+    <span class="n">artifacts</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;tsne_plot&quot;</span><span class="p">:</span> <span class="s2">&quot;/tmp/tsne_visualization.png&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;vlm_responses&quot;</span><span class="p">:</span> <span class="s2">&quot;/tmp/responses.json&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;confusion_matrix&quot;</span><span class="p">:</span> <span class="s2">&quot;/tmp/cm.png&quot;</span>
+    <span class="p">},</span>
+    <span class="n">copy_files</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="summary-reports">
+<h3>Summary Reports<a class="headerlink" href="#summary-reports" title="Link to this heading"></a></h3>
+<p>Generate comprehensive reports:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create summary report</span>
+<span class="n">report</span> <span class="o">=</span> <span class="n">results_manager</span><span class="o">.</span><span class="n">create_summary_report</span><span class="p">(</span>
+    <span class="n">modality</span><span class="o">=</span><span class="s2">&quot;tabular&quot;</span><span class="p">,</span>
+    <span class="n">output_file</span><span class="o">=</span><span class="s2">&quot;tabular_summary.json&quot;</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total experiments: </span><span class="si">{</span><span class="n">report</span><span class="p">[</span><span class="s1">&#39;summary&#39;</span><span class="p">][</span><span class="s1">&#39;total_experiments&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best accuracy: </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">exp</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">exp</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">report</span><span class="p">[</span><span class="s1">&#39;experiments&#39;</span><span class="p">]</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">exp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;accuracy&#39;</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="cleanup-management">
+<h3>Cleanup Management<a class="headerlink" href="#cleanup-management" title="Link to this heading"></a></h3>
+<p>Automatically manage old results:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Clean up results older than 30 days</span>
+<span class="n">stats</span> <span class="o">=</span> <span class="n">results_manager</span><span class="o">.</span><span class="n">cleanup_old_results</span><span class="p">(</span>
+    <span class="n">days_old</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cleaned up </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;deleted&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> experiments&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Freed </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;freed_size_mb&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h2>
+<p>The system uses the existing resource manager configuration:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">clam.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResourceConfig</span><span class="p">,</span> <span class="n">get_results_manager</span>
+
+<span class="c1"># Custom configuration</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">ResourceConfig</span><span class="p">(</span>
+    <span class="n">base_dir</span><span class="o">=</span><span class="s2">&quot;/custom/clam/dir&quot;</span><span class="p">,</span>
+    <span class="n">cache_dir</span><span class="o">=</span><span class="s2">&quot;/custom/cache&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Use with results manager</span>
+<span class="n">results_manager</span> <span class="o">=</span> <span class="n">get_results_manager</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Environment variables:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CLAM_BASE_DIR</span></code>: Base directory for all CLAM data</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CLAM_CACHE_DIR</span></code>: Cache directory</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CLAM_DISABLE_REGISTRY</span></code>: Disable dataset registry</p></li>
+</ul>
+</section>
+<section id="best-practices">
+<h2>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading"></a></h2>
+<section id="consistent-naming">
+<h3>1. Consistent Naming<a class="headerlink" href="#consistent-naming" title="Link to this heading"></a></h3>
+<p>Use consistent naming conventions:</p>
+<ul class="simple">
+<li><p><strong>Model names</strong>: Use snake_case (e.g., <code class="docutils literal notranslate"><span class="pre">tabllm</span></code>, <code class="docutils literal notranslate"><span class="pre">clam_tsne</span></code>, <code class="docutils literal notranslate"><span class="pre">dinov2_linear</span></code>)</p></li>
+<li><p><strong>Dataset IDs</strong>: Use original identifiers when possible (e.g., OpenML task IDs)</p></li>
+<li><p><strong>Modalities</strong>: Use standard names (<code class="docutils literal notranslate"><span class="pre">tabular</span></code>, <code class="docutils literal notranslate"><span class="pre">vision</span></code>, <code class="docutils literal notranslate"><span class="pre">audio</span></code>)</p></li>
+</ul>
+</section>
+<section id="comprehensive-metadata">
+<h3>2. Comprehensive Metadata<a class="headerlink" href="#comprehensive-metadata" title="Link to this heading"></a></h3>
+<p>Include as much metadata as possible:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">metadata</span> <span class="o">=</span> <span class="n">ExperimentMetadata</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;tabllm&quot;</span><span class="p">,</span>
+    <span class="n">dataset_id</span><span class="o">=</span><span class="s2">&quot;adult&quot;</span><span class="p">,</span>
+    <span class="n">modality</span><span class="o">=</span><span class="s2">&quot;tabular&quot;</span><span class="p">,</span>
+    <span class="n">num_samples_train</span><span class="o">=</span><span class="mi">32561</span><span class="p">,</span>
+    <span class="n">num_samples_test</span><span class="o">=</span><span class="mi">16281</span><span class="p">,</span>
+    <span class="n">num_features</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+    <span class="n">num_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">class_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&lt;=50K&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;50K&quot;</span><span class="p">],</span>
+    <span class="n">k_shot</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">random_seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+    <span class="n">model_config</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;model_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Qwen/Qwen2.5-7B-Instruct&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="s2">&quot;max_tokens&quot;</span><span class="p">:</span> <span class="mi">100</span>
+    <span class="p">},</span>
+    <span class="n">hyperparameters</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;num_few_shot_examples&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="s2">&quot;balanced_few_shot&quot;</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="p">},</span>
+    <span class="n">notes</span><span class="o">=</span><span class="s2">&quot;Experiment to test TabLLM performance on income prediction&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="error-handling">
+<h3>3. Error Handling<a class="headerlink" href="#error-handling" title="Link to this heading"></a></h3>
+<p>Always handle errors gracefully:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">experiment_dir</span> <span class="o">=</span> <span class="n">results_manager</span><span class="o">.</span><span class="n">save_evaluation_results</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Results saved to </span><span class="si">{</span><span class="n">experiment_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to save results: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># Fall back to legacy method</span>
+    <span class="n">save_results</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">dataset_name</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="regular-cleanup">
+<h3>4. Regular Cleanup<a class="headerlink" href="#regular-cleanup" title="Link to this heading"></a></h3>
+<p>Set up regular cleanup of old results:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># In your evaluation scripts</span>
+<span class="k">if</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">day</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># Monthly cleanup</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">results_manager</span><span class="o">.</span><span class="n">cleanup_old_results</span><span class="p">(</span><span class="n">days_old</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Monthly cleanup: freed </span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;freed_size_mb&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h3>5. Validation<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>Validate results before saving:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">clam.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_result_file</span>
+
+<span class="c1"># Validate before using</span>
+<span class="n">validation</span> <span class="o">=</span> <span class="n">validate_result_file</span><span class="p">(</span><span class="s2">&quot;result.json&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">validation</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;valid&#39;</span><span class="p">:</span>
+    <span class="c1"># Process the result</span>
+    <span class="k">pass</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid result file: </span><span class="si">{</span><span class="n">validation</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>
+<section id="common-issues">
+<h3>Common Issues<a class="headerlink" href="#common-issues" title="Link to this heading"></a></h3>
+<ol class="arabic">
+<li><p><strong>Permission Errors</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="n">Check</span> <span class="n">directory</span> <span class="n">permissions</span> <span class="k">for</span> <span class="n">CLAM</span> <span class="n">base</span> <span class="n">directory</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Migration Failures</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="n">Use</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span> <span class="n">first</span><span class="p">,</span> <span class="n">check</span> <span class="n">file</span> <span class="n">formats</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Large Result Files</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="n">Use</span> <span class="n">artifacts</span> <span class="k">for</span> <span class="n">large</span> <span class="n">files</span><span class="p">,</span> <span class="n">enable</span> <span class="n">compression</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Concurrent Access</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Solution</span><span class="p">:</span> <span class="n">The</span> <span class="n">system</span> <span class="n">handles</span> <span class="n">concurrent</span> <span class="n">access</span> <span class="n">automatically</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="debug-information">
+<h3>Debug Information<a class="headerlink" href="#debug-information" title="Link to this heading"></a></h3>
+<p>Enable debug logging:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;clam.utils.results_manager&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Check system status:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">results_manager</span> <span class="o">=</span> <span class="n">get_results_manager</span><span class="p">()</span>
+<span class="n">status</span> <span class="o">=</span> <span class="n">results_manager</span><span class="o">.</span><span class="n">get_registry_status</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">results_manager</span><span class="p">,</span> <span class="s1">&#39;get_registry_status&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;System status: </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="migration-from-legacy-system">
+<h2>Migration from Legacy System<a class="headerlink" href="#migration-from-legacy-system" title="Link to this heading"></a></h2>
+<section id="step-1-identify-legacy-results">
+<h3>Step 1: Identify Legacy Results<a class="headerlink" href="#step-1-identify-legacy-results" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>find<span class="w"> </span>.<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*_results.json&quot;</span><span class="w"> </span>-type<span class="w"> </span>f
+</pre></div>
+</div>
+</section>
+<section id="step-2-validate-legacy-format">
+<h3>Step 2: Validate Legacy Format<a class="headerlink" href="#step-2-validate-legacy-format" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">clam.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_result_file</span>
+
+<span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">legacy_files</span><span class="p">:</span>
+    <span class="n">validation</span> <span class="o">=</span> <span class="n">validate_result_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">validation</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="step-3-migrate">
+<h3>Step 3: Migrate<a class="headerlink" href="#step-3-migrate" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/results_cli.py<span class="w"> </span>migrate<span class="w"> </span>./legacy_results<span class="w"> </span>--no-dry-run
+</pre></div>
+</div>
+</section>
+<section id="step-4-verify-migration">
+<h3>Step 4: Verify Migration<a class="headerlink" href="#step-4-verify-migration" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/results_cli.py<span class="w"> </span>list
+python<span class="w"> </span>scripts/results_cli.py<span class="w"> </span>report<span class="w"> </span>--output<span class="w"> </span>migration_report.json
+</pre></div>
+</div>
+</section>
+<section id="step-5-update-scripts">
+<h3>Step 5: Update Scripts<a class="headerlink" href="#step-5-update-scripts" title="Link to this heading"></a></h3>
+<p>Add unified results support to evaluation scripts using the examples provided.</p>
+</section>
+</section>
+<section id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h2>
+<section id="core-classes">
+<h3>Core Classes<a class="headerlink" href="#core-classes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ResultsManager</span></code>: Main interface for results management</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">EvaluationResults</span></code>: Standardized evaluation metrics</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ExperimentMetadata</span></code>: Comprehensive experiment metadata</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ResultsArtifacts</span></code>: Container for additional files</p></li>
+</ul>
+</section>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">get_results_manager()</span></code>: Get global results manager instance</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">save_results_unified()</span></code>: Unified save function with backward compatibility</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">migrate_legacy_results()</span></code>: Migrate legacy result directories</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">validate_result_file()</span></code>: Validate individual result files</p></li>
+</ul>
+</section>
+<section id="cli-commands">
+<h3>CLI Commands<a class="headerlink" href="#cli-commands" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">results_cli.py</span> <span class="pre">list</span></code>: List experiments</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">results_cli.py</span> <span class="pre">migrate</span></code>: Migrate legacy results</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">results_cli.py</span> <span class="pre">report</span></code>: Generate reports</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">results_cli.py</span> <span class="pre">cleanup</span></code>: Clean up old results</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">results_cli.py</span> <span class="pre">validate</span></code>: Validate result files</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">results_cli.py</span> <span class="pre">info</span></code>: Show system information</p></li>
+</ul>
+<p>For more examples and detailed API documentation, see the demonstration scripts in <code class="docutils literal notranslate"><span class="pre">scripts/results_manager_demo.py</span></code>.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, CLAM Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

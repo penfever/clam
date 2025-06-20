@@ -282,6 +282,9 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
     if args.use_semantic_names:
         cmd.append("--use_semantic_names")
     
+    # Add visualization save cadence
+    cmd.extend(["--visualization_save_cadence", str(args.visualization_save_cadence)])
+    
     # Add custom viewing angles if specified
     if args.viewing_angles:
         cmd.extend(["--viewing_angles", args.viewing_angles])
@@ -374,7 +377,8 @@ def process_task(task, args):
                     "max_vlm_image_size": args.max_vlm_image_size,
                     "image_dpi": args.image_dpi,
                     "force_rgb_mode": args.force_rgb_mode,
-                    "save_sample_visualizations": args.save_sample_visualizations
+                    "save_sample_visualizations": args.save_sample_visualizations,
+                    "visualization_save_cadence": args.visualization_save_cadence
                 }
             }
         }

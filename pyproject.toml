@@ -136,6 +136,24 @@ tabula_8b = [
     "rtfm @ git+https://github.com/penfever/rtfm.git",
 ]
 
+docs = [
+    # Documentation dependencies
+    "sphinx>=6.0",
+    "sphinx-rtd-theme>=1.3.0",
+    "myst-parser>=0.18.0",
+    "sphinx-autobuild>=2021.3.14",
+]
+
+dev = [
+    # Development dependencies
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "pre-commit>=3.0.0",
+    "mypy>=1.0.0",
+]
+
 [project.urls]
 Homepage = "https://github.com/penfever/clam"
 Repository = "https://github.com/penfever/clam"
