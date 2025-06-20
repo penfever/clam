@@ -623,7 +623,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
     if 'openai_vlm' in args.models:
         logger.info("Testing OpenAI VLM...")
         try:
-            from examples.vision.api_vlm_baseline import OpenAIVLMBaseline
+            from examples.vision.openai_vlm_baseline import OpenAIVLMBaseline
             
             if not hasattr(args, 'openai_model') or not args.openai_model:
                 raise ValueError("--openai_model is required when using openai_vlm")

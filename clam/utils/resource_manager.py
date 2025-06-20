@@ -1,5 +1,5 @@
 """
-Robust resource management system for CLAM.
+Robust resource management system for CLAM with concurrent access support.
 
 This module provides centralized, package-aware resource management that eliminates
 fragile path-guessing logic and provides consistent resource organization across
@@ -12,6 +12,20 @@ Key features:
 - Backward compatibility with existing code
 - Centralized config and metadata management
 - Unified dataset preparation with intelligent caching and checking
+- Thread-safe dataset registry with concurrent access support
+
+The DatasetRegistry provides safe concurrent access through:
+- File locking with timeout and retry mechanisms
+- Atomic write operations using temporary files + rename
+- Distributed registry architecture with local registry files
+- Automatic merging of registry updates from multiple processes
+- Graceful degradation when registry is unavailable
+
+Environment Variables for Registry Configuration:
+- CLAM_REGISTRY_LOCK_TIMEOUT: Lock acquisition timeout in seconds (default: 10.0)
+- CLAM_REGISTRY_RETRY_ATTEMPTS: Number of retry attempts (default: 3)
+- CLAM_REGISTRY_SYNC_INTERVAL: Registry refresh interval in seconds (default: 30.0)
+- CLAM_DISABLE_REGISTRY: Set to 'true' to disable registry entirely (default: false)
 
 The DatasetPreparer class provides a unified interface for dataset preparation that:
 - Checks if datasets are already prepared before re-downloading
@@ -32,11 +46,16 @@ Usage examples:
         download_function=my_download_function,
         organize_function=my_organize_function
     )
+    
+    # Registry management
+    resource_manager.cleanup_registry(max_age_days=7)  # Clean up old entries
+    status = resource_manager.get_registry_status()    # Get registry info
 """
 
 import os
 import json
 import logging
+import time
 from pathlib import Path
 from typing import Dict, List, Optional, Union, Any
 from dataclasses import dataclass, field
@@ -220,60 +239,428 @@ class PathResolver:
 
 
 class DatasetRegistry:
-    """Registry for tracking dataset metadata and locations."""
+    """Thread-safe registry for tracking dataset metadata and locations with concurrent access support."""
     
     def __init__(self, path_resolver: PathResolver):
         self.path_resolver = path_resolver
         self._registry = {}
-        self._load_registry()
+        self._lock_timeout = float(os.environ.get('CLAM_REGISTRY_LOCK_TIMEOUT', '10.0'))
+        self._retry_attempts = int(os.environ.get('CLAM_REGISTRY_RETRY_ATTEMPTS', '3'))
+        self._sync_interval = float(os.environ.get('CLAM_REGISTRY_SYNC_INTERVAL', '30.0'))
+        self._last_sync_time = 0
+        self._disable_registry = os.environ.get('CLAM_DISABLE_REGISTRY', '').lower() in ('true', '1', 'yes')
+        
+        if not self._disable_registry:
+            self._load_registry()
     
     def _get_registry_path(self) -> Path:
-        """Get path to registry file."""
+        """Get path to main registry file."""
         return self.path_resolver.get_base_dir() / 'dataset_registry.json'
     
-    def _load_registry(self):
-        """Load registry from disk."""
-        registry_path = self._get_registry_path()
-        if registry_path.exists():
-            try:
-                with open(registry_path, 'r') as f:
-                    self._registry = json.load(f)
-            except Exception as e:
-                logger.warning(f"Error loading dataset registry: {e}")
-                self._registry = {}
+    def _get_local_registry_path(self) -> Path:
+        """Get path to process-specific local registry file."""
+        import time
+        pid = os.getpid()
+        timestamp = int(time.time())
+        return self.path_resolver.get_base_dir() / f'dataset_registry_{pid}_{timestamp}.json'
     
-    def _save_registry(self):
-        """Save registry to disk."""
-        registry_path = self._get_registry_path()
+    def _get_lock_path(self) -> Path:
+        """Get path to registry lock file."""
+        return self.path_resolver.get_base_dir() / 'dataset_registry.lock'
+    
+    def _acquire_file_lock(self, lock_path: Path, timeout: float = None) -> Optional[int]:
+        """
+        Acquire file lock with timeout support.
+        Returns file descriptor if successful, None if failed.
+        """
+        if timeout is None:
+            timeout = self._lock_timeout
+            
         try:
-            with open(registry_path, 'w') as f:
-                json.dump(self._registry, f, indent=2)
+            import fcntl
+            import time
+            
+            # Create lock file if it doesn't exist
+            lock_path.parent.mkdir(parents=True, exist_ok=True)
+            lock_fd = os.open(str(lock_path), os.O_CREAT | os.O_TRUNC | os.O_RDWR)
+            
+            start_time = time.time()
+            while time.time() - start_time < timeout:
+                try:
+                    fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    return lock_fd
+                except (IOError, OSError):
+                    time.sleep(0.1)
+                    
+            # Timeout reached
+            os.close(lock_fd)
+            return None
+            
+        except ImportError:
+            # Windows - use msvcrt if available
+            try:
+                import msvcrt
+                import time
+                
+                lock_path.parent.mkdir(parents=True, exist_ok=True)
+                start_time = time.time()
+                
+                while time.time() - start_time < timeout:
+                    try:
+                        lock_fd = os.open(str(lock_path), os.O_CREAT | os.O_TRUNC | os.O_RDWR)
+                        msvcrt.locking(lock_fd, msvcrt.LK_NBLCK, 1)
+                        return lock_fd
+                    except (IOError, OSError):
+                        if 'lock_fd' in locals():
+                            try:
+                                os.close(lock_fd)
+                            except:
+                                pass
+                        time.sleep(0.1)
+                        
+                return None
+                
+            except ImportError:
+                # No file locking available - log warning and continue
+                logger.warning("File locking not available on this platform. Registry may have race conditions.")
+                return -1  # Dummy fd to indicate "success" without locking
         except Exception as e:
-            logger.warning(f"Error saving dataset registry: {e}")
+            logger.debug(f"Failed to acquire file lock: {e}")
+            return None
+    
+    def _release_file_lock(self, lock_fd: int, lock_path: Path):
+        """Release file lock."""
+        if lock_fd == -1:  # Dummy fd from platforms without locking
+            return
+            
+        try:
+            import fcntl
+            fcntl.flock(lock_fd, fcntl.LOCK_UN)
+            os.close(lock_fd)
+        except ImportError:
+            try:
+                import msvcrt
+                msvcrt.locking(lock_fd, msvcrt.LK_UNLCK, 1)
+                os.close(lock_fd)
+            except ImportError:
+                pass
+        except Exception as e:
+            logger.debug(f"Error releasing file lock: {e}")
+        
+        # Clean up lock file
+        try:
+            if lock_path.exists():
+                lock_path.unlink()
+        except Exception:
+            pass
+    
+    def _atomic_write_json(self, data: dict, file_path: Path) -> bool:
+        """Write JSON data atomically using temporary file + rename."""
+        import tempfile
+        import shutil
+        
+        try:
+            # Write to temporary file first
+            with tempfile.NamedTemporaryFile(
+                mode='w', 
+                dir=file_path.parent,
+                delete=False,
+                suffix='.tmp'
+            ) as tmp_file:
+                json.dump(data, tmp_file, indent=2)
+                tmp_path = Path(tmp_file.name)
+            
+            # Atomic rename
+            shutil.move(str(tmp_path), str(file_path))
+            return True
+            
+        except Exception as e:
+            logger.warning(f"Error in atomic write to {file_path}: {e}")
+            # Clean up temporary file if it exists
+            try:
+                if 'tmp_path' in locals() and tmp_path.exists():
+                    tmp_path.unlink()
+            except Exception:
+                pass
+            return False
+    
+    def _validate_registry_data(self, data: dict) -> bool:
+        """Validate registry data structure."""
+        if not isinstance(data, dict):
+            return False
+            
+        for dataset_id, entry in data.items():
+            if not isinstance(dataset_id, str) or not isinstance(entry, dict):
+                return False
+            if 'registered_at' not in entry or 'workspace_dir' not in entry:
+                return False
+                
+        return True
+    
+    def _load_registry_with_retry(self) -> dict:
+        """Load registry with retry logic and corruption handling."""
+        registry_path = self._get_registry_path()
+        
+        for attempt in range(self._retry_attempts):
+            try:
+                if not registry_path.exists():
+                    return {}
+                    
+                with open(registry_path, 'r') as f:
+                    data = json.load(f)
+                    
+                if self._validate_registry_data(data):
+                    return data
+                else:
+                    logger.warning(f"Registry data validation failed on attempt {attempt + 1}")
+                    
+            except Exception as e:
+                logger.warning(f"Error loading registry on attempt {attempt + 1}: {e}")
+                
+            if attempt < self._retry_attempts - 1:
+                import time
+                time.sleep(0.5 * (2 ** attempt))  # Exponential backoff
+        
+        logger.warning("Failed to load registry after all retry attempts, starting with empty registry")
+        return {}
+    
+    def _load_registry(self):
+        """Load registry from disk with concurrency safety."""
+        if self._disable_registry:
+            self._registry = {}
+            return
+            
+        try:
+            # Try to merge any pending local registries first
+            self._merge_local_registries()
+            
+            # Load main registry
+            self._registry = self._load_registry_with_retry()
+            self._last_sync_time = time.time()
+            
+        except Exception as e:
+            logger.warning(f"Error loading dataset registry: {e}")
+            self._registry = {}
+    
+    def _merge_local_registries(self):
+        """Merge local registry files into main registry."""
+        try:
+            base_dir = self.path_resolver.get_base_dir()
+            local_registry_pattern = 'dataset_registry_*.json'
+            
+            # Find all local registry files
+            local_registries = list(base_dir.glob(local_registry_pattern))
+            if not local_registries:
+                return
+                
+            logger.debug(f"Found {len(local_registries)} local registry files to merge")
+            
+            lock_path = self._get_lock_path()
+            lock_fd = self._acquire_file_lock(lock_path, timeout=5.0)
+            
+            if lock_fd is None:
+                logger.debug("Could not acquire lock for registry merge, skipping")
+                return
+                
+            try:
+                # Load current main registry
+                main_registry = self._load_registry_with_retry()
+                
+                # Merge local registries
+                merged_count = 0
+                for local_path in local_registries:
+                    try:
+                        with open(local_path, 'r') as f:
+                            local_data = json.load(f)
+                            
+                        if self._validate_registry_data(local_data):
+                            # Merge with timestamp-based conflict resolution
+                            for dataset_id, entry in local_data.items():
+                                existing = main_registry.get(dataset_id)
+                                if (not existing or 
+                                    entry.get('registered_at', '') > existing.get('registered_at', '')):
+                                    main_registry[dataset_id] = entry
+                                    merged_count += 1
+                        
+                        # Remove successfully merged local registry
+                        local_path.unlink()
+                        
+                    except Exception as e:
+                        logger.debug(f"Error merging local registry {local_path}: {e}")
+                
+                # Save merged registry
+                if merged_count > 0:
+                    registry_path = self._get_registry_path()
+                    if self._atomic_write_json(main_registry, registry_path):
+                        logger.debug(f"Successfully merged {merged_count} registry entries")
+                        
+            finally:
+                self._release_file_lock(lock_fd, lock_path)
+                
+        except Exception as e:
+            logger.debug(f"Error in registry merge: {e}")
+    
+    def _save_registry_safe(self) -> bool:
+        """Save registry with file locking and atomic operations."""
+        if self._disable_registry:
+            return True
+            
+        registry_path = self._get_registry_path()
+        lock_path = self._get_lock_path()
+        
+        # Try to acquire lock
+        lock_fd = self._acquire_file_lock(lock_path)
+        
+        if lock_fd is None:
+            # Can't get lock - save to local registry instead
+            logger.debug("Registry locked, saving to local registry file")
+            return self._save_to_local_registry()
+        
+        try:
+            # We have the lock - perform atomic write
+            success = self._atomic_write_json(self._registry, registry_path)
+            if success:
+                logger.debug("Successfully saved main registry")
+            return success
+            
+        finally:
+            self._release_file_lock(lock_fd, lock_path)
+    
+    def _save_to_local_registry(self) -> bool:
+        """Save registry entry to local process-specific file."""
+        try:
+            local_path = self._get_local_registry_path()
+            local_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            success = self._atomic_write_json(self._registry, local_path)
+            if success:
+                logger.debug(f"Saved registry to local file: {local_path}")
+            return success
+            
+        except Exception as e:
+            logger.warning(f"Error saving to local registry: {e}")
+            return False
+    
+    def _refresh_if_needed(self):
+        """Refresh registry from disk if enough time has passed."""
+        import time
+        
+        if (self._disable_registry or 
+            time.time() - self._last_sync_time < self._sync_interval):
+            return
+            
+        try:
+            # Try to merge and reload
+            old_registry = self._registry.copy()
+            self._load_registry()
+            
+            # Check if anything changed
+            if self._registry != old_registry:
+                logger.debug("Registry refreshed with external changes")
+                
+        except Exception as e:
+            logger.debug(f"Error refreshing registry: {e}")
     
     def register_dataset(self, dataset_id: str, metadata: Dict[str, Any]):
-        """Register a dataset with metadata."""
+        """Register a dataset with metadata using safe concurrent operations."""
+        if self._disable_registry:
+            logger.debug("Registry disabled, skipping dataset registration")
+            return
+            
         import datetime
-        self._registry[dataset_id] = {
+        
+        # Refresh registry to get latest state
+        self._refresh_if_needed()
+        
+        # Add dataset entry
+        entry = {
             'metadata': metadata,
             'registered_at': datetime.datetime.now().isoformat(),
             'workspace_dir': str(self.path_resolver.get_dataset_dir(dataset_id))
         }
-        self._save_registry()
+        
+        self._registry[dataset_id] = entry
+        
+        # Try to save safely
+        success = self._save_registry_safe()
+        if not success:
+            logger.warning(f"Could not save registry for dataset {dataset_id}, but operation will continue")
     
     def get_dataset_info(self, dataset_id: str) -> Optional[Dict[str, Any]]:
-        """Get dataset information."""
+        """Get dataset information with fresh data."""
+        if self._disable_registry:
+            return None
+            
+        self._refresh_if_needed()
         return self._registry.get(dataset_id)
     
     def list_datasets(self) -> List[str]:
-        """List all registered datasets."""
+        """List all registered datasets with fresh data."""
+        if self._disable_registry:
+            return []
+            
+        self._refresh_if_needed()
         return list(self._registry.keys())
     
     def unregister_dataset(self, dataset_id: str):
-        """Unregister a dataset."""
+        """Unregister a dataset using safe concurrent operations."""
+        if self._disable_registry:
+            return
+            
+        self._refresh_if_needed()
+        
         if dataset_id in self._registry:
             del self._registry[dataset_id]
-            self._save_registry()
+            success = self._save_registry_safe()
+            if not success:
+                logger.warning(f"Could not save registry after unregistering dataset {dataset_id}")
+    
+    def cleanup_stale_entries(self, max_age_days: int = 30):
+        """Clean up stale registry entries and local registry files."""
+        if self._disable_registry:
+            return
+            
+        try:
+            import datetime
+            import time
+            
+            cutoff_date = datetime.datetime.now() - datetime.timedelta(days=max_age_days)
+            cutoff_iso = cutoff_date.isoformat()
+            
+            # Clean up main registry
+            original_count = len(self._registry)
+            self._registry = {
+                k: v for k, v in self._registry.items()
+                if v.get('registered_at', '') > cutoff_iso
+            }
+            
+            removed_count = original_count - len(self._registry)
+            if removed_count > 0:
+                self._save_registry_safe()
+                logger.info(f"Cleaned up {removed_count} stale registry entries")
+            
+            # Clean up old local registry files
+            base_dir = self.path_resolver.get_base_dir()
+            local_files = list(base_dir.glob('dataset_registry_*.json'))
+            current_time = time.time()
+            
+            for local_file in local_files:
+                try:
+                    # Extract timestamp from filename
+                    parts = local_file.stem.split('_')
+                    if len(parts) >= 4:
+                        timestamp = int(parts[-1])
+                        age_days = (current_time - timestamp) / (24 * 3600)
+                        
+                        if age_days > max_age_days:
+                            local_file.unlink()
+                            logger.debug(f"Removed stale local registry file: {local_file}")
+                            
+                except Exception as e:
+                    logger.debug(f"Error cleaning up local registry file {local_file}: {e}")
+                    
+        except Exception as e:
+            logger.warning(f"Error during registry cleanup: {e}")
 
 
 class CacheManager:
@@ -407,7 +794,7 @@ class ClamResourceManager:
         self.dataset_registry = DatasetRegistry(self.path_resolver)
         self.config_manager = ConfigManager(self.path_resolver)
         self.cache_manager = CacheManager(self.path_resolver)
-        self.dataset_preparer = DatasetPreparer(self.path_resolver)
+        self.dataset_preparer = DatasetPreparer(self.path_resolver, self.dataset_registry)
         
         logger.debug(f"Initialized CLAM resource manager with base dir: {self.path_resolver.get_base_dir()}")
     
@@ -512,13 +899,53 @@ class ClamResourceManager:
                 result['warnings'].append(f"TabLLM notes file not found for {dataset_name}")
         
         return result
+    
+    def cleanup_registry(self, max_age_days: int = 30):
+        """Clean up stale registry entries and local registry files."""
+        self.dataset_registry.cleanup_stale_entries(max_age_days)
+    
+    def get_registry_status(self) -> Dict[str, Any]:
+        """Get status information about the dataset registry."""
+        try:
+            registry_path = self.dataset_registry._get_registry_path()
+            base_dir = self.path_resolver.get_base_dir()
+            
+            # Count local registry files
+            local_files = list(base_dir.glob('dataset_registry_*.json'))
+            
+            status = {
+                'registry_enabled': not self.dataset_registry._disable_registry,
+                'main_registry_exists': registry_path.exists(),
+                'main_registry_path': str(registry_path),
+                'local_registry_files': len(local_files),
+                'total_datasets': len(self.dataset_registry.list_datasets()),
+                'sync_interval': self.dataset_registry._sync_interval,
+                'lock_timeout': self.dataset_registry._lock_timeout,
+                'retry_attempts': self.dataset_registry._retry_attempts
+            }
+            
+            if registry_path.exists():
+                import os
+                stat = os.stat(registry_path)
+                status['main_registry_size'] = stat.st_size
+                status['main_registry_modified'] = stat.st_mtime
+            
+            return status
+            
+        except Exception as e:
+            logger.warning(f"Error getting registry status: {e}")
+            return {
+                'error': str(e),
+                'registry_enabled': not self.dataset_registry._disable_registry
+            }
 
 
 class DatasetPreparer:
     """Unified dataset preparation with intelligent caching and checking."""
     
-    def __init__(self, path_resolver: PathResolver):
+    def __init__(self, path_resolver: PathResolver, dataset_registry: Optional['DatasetRegistry'] = None):
         self.path_resolver = path_resolver
+        self.dataset_registry = dataset_registry
     
     def prepare_dataset(
         self,
@@ -618,8 +1045,11 @@ class DatasetPreparer:
                     'workspace_dir': str(dataset_dir)
                 }
                 
-                dataset_registry = DatasetRegistry(self.path_resolver)
-                dataset_registry.register_dataset(dataset_id, metadata)
+                # Register dataset in registry if available
+                if self.dataset_registry:
+                    self.dataset_registry.register_dataset(dataset_id, metadata)
+                else:
+                    logger.debug("No dataset registry available, skipping registration")
                 
                 return True
             else:
