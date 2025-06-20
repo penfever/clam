@@ -988,7 +988,7 @@ def test_single_dataset(dataset_name: str, args):
         logger.info("Testing CLAM t-SNE with BioClip2 backend...")
         try:
             classifier = BioClip2ClamClassifier(
-                bioclip2_model=args.bioclip2_model,
+                bioclip2_model=getattr(args, 'bioclip2_model', 'hf-hub:imageomics/bioclip-2'),
                 embedding_size=512,
                 tsne_perplexity=min(30.0, len(train_paths) / 4),
                 tsne_n_iter=1000,
@@ -1003,7 +1003,7 @@ def test_single_dataset(dataset_name: str, args):
                 cache_dir=args.cache_dir,
                 device=args.device if args.device != "auto" else None,
                 use_semantic_names=args.use_semantic_names,
-                seed=42
+                seed=getattr(args, 'seed', 42)
             )
             
             # Pass save_every_n parameter
@@ -1329,6 +1329,12 @@ def parse_args():
         "--use_semantic_names",
         action="store_true",
         help="Use semantic class names in prompts instead of 'Class X' format"
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help="Random seed for reproducibility"
     )
     
     # Weights & Biases logging
