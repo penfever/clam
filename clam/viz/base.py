@@ -339,115 +339,25 @@ class BaseVisualization(ABC):
         highlight_test_indices: Optional[List[int]],
         use_3d: bool
     ) -> Dict[str, Any]:
-        """Plot for classification tasks."""
+        """Plot for classification tasks using consistent styling."""
+        from .utils.styling import apply_consistent_point_styling
         
-        legend_text_parts = []
-        metadata = {'classes': [], 'plot_type': 'classification'}
+        # Check if this instance has class names stored (e.g., from TSNEVisualization)
+        class_names = getattr(self, '_class_names', None)
+        use_semantic_names = getattr(self, '_use_semantic_names', False)
         
-        if y is not None:
-            unique_classes = np.unique(y)
-            colors = plt.cm.get_cmap(self.config.colormap)(np.linspace(0, 1, len(unique_classes)))
-            
-            for i, cls in enumerate(unique_classes):
-                mask = y == cls
-                if use_3d:
-                    ax.scatter(
-                        transformed_data[mask, 0],
-                        transformed_data[mask, 1],
-                        transformed_data[mask, 2],
-                        c=[colors[i]], s=self.config.point_size, alpha=self.config.alpha,
-                        label=f'Class {cls}'
-                    )
-                else:
-                    ax.scatter(
-                        transformed_data[mask, 0],
-                        transformed_data[mask, 1],
-                        c=[colors[i]], s=self.config.point_size, alpha=self.config.alpha,
-                        edgecolors='black', linewidth=0.5, label=f'Class {cls}'
-                    )
-                
-                metadata['classes'].append(cls)
-                legend_text_parts.append(f"Class {cls}: {colors[i]}")
-        else:
-            # No labels - use single color
-            if use_3d:
-                ax.scatter(
-                    transformed_data[:, 0],
-                    transformed_data[:, 1],
-                    transformed_data[:, 2],
-                    s=self.config.point_size, alpha=self.config.alpha
-                )
-            else:
-                ax.scatter(
-                    transformed_data[:, 0],
-                    transformed_data[:, 1],
-                    s=self.config.point_size, alpha=self.config.alpha
-                )
-        
-        # Highlight specific points
-        if highlight_indices:
-            if use_3d:
-                ax.scatter(
-                    transformed_data[highlight_indices, 0],
-                    transformed_data[highlight_indices, 1],
-                    transformed_data[highlight_indices, 2],
-                    c='red', s=self.config.point_size * 2, alpha=1.0,
-                    marker='x', linewidths=3, label='Highlighted'
-                )
-            else:
-                ax.scatter(
-                    transformed_data[highlight_indices, 0],
-                    transformed_data[highlight_indices, 1],
-                    c='red', s=self.config.point_size * 2, alpha=1.0,
-                    marker='x', linewidths=3, label='Highlighted'
-                )
-            
-            metadata['highlighted_indices'] = highlight_indices
-        
-        # Plot test data
-        if test_data is not None:
-            if use_3d:
-                ax.scatter(
-                    test_data[:, 0],
-                    test_data[:, 1],
-                    test_data[:, 2],
-                    c='lightgray', s=self.config.point_size * 1.2, alpha=0.8,
-                    marker='s', edgecolors='black', linewidth=0.8,
-                    label='Test Points (Light Gray)'
-                )
-            else:
-                ax.scatter(
-                    test_data[:, 0],
-                    test_data[:, 1],
-                    c='lightgray', s=self.config.point_size * 1.2, alpha=0.8,
-                    marker='s', edgecolors='black', linewidth=0.8,
-                    label='Test Points (Light Gray)'
-                )
-        
-        # Highlight specific test points with red X markers
-        if test_data is not None and highlight_test_indices:
-            highlighted_test_data = test_data[highlight_test_indices]
-            if use_3d:
-                ax.scatter(
-                    highlighted_test_data[:, 0],
-                    highlighted_test_data[:, 1],
-                    highlighted_test_data[:, 2],
-                    c='red', s=self.config.point_size * 3, alpha=1.0,
-                    marker='x', linewidths=4, label='Query point'
-                )
-            else:
-                ax.scatter(
-                    highlighted_test_data[:, 0],
-                    highlighted_test_data[:, 1],
-                    c='red', s=self.config.point_size * 3, alpha=1.0,
-                    marker='x', linewidths=4, label='Query point'
-                )
-            legend_text_parts.append('Query point (red X)')
-        
-        return {
-            'legend_text': '; '.join(legend_text_parts),
-            'metadata': metadata
-        }
+        # Use the shared styling utilities for consistent appearance
+        return apply_consistent_point_styling(
+            ax=ax,
+            transformed_data=transformed_data,
+            y=y,
+            highlight_indices=highlight_indices,
+            test_data=test_data,
+            highlight_test_indices=highlight_test_indices,
+            use_3d=use_3d,
+            class_names=class_names,
+            use_semantic_names=use_semantic_names
+        )
     
     def _plot_regression(
         self,
@@ -579,11 +489,9 @@ class BaseVisualization(ABC):
             ax.set_zlabel(f'{self.method_name} Component 3')
         
         if self.config.show_legend:
-            ax.legend()
-        
-        # Add grid for better readability (matching original implementation)
-        if not use_3d:
-            ax.grid(True, alpha=0.3)
+            # Use consistent legend formatting from shared styling
+            from .utils.styling import apply_consistent_legend_formatting
+            apply_consistent_legend_formatting(ax, use_3d)
         
         # Apply zoom factor
         if self.config.zoom_factor != 1.0:

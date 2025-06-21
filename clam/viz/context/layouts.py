@@ -252,16 +252,16 @@ class LayoutManager:
         return composition
     
     def _compose_sequential_layout(self, results: List[VisualizationResult]) -> Image.Image:
-        """Compose results in a horizontal sequence."""
+        """Compose results in a horizontal sequence matching tsne_functions style."""
         if not results:
             return Image.new('RGB', (100, 100), (255, 255, 255))
         
-        # Calculate dimensions
-        target_height = 400
-        spacing = 20
-        padding = 30
+        # Use larger dimensions to match tsne_functions quality
+        target_height = 600  # Increased from 400 for better quality
+        spacing = 40  # Increased spacing for better separation
+        padding = 50  # Increased padding for better framing
         
-        # Resize all images to same height
+        # Resize all images to same height while preserving aspect ratio
         resized_results = []
         total_width = 0
         
@@ -273,22 +273,23 @@ class LayoutManager:
             total_width += new_width
         
         total_width += (len(results) - 1) * spacing + 2 * padding
-        total_height = target_height + 2 * padding + 40  # Extra space for labels
+        total_height = target_height + 2 * padding + 60  # Extra space for labels
         
-        # Create composition
-        composition = Image.new('RGB', (total_width, total_height), self.layout_config.background_color)
+        # Create composition with white background matching tsne_functions
+        composition = Image.new('RGB', (total_width, total_height), (255, 255, 255))
         
-        # Place images
+        # Place images side by side
         current_x = padding
         for resized_image, result in resized_results:
             composition.paste(resized_image, (current_x, padding))
             
-            # Add label
+            # Add method label below image (like tsne_functions legend style)
             self._add_text_label(
                 composition, 
                 result.method_name,
                 current_x + resized_image.width // 2,
-                padding + target_height + 10
+                padding + target_height + 15,
+                font_size=18  # Larger font for better readability
             )
             
             current_x += resized_image.width + spacing

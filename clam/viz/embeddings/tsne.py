@@ -111,13 +111,31 @@ class TSNEVisualization(BaseVisualization):
         highlight_indices: Optional[List[int]] = None,
         test_data: Optional[np.ndarray] = None,
         highlight_test_indices: Optional[List[int]] = None,
+        class_names: Optional[List[str]] = None,
+        use_semantic_names: bool = False,
         **kwargs
     ) -> VisualizationResult:
         """
-        Generate t-SNE plot using the BaseVisualization framework.
+        Generate t-SNE plot using consistent styling.
         
-        This delegates to the parent implementation for consistent plotting.
+        Args:
+            transformed_data: Transformed coordinates
+            y: Optional target values for coloring
+            highlight_indices: Indices of points to highlight in training data
+            test_data: Optional test data coordinates
+            highlight_test_indices: Indices of test points to highlight with red stars
+            class_names: Optional semantic class names
+            use_semantic_names: Whether to use semantic class names
+            **kwargs: Additional plotting parameters
+            
+        Returns:
+            VisualizationResult object
         """
+        # Store class names for consistent styling
+        self._class_names = class_names
+        self._use_semantic_names = use_semantic_names
+        
+        # Delegate to parent implementation which now uses shared styling
         return super().generate_plot(
             transformed_data=transformed_data,
             y=y,

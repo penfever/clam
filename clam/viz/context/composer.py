@@ -24,8 +24,8 @@ logger = logging.getLogger(__name__)
 class CompositionConfig:
     """Configuration for context composition."""
     
-    # Layout options
-    layout_strategy: LayoutStrategy = LayoutStrategy.GRID
+    # Layout options - use sequential (horizontal) as default to match tsne_functions
+    layout_strategy: LayoutStrategy = LayoutStrategy.SEQUENTIAL
     max_visualizations_per_row: int = 2
     subplot_spacing: float = 0.3
     

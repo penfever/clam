@@ -745,19 +745,22 @@ class ClamTsneClassifier:
         # Set up class/target information based on task type
         if self.task_type == 'classification':
             # Get unique classes and set up class names
-            if not hasattr(self, 'unique_classes'):
+            if not hasattr(self, 'unique_classes') or self.unique_classes is None:
                 self.unique_classes = np.unique(self.y_train_sample)
             
             # Extract semantic class names with fallback
             semantic_class_names, _ = extract_class_names_from_labels(
-                labels=self.unique_classes.tolist(),
+                labels=self.unique_classes.tolist() if self.unique_classes is not None else [],
                 dataset_name=kwargs.get('dataset_name', None),
                 semantic_data_dir=kwargs.get('semantic_data_dir', None),
                 use_semantic=self.use_semantic_names
             )
             
             # Create mapping from numeric labels to semantic names
-            self.class_to_semantic = {cls: name for cls, name in zip(sorted(self.unique_classes), semantic_class_names)}
+            if self.unique_classes is not None:
+                self.class_to_semantic = {cls: name for cls, name in zip(sorted(self.unique_classes), semantic_class_names)}
+            else:
+                self.class_to_semantic = {}
             
             # Store class names
             if class_names is not None:
@@ -1219,12 +1222,15 @@ class ClamTsneClassifier:
                 # Store details
                 if return_detailed and y_test is not None:
                     true_label = y_test[i] if hasattr(y_test, '__getitem__') else y_test.iloc[i]
+                    # Get tsne coordinates safely
+                    tsne_coords = (self.test_tsne[i].tolist() if self.test_tsne is not None and i < len(self.test_tsne) 
+                                  else [0.0, 0.0])  # Default coordinates if not available
                     prediction_details.append({
                         'test_point_idx': i,
                         'vlm_response': response,
                         'parsed_prediction': prediction,
                         'true_label': true_label,
-                        'tsne_coords': self.test_tsne[i].tolist(),
+                        'tsne_coords': tsne_coords,
                         'image_size': f"{image.width}x{image.height}",
                         'visible_classes': visible_classes_list
                     })

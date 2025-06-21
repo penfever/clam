@@ -13,6 +13,21 @@ import base64
 from PIL import Image
 import warnings
 
+# Import shared styling utilities
+from .utils.styling import (
+    get_distinct_colors,
+    create_distinct_color_map,
+    get_class_color_name_map,
+    create_class_legend,
+    format_class_label,
+    create_regression_color_map,
+    apply_consistent_point_styling,
+    apply_consistent_legend_formatting,
+    get_standard_test_point_style,
+    get_standard_target_point_style,
+    get_standard_training_point_style
+)
+
 __all__ = [
     'create_tsne_visualization',
     'create_tsne_3d_visualization',
@@ -302,183 +317,11 @@ def create_tsne_3d_visualization(
     return train_tsne, test_tsne, fig
 
 
-def get_distinct_colors(n_classes: int) -> List[Tuple[np.ndarray, str]]:
-    """
-    Get distinct colors with semantic names for visualization.
-    Generates additional colors programmatically if more than the predefined set are needed.
-    
-    Args:
-        n_classes: Number of distinct colors needed
-        
-    Returns:
-        List of (color_array, color_name) tuples
-    """
-    # Define a set of highly distinct colors with semantic names
-    base_distinct_colors = [
-        (np.array([0.12, 0.47, 0.71]), "Blue"),           # Blue
-        (np.array([1.00, 0.50, 0.05]), "Orange"),         # Orange  
-        (np.array([0.17, 0.63, 0.17]), "Green"),          # Green
-        (np.array([0.84, 0.15, 0.16]), "Red"),            # Red
-        (np.array([0.58, 0.40, 0.74]), "Purple"),         # Purple
-        (np.array([0.55, 0.34, 0.29]), "Brown"),          # Brown
-        (np.array([0.89, 0.47, 0.76]), "Pink"),           # Pink
-        (np.array([0.50, 0.50, 0.50]), "Gray"),           # Gray
-        (np.array([0.74, 0.74, 0.13]), "Olive"),          # Olive
-        (np.array([0.09, 0.75, 0.81]), "Cyan"),           # Cyan
-        (np.array([1.00, 1.00, 0.20]), "Yellow"),         # Yellow
-        (np.array([0.65, 0.33, 0.65]), "Violet"),         # Violet
-        (np.array([0.20, 0.20, 0.80]), "Navy"),           # Navy
-        (np.array([0.80, 0.20, 0.20]), "Crimson"),        # Crimson
-        (np.array([0.00, 0.50, 0.00]), "Dark Green"),     # Dark Green
-        (np.array([0.80, 0.60, 0.20]), "Gold"),           # Gold
-        (np.array([0.40, 0.20, 0.60]), "Indigo"),         # Indigo
-        (np.array([0.90, 0.30, 0.30]), "Coral"),          # Coral
-        (np.array([0.30, 0.70, 0.70]), "Teal"),           # Teal
-        (np.array([0.70, 0.50, 0.80]), "Lavender"),       # Lavender
-        (np.array([0.60, 0.80, 0.20]), "Lime"),           # Lime
-        (np.array([0.90, 0.70, 0.50]), "Tan"),            # Tan
-        (np.array([0.40, 0.60, 0.90]), "Sky Blue"),       # Sky Blue
-        (np.array([0.80, 0.40, 0.60]), "Rose"),           # Rose
-        (np.array([0.30, 0.50, 0.30]), "Forest Green"),   # Forest Green
-    ]
-    
-    colors_needed = []
-    
-    # Use base colors first
-    for i in range(min(n_classes, len(base_distinct_colors))):
-        colors_needed.append(base_distinct_colors[i])
-    
-    # Generate additional colors if needed using HSV color space for maximum distinctness
-    if n_classes > len(base_distinct_colors):
-        import colorsys
-        additional_needed = n_classes - len(base_distinct_colors)
-        
-        # Generate colors in HSV space with varied hue, saturation, and value
-        for i in range(additional_needed):
-            # Vary hue across the spectrum, with some saturation and value variation
-            hue = (i * 0.618033988749895) % 1.0  # Golden ratio for good distribution
-            saturation = 0.6 + (i % 3) * 0.15  # Vary between 0.6, 0.75, 0.9
-            value = 0.7 + (i % 2) * 0.2  # Vary between 0.7, 0.9
-            
-            # Convert HSV to RGB
-            rgb = colorsys.hsv_to_rgb(hue, saturation, value)
-            color_array = np.array(rgb)
-            color_name = f"Color_{len(base_distinct_colors) + i + 1}"
-            
-            colors_needed.append((color_array, color_name))
-    
-    return colors_needed
 
 
-def create_distinct_color_map(unique_classes: np.ndarray) -> Dict:
-    """
-    Create a color mapping using distinct, semantically named colors.
-    
-    Args:
-        unique_classes: Array of unique class labels
-        
-    Returns:
-        Dictionary mapping class labels to colors
-    """
-    distinct_colors = get_distinct_colors(len(unique_classes))
-    class_color_map = {}
-    
-    for i, class_label in enumerate(unique_classes):
-        color_array, color_name = distinct_colors[i]
-        class_color_map[class_label] = color_array
-    
-    return class_color_map
 
 
-def get_class_color_name_map(unique_classes: np.ndarray) -> Dict:
-    """
-    Create a mapping from class labels to semantic color names.
-    
-    Args:
-        unique_classes: Array of unique class labels
-        
-    Returns:
-        Dictionary mapping class labels to color names
-    """
-    distinct_colors = get_distinct_colors(len(unique_classes))
-    class_name_map = {}
-    
-    for i, class_label in enumerate(unique_classes):
-        color_array, color_name = distinct_colors[i]
-        class_name_map[class_label] = color_name
-    
-    return class_name_map
 
-
-def format_class_label(class_label, class_names: Optional[List[str]] = None, use_semantic_names: bool = False, prefix: str = "Class") -> str:
-    """
-    Format a class label consistently based on semantic names setting.
-    
-    Args:
-        class_label: The class index/label
-        class_names: Optional list of semantic class names
-        use_semantic_names: Whether to use semantic names
-        prefix: Prefix for non-semantic format (e.g., "Class", "Training Class")
-        
-    Returns:
-        Formatted class label string
-    """
-    if use_semantic_names and class_names and class_label < len(class_names):
-        return class_names[class_label]
-    else:
-        return f"{prefix} {class_label}"
-
-
-def create_class_legend(unique_classes: np.ndarray, class_color_map: Dict, class_names: Optional[List[str]] = None, use_semantic_names: bool = False) -> str:
-    """
-    Create a text legend describing class colors with both semantic names and RGB values.
-    
-    Args:
-        unique_classes: Array of unique class labels
-        class_color_map: Dictionary mapping class labels to colors
-        class_names: Optional list of semantic class names
-        use_semantic_names: Whether to show semantic names in legend
-        
-    Returns:
-        legend_text: String description of the color legend
-    """
-    legend_lines = ["Class Legend:"]
-    
-    for class_label in unique_classes:
-        color = class_color_map[class_label]
-        
-        # Get RGB values
-        if hasattr(color, '__len__') and len(color) >= 3:
-            rgb = tuple(int(c * 255) for c in color[:3])
-        else:
-            rgb = (128, 128, 128)  # Default gray
-        
-        # Get semantic color name
-        color_name = "Unknown"
-        if hasattr(color, '__len__') and len(color) >= 3:
-            # Find the closest semantic color name
-            color_array = np.array(color[:3])
-            distinct_colors = get_distinct_colors(15)  # Get all available colors
-            
-            min_distance = float('inf')
-            for color_ref, name in distinct_colors:
-                distance = np.linalg.norm(color_array - color_ref)
-                if distance < min_distance:
-                    min_distance = distance
-                    color_name = name
-        
-        # Format class label consistently
-        if use_semantic_names and class_names and class_label < len(class_names):
-            # In semantic names mode, show only the semantic name
-            class_display = class_names[class_label]
-        else:
-            class_display = f"Class {class_label}"
-            
-        legend_lines.append(f"- {class_display}: {color_name} RGB{rgb}")
-    
-    legend_lines.append("- Test points: Light Gray RGB(211, 211, 211)")
-    
-    return "\n".join(legend_lines)
 
 
 def create_combined_tsne_plot(
@@ -1501,36 +1344,6 @@ def save_plot_as_image(fig: plt.Figure, filepath: str, dpi: int = 150) -> None:
     logger.info(f"Saved plot to {filepath}")
 
 
-def create_regression_color_map(target_values: np.ndarray, colormap: str = 'RdBu_r', n_levels: int = 20) -> Tuple[np.ndarray, mcolors.Colormap, float, float]:
-    """
-    Create a discrete red-blue colormap for regression target values.
-    
-    Blue represents minimum values, red represents maximum values.
-    Uses 20+ discrete levels for fine-grained VLM estimation.
-    
-    Args:
-        target_values: Array of target values
-        colormap: Name of matplotlib colormap to use (default: 'RdBu_r' for red-blue)
-        n_levels: Number of discrete color levels (default: 20)
-        
-    Returns:
-        Tuple of (normalized_values, colormap_object, vmin, vmax)
-    """
-    vmin, vmax = np.min(target_values), np.max(target_values)
-    if vmin == vmax:
-        # Handle constant values
-        vmin -= 0.1
-        vmax += 0.1
-    
-    # Normalize values to [0, 1] range
-    normalized_values = (target_values - vmin) / (vmax - vmin)
-    
-    # Create discrete colormap with specified number of levels
-    base_cmap = plt.get_cmap(colormap)
-    colors = base_cmap(np.linspace(0, 1, n_levels))
-    cmap = mcolors.ListedColormap(colors, name=f'{colormap}_discrete_{n_levels}')
-    
-    return normalized_values, cmap, vmin, vmax
 
 
 def create_regression_tsne_visualization(
