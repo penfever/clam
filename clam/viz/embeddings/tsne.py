@@ -38,7 +38,7 @@ class TSNEVisualization(BaseVisualization):
     
     @property
     def supports_new_data(self) -> bool:
-        return False  # t-SNE doesn't support transform on new data
+        return False  # t-SNE doesn't support transform on new data (use combined fitting)
     
     def _create_transformer(self, **kwargs) -> Any:
         """Create t-SNE transformer."""

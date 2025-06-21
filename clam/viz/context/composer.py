@@ -182,18 +182,41 @@ class ContextComposer:
             viz_start = time.time()
             
             try:
-                # Fit and transform training data
-                train_transformed = viz.fit_transform(X_train, y_train)
-                
-                # Cache the result
-                cache_key = f"viz_{i}_train"
-                self.cached_results[cache_key] = train_transformed
-                
-                # Transform test data if available and supported
-                if X_test is not None and viz.supports_new_data:
-                    test_transformed = viz.transform(X_test)
+                if X_test is not None and not viz.supports_new_data:
+                    # For methods that don't support new data (like Spectral, t-SNE),
+                    # fit on combined data and split afterwards (like original t-SNE implementation)
+                    combined_data = np.vstack([X_train, X_test])
+                    if y_train is not None:
+                        # Use -1 for test labels to distinguish from training labels
+                        combined_labels = np.concatenate([y_train, np.full(len(X_test), -1)])
+                    else:
+                        combined_labels = None
+                    
+                    combined_transformed = viz.fit_transform(combined_data, combined_labels)
+                    
+                    # Split back into train and test
+                    n_train = len(X_train)
+                    train_transformed = combined_transformed[:n_train]
+                    test_transformed = combined_transformed[n_train:]
+                    
+                    # Cache both results
+                    cache_key = f"viz_{i}_train"
+                    self.cached_results[cache_key] = train_transformed
                     cache_key_test = f"viz_{i}_test"
                     self.cached_results[cache_key_test] = test_transformed
+                else:
+                    # Fit and transform training data
+                    train_transformed = viz.fit_transform(X_train, y_train)
+                    
+                    # Cache the result
+                    cache_key = f"viz_{i}_train"
+                    self.cached_results[cache_key] = train_transformed
+                    
+                    # Transform test data if available and supported
+                    if X_test is not None and viz.supports_new_data:
+                        test_transformed = viz.transform(X_test)
+                        cache_key_test = f"viz_{i}_test"
+                        self.cached_results[cache_key_test] = test_transformed
                 
                 viz_time = time.time() - viz_start
                 self.logger.info(f"Fitted {viz.method_name} in {viz_time:.2f}s")

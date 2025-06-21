@@ -81,6 +81,11 @@ class FrequentPatternsVisualization(BaseVisualization):
     
     def fit_transform(self, X: np.ndarray, y: Optional[np.ndarray] = None, **kwargs) -> np.ndarray:
         """Discretize data and analyze patterns."""
+        # Create transformer if not exists
+        if self._transformer is None:
+            merged_kwargs = {**self.config.extra_params, **kwargs}
+            self._transformer = self._create_transformer(**merged_kwargs)
+        
         # Discretize the data
         discrete_data = self._transformer.fit_transform(X)
         

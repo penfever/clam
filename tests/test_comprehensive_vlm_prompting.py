@@ -28,8 +28,12 @@ sys.path.insert(0, str(project_root))
 
 from clam.models.clam_tsne import ClamTsneClassifier
 from clam.utils.vlm_prompting import create_classification_prompt, create_regression_prompt
+from clam.utils.unified_metrics import MetricsLogger
+from clam.utils.json_utils import safe_json_dump
+from clam.utils.class_name_utils import extract_class_names_from_labels
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import fetch_openml
+from sklearn.metrics import accuracy_score, balanced_accuracy_score, precision_recall_fscore_support, confusion_matrix
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -74,6 +78,142 @@ class VLMPromptingTestSuite:
         
         logger.info(f"Initialized test suite with dataset {dataset_id}")
         logger.info(f"Dataset shape: {self.X.shape}, Classes: {len(np.unique(self.y))}")
+    
+    def _load_semantic_class_names(self, task_id: int, num_classes: int) -> Optional[List[str]]:
+        """
+        Load semantic class names from CC18 semantic data directory.
+        
+        Args:
+            task_id: OpenML task ID
+            num_classes: Number of classes in the dataset
+            
+        Returns:
+            List of semantic class names if found, None otherwise
+        """
+        semantic_file = Path(__file__).parent.parent / "data" / "cc18_semantic" / f"{task_id}.json"
+        
+        if not semantic_file.exists():
+            logger.info(f"No semantic file found for task {task_id}")
+            return None
+        
+        try:
+            with open(semantic_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            # Try different structures to extract class names
+            class_names = None
+            
+            # Method 1: target_values (maps numeric labels to semantic names)
+            if 'target_values' in data:
+                target_values = data['target_values']
+                if isinstance(target_values, dict):
+                    # Sort by numeric key to get correct order
+                    sorted_items = sorted(target_values.items(), key=lambda x: int(x[0]))
+                    class_names = [item[1] for item in sorted_items]
+            
+            # Method 2: target_classes (list with name/meaning)
+            if class_names is None and 'target_classes' in data:
+                target_classes = data['target_classes']
+                if isinstance(target_classes, list):
+                    # Use 'meaning' if available, otherwise 'name'
+                    class_names = []
+                    for tc in target_classes:
+                        if isinstance(tc, dict):
+                            name = tc.get('meaning', tc.get('name', ''))
+                            class_names.append(name)
+                        else:
+                            class_names.append(str(tc))
+            
+            # Method 3: instances_per_class keys
+            if class_names is None and 'instances_per_class' in data:
+                instances_per_class = data['instances_per_class']
+                if isinstance(instances_per_class, dict):
+                    class_names = list(instances_per_class.keys())
+            
+            # Validate and truncate to match number of classes
+            if class_names:
+                # Clean up class names (remove extra whitespace, etc.)
+                class_names = [name.strip() for name in class_names if name.strip()]
+                
+                # Truncate to match actual number of classes
+                if len(class_names) >= num_classes:
+                    class_names = class_names[:num_classes]
+                    logger.info(f"Loaded {len(class_names)} semantic class names for task {task_id}: {class_names}")
+                    return class_names
+                else:
+                    logger.warning(f"Found {len(class_names)} semantic names but need {num_classes} for task {task_id}")
+            
+        except Exception as e:
+            logger.warning(f"Failed to load semantic file for task {task_id}: {e}")
+        
+        return None
+    
+    def _calculate_metrics(self, prediction_details, ground_truth_labels, config_name):
+        """Calculate comprehensive metrics from prediction details."""
+        if not prediction_details:
+            return None
+        
+        # Extract predictions and true labels
+        predictions = []
+        true_labels = []
+        
+        for detail in prediction_details:
+            if 'parsed_prediction' in detail and 'true_label' in detail:
+                try:
+                    pred = int(detail['parsed_prediction'])
+                    true = int(detail['true_label'])
+                    predictions.append(pred)
+                    true_labels.append(true)
+                except (ValueError, TypeError):
+                    # Skip invalid predictions
+                    continue
+        
+        if len(predictions) == 0:
+            return None
+        
+        # Calculate basic metrics
+        accuracy = accuracy_score(true_labels, predictions)
+        balanced_acc = balanced_accuracy_score(true_labels, predictions)
+        
+        # Calculate precision, recall, F1
+        precision, recall, f1, support = precision_recall_fscore_support(
+            true_labels, predictions, average='macro', zero_division=0
+        )
+        
+        # Calculate per-class metrics
+        precision_micro, recall_micro, f1_micro, _ = precision_recall_fscore_support(
+            true_labels, predictions, average='micro', zero_division=0
+        )
+        
+        precision_weighted, recall_weighted, f1_weighted, _ = precision_recall_fscore_support(
+            true_labels, predictions, average='weighted', zero_division=0
+        )
+        
+        # Confusion matrix
+        cm = confusion_matrix(true_labels, predictions)
+        
+        # Completion rate
+        completion_rate = len(predictions) / len(prediction_details)
+        
+        return {
+            'config_name': config_name,
+            'accuracy': float(accuracy),
+            'balanced_accuracy': float(balanced_acc),
+            'precision_macro': float(precision),
+            'recall_macro': float(recall), 
+            'f1_macro': float(f1),
+            'precision_micro': float(precision_micro),
+            'recall_micro': float(recall_micro),
+            'f1_micro': float(f1_micro),
+            'precision_weighted': float(precision_weighted),
+            'recall_weighted': float(recall_weighted),
+            'f1_weighted': float(f1_weighted),
+            'confusion_matrix': cm.tolist(),
+            'completion_rate': float(completion_rate),
+            'num_test_samples': len(predictions),
+            'num_classes': len(np.unique(true_labels)),
+            'support': support.tolist()
+        }
     
     def _load_dataset(self):
         """Load OpenML dataset with robust error handling."""
@@ -268,11 +408,12 @@ class VLMPromptingTestSuite:
         
         # Semantic naming variations
         semantic_configs = [
-            # Single viz with semantic names
+            # Single viz with semantic names - loaded from CC18 semantic data
             {
                 'name': 'tsne_semantic',
                 'enable_multi_viz': False,
                 'use_semantic_names': True,
+                'load_semantic_from_cc18': True,  # Load from CC18 semantic directory
                 'use_3d_tsne': False,
                 'use_knn_connections': False,
                 'tsne_perplexity': 15
@@ -284,11 +425,12 @@ class VLMPromptingTestSuite:
                 'visualization_methods': ['pca', 'tsne'],
                 'layout_strategy': 'adaptive_grid',
                 'reasoning_focus': 'comparison',
-                'use_semantic_names': True
+                'use_semantic_names': True,
+                'load_semantic_from_cc18': True  # Load from CC18 semantic directory
             }
         ]
         
-        # Different modality parameters
+        # Different modality parameters and mlxtend methods
         parameter_configs = [
             # High DPI visualization
             {
@@ -307,6 +449,33 @@ class VLMPromptingTestSuite:
                 'use_knn_connections': False,
                 'tsne_perplexity': 15,
                 'tsne_zoom_factor': 3.0
+            },
+            # MLxtend frequent patterns
+            {
+                'name': 'frequent_patterns',
+                'enable_multi_viz': True,
+                'visualization_methods': ['pca', 'frequent_patterns'],
+                'layout_strategy': 'adaptive_grid',
+                'reasoning_focus': 'comparison'
+            },
+            # MLxtend decision regions with SVM
+            {
+                'name': 'decision_regions_svm',
+                'enable_multi_viz': True,
+                'visualization_methods': ['pca', 'decision_regions'],
+                'layout_strategy': 'adaptive_grid',
+                'reasoning_focus': 'comparison',
+                'decision_classifier': 'svm'
+            },
+            # Metadata testing with comprehensive info
+            {
+                'name': 'metadata_comprehensive',
+                'enable_multi_viz': True,
+                'visualization_methods': ['pca', 'tsne', 'isomap'],
+                'layout_strategy': 'hierarchical',
+                'reasoning_focus': 'comparison',
+                'include_metadata': True,
+                'metadata_types': ['quality_metrics', 'timing_info', 'method_params']
             }
         ]
         
@@ -314,12 +483,12 @@ class VLMPromptingTestSuite:
         all_configs = (single_viz_configs + multi_viz_configs + 
                       semantic_configs + parameter_configs)
         
-        # Limit to 20 configurations
-        return all_configs[:20]
+        # Limit to 25 configurations to include new mlxtend and metadata tests
+        return all_configs[:25]
     
     def run_single_test(self, config: Dict[str, Any], test_idx: int) -> Dict[str, Any]:
         """Run a single test configuration."""
-        logger.info(f"Running test {test_idx + 1}/20: {config['name']}")
+        logger.info(f"Running test {test_idx + 1}: {config['name']}")
         
         # Split data
         X_train, X_test, y_train, y_test = train_test_split(
@@ -346,6 +515,18 @@ class VLMPromptingTestSuite:
         (test_dir / "prompts").mkdir(exist_ok=True)
         
         try:
+            # Load semantic class names if requested
+            semantic_class_names = None
+            if config.get('load_semantic_from_cc18', False):
+                semantic_class_names = self._load_semantic_class_names(self.dataset_id, len(np.unique(y_train)))
+                if semantic_class_names:
+                    config['semantic_class_names'] = semantic_class_names
+                    logger.info(f"Loaded semantic class names for test {test_idx + 1}: {semantic_class_names}")
+                else:
+                    logger.info(f"No semantic class names found for task {self.dataset_id}, using Class_<NUM> fallback")
+                    config['semantic_class_names'] = [f"Class_{i}" for i in range(len(np.unique(y_train)))]
+                    config['use_semantic_names'] = False  # Disable semantic names since we couldn't load them
+            
             # Create classifier with configuration
             classifier_config = {
                 'modality': 'tabular',
@@ -382,7 +563,12 @@ class VLMPromptingTestSuite:
             classifier = ClamTsneClassifier(**classifier_config)
             
             # Fit the classifier first
-            classifier.fit(X_train, y_train, X_test)
+            # Pass semantic class names if provided
+            fit_kwargs = {}
+            if config.get('use_semantic_names', False) and config.get('semantic_class_names'):
+                fit_kwargs['class_names'] = config['semantic_class_names'][:len(np.unique(y_train))]
+            
+            classifier.fit(X_train, y_train, X_test, **fit_kwargs)
             
             # Use CLAM's evaluate method to get detailed prediction information
             try:
@@ -462,11 +648,18 @@ class VLMPromptingTestSuite:
                         all_responses = [f"Class: UNKNOWN | Reasoning: No prediction details available" for _ in range(len(X_test))]
                     
                     # Generate fallback prompts
+                    # Generate appropriate class names for fallback
+                    if config.get('use_semantic_names', False) and config.get('semantic_class_names'):
+                        fallback_class_names = config['semantic_class_names'][:len(np.unique(y_train))]
+                    else:
+                        fallback_class_names = [f"Class_{i}" for i in range(len(np.unique(y_train)))]
+                    
                     from clam.utils.vlm_prompting import create_classification_prompt
                     sample_prompt = create_classification_prompt(
-                        class_names=[f"Class_{i}" for i in range(len(np.unique(y_train)))],
+                        class_names=fallback_class_names,
                         modality='tabular',
-                        dataset_description=f"Test dataset with {len(np.unique(y_train))} classes"
+                        dataset_description=f"Test dataset with {len(np.unique(y_train))} classes",
+                        use_semantic_names=config.get('use_semantic_names', False)
                     )
                     all_prompts = [sample_prompt] * len(all_responses)
                 
@@ -485,6 +678,37 @@ class VLMPromptingTestSuite:
                     with open(detailed_output_path, 'w') as f:
                         json.dump(detailed_output, f, indent=2, default=str)
                     logger.info(f"Saved detailed VLM outputs to {detailed_output_path}")
+                    
+                    # Calculate and log metrics using unified metrics system
+                    metrics = self._calculate_metrics(
+                        results['prediction_details'], 
+                        ground_truth_labels, 
+                        config['name']
+                    )
+                    
+                    if metrics:
+                        # Log metrics using unified metrics logger
+                        metrics_logger = MetricsLogger(
+                            model_name=f"CLAM-{config['name']}",
+                            dataset_name=self.dataset_info.get('name', f'dataset_{self.dataset_id}'),
+                            use_wandb=False,  # Disable W&B for test script
+                            logger=logger
+                        )
+                        
+                        # Log all calculated metrics
+                        metrics_logger.log_all_metrics(metrics)
+                        
+                        # Add metrics to detailed output
+                        detailed_output['metrics'] = metrics
+                        
+                        # Save updated detailed output with metrics
+                        with open(detailed_output_path, 'w') as f:
+                            json.dump(detailed_output, f, indent=2, default=str)
+                        
+                        logger.info(f"✓ Test {test_idx + 1} metrics: Accuracy={metrics['accuracy']:.3f}, F1={metrics['f1_macro']:.3f}")
+                    else:
+                        logger.warning(f"Could not calculate metrics for test {test_idx + 1}")
+                        metrics = {'error': 'Could not calculate metrics'}
                 
                 # Save individual response and prompt files in test directory
                 for i, (response, prompt) in enumerate(zip(all_responses, all_prompts)):
@@ -539,13 +763,29 @@ class VLMPromptingTestSuite:
                 f.write("\n\n=== RESPONSE ===\n\n".join(all_responses))
             
             # Save ground truth
+            # Use semantic class names if provided
+            if config.get('use_semantic_names', False) and config.get('semantic_class_names'):
+                gt_class_names = config['semantic_class_names'][:len(np.unique(y_train))]
+            else:
+                gt_class_names = [f"Class_{i}" for i in range(len(np.unique(y_train)))]
+            
             ground_truth_path = self.output_dir / "ground_truth" / f"test_{test_idx:02d}_{config['name']}.json"
+            ground_truth_data = {
+                'test_indices': self.test_indices.tolist(),
+                'ground_truth_labels': ground_truth_labels,
+                'class_names': gt_class_names
+            }
+            
+            # Add metadata information if this is a metadata test
+            if config.get('include_metadata', False):
+                ground_truth_data['metadata_config'] = {
+                    'metadata_types': config.get('metadata_types', []),
+                    'visualization_methods': config.get('visualization_methods', []),
+                    'note': 'This test includes comprehensive metadata from visualization methods'
+                }
+            
             with open(ground_truth_path, 'w') as f:
-                json.dump({
-                    'test_indices': self.test_indices.tolist(),
-                    'ground_truth_labels': ground_truth_labels,
-                    'class_names': [f"Class_{i}" for i in range(len(np.unique(y_train)))]
-                }, f, indent=2)
+                json.dump(ground_truth_data, f, indent=2)
             
             # Save configuration
             config_path = self.output_dir / "configs" / f"test_{test_idx:02d}_{config['name']}.json"
@@ -569,6 +809,7 @@ class VLMPromptingTestSuite:
                 'test_directory': str(test_dir.relative_to(self.output_dir)),
                 'is_multi_viz': config.get('enable_multi_viz', False),
                 'visualization_methods': config.get('visualization_methods', ['tsne']),
+                'metrics': metrics if 'metrics' in locals() else None,
                 'error': None
             }
             
@@ -603,21 +844,19 @@ class VLMPromptingTestSuite:
         # Generate summary
         summary = self._generate_summary()
         
-        # Save summary
+        # Save summary using unified JSON utilities
         summary_path = self.output_dir / "test_summary.json"
-        with open(summary_path, 'w') as f:
-            json.dump(summary, f, indent=2, default=str)
+        safe_json_dump(summary, str(summary_path), logger=logger, indent=2)
         
-        # Save detailed results
+        # Save detailed results using unified JSON utilities
         results_path = self.output_dir / "detailed_results.json"
-        with open(results_path, 'w') as f:
-            json.dump(self.test_results, f, indent=2, default=str)
+        safe_json_dump(self.test_results, str(results_path), logger=logger, indent=2)
         
         logger.info(f"Test suite completed. Results saved to {self.output_dir}")
         return summary
     
     def _generate_summary(self) -> Dict[str, Any]:
-        """Generate test summary."""
+        """Generate comprehensive test summary with comparative analysis."""
         successful_tests = [r for r in self.test_results if r.get('success', False)]
         failed_tests = [r for r in self.test_results if not r.get('success', False)]
         
@@ -630,6 +869,71 @@ class VLMPromptingTestSuite:
             methods = result.get('visualization_methods', [])
             for method in methods:
                 method_counts[method] = method_counts.get(method, 0) + 1
+        
+        # Aggregate metrics for comparative analysis
+        config_metrics = {}
+        overall_metrics = {'accuracy': [], 'f1_macro': [], 'balanced_accuracy': []}
+        
+        for result in successful_tests:
+            if result.get('metrics'):
+                config_name = result['config_name']
+                metrics = result['metrics']
+                
+                config_metrics[config_name] = metrics
+                
+                # Collect for overall statistics
+                if metrics.get('accuracy') is not None:
+                    overall_metrics['accuracy'].append(metrics['accuracy'])
+                if metrics.get('f1_macro') is not None:
+                    overall_metrics['f1_macro'].append(metrics['f1_macro'])
+                if metrics.get('balanced_accuracy') is not None:
+                    overall_metrics['balanced_accuracy'].append(metrics['balanced_accuracy'])
+        
+        # Calculate aggregate statistics
+        aggregate_stats = {}
+        for metric_name, values in overall_metrics.items():
+            if values:
+                aggregate_stats[metric_name] = {
+                    'mean': np.mean(values),
+                    'std': np.std(values),
+                    'min': np.min(values),
+                    'max': np.max(values),
+                    'count': len(values)
+                }
+        
+        # Find best performing configurations
+        best_configs = {}
+        for metric_name in ['accuracy', 'f1_macro', 'balanced_accuracy']:
+            best_score = -1
+            best_config = None
+            for config_name, metrics in config_metrics.items():
+                if metrics.get(metric_name, -1) > best_score:
+                    best_score = metrics[metric_name]
+                    best_config = config_name
+            if best_config:
+                best_configs[metric_name] = {
+                    'config': best_config,
+                    'score': best_score
+                }
+        
+        # Compare single-viz vs multi-viz performance
+        single_viz_metrics = [r['metrics'] for r in single_viz_tests if r.get('metrics')]
+        multi_viz_metrics = [r['metrics'] for r in multi_viz_tests if r.get('metrics')]
+        
+        comparison = {}
+        if single_viz_metrics and multi_viz_metrics:
+            for metric_name in ['accuracy', 'f1_macro', 'balanced_accuracy']:
+                single_scores = [m[metric_name] for m in single_viz_metrics if m.get(metric_name) is not None]
+                multi_scores = [m[metric_name] for m in multi_viz_metrics if m.get(metric_name) is not None]
+                
+                if single_scores and multi_scores:
+                    comparison[metric_name] = {
+                        'single_viz_mean': np.mean(single_scores),
+                        'multi_viz_mean': np.mean(multi_scores),
+                        'difference': np.mean(multi_scores) - np.mean(single_scores),
+                        'single_viz_count': len(single_scores),
+                        'multi_viz_count': len(multi_scores)
+                    }
         
         summary = {
             'timestamp': datetime.now().isoformat(),
@@ -645,6 +949,24 @@ class VLMPromptingTestSuite:
             'average_prompt_length': np.mean([r.get('avg_prompt_length', 0) for r in successful_tests]),
             'total_test_samples': sum([r.get('num_test_samples', 0) for r in successful_tests]),
             'output_directory': str(self.output_dir),
+            
+            # New metrics analysis
+            'overall_metrics': aggregate_stats,
+            'best_performing_configs': best_configs,
+            'single_vs_multi_viz_comparison': comparison,
+            'config_performance': config_metrics,
+            
+            # Analysis insights
+            'insights': {
+                'best_overall_config': best_configs.get('accuracy', {}).get('config'),
+                'multi_viz_advantage': {
+                    metric: comp.get('difference', 0) > 0 
+                    for metric, comp in comparison.items()
+                } if comparison else {},
+                'most_tested_viz_method': max(method_counts, key=method_counts.get) if method_counts else None,
+                'configs_with_metrics': len(config_metrics)
+            },
+            
             'files_generated': {
                 'visualizations': len(list((self.output_dir / "visualizations").glob("*.png"))),
                 'prompts': len(list((self.output_dir / "prompts").glob("*.txt"))),
@@ -702,6 +1024,46 @@ def main():
         print(f"  {file_type}: {count}")
     print(f"\nOutput Directory: {summary['output_directory']}")
     print(f"Summary saved to: {args.output_dir}/test_summary.json")
+    print(f"Detailed results saved to: {args.output_dir}/detailed_results.json")
+    
+    # Print metrics analysis
+    if summary.get('overall_metrics'):
+        print("\n" + "=" * 60)
+        print("PERFORMANCE METRICS ANALYSIS")
+        print("=" * 60)
+        
+        for metric_name, stats in summary['overall_metrics'].items():
+            print(f"\n{metric_name.upper()}:")
+            print(f"  Mean: {stats['mean']:.3f} ± {stats['std']:.3f}")
+            print(f"  Range: [{stats['min']:.3f}, {stats['max']:.3f}]")
+            print(f"  Configs tested: {stats['count']}")
+        
+        # Best performing configs
+        if summary.get('best_performing_configs'):
+            print("\nBEST PERFORMING CONFIGURATIONS:")
+            for metric, best in summary['best_performing_configs'].items():
+                print(f"  {metric}: {best['config']} (score: {best['score']:.3f})")
+        
+        # Single vs Multi-viz comparison
+        if summary.get('single_vs_multi_viz_comparison'):
+            print("\nSINGLE-VIZ vs MULTI-VIZ COMPARISON:")
+            for metric, comp in summary['single_vs_multi_viz_comparison'].items():
+                advantage = "Multi-viz" if comp['difference'] > 0 else "Single-viz"
+                print(f"  {metric}: Single={comp['single_viz_mean']:.3f}, Multi={comp['multi_viz_mean']:.3f}")
+                print(f"    Advantage: {advantage} (+{abs(comp['difference']):.3f})")
+        
+        # Key insights
+        if summary.get('insights'):
+            insights = summary['insights']
+            print("\nKEY INSIGHTS:")
+            if insights.get('best_overall_config'):
+                print(f"  • Best overall configuration: {insights['best_overall_config']}")
+            if insights.get('most_tested_viz_method'):
+                print(f"  • Most tested visualization method: {insights['most_tested_viz_method']}")
+            if insights.get('multi_viz_advantage'):
+                multi_advantages = [k for k, v in insights['multi_viz_advantage'].items() if v]
+                if multi_advantages:
+                    print(f"  • Multi-viz shows advantage in: {', '.join(multi_advantages)}")
     
     if summary['visualization_method_counts']:
         print(f"\nVisualization Methods Used:")
@@ -712,6 +1074,7 @@ def main():
     print("\nTo inspect results:")
     print(f"  ls {args.output_dir}/")
     print(f"  cat {args.output_dir}/test_summary.json")
+    print(f"  cat {args.output_dir}/detailed_results.json")
 
 
 if __name__ == "__main__":

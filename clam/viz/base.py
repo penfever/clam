@@ -22,7 +22,7 @@ class VisualizationConfig:
     """Configuration for visualization parameters."""
     
     # General parameters
-    figsize: Tuple[int, int] = (8, 6)
+    figsize: Tuple[int, int] = (12, 8)  # Match original high-quality implementation
     dpi: int = 100
     random_state: int = 42
     
@@ -363,7 +363,7 @@ class BaseVisualization(ABC):
                         transformed_data[mask, 0],
                         transformed_data[mask, 1],
                         c=[colors[i]], s=self.config.point_size, alpha=self.config.alpha,
-                        label=f'Class {cls}'
+                        edgecolors='black', linewidth=0.5, label=f'Class {cls}'
                     )
                 
                 metadata['classes'].append(cls)
@@ -411,15 +411,17 @@ class BaseVisualization(ABC):
                     test_data[:, 0],
                     test_data[:, 1],
                     test_data[:, 2],
-                    c='black', s=self.config.point_size * 1.5, alpha=0.8,
-                    marker='^', label='Test points'
+                    c='lightgray', s=self.config.point_size * 1.2, alpha=0.8,
+                    marker='s', edgecolors='black', linewidth=0.8,
+                    label='Test Points (Light Gray)'
                 )
             else:
                 ax.scatter(
                     test_data[:, 0],
                     test_data[:, 1],
-                    c='black', s=self.config.point_size * 1.5, alpha=0.8,
-                    marker='^', label='Test points'
+                    c='lightgray', s=self.config.point_size * 1.2, alpha=0.8,
+                    marker='s', edgecolors='black', linewidth=0.8,
+                    label='Test Points (Light Gray)'
                 )
         
         # Highlight specific test points with red X markers
@@ -514,15 +516,17 @@ class BaseVisualization(ABC):
                     test_data[:, 0],
                     test_data[:, 1],
                     test_data[:, 2],
-                    c='black', s=self.config.point_size * 1.5, alpha=0.8,
-                    marker='^', label='Test points'
+                    c='lightgray', s=self.config.point_size * 1.2, alpha=0.8,
+                    marker='s', edgecolors='black', linewidth=0.8,
+                    label='Test Points (Light Gray)'
                 )
             else:
                 ax.scatter(
                     test_data[:, 0],
                     test_data[:, 1],
-                    c='black', s=self.config.point_size * 1.5, alpha=0.8,
-                    marker='^', label='Test points'
+                    c='lightgray', s=self.config.point_size * 1.2, alpha=0.8,
+                    marker='s', edgecolors='black', linewidth=0.8,
+                    label='Test Points (Light Gray)'
                 )
         
         # Highlight specific test points with red X markers
@@ -576,6 +580,10 @@ class BaseVisualization(ABC):
         
         if self.config.show_legend:
             ax.legend()
+        
+        # Add grid for better readability (matching original implementation)
+        if not use_3d:
+            ax.grid(True, alpha=0.3)
         
         # Apply zoom factor
         if self.config.zoom_factor != 1.0:
