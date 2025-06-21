@@ -121,6 +121,7 @@ class ClamTsneClassifier:
         metadata_base_dir: Optional[str] = None,
         use_metadata: bool = False,
         semantic_axes: bool = False,
+        semantic_axes_method: str = "pca_loadings",
         feature_names: Optional[List[str]] = None,
         **kwargs
     ):
@@ -221,6 +222,7 @@ class ClamTsneClassifier:
         self.metadata_base_dir = metadata_base_dir
         self.use_metadata = use_metadata
         self.semantic_axes = semantic_axes
+        self.semantic_axes_method = semantic_axes_method
         self._loaded_metadata = None  # Cached loaded metadata
         
         # New multi-visualization parameters
@@ -280,6 +282,9 @@ class ClamTsneClassifier:
         
         # Multi-visualization context composer
         self.context_composer = None
+        
+        # Embedding model for perturbation-based semantic axes (tabular only)
+        self._embedding_model = None
     
     def _determine_effective_model(self) -> str:
         """Determine the effective model ID to use based on API model parameters."""
@@ -325,6 +330,32 @@ class ClamTsneClassifier:
             return get_dinov2_embeddings
         else:
             raise ValueError(f"Unsupported modality: {self.modality}")
+    
+    def _apply_dimensionality_reduction(self, embeddings, n_components):
+        """
+        Apply dimensionality reduction (t-SNE) to embeddings.
+        
+        This method is used by the perturbation-based semantic axes computation
+        to apply the same dimensionality reduction as used in the main visualization.
+        
+        Args:
+            embeddings: High-dimensional embeddings to reduce
+            n_components: Number of components for the reduced representation
+            
+        Returns:
+            Reduced coordinates with shape [n_samples, n_components]
+        """
+        from sklearn.manifold import TSNE
+        
+        # Use same parameters as the main t-SNE computation
+        tsne = TSNE(
+            n_components=n_components,
+            perplexity=min(self._tsne_params['perplexity'], len(embeddings) // 4),
+            n_iter=self._tsne_params['n_iter'],
+            random_state=self._tsne_params['random_state']
+        )
+        
+        return tsne.fit_transform(embeddings)
     
     def _get_tsne_visualization_methods(self):
         """Get t-SNE visualization methods."""
@@ -604,13 +635,11 @@ class ClamTsneClassifier:
     
     def _get_metadata_for_prompt(self):
         """Get metadata summary for use in VLM prompts."""
-        self.logger.info(f"Getting metadata for prompt: use_metadata={self.use_metadata}, _loaded_metadata={'loaded' if self._loaded_metadata else 'None'}")
         if not self.use_metadata or self._loaded_metadata is None:
             return None
             
         try:
             summary = create_metadata_summary(self._loaded_metadata)
-            self.logger.info(f"Created metadata summary: {len(summary) if summary else 0} chars")
             return summary
         except Exception as e:
             self.logger.warning(f"Failed to create metadata summary: {e}")
@@ -641,10 +670,38 @@ class ClamTsneClassifier:
             
         try:
             from clam.utils.semantic_axes import SemanticAxesComputer
-            computer = SemanticAxesComputer(method="pca_loadings")
-            semantic_axes = computer.compute_semantic_axes(
-                embeddings, reduced_coords, labels, feature_names, self._loaded_metadata
-            )
+            computer = SemanticAxesComputer(method=self.semantic_axes_method)
+            
+            # For perturbation method, we need additional parameters
+            if self.semantic_axes_method == "perturbation":
+                # Check if we have the necessary components for perturbation
+                if (hasattr(self, '_original_features') and 
+                    hasattr(self, '_embedding_model') and 
+                    self._original_features is not None and
+                    self._embedding_model is not None):
+                    
+                    # Create reduction function
+                    def reduction_func(emb):
+                        return self._apply_dimensionality_reduction(emb, reduced_coords.shape[1])
+                    
+                    semantic_axes = computer.compute_semantic_axes(
+                        embeddings, reduced_coords, labels, feature_names, self._loaded_metadata,
+                        original_features=self._original_features,
+                        embedding_model=self._embedding_model,
+                        reduction_func=reduction_func
+                    )
+                else:
+                    self.logger.warning("Perturbation method requires original features and embedding model, falling back to PCA")
+                    # Fallback to PCA method
+                    computer = SemanticAxesComputer(method="pca_loadings")
+                    semantic_axes = computer.compute_semantic_axes(
+                        embeddings, reduced_coords, labels, feature_names, self._loaded_metadata
+                    )
+            else:
+                # Standard methods (pca_loadings, feature_importance)
+                semantic_axes = computer.compute_semantic_axes(
+                    embeddings, reduced_coords, labels, feature_names, self._loaded_metadata
+                )
             return semantic_axes
         except Exception as e:
             self.logger.warning(f"Failed to compute semantic axes labels: {e}")
@@ -727,6 +784,10 @@ class ClamTsneClassifier:
             X_train_array, y_train_array, test_size=0.2, random_state=self.seed
         )
         
+        # Store original features for semantic axes computation (before any transformation)
+        if self.semantic_axes and self.modality == "tabular":
+            self._original_features = X_train_fit.copy()
+        
         # Generate embeddings using modality-specific method
         embedding_method = self._get_embedding_method()
         
@@ -748,6 +809,27 @@ class ClamTsneClassifier:
                 task_type=self.task_type,
                 seed=self.seed
             )
+            
+            # Store the TabPFN model in _embedding_model for perturbation method
+            if self.tabpfn is not None:
+                # Create a wrapper that provides a transform method for TabPFN
+                class TabPFNWrapper:
+                    def __init__(self, tabpfn_model):
+                        self.tabpfn = tabpfn_model
+                    
+                    def transform(self, X):
+                        """Wrapper method to provide sklearn-style transform interface."""
+                        embeddings = self.tabpfn.get_embeddings(X)
+                        # Handle ensemble embeddings by averaging if needed
+                        if len(embeddings.shape) == 3 and embeddings.shape[0] > 1:
+                            embeddings = np.mean(embeddings, axis=0)
+                        elif len(embeddings.shape) == 3:
+                            embeddings = embeddings[0]
+                        return embeddings
+                
+                self._embedding_model = TabPFNWrapper(self.tabpfn)
+            else:
+                self._embedding_model = None
             
         elif self.modality == "audio":
             # Audio embedding generation
@@ -804,6 +886,7 @@ class ClamTsneClassifier:
                 
             self.y_train_sample = y_train_fit
             self.tabpfn = None  # Not used for audio
+            self._embedding_model = None  # Perturbation method not available for audio
             
         elif self.modality == "vision":
             # Vision embedding generation
@@ -841,9 +924,17 @@ class ClamTsneClassifier:
                 
             self.y_train_sample = y_train_fit
             self.tabpfn = None  # Not used for vision
+            self._embedding_model = None  # Perturbation method not available for vision
             
         else:
             raise ValueError(f"Unsupported modality: {self.modality}")
+        
+        # Store t-SNE parameters for potential reuse in perturbation method
+        self._tsne_params = {
+            'perplexity': self.tsne_perplexity,
+            'n_iter': self.tsne_n_iter,
+            'random_state': self.seed
+        }
         
         # Create t-SNE visualization based on task type
         viz_methods = self._get_tsne_visualization_methods()
@@ -922,12 +1013,21 @@ class ClamTsneClassifier:
         
         # Compute semantic axes labels if enabled
         if self.semantic_axes and self.train_embeddings is not None and self.train_tsne is not None:
-            self.semantic_axes_labels = self._compute_semantic_axes_labels(
-                self.train_embeddings, 
-                self.train_tsne, 
-                self.y_train_sample,
-                feature_names=self.feature_names
-            )
+            # For tabular data, prefer original features over processed embeddings for semantic axes
+            if self.modality == "tabular" and hasattr(self, '_original_features'):
+                self.semantic_axes_labels = self._compute_semantic_axes_labels(
+                    self._original_features, 
+                    self.train_tsne, 
+                    self.y_train_sample,
+                    feature_names=self.feature_names
+                )
+            else:
+                self.semantic_axes_labels = self._compute_semantic_axes_labels(
+                    self.train_embeddings, 
+                    self.train_tsne, 
+                    self.y_train_sample,
+                    feature_names=self.feature_names
+                )
             if self.semantic_axes_labels:
                 self.logger.info(f"Computed semantic axes: X={self.semantic_axes_labels.get('X', 'N/A')}, Y={self.semantic_axes_labels.get('Y', 'N/A')}")
         
