@@ -297,6 +297,16 @@ def add_evaluation_control_args(parser: argparse.ArgumentParser):
         action="store_true",
         help="Use semantic class names in prompts instead of 'Class X' format"
     )
+    parser.add_argument(
+        "--use_metadata",
+        action="store_true",
+        help="Incorporate semantic feature names and domain context into VLM prompts"
+    )
+    parser.add_argument(
+        "--semantic_axes",
+        action="store_true",
+        help="Compute factor weighting of named features to improve visualization legends with semantic axis labels"
+    )
 
 
 def add_audio_args(parser: argparse.ArgumentParser):

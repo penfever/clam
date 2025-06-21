@@ -436,6 +436,55 @@ class VLMPromptingTestSuite:
                 'reasoning_focus': 'comparison',
                 'use_semantic_names': True,
                 'load_semantic_from_cc18': True  # Load from CC18 semantic directory
+            },
+            # Semantic axes test - single visualization with axes interpretation
+            {
+                'name': 'tsne_semantic_axes',
+                'enable_multi_viz': False,
+                'use_semantic_names': True,
+                'load_semantic_from_cc18': True,
+                'semantic_axes': True,  # NEW: Enable semantic axes computation
+                'use_3d_tsne': False,
+                'use_knn_connections': False,
+                'tsne_perplexity': 15
+            },
+            # Use metadata test - incorporate metadata into prompts
+            {
+                'name': 'tsne_use_metadata',
+                'enable_multi_viz': False,
+                'use_semantic_names': True,
+                'load_semantic_from_cc18': True,
+                'use_metadata': True,  # NEW: Enable metadata incorporation
+                'auto_load_metadata': True,
+                'use_3d_tsne': False,
+                'use_knn_connections': False,
+                'tsne_perplexity': 15
+            },
+            # Combined new features test
+            {
+                'name': 'tsne_semantic_metadata_combined',
+                'enable_multi_viz': False,
+                'use_semantic_names': True,
+                'load_semantic_from_cc18': True,
+                'semantic_axes': True,  # NEW: Enable semantic axes
+                'use_metadata': True,   # NEW: Enable metadata
+                'auto_load_metadata': True,
+                'use_3d_tsne': False,
+                'use_knn_connections': False,
+                'tsne_perplexity': 15
+            },
+            # Multi-viz with new features
+            {
+                'name': 'multi_semantic_axes_metadata',
+                'enable_multi_viz': True,
+                'visualization_methods': ['pca', 'tsne'],
+                'layout_strategy': 'sequential',
+                'reasoning_focus': 'comparison',
+                'use_semantic_names': True,
+                'load_semantic_from_cc18': True,
+                'semantic_axes': True,  # NEW: Enable semantic axes
+                'use_metadata': True,   # NEW: Enable metadata
+                'auto_load_metadata': True
             }
         ]
         
@@ -547,6 +596,10 @@ class VLMPromptingTestSuite:
                 'image_dpi': config.get('image_dpi', 100),
                 'zoom_factor': config.get('zoom_factor', self.zoom_factor),  # Use instance variable as default
                 'use_semantic_names': config.get('use_semantic_names', False),
+                # NEW: Add semantic axes and metadata parameters
+                'semantic_axes': config.get('semantic_axes', False),
+                'use_metadata': config.get('use_metadata', False),
+                'auto_load_metadata': config.get('auto_load_metadata', True),
                 # VLM model parameters to avoid KV cache issues
                 'max_model_len': 16384,
                 'gpu_memory_utilization': 0.7,  # Reduced to be safer
@@ -565,9 +618,9 @@ class VLMPromptingTestSuite:
             else:
                 classifier_config.update({
                     'enable_multi_viz': False,
-                    'use_3d_tsne': config.get('use_3d_tsne', False),
+                    'use_3d': config.get('use_3d_tsne', False),  # Updated parameter name
                     'use_knn_connections': config.get('use_knn_connections', False),
-                    'knn_k': config.get('knn_k', 5)
+                    'nn_k': config.get('knn_k', 5)  # Updated parameter name
                 })
             
             classifier = ClamTsneClassifier(**classifier_config)

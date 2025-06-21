@@ -23,11 +23,14 @@ import matplotlib.pyplot as plt
 from clam.utils.model_loader import model_loader, GenerationConfig
 
 # Import VLM prompting utilities
-from clam.utils.vlm_prompting import create_classification_prompt, parse_vlm_response, create_vlm_conversation
+from clam.utils.vlm_prompting import create_classification_prompt, parse_vlm_response, create_vlm_conversation, create_metadata_summary
 from clam.utils.class_name_utils import extract_class_names_from_labels
 
 # Import metadata utilities
-from clam.utils.metadata_loader import load_dataset_metadata, create_metadata_summary, detect_dataset_id_from_path
+from clam.utils.metadata_loader import load_dataset_metadata, detect_dataset_id_from_path
+
+# Import semantic axes utilities
+from clam.utils.semantic_axes import enhance_visualization_with_semantic_axes
 
 # Import new multi-visualization framework
 from clam.viz import ContextComposer, VisualizationConfig
@@ -116,6 +119,8 @@ class ClamTsneClassifier:
         dataset_metadata: Optional[Union[str, Dict[str, Any], Path]] = None,
         auto_load_metadata: bool = True,
         metadata_base_dir: Optional[str] = None,
+        use_metadata: bool = False,
+        semantic_axes: bool = False,
         **kwargs
     ):
         """
@@ -168,6 +173,13 @@ class ClamTsneClassifier:
                 use_pca_backend: Use PCA instead of t-SNE
                 max_train_plot_samples: Maximum training samples to plot
                 
+            Metadata and enhancement parameters:
+                dataset_metadata: Path or dict with dataset metadata
+                auto_load_metadata: Automatically load metadata if available  
+                metadata_base_dir: Base directory for metadata files
+                use_metadata: Incorporate semantic feature names and domain context into prompts
+                semantic_axes: Compute factor weighting of named features to improve visualization legends
+                
             **kwargs: Additional modality-specific arguments
         """
         self.modality = modality.lower()
@@ -206,6 +218,8 @@ class ClamTsneClassifier:
         self.dataset_metadata = dataset_metadata
         self.auto_load_metadata = auto_load_metadata
         self.metadata_base_dir = metadata_base_dir
+        self.use_metadata = use_metadata
+        self.semantic_axes = semantic_axes
         self._loaded_metadata = None  # Cached loaded metadata
         
         # New multi-visualization parameters
@@ -512,15 +526,32 @@ class ClamTsneClassifier:
     
     def _get_metadata_for_prompt(self):
         """Get metadata summary for use in VLM prompts."""
-        if self._loaded_metadata is None:
+        if not self.use_metadata or self._loaded_metadata is None:
             return None
             
         try:
-            from clam.utils.metadata_loader import create_metadata_summary
             return create_metadata_summary(self._loaded_metadata)
         except Exception as e:
             self.logger.warning(f"Failed to create metadata summary: {e}")
             return None
+    
+    def _get_semantic_axes_legend(self, embeddings, reduced_coords, labels, feature_names=None):
+        """Get semantic axes legend for visualization enhancement."""
+        if not self.semantic_axes:
+            return ""
+            
+        try:
+            return enhance_visualization_with_semantic_axes(
+                embeddings=embeddings,
+                reduced_coords=reduced_coords,
+                labels=labels,
+                metadata=self._loaded_metadata,
+                feature_names=feature_names,
+                method="pca_loadings"
+            )
+        except Exception as e:
+            self.logger.warning(f"Failed to create semantic axes legend: {e}")
+            return ""
     
     def fit(self, X_train, y_train, X_test=None, class_names=None, task_type=None, **kwargs):
         """
@@ -1088,13 +1119,22 @@ class ClamTsneClassifier:
                         from clam.utils.vlm_prompting import create_regression_prompt, parse_vlm_response
                         
                         # Create regression prompt
+                        # Enhance legend with semantic axes if enabled
+                        enhanced_legend = legend_text
+                        if self.semantic_axes and self.train_embeddings is not None:
+                            semantic_axes_legend = self._get_semantic_axes_legend(
+                                self.train_embeddings, self.train_tsne, self.y_train_sample
+                            )
+                            if semantic_axes_legend:
+                                enhanced_legend = f"{legend_text}\n\n{semantic_axes_legend}"
+                        
                         prompt = create_regression_prompt(
                             target_stats=self.target_stats,
                             modality=self.modality,
                             use_knn=self.use_knn_connections,
                             use_3d=self.use_3d,
                             knn_k=self.knn_k if self.use_knn_connections else None,
-                            legend_text=legend_text,
+                            legend_text=enhanced_legend,
                             dataset_description=f"{self.modality.title()} data embedded using appropriate features",
                             dataset_metadata=self._get_metadata_for_prompt()
                         )
@@ -1134,13 +1174,23 @@ class ClamTsneClassifier:
                         
                         # Create classification prompt
                         from clam.utils.vlm_prompting import create_classification_prompt, parse_vlm_response
+                        
+                        # Enhance legend with semantic axes if enabled
+                        enhanced_legend = legend_text
+                        if self.semantic_axes and self.train_embeddings is not None:
+                            semantic_axes_legend = self._get_semantic_axes_legend(
+                                self.train_embeddings, self.train_tsne, self.y_train_sample
+                            )
+                            if semantic_axes_legend:
+                                enhanced_legend = f"{legend_text}\n\n{semantic_axes_legend}"
+                        
                         prompt = create_classification_prompt(
                             class_names=visible_semantic_names,
                             modality=self.modality,
                             use_knn=self.use_knn_connections,
                             use_3d=self.use_3d,
                             knn_k=self.knn_k if self.use_knn_connections else None,
-                            legend_text=legend_text,
+                            legend_text=enhanced_legend,
                             dataset_description=f"{self.modality.title()} data embedded using appropriate features",
                             use_semantic_names=self.use_semantic_names,
                             dataset_metadata=self._get_metadata_for_prompt()

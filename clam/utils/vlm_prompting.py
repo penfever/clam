@@ -12,6 +12,56 @@ from typing import List, Optional, Dict, Any
 logger = logging.getLogger(__name__)
 
 
+def create_metadata_summary(metadata: 'DatasetMetadata') -> str:
+    """
+    Create a concise metadata summary for VLM prompts.
+    
+    Args:
+        metadata: DatasetMetadata object with rich dataset information
+        
+    Returns:
+        Formatted metadata summary for inclusion in prompts
+    """
+    if not metadata:
+        return ""
+        
+    summary_parts = []
+    
+    # Dataset description
+    if metadata.description:
+        summary_parts.append(f"Dataset: {metadata.description}")
+    
+    # Key features (top 3-5 most informative)
+    if metadata.columns:
+        feature_descriptions = []
+        for col in metadata.columns[:5]:  # Limit to avoid prompt bloat
+            if col.semantic_description and len(col.semantic_description) < 80:
+                feature_descriptions.append(f"{col.name}: {col.semantic_description}")
+            else:
+                feature_descriptions.append(col.name)
+        
+        if feature_descriptions:
+            summary_parts.append(f"Key features: {'; '.join(feature_descriptions)}")
+    
+    # Target classes with meanings
+    if metadata.target_classes:
+        class_meanings = []
+        for target_class in metadata.target_classes[:10]:  # Limit to avoid bloat
+            if target_class.meaning and len(target_class.meaning) < 60:
+                class_meanings.append(f'"{target_class.name}": {target_class.meaning}')
+            else:
+                class_meanings.append(f'"{target_class.name}"')
+        
+        if class_meanings:
+            summary_parts.append(f"Classes: {'; '.join(class_meanings)}")
+    
+    # Domain context from inference notes
+    if metadata.inference_notes and len(metadata.inference_notes) < 200:
+        summary_parts.append(f"Context: {metadata.inference_notes}")
+    
+    return " | ".join(summary_parts)
+
+
 def validate_and_clean_class_names(class_names: List[str]) -> List[str]:
     """
     Validate and clean class names for semantic naming.
