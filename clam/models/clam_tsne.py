@@ -1058,7 +1058,6 @@ class ClamTsneClassifier:
                         viz_filename = f"visualization_test_{i:03d}.png"
                         viz_path = os.path.join(self.temp_dir, viz_filename)
                         fig.savefig(viz_path, dpi=self.image_dpi, bbox_inches='tight', facecolor='white')
-                        self.logger.info(f"Saved visualization to {viz_path}")
                     
                     plt.close(fig)
                 

@@ -114,23 +114,21 @@ class ClassNameExtractor:
         
         # 4. If labels are already strings, try to use them directly
         if semantic_names is None and all(isinstance(label, str) for label in unique_labels):
-            try:
-                semantic_names = validate_and_clean_class_names([str(label) for label in unique_labels])
-                logger.info(f"Using provided string labels as semantic names")
-            except ValueError as e:
-                logger.warning(f"Failed to validate provided string labels: {e}")
+            semantic_names = [str(label) for label in unique_labels]
+            logger.info(f"Using provided string labels as semantic names")
         
-        # Apply validation if we have semantic names
+        # SINGLE VALIDATION POINT: Apply validation if we have semantic names from any source
         if semantic_names:
             try:
                 validated_names = validate_and_clean_class_names(semantic_names)
                 if len(validated_names) == num_classes:
-                    logger.info(f"Successfully extracted {num_classes} semantic class names")
+                    logger.info(f"Successfully extracted and validated {num_classes} semantic class names: {validated_names}")
                     return validated_names, True
                 else:
                     logger.warning(f"Semantic names count mismatch: got {len(validated_names)}, expected {num_classes}")
             except ValueError as e:
                 logger.warning(f"Semantic name validation failed: {e}")
+                logger.info(f"Falling back to Class_<NUM> format due to validation failure")
         
         # Fallback to Class_<NUM> format
         logger.info(f"Using fallback Class_<NUM> format for {num_classes} classes")

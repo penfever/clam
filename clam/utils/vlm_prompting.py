@@ -119,21 +119,11 @@ def create_classification_prompt(
     Returns:
         Formatted prompt string
     """
-    # Format class list consistently
+    # Format class list consistently - class names are already validated at source
     if use_semantic_names and not all(isinstance(name, (int, float)) for name in class_names):
-        # Validate and clean semantic names
-        try:
-            cleaned_class_names = validate_and_clean_class_names(class_names)
-            class_list_str = ", ".join([f'"{name}"' for name in cleaned_class_names])
-            class_format_example = f'"{cleaned_class_names[0]}", "{cleaned_class_names[1]}", etc.'
-        except ValueError as e:
-            logger.warning(f"Class name validation failed: {e}. Falling back to 'Class_X' format.")
-            # Fall back to Class_X format using class_name_utils
-            from .class_name_utils import normalize_class_names_to_class_num
-            fallback_names = normalize_class_names_to_class_num(len(class_names))
-            class_list_str = ", ".join([f'"{name}"' for name in fallback_names])
-            class_format_example = '"Class_0", "Class_1", "Class_2"'
-            use_semantic_names = False  # Override to ensure consistent parsing
+        # Use pre-validated semantic class names (validated in class_name_utils.py)
+        class_list_str = ", ".join([f'"{name}"' for name in class_names])
+        class_format_example = f'"{class_names[0]}", "{class_names[1]}", etc.' if len(class_names) >= 2 else f'"{class_names[0]}"'
     else:
         # Default: Always use "Class_X" format for consistency with legends
         from .class_name_utils import normalize_class_names_to_class_num
