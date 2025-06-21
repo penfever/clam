@@ -44,7 +44,7 @@ class VLMPromptingTestSuite:
     """Comprehensive test suite for VLM prompting with various configurations."""
     
     def __init__(self, output_dir: str, dataset_id: int = 23, vlm_model: str = "Qwen/Qwen2-VL-2B-Instruct", 
-                 num_tests: int = 16, num_samples_per_test: int = 10, backend: str = "auto", zoom_factor: float = 6.5):
+                 num_tests: int = None, num_samples_per_test: int = 10, backend: str = "auto", zoom_factor: float = 6.5):
         """
         Initialize the test suite.
         
@@ -52,7 +52,7 @@ class VLMPromptingTestSuite:
             output_dir: Directory to save outputs
             dataset_id: OpenML task ID (default: 23 = cmc contraceptive method choice)
             vlm_model: VLM model to use (default: small Qwen model)
-            num_tests: Number of test configurations to run (default: 16)
+            num_tests: Number of test configurations to run (default: None, runs all available)
             num_samples_per_test: Number of test samples per configuration (default: 10)
             backend: Backend to use for VLM inference (default: auto)
             zoom_factor: Zoom factor for t-SNE visualizations (default: 6.5)
@@ -924,7 +924,7 @@ class VLMPromptingTestSuite:
         configs = self._get_test_configurations()
         
         # Limit the number of test configurations if specified
-        if self.num_tests < len(configs):
+        if self.num_tests is not None and self.num_tests < len(configs):
             configs = configs[:self.num_tests]
             logger.info(f"Limited to {self.num_tests} test configurations (out of {len(self._get_test_configurations())} available)")
         
@@ -1084,8 +1084,8 @@ def main():
                        help="VLM model to use")
     parser.add_argument("--seed", type=int, default=42,
                        help="Random seed")
-    parser.add_argument("--num_tests", type=int, default=16,
-                       help="Number of test configurations to run (default: 16)")
+    parser.add_argument("--num_tests", type=int, default=None,
+                       help="Number of test configurations to run (default: None, runs all available)")
     parser.add_argument("--num_samples_per_test", type=int, default=10,
                        help="Number of test samples to process per configuration (default: 10)")
     parser.add_argument("--backend", type=str, default="auto",
