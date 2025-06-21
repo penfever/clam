@@ -116,8 +116,12 @@ class VLMPromptingTestSuite:
             if 'target_values' in data:
                 target_values = data['target_values']
                 if isinstance(target_values, dict):
-                    # Sort by numeric key to get correct order
-                    sorted_items = sorted(target_values.items(), key=lambda x: int(x[0]))
+                    # Sort by key (handle both numeric and string keys)
+                    try:
+                        sorted_items = sorted(target_values.items(), key=lambda x: int(x[0]))
+                    except ValueError:
+                        # If keys are strings, sort lexicographically
+                        sorted_items = sorted(target_values.items(), key=lambda x: x[0])
                     class_names = [item[1] for item in sorted_items]
             
             # Method 2: target_classes (list with name/meaning)
@@ -275,13 +279,21 @@ class VLMPromptingTestSuite:
                 X = X[indices]
                 y = y[indices]
             
+            # Extract feature names from OpenML dataset
+            feature_names = None
+            if hasattr(dataset, 'feature_names') and dataset.feature_names is not None:
+                feature_names = list(dataset.feature_names)
+            elif hasattr(dataset, 'data') and hasattr(dataset.data, 'columns'):
+                feature_names = list(dataset.data.columns)
+            
             dataset_info = {
                 'name': dataset.DESCR if hasattr(dataset, 'DESCR') else f'OpenML_{self.dataset_id}',
                 'n_samples': len(X),
                 'n_features': X.shape[1],
                 'n_classes': len(np.unique(y)),
                 'openml_id': self.dataset_id,
-                'data_source': 'openml'
+                'data_source': 'openml',
+                'feature_names': feature_names
             }
             
             logger.info(f"Successfully loaded OpenML dataset {self.dataset_id}")
@@ -301,7 +313,8 @@ class VLMPromptingTestSuite:
                 'n_features': X.shape[1], 
                 'n_classes': len(np.unique(y)),
                 'openml_id': None,
-                'data_source': 'synthetic'
+                'data_source': 'synthetic',
+                'feature_names': [f'feature_{i}' for i in range(X.shape[1])]
             }
             return X, y, dataset_info
     
@@ -619,6 +632,8 @@ class VLMPromptingTestSuite:
                 # NEW: Add semantic axes and metadata parameters
                 'semantic_axes': config.get('semantic_axes', False),
                 'use_metadata': config.get('use_metadata', False),
+                # Pass feature names for semantic axes computation
+                'feature_names': self.dataset_info.get('feature_names', None),
                 'auto_load_metadata': config.get('auto_load_metadata', True),
                 # VLM model parameters to avoid KV cache issues
                 'max_model_len': 16384,

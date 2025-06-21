@@ -121,6 +121,7 @@ class ClamTsneClassifier:
         metadata_base_dir: Optional[str] = None,
         use_metadata: bool = False,
         semantic_axes: bool = False,
+        feature_names: Optional[List[str]] = None,
         **kwargs
     ):
         """
@@ -266,6 +267,9 @@ class ClamTsneClassifier:
         # Store fitted data
         self.train_embeddings = None
         self.test_embeddings = None
+        
+        # Store feature names for semantic axes computation
+        self.feature_names = feature_names
         self.train_tsne = None
         self.test_tsne = None
         self.y_train_sample = None
@@ -1123,7 +1127,8 @@ class ClamTsneClassifier:
                         enhanced_legend = legend_text
                         if self.semantic_axes and self.train_embeddings is not None:
                             semantic_axes_legend = self._get_semantic_axes_legend(
-                                self.train_embeddings, self.train_tsne, self.y_train_sample
+                                self.train_embeddings, self.train_tsne, self.y_train_sample,
+                                feature_names=getattr(self, 'feature_names', None)
                             )
                             if semantic_axes_legend:
                                 enhanced_legend = f"{legend_text}\n\n{semantic_axes_legend}"
@@ -1179,7 +1184,8 @@ class ClamTsneClassifier:
                         enhanced_legend = legend_text
                         if self.semantic_axes and self.train_embeddings is not None:
                             semantic_axes_legend = self._get_semantic_axes_legend(
-                                self.train_embeddings, self.train_tsne, self.y_train_sample
+                                self.train_embeddings, self.train_tsne, self.y_train_sample,
+                                feature_names=getattr(self, 'feature_names', None)
                             )
                             if semantic_axes_legend:
                                 enhanced_legend = f"{legend_text}\n\n{semantic_axes_legend}"
