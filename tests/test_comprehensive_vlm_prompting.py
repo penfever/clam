@@ -437,6 +437,16 @@ class VLMPromptingTestSuite:
                 'use_semantic_names': True,
                 'load_semantic_from_cc18': True  # Load from CC18 semantic directory
             },
+            # Semantic class names test - single visualization with semantic names only
+            {
+                'name': 'tsne_semantic',
+                'enable_multi_viz': False,
+                'use_semantic_names': True,
+                'load_semantic_from_cc18': True,
+                'use_3d_tsne': False,
+                'use_knn_connections': False,
+                'tsne_perplexity': 15
+            },
             # Semantic axes test - single visualization with axes interpretation
             {
                 'name': 'tsne_semantic_axes',
@@ -472,6 +482,16 @@ class VLMPromptingTestSuite:
                 'use_3d_tsne': False,
                 'use_knn_connections': False,
                 'tsne_perplexity': 15
+            },
+            # Multi-viz with semantic names only
+            {
+                'name': 'multi_tsne_semantic',
+                'enable_multi_viz': True,
+                'visualization_methods': ['pca', 'tsne'],
+                'layout_strategy': 'sequential',
+                'reasoning_focus': 'comparison',
+                'use_semantic_names': True,
+                'load_semantic_from_cc18': True
             },
             # Multi-viz with new features
             {
