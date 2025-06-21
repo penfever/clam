@@ -589,7 +589,7 @@ class VisionLanguageModelWrapper(BaseModelWrapper):
         # Filter out wrapper-specific kwargs that shouldn't be passed to the model
         wrapper_specific_kwargs = {
             'backend', 'tensor_parallel_size', 'gpu_memory_utilization', 
-            'torch_dtype', 'low_cpu_mem_usage', 'device_map'
+            'max_model_len', 'torch_dtype', 'low_cpu_mem_usage', 'device_map'
         }
         
         # Add any additional kwargs (excluding wrapper-specific ones)

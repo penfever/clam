@@ -43,7 +43,8 @@ logger = logging.getLogger(__name__)
 class VLMPromptingTestSuite:
     """Comprehensive test suite for VLM prompting with various configurations."""
     
-    def __init__(self, output_dir: str, dataset_id: int = 31, vlm_model: str = "Qwen/Qwen2-VL-2B-Instruct"):
+    def __init__(self, output_dir: str, dataset_id: int = 31, vlm_model: str = "Qwen/Qwen2-VL-2B-Instruct", 
+                 num_tests: int = 16, num_samples_per_test: int = 10):
         """
         Initialize the test suite.
         
@@ -51,10 +52,14 @@ class VLMPromptingTestSuite:
             output_dir: Directory to save outputs
             dataset_id: OpenML dataset ID (default: 31 = credit-g)
             vlm_model: VLM model to use (default: small Qwen model)
+            num_tests: Number of test configurations to run (default: 16)
+            num_samples_per_test: Number of test samples per configuration (default: 10)
         """
         self.output_dir = Path(output_dir)
         self.dataset_id = dataset_id
         self.vlm_model = vlm_model
+        self.num_tests = num_tests
+        self.num_samples_per_test = num_samples_per_test
         
         # Create output directories with nested structure
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -70,8 +75,8 @@ class VLMPromptingTestSuite:
         # Store test results
         self.test_results = []
         
-        # Number of responses per test
-        self.responses_per_test = 10
+        # Number of responses per test (use the provided parameter)
+        self.responses_per_test = num_samples_per_test
         
         # Load dataset
         self.X, self.y, self.dataset_info = self._load_dataset()
@@ -835,7 +840,13 @@ class VLMPromptingTestSuite:
         logger.info(f"Output Directory: {self.output_dir}")
         
         configs = self._get_test_configurations()
-        logger.info(f"Running {len(configs)} test configurations...")
+        
+        # Limit the number of test configurations if specified
+        if self.num_tests < len(configs):
+            configs = configs[:self.num_tests]
+            logger.info(f"Limited to {self.num_tests} test configurations (out of {len(self._get_test_configurations())} available)")
+        
+        logger.info(f"Running {len(configs)} test configurations with {self.num_samples_per_test} samples each...")
         
         for i, config in enumerate(configs):
             result = self.run_single_test(config, i)
@@ -991,6 +1002,10 @@ def main():
                        help="VLM model to use")
     parser.add_argument("--seed", type=int, default=42,
                        help="Random seed")
+    parser.add_argument("--num_tests", type=int, default=16,
+                       help="Number of test configurations to run (default: 16)")
+    parser.add_argument("--num_samples_per_test", type=int, default=10,
+                       help="Number of test samples to process per configuration (default: 10)")
     
     args = parser.parse_args()
     
@@ -1001,7 +1016,9 @@ def main():
     test_suite = VLMPromptingTestSuite(
         output_dir=args.output_dir,
         dataset_id=args.dataset_id,
-        vlm_model=args.vlm_model
+        vlm_model=args.vlm_model,
+        num_tests=args.num_tests,
+        num_samples_per_test=args.num_samples_per_test
     )
     
     summary = test_suite.run_all_tests()
