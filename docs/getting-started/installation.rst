@@ -10,7 +10,9 @@ Requirements
 
 **System Requirements**:
 
-* **GPU**: NVIDIA GPU with CUDA support (recommended for VLM models)
+* **GPU**: 
+  * NVIDIA GPU with CUDA support (recommended for VLM models)
+  * Apple Silicon Mac (M1/M2/M3/M4) with Metal Performance Shaders support
 * **Memory**: 8GB+ RAM (16GB+ recommended for large models)
 * **Storage**: 5GB+ free space for models and cache
 
@@ -103,8 +105,31 @@ For faster local VLM inference with VLLM:
    pip install vllm
 
 .. note::
-   VLLM requires CUDA and may have specific GPU compatibility requirements.
+   VLLM requires CUDA and is not compatible with Apple Silicon (MPS).
    See `VLLM installation guide <https://docs.vllm.ai/en/latest/getting_started/installation.html>`_ for details.
+
+Apple Silicon Support
+~~~~~~~~~~~~~~~~~~~~~
+
+CLAM automatically detects and uses Metal Performance Shaders (MPS) on Apple Silicon Macs:
+
+.. code-block:: bash
+
+   # Force transformers backend for MPS support
+   export VLLM_AVAILABLE=false
+   
+   # Run with automatic MPS detection
+   python your_script.py
+
+To verify MPS is being used:
+
+.. code-block:: bash
+
+   python tests/test_mps_detection.py
+
+.. note::
+   The transformers backend provides full MPS support for GPU acceleration on Mac.
+   Monitor GPU usage in Activity Monitor to verify MPS utilization.
 
 Development Installation
 ~~~~~~~~~~~~~~~~~~~~~~~~

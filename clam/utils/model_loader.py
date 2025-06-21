@@ -429,7 +429,7 @@ class TransformersModelWrapper(BaseModelWrapper):
     
     def __init__(self, model_name: str, device: str = "auto", **kwargs):
         super().__init__(model_name, device, **kwargs)
-        self.torch_dtype = kwargs.get('torch_dtype', torch.float16)
+        self.torch_dtype = kwargs.get('torch_dtype', torch.bfloat16)
         self.low_cpu_mem_usage = kwargs.get('low_cpu_mem_usage', True)
         self.device_map = kwargs.get('device_map', 'auto' if device == 'auto' else None)
         
@@ -591,7 +591,7 @@ class VisionLanguageModelWrapper(BaseModelWrapper):
     
     def __init__(self, model_name: str, device: str = "auto", **kwargs):
         super().__init__(model_name, device, **kwargs)
-        self.torch_dtype = kwargs.get('torch_dtype', torch.float16)
+        self.torch_dtype = kwargs.get('torch_dtype', torch.bfloat16)
         self.low_cpu_mem_usage = kwargs.get('low_cpu_mem_usage', True)
         self.device_map = kwargs.get('device_map', 'auto' if device == 'auto' else None)
         self._processor = None

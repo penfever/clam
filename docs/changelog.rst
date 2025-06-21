@@ -16,12 +16,24 @@ Added
 * Metadata integration for enhanced VLM prompts
 * Multi-visualization framework with adaptive layouts
 * Comprehensive troubleshooting guide
+* **Apple Silicon (MPS) Support**: Automatic detection and use of Metal Performance Shaders for GPU acceleration on M1/M2/M3/M4 Macs
+* Platform detection utilities for optimal device selection
+* MPS-specific configuration and optimization
 
 Changed
 ~~~~~~~
 * Streamlined README from 606 to ~150 lines
 * Unified ``use_3d`` parameter (deprecated ``use_3d_tsne``)
 * Enhanced VLM prompting with metadata context
+* **Model Loading**: Improved device detection to support MPS alongside CUDA and CPU
+* **Platform Optimization**: Automatic dtype selection (float32 for MPS, bfloat16 for CUDA)
+* Added MPS detection test (`test_mps_detection.py`)
+
+Fixed
+~~~~~
+* Sequential layout for multi-visualization now ensures consistent sizing
+* Semantic names properly loaded from CC18 data
+* KNN connections now supported across all visualization types
 
 [1.0.0] - 2024-XX-XX
 ---------------------

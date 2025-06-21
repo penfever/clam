@@ -249,6 +249,66 @@ For limited memory environments:
    enable_multi_viz: false
    use_3d: false
 
+Hardware and Platform Configuration
+-----------------------------------
+
+Device Selection
+~~~~~~~~~~~~~~~~
+
+CLAM automatically detects the optimal device for your hardware:
+
+.. code-block:: yaml
+
+   # Automatic device detection (default)
+   device: "auto"  # Automatically selects MPS on Mac, CUDA on Linux/Windows, CPU otherwise
+   
+   # Explicit device selection
+   device: "mps"   # Force Metal Performance Shaders (Apple Silicon)
+   device: "cuda"  # Force CUDA (NVIDIA GPUs)  
+   device: "cpu"   # Force CPU-only execution
+
+Backend Selection
+~~~~~~~~~~~~~~~~~
+
+Choose between VLLM (fast) and transformers (compatible) backends:
+
+.. code-block:: yaml
+
+   # Backend configuration
+   backend: "auto"         # Automatically choose best backend
+   backend: "vllm"         # Force VLLM (CUDA only, fastest)
+   backend: "transformers" # Force transformers (MPS/CUDA/CPU compatible)
+
+Apple Silicon Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Optimized settings for M1/M2/M3/M4 Macs:
+
+.. code-block:: yaml
+
+   # Apple Silicon optimized
+   device: "mps"
+   backend: "transformers"  # VLLM doesn't support MPS
+   torch_dtype: "float32"   # MPS performs better with float32
+   low_cpu_mem_usage: true
+   
+   # Force transformers backend via environment
+   # export VLLM_AVAILABLE=false
+
+NVIDIA GPU Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Settings for CUDA-enabled GPUs:
+
+.. code-block:: yaml
+
+   # NVIDIA GPU optimized
+   device: "cuda"
+   backend: "vllm"  # Use VLLM for fastest inference
+   torch_dtype: "bfloat16"  # Better numerical stability than float16
+   tensor_parallel_size: 1  # Multi-GPU if available
+   gpu_memory_utilization: 0.9
+
 API Model Configurations
 ------------------------
 

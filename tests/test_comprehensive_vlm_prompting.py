@@ -44,7 +44,7 @@ class VLMPromptingTestSuite:
     """Comprehensive test suite for VLM prompting with various configurations."""
     
     def __init__(self, output_dir: str, dataset_id: int = 23, vlm_model: str = "Qwen/Qwen2-VL-2B-Instruct", 
-                 num_tests: int = 16, num_samples_per_test: int = 10):
+                 num_tests: int = 16, num_samples_per_test: int = 10, backend: str = "auto"):
         """
         Initialize the test suite.
         
@@ -54,12 +54,14 @@ class VLMPromptingTestSuite:
             vlm_model: VLM model to use (default: small Qwen model)
             num_tests: Number of test configurations to run (default: 16)
             num_samples_per_test: Number of test samples per configuration (default: 10)
+            backend: Backend to use for VLM inference (default: auto)
         """
         self.output_dir = Path(output_dir)
         self.dataset_id = dataset_id
         self.vlm_model = vlm_model
         self.num_tests = num_tests
         self.num_samples_per_test = num_samples_per_test
+        self.backend = backend
         
         # Create output directories with nested structure
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -545,7 +547,8 @@ class VLMPromptingTestSuite:
                 'use_semantic_names': config.get('use_semantic_names', False),
                 # VLM model parameters to avoid KV cache issues
                 'max_model_len': 16384,
-                'gpu_memory_utilization': 0.7  # Reduced to be safer
+                'gpu_memory_utilization': 0.7,  # Reduced to be safer
+                'backend': self.backend  # Use backend from command line
             }
             
             # Add single or multi-viz specific parameters
@@ -1006,6 +1009,9 @@ def main():
                        help="Number of test configurations to run (default: 16)")
     parser.add_argument("--num_samples_per_test", type=int, default=10,
                        help="Number of test samples to process per configuration (default: 10)")
+    parser.add_argument("--backend", type=str, default="auto",
+                       choices=["auto", "vllm", "transformers"],
+                       help="Backend to use for VLM inference (default: auto)")
     
     args = parser.parse_args()
     
@@ -1018,7 +1024,8 @@ def main():
         dataset_id=args.dataset_id,
         vlm_model=args.vlm_model,
         num_tests=args.num_tests,
-        num_samples_per_test=args.num_samples_per_test
+        num_samples_per_test=args.num_samples_per_test,
+        backend=args.backend
     )
     
     summary = test_suite.run_all_tests()

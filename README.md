@@ -92,6 +92,34 @@ classifier = ClamTsneClassifier(
 * **Vector Quantization**: Reduce memory footprint for large-scale datasets
 * **Evaluation Frameworks**: Comprehensive benchmarking on OpenML CC18 suite
 
+## 🖥️ Platform Support
+
+CLAM automatically detects and optimizes for your hardware:
+
+### Apple Silicon (M1/M2/M3/M4)
+* **Automatic MPS Detection**: Uses Metal Performance Shaders for GPU acceleration
+* **Transformers Backend**: Full MPS support for efficient inference
+* **Usage**: Set `export VLLM_AVAILABLE=false` to force transformers backend
+
+### NVIDIA GPUs
+* **VLLM Support**: Fastest inference with VLLM backend
+* **CUDA Optimization**: Automatic device selection and memory management
+* **Multi-GPU**: Support for tensor parallelism
+
+### CPU Fallback
+* **Universal Support**: Works on any system without GPU
+* **Optimized Settings**: Automatic configuration for CPU-only inference
+
+```python
+# Device is automatically detected
+classifier = ClamTsneClassifier(device="auto")  # Uses MPS on Mac, CUDA on Linux/Windows
+
+# Or specify explicitly
+classifier = ClamTsneClassifier(device="mps")   # Force MPS
+classifier = ClamTsneClassifier(device="cuda")  # Force CUDA
+classifier = ClamTsneClassifier(device="cpu")   # Force CPU
+```
+
 ## 🤝 Contributing
 
 We welcome contributions! Please see our contributing guidelines and:

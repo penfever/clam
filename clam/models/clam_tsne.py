@@ -368,7 +368,7 @@ class ClamTsneClassifier:
             
             if actual_device == "cuda" and torch.cuda.is_available():
                 vlm_kwargs.update({
-                    'torch_dtype': torch.float16,
+                    'torch_dtype': torch.bfloat16,
                     'device_map': "auto",
                     'low_cpu_mem_usage': True
                 })
