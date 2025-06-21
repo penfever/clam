@@ -1,0 +1,105 @@
+{
+  "test_config": {
+    "name": "tsne_semantic",
+    "enable_multi_viz": false,
+    "use_semantic_names": true,
+    "load_semantic_from_cc18": true,
+    "use_3d_tsne": false,
+    "use_knn_connections": false,
+    "tsne_perplexity": 15,
+    "semantic_class_names": [
+      "No-use",
+      "Long-term methods",
+      "Short-term methods"
+    ]
+  },
+  "ground_truth": [
+    2,
+    1,
+    1
+  ],
+  "prediction_details": [
+    {
+      "test_point_idx": 0,
+      "vlm_response": "Class: Long-term_methods | Reasoning: The red star (query point) is closest to the cluster of orange-colored points, which represent the \"Long-term_methods\" class. This spatial proximity suggests that the query point is more aligned with the characteristics of the \"Long-term_methods\" class.",
+      "parsed_prediction": "1",
+      "true_label": "2",
+      "tsne_coords": [
+        15.442367553710938,
+        -19.0411434173584
+      ],
+      "image_size": "782x590",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 1,
+      "vlm_response": "Class: Long-term_methods | Reasoning: The red star (query point) is positioned closer to the cluster of orange-colored points, which represent \"Long-term_methods\". This spatial proximity suggests that the query point is most likely associated with the \"Long-term_methods\" class.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        20.687606811523438,
+        -7.13749361038208
+      ],
+      "image_size": "782x590",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 2,
+      "vlm_response": "Class: Long-term_methods | Reasoning: The red star (query point) is positioned closer to the cluster of orange-colored points, which represent the \"Long-term_methods\" class. This spatial proximity suggests that the query point is most likely associated with the \"Long-term_methods\" class.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        25.20269775390625,
+        3.602067708969116
+      ],
+      "image_size": "782x590",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    }
+  ],
+  "completion_rate": 1.0,
+  "test_indices": [
+    34,
+    95,
+    111
+  ],
+  "metrics": {
+    "config_name": "tsne_semantic",
+    "accuracy": 0.6666666666666666,
+    "balanced_accuracy": 0.5,
+    "precision_macro": 0.3333333333333333,
+    "recall_macro": 0.5,
+    "f1_macro": 0.4,
+    "precision_micro": 0.6666666666666666,
+    "recall_micro": 0.6666666666666666,
+    "f1_micro": 0.6666666666666666,
+    "precision_weighted": 0.4444444444444444,
+    "recall_weighted": 0.6666666666666666,
+    "f1_weighted": 0.5333333333333333,
+    "confusion_matrix": [
+      [
+        2,
+        0
+      ],
+      [
+        1,
+        0
+      ]
+    ],
+    "completion_rate": 1.0,
+    "num_test_samples": 3,
+    "num_classes": 2,
+    "support": []
+  }
+}

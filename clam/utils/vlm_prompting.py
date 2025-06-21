@@ -531,6 +531,101 @@ Format your response as: "Value: [predicted_value] | Reasoning: [brief explanati
     return prompt
 
 
+def normalize_class_name(name: str) -> str:
+    """
+    Normalize a class name for fuzzy matching by converting to lowercase
+    and standardizing separators.
+    
+    Args:
+        name: Class name to normalize
+        
+    Returns:
+        Normalized class name
+    """
+    if not name:
+        return ""
+    
+    # Convert to lowercase and replace various separators with underscores
+    normalized = str(name).lower()
+    # Replace spaces, hyphens, dots, and multiple underscores with single underscore
+    import re
+    normalized = re.sub(r'[\s\-\.]+', '_', normalized)
+    normalized = re.sub(r'_+', '_', normalized)
+    # Remove leading/trailing underscores
+    normalized = normalized.strip('_')
+    
+    return normalized
+
+
+def find_best_class_match(class_part: str, unique_classes: List, logger_instance: logging.Logger) -> Any:
+    """
+    Find the best matching class using various fuzzy matching strategies.
+    
+    Args:
+        class_part: Extracted class part from VLM response
+        unique_classes: List of valid class labels
+        logger_instance: Logger for debugging
+        
+    Returns:
+        Best matching class or None if no good match found
+    """
+    if not class_part or not unique_classes:
+        return None
+    
+    class_part_clean = class_part.strip('"\'').strip()
+    class_part_lower = class_part_clean.lower()
+    class_part_norm = normalize_class_name(class_part_clean)
+    
+    logger_instance.debug(f"Finding match for: '{class_part_clean}' (normalized: '{class_part_norm}')")
+    
+    # Strategy 1: Exact match (case-insensitive)
+    for cls in unique_classes:
+        if str(cls).lower() == class_part_lower:
+            logger_instance.debug(f"Exact match: '{class_part_clean}' -> {cls}")
+            return cls
+    
+    # Strategy 2: Normalized match (handles spaces/underscores/hyphens)
+    for cls in unique_classes:
+        cls_norm = normalize_class_name(str(cls))
+        if cls_norm == class_part_norm and cls_norm:  # Ensure not empty
+            logger_instance.debug(f"Normalized match: '{class_part_clean}' -> {cls} (both normalize to '{cls_norm}')")
+            return cls
+    
+    # Strategy 3: Partial match - class name appears at start of response part
+    for cls in unique_classes:
+        cls_str = str(cls).lower()
+        if class_part_lower.startswith(cls_str) and len(cls_str) > 2:  # Avoid very short matches
+            logger_instance.debug(f"Partial match (starts with): '{class_part_clean}' -> {cls}")
+            return cls
+    
+    # Strategy 4: Partial match - normalized version starts with class name
+    for cls in unique_classes:
+        cls_norm = normalize_class_name(str(cls))
+        if class_part_norm.startswith(cls_norm) and len(cls_norm) > 2:  # Avoid very short matches
+            logger_instance.debug(f"Partial normalized match: '{class_part_clean}' -> {cls}")
+            return cls
+    
+    # Strategy 5: Substring match with word boundaries (more strict)
+    import re
+    for cls in unique_classes:
+        cls_str = str(cls).lower()
+        # Create pattern that matches whole words and handles common separators
+        pattern = r'\b' + re.escape(cls_str).replace(r'\ ', r'[\s_\-]*').replace(r'\-', r'[\s_\-]*') + r'\b'
+        if re.search(pattern, class_part_lower):
+            logger_instance.debug(f"Word boundary match: '{class_part_clean}' -> {cls}")
+            return cls
+    
+    # Strategy 6: Flexible substring matching for complex class names
+    for cls in unique_classes:
+        cls_norm = normalize_class_name(str(cls))
+        if cls_norm in class_part_norm and len(cls_norm) > 3:  # Avoid very short matches
+            logger_instance.debug(f"Substring normalized match: '{class_part_clean}' -> {cls}")
+            return cls
+    
+    logger_instance.debug(f"No match found for: '{class_part_clean}'")
+    return None
+
+
 def parse_vlm_response(response: str, unique_classes: List = None, logger_instance: Optional[logging.Logger] = None, use_semantic_names: bool = False, task_type: str = "classification", target_stats: Optional[Dict] = None) -> Any:
     """
     Parse VLM response to extract the predicted class or value.
@@ -616,6 +711,8 @@ def parse_vlm_response(response: str, unique_classes: List = None, logger_instan
                 logger_instance.warning(f"Could not parse value from response: '{response}'. Using fallback: 0.0")
                 return 0.0
     
+    # Classification parsing starts here
+    
     # Try to parse structured response format first
     if "class:" in response_lower:
         try:
@@ -651,20 +748,11 @@ def parse_vlm_response(response: str, unique_classes: List = None, logger_instan
                         except (ValueError, IndexError):
                             pass
                 
-                # Try to match with available classes (semantic names or direct)
+                # Try to match with available classes using improved fuzzy matching
                 if use_semantic_names:
-                    # First try exact match
-                    for cls in unique_classes:
-                        if str(cls).lower() == class_part.lower():
-                            logger_instance.debug(f"Parsed structured response: '{class_part}' -> {cls}")
-                            return cls
-                    
-                    # Then try partial match (class name appears at start of response)
-                    for cls in unique_classes:
-                        cls_str = str(cls).lower()
-                        if class_part.lower().startswith(cls_str):
-                            logger_instance.debug(f"Parsed partial match: '{class_part}' -> {cls}")
-                            return cls
+                    best_match = find_best_class_match(class_part, unique_classes, logger_instance)
+                    if best_match is not None:
+                        return best_match
                         
         except Exception as e:
             logger_instance.warning(f"Error parsing structured response: {e}")
@@ -690,16 +778,36 @@ def parse_vlm_response(response: str, unique_classes: List = None, logger_instan
                 except (ValueError, IndexError):
                     continue
     
-    # Fallback: Look for any class name in the response (for semantic names)
+    # Fallback: Look for any class name in the response using improved fuzzy matching
     if use_semantic_names:
+        # Try to find any class name mentioned anywhere in the response
+        response_norm = normalize_class_name(response)
+        logger_instance.debug(f"Searching for class names in full response (normalized: '{response_norm}')")
+        
+        # First try whole word matches
+        import re
         for cls in unique_classes:
             cls_str = str(cls).lower()
-            if cls_str in response_lower:
-                # Check if it's a whole word match (not part of another word)
-                import re
-                if re.search(r'\b' + re.escape(cls_str) + r'\b', response_lower):
-                    logger_instance.debug(f"Found class in response: '{cls_str}' -> {cls}")
-                    return cls
+            # Check if it's a whole word match (not part of another word)
+            if re.search(r'\b' + re.escape(cls_str) + r'\b', response_lower):
+                logger_instance.debug(f"Found class in response (whole word): '{cls_str}' -> {cls}")
+                return cls
+        
+        # Then try normalized substring matching
+        for cls in unique_classes:
+            cls_norm = normalize_class_name(str(cls))
+            if cls_norm and cls_norm in response_norm and len(cls_norm) > 2:  # Avoid very short matches
+                logger_instance.debug(f"Found class in response (normalized): '{cls_norm}' -> {cls}")
+                return cls
+        
+        # Finally try flexible pattern matching
+        for cls in unique_classes:
+            cls_str = str(cls).lower()
+            # Create flexible pattern that handles common variations
+            flexible_pattern = re.escape(cls_str).replace(r'\ ', r'[\s_\-]*').replace(r'\-', r'[\s_\-]*')
+            if re.search(flexible_pattern, response_lower):
+                logger_instance.debug(f"Found class in response (flexible): '{cls_str}' -> {cls}")
+                return cls
     
     # Final fallback: Return appropriate default based on naming convention
     if use_semantic_names:
