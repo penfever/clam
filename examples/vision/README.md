@@ -177,7 +177,7 @@ python examples/vision/evaluate_all_vision.py \
     --datasets cifar10 \
     --models clam_tsne \
     --use_knn_connections \
-    --knn_k 10 \
+    --nn_k 10 \
     --output_dir ./knn_results
 ```
 
@@ -199,7 +199,7 @@ python examples/vision/evaluate_all_vision.py \
     --models clam_tsne \
     --use_3d_tsne \
     --use_knn_connections \
-    --knn_k 20 \
+    --nn_k 20 \
     --zoom_factor 7.0 \
     --use_semantic_names \
     --output_dir ./full_features_results

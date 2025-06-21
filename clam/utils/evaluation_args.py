@@ -491,7 +491,7 @@ def add_tsne_visualization_args(parser: argparse.ArgumentParser):
         help="Show KNN connections in t-SNE visualization"
     )
     parser.add_argument(
-        "--knn_k",
+        "--nn_k",
         type=int,
         default=5,
         help="Number of nearest neighbors for KNN connections/analysis"

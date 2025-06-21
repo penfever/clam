@@ -39,10 +39,10 @@ Usage examples:
     python evaluate_llm_baselines.py --dataset_name har --models clam_tsne --use_3d_tsne --viewing_angles "20,45;0,0;90,0" --output_dir ./results
     
     # Using KNN connections to show nearest neighbors in embedding space
-    python evaluate_llm_baselines.py --dataset_name adult --models clam_tsne --use_knn_connections --knn_k 7 --output_dir ./results
+    python evaluate_llm_baselines.py --dataset_name adult --models clam_tsne --use_knn_connections --nn_k 7 --output_dir ./results
     
     # Combining 3D t-SNE with KNN connections for maximum information
-    python evaluate_llm_baselines.py --dataset_name diabetes --models clam_tsne --use_3d_tsne --use_knn_connections --knn_k 5 --output_dir ./results
+    python evaluate_llm_baselines.py --dataset_name diabetes --models clam_tsne --use_3d_tsne --use_knn_connections --nn_k 5 --output_dir ./results
     
     # Customizing image size and DPI for VLM compatibility
     python evaluate_llm_baselines.py --dataset_name adult --models clam_tsne --max_vlm_image_size 1024 --image_dpi 72 --output_dir ./results
@@ -252,7 +252,7 @@ def parse_args_old():
         help="Show KNN connections from query point to nearest neighbors in embedding space (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
-        "--knn_k",
+        "--nn_k",
         type=int,
         default=5,
         help="Number of nearest neighbors to show when using KNN connections (CLAM-T-SNe baseline)"

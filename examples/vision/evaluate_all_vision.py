@@ -16,7 +16,7 @@ Examples:
     python evaluate_all_vision.py --dataset custom --dataset_path /path/to/data --num_classes 10
     
     # Test with 3D visualizations and KNN connections
-    python evaluate_all_vision.py --dataset cifar10 --use_3d_tsne --use_knn_connections --knn_k 10
+    python evaluate_all_vision.py --dataset cifar10 --use_3d_tsne --use_knn_connections --nn_k 10
 """
 
 import argparse
@@ -450,7 +450,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
         if args.use_3d_tsne:
             features.append("3D")
         if args.use_knn_connections:
-            features.append(f"KNN-{args.knn_k}")
+            features.append(f"KNN-{args.nn_k}")
         feature_str = f" ({', '.join(features)})" if features else ""
         
         # Validate feature combinations
@@ -467,7 +467,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
                 vlm_model_id="Qwen/Qwen2.5-VL-3B-Instruct",
                 use_3d_tsne=args.use_3d_tsne,
                 use_knn_connections=args.use_knn_connections,
-                knn_k=args.knn_k,
+                knn_k=args.nn_k,
                 max_vlm_image_size=1024,
                 zoom_factor=args.zoom_factor,
                 use_pca_backend=args.use_pca_backend,
@@ -790,7 +790,7 @@ def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names:
         metrics.update({
             f"{model_name}/use_3d_tsne": config.get('use_3d_tsne', False),
             f"{model_name}/use_knn_connections": config.get('use_knn_connections', False),
-            f"{model_name}/knn_k": config.get('knn_k', 0),
+            f"{model_name}/nn_k": config.get('nn_k', 0),
             f"{model_name}/use_pca_backend": config.get('use_pca_backend', False),
             f"{model_name}/zoom_factor": config.get('zoom_factor', 1.0),
             f"{model_name}/max_train_plot_samples": config.get('max_train_plot_samples', 0),
@@ -1009,7 +1009,7 @@ def parse_args_old():
         help="Show KNN connections from query point to nearest neighbors"
     )
     tsne_group.add_argument(
-        "--knn_k",
+        "--nn_k",
         type=int,
         default=5,
         help="Number of nearest neighbors for KNN connections"
@@ -1133,7 +1133,7 @@ def run_all_image_tests(args):
                     if args.use_3d_tsne:
                         feature_suffix += "_3d"
                     if args.use_knn_connections:
-                        feature_suffix += f"_knn{args.knn_k}"
+                        feature_suffix += f"_knn{args.nn_k}"
                     if args.use_pca_backend:
                         feature_suffix += "_pca"
                     run_name = f"{dataset_name}_clam_{timestamp}{feature_suffix}"
@@ -1191,7 +1191,7 @@ def main():
     logger.info(f"  3D t-SNE: {getattr(args, 'use_3d_tsne', False)}")
     logger.info(f"  KNN connections: {getattr(args, 'use_knn_connections', False)}")
     if getattr(args, 'use_knn_connections', False):
-        logger.info(f"  KNN k: {getattr(args, 'knn_k', 5)}")
+        logger.info(f"  KNN k: {getattr(args, 'nn_k', 5)}")
     
     # Run tests on all datasets
     all_results = run_all_image_tests(args)

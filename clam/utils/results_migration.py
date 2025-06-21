@@ -411,7 +411,7 @@ def create_migration_adapters():
         if args:
             results['use_3d_tsne'] = getattr(args, 'use_3d_tsne', False)
             results['use_knn_connections'] = getattr(args, 'use_knn_connections', False)
-            results['knn_k'] = getattr(args, 'knn_k', 5)
+            results['knn_k'] = getattr(args, 'nn_k', 5)
             results['use_pca_backend'] = getattr(args, 'use_pca_backend', False)
             results['dinov2_model'] = getattr(args, 'dinov2_model', None)
             results['seed'] = getattr(args, 'seed', None)

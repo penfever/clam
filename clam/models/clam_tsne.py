@@ -1424,7 +1424,7 @@ def evaluate_clam_tsne(dataset, args):
             tsne_n_iter=getattr(args, 'tsne_n_iter', 1000),
             use_3d=getattr(args, 'use_3d', False),
             use_knn_connections=getattr(args, 'use_knn_connections', False),
-            knn_k=getattr(args, 'knn_k', 5),
+            knn_k=getattr(args, 'nn_k', 5),
             max_vlm_image_size=getattr(args, 'max_vlm_image_size', 2048),
             image_dpi=getattr(args, 'image_dpi', 100),
             force_rgb_mode=getattr(args, 'force_rgb_mode', True),

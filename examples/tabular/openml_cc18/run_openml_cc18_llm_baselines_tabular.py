@@ -22,7 +22,7 @@ Usage:
     
     # Run only CLAM-T-SNe with 3D t-SNE and KNN connections
     python run_openml_cc18_llm_baselines.py --clam_repo_path /path/to/clam --output_dir ./results \
-        --models clam_tsne --use_3d_tsne --use_knn_connections --knn_k 7
+        --models clam_tsne --use_3d_tsne --use_knn_connections --nn_k 7
     
     # Run with custom image settings
     python run_openml_cc18_llm_baselines.py --clam_repo_path /path/to/clam --output_dir ./results \
@@ -261,7 +261,7 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
         "--tsne_perplexity", str(args.tsne_perplexity),
         "--tsne_n_iter", str(args.tsne_n_iter),
         "--max_tabpfn_samples", str(args.max_tabpfn_samples),
-        "--knn_k", str(args.knn_k),
+        "--nn_k", str(args.nn_k),
         "--max_vlm_image_size", str(args.max_vlm_image_size),
         "--image_dpi", str(args.image_dpi),
     ])
@@ -373,7 +373,7 @@ def process_task(task, args):
                     "use_3d_tsne": args.use_3d_tsne,
                     "viewing_angles": args.viewing_angles,
                     "use_knn_connections": args.use_knn_connections,
-                    "knn_k": args.knn_k,
+                    "nn_k": args.nn_k,
                     "max_vlm_image_size": args.max_vlm_image_size,
                     "image_dpi": args.image_dpi,
                     "force_rgb_mode": args.force_rgb_mode,

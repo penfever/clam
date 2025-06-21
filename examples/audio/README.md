@@ -83,7 +83,7 @@ python examples/audio/test_ravdess.py --k_shot 10 --whisper_model large-v2
   - Example: `--k_shot 5` uses 5 training samples per class
   - For ESC-50 (50 classes): k_shot=5 → 250 total training samples
   - For RAVDESS (8 emotions): k_shot=5 → 40 total training samples
-  - **Note**: This is different from `--knn_k` which controls visualization connections
+  - **Note**: This is different from `--nn_k` which controls visualization connections
 
 ## Example Output
 
@@ -384,7 +384,7 @@ python test_esc50.py --k_shot 10
 
 ---
 
-### `--knn_k` (Visualization Connections)
+### `--nn_k` (Visualization Connections)
 
 **What it controls**: Number of nearest neighbors to show in t-SNE visualizations
 
@@ -396,15 +396,15 @@ python test_esc50.py --k_shot 10
 **Examples**:
 ```bash
 # Show connections to 5 nearest neighbors
-python test_esc50.py --use_knn_connections --knn_k 5
+python test_esc50.py --use_knn_connections --nn_k 5
 
 # Show connections to 10 nearest neighbors  
-python test_esc50.py --use_knn_connections --knn_k 10
+python test_esc50.py --use_knn_connections --nn_k 10
 ```
 
 **Effect on Visualization**:
-- Higher knn_k → More connections shown → Busier visualization
-- Lower knn_k → Fewer connections → Cleaner visualization
+- Higher nn_k → More connections shown → Busier visualization
+- Lower nn_k → Fewer connections → Cleaner visualization
 
 ---
 
@@ -446,7 +446,7 @@ python test_esc50.py --k_shot 10 --whisper_model large-v2
 
 ### Scenario 3: Visualization Focus
 ```bash
-python test_esc50.py --k_shot 5 --use_knn_connections --knn_k 3 --use_3d_tsne
+python test_esc50.py --k_shot 5 --use_knn_connections --nn_k 3 --use_3d_tsne
 # - 5 training samples per class
 # - Show 3 nearest neighbor connections
 # - 3D t-SNE visualization
@@ -473,21 +473,21 @@ python test_esc50.py --k_shot 5 --use_knn_connections --knn_k 3 --use_3d_tsne
 
 ### ❌ Wrong Understanding
 - "k_shot controls KNN classification"
-- "knn_k affects training data size"
-- "k_shot and knn_k should be the same"
+- "nn_k affects training data size"
+- "k_shot and nn_k should be the same"
 
 ### ✅ Correct Understanding  
 - `k_shot` controls training data: how many samples per class to learn from
-- `knn_k` controls visualization: how many connections to draw in plots
+- `nn_k` controls visualization: how many connections to draw in plots
 - These are independent parameters for different purposes
 
 ### Example Clarification
 ```bash
-python test_esc50.py --k_shot 5 --use_knn_connections --knn_k 10
+python test_esc50.py --k_shot 5 --use_knn_connections --nn_k 10
 ```
 This means:
 - Train on 5 samples per class (k_shot=5)
-- Show 10 nearest neighbor connections in visualizations (knn_k=10)
+- Show 10 nearest neighbor connections in visualizations (nn_k=10)
 - The classifier is not using KNN - it's using VLM on t-SNE plots
 
 # Audio Visualization Saving Update
@@ -558,7 +558,7 @@ python test_esc50.py \
   --k_shot 4 \
   --zoom_factor 8.0 \
   --use_knn_connections \
-  --knn_k 30 \
+  --nn_k 30 \
   --save_every_n 10 \
   --use_wandb
 ```
@@ -607,7 +607,7 @@ When `return_detailed=True`, includes:
     "use_pca_backend": false,
     "use_3d_tsne": false,
     "use_knn_connections": true,
-    "knn_k": 30,
+    "nn_k": 30,
     "zoom_factor": 8.0,
     "max_train_plot_samples": 500,
     "whisper_model": "large-v2",

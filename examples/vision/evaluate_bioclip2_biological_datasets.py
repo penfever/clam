@@ -995,7 +995,7 @@ def test_single_dataset(dataset_name: str, args):
                 vlm_model_id=args.vlm_model_id,
                 use_3d_tsne=args.use_3d_tsne,
                 use_knn_connections=args.use_knn_connections,
-                knn_k=args.knn_k,
+                knn_k=args.nn_k,
                 max_vlm_image_size=1024,
                 zoom_factor=args.zoom_factor,
                 use_pca_backend=args.use_pca_backend,
@@ -1063,7 +1063,7 @@ def run_all_biological_tests(args):
                     if args.use_3d_tsne:
                         feature_suffix += "_3d"
                     if args.use_knn_connections:
-                        feature_suffix += f"_knn{args.knn_k}"
+                        feature_suffix += f"_knn{args.nn_k}"
                     if args.use_pca_backend:
                         feature_suffix += "_pca"
                     run_name = f"{dataset_name}_bioclip2_{timestamp}{feature_suffix}"
@@ -1309,7 +1309,7 @@ def parse_args():
         help="Show KNN connections from query point to nearest neighbors in embedding space (clam_tsne only)"
     )
     parser.add_argument(
-        "--knn_k",
+        "--nn_k",
         type=int,
         default=5,
         help="Number of nearest neighbors to show when using KNN connections (default: 5)"
@@ -1381,7 +1381,7 @@ def main():
     logger.info(f"  3D t-SNE: {getattr(args, 'use_3d_tsne', False)}")
     logger.info(f"  KNN connections: {getattr(args, 'use_knn_connections', False)}")
     if getattr(args, 'use_knn_connections', False):
-        logger.info(f"  KNN k: {getattr(args, 'knn_k', 5)}")
+        logger.info(f"  KNN k: {getattr(args, 'nn_k', 5)}")
     
     # Run tests on all datasets
     all_results = run_all_biological_tests(args)

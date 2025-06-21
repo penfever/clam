@@ -102,7 +102,7 @@ def test_dataset(dataset_class, dataset_name, data_dir, args, use_wandb_logging=
             if args.use_3d_tsne:
                 features.append("3D")
             if args.use_knn_connections:
-                features.append(f"KNN-{args.knn_k}")
+                features.append(f"KNN-{args.nn_k}")
             feature_str = f" ({', '.join(features)})" if features else ""
             
             logger.info(f"Testing CLAM {backend_name}{feature_str} ({args.embedding_model.upper()} → {backend_name} → VLM)...")
@@ -118,7 +118,7 @@ def test_dataset(dataset_class, dataset_name, data_dir, args, use_wandb_logging=
                     vlm_model_id="Qwen/Qwen2.5-VL-3B-Instruct",
                     use_3d_tsne=args.use_3d_tsne,
                     use_knn_connections=args.use_knn_connections,
-                    knn_k=args.knn_k,
+                    knn_k=args.nn_k,
                     max_vlm_image_size=1024,
                     zoom_factor=args.zoom_factor,
                     use_pca_backend=args.use_pca_backend,
@@ -353,7 +353,7 @@ def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names:
             f"{model_name}/clap_version": config.get('clap_version', 'unknown'),
             f"{model_name}/use_3d_tsne": config.get('use_3d_tsne', False),
             f"{model_name}/use_knn_connections": config.get('use_knn_connections', False),
-            f"{model_name}/knn_k": config.get('knn_k', 0),
+            f"{model_name}/nn_k": config.get('nn_k', 0),
             f"{model_name}/use_pca_backend": config.get('use_pca_backend', False),
             f"{model_name}/include_spectrogram": config.get('include_spectrogram', False),
             f"{model_name}/audio_duration": config.get('audio_duration', None),
@@ -668,7 +668,7 @@ def parse_args_old_implementation():
         help="Show KNN connections from query point to nearest neighbors"
     )
     parser.add_argument(
-        "--knn_k",
+        "--nn_k",
         type=int,
         default=5,
         help="Number of nearest neighbors to show when using KNN connections"
@@ -774,7 +774,7 @@ def main():
                 if args.use_3d_tsne:
                     feature_suffix += "_3d"
                 if args.use_knn_connections:
-                    feature_suffix += f"_knn{args.knn_k}"
+                    feature_suffix += f"_knn{args.nn_k}"
                 if args.use_pca_backend:
                     feature_suffix += "_pca"
                 args.wandb_name = f"audio_clam_{timestamp}{feature_suffix}"
