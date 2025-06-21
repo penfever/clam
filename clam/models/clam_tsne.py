@@ -512,7 +512,7 @@ class ClamTsneClassifier:
                 
                 # Try to detect from dataset_info if available
                 if dataset_info and isinstance(dataset_info, dict):
-                    dataset_id = dataset_info.get('dataset_id') or dataset_info.get('openml_id') or dataset_info.get('task_id')
+                    dataset_id = dataset_info.get('dataset_id') or dataset_info.get('task_id')
                     self.logger.info(f"Trying to load metadata for dataset_id: {dataset_id} from dataset_info: {dataset_info}")
                 
                 # Try to load metadata using detected ID

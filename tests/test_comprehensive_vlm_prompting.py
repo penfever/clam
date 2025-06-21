@@ -287,12 +287,11 @@ class VLMPromptingTestSuite:
                 feature_names = list(dataset.data.columns)
             
             dataset_info = {
-                'name': dataset.DESCR if hasattr(dataset, 'DESCR') else f'OpenML_{self.task_id}',
+                'name': dataset.DESCR if hasattr(dataset, 'DESCR') else f'OpenML_Task_{self.task_id}',
                 'n_samples': len(X),
                 'n_features': X.shape[1],
                 'n_classes': len(np.unique(y)),
-                'openml_id': self.task_id,
-                'task_id': self.task_id,  # Add task_id for metadata loading
+                'task_id': self.task_id,  # OpenML task ID for metadata loading
                 'data_source': 'openml',
                 'feature_names': feature_names
             }
@@ -313,7 +312,6 @@ class VLMPromptingTestSuite:
                 'n_samples': len(X),
                 'n_features': X.shape[1], 
                 'n_classes': len(np.unique(y)),
-                'openml_id': None,
                 'task_id': None,
                 'data_source': 'synthetic',
                 'feature_names': [f'feature_{i}' for i in range(X.shape[1])]
