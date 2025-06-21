@@ -536,7 +536,7 @@ class VLMPromptingTestSuite:
                 'seed': 42,
                 'max_vlm_image_size': 1024,  # Reduced for speed
                 'image_dpi': config.get('image_dpi', 100),
-                'tsne_zoom_factor': config.get('tsne_zoom_factor', 2.0),
+                'zoom_factor': config.get('zoom_factor', config.get('tsne_zoom_factor', 2.0)),  # Backward compatibility
                 'use_semantic_names': config.get('use_semantic_names', False),
                 # VLM model parameters to avoid KV cache issues
                 'max_model_len': 16384,

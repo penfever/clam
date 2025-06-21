@@ -78,7 +78,7 @@ class ClamTsneClassifier:
         max_vlm_image_size: int = 2048,
         image_dpi: int = 100,
         force_rgb_mode: bool = True,
-        tsne_zoom_factor: float = 2.0,
+        zoom_factor: float = 2.0,
         max_tabpfn_samples: int = 3000,
         cache_dir: Optional[str] = None,
         use_semantic_names: bool = False,
@@ -133,7 +133,7 @@ class ClamTsneClassifier:
             max_vlm_image_size: Maximum image size for VLM
             image_dpi: DPI for generated images
             force_rgb_mode: Whether to force RGB mode for images
-            tsne_zoom_factor: Zoom factor for t-SNE plots
+            zoom_factor: Zoom factor for all visualizations
             max_tabpfn_samples: Maximum samples for TabPFN (tabular only)
             cache_dir: Directory for caching embeddings
             use_semantic_names: Whether to use semantic class names
@@ -187,7 +187,7 @@ class ClamTsneClassifier:
         self.max_vlm_image_size = max_vlm_image_size
         self.image_dpi = image_dpi
         self.force_rgb_mode = force_rgb_mode
-        self.tsne_zoom_factor = tsne_zoom_factor
+        self.zoom_factor = zoom_factor
         self.max_tabpfn_samples = max_tabpfn_samples
         self.cache_dir = cache_dir
         self.use_semantic_names = use_semantic_names
@@ -309,13 +309,19 @@ class ClamTsneClassifier:
     
     def _get_tsne_visualization_methods(self):
         """Get t-SNE visualization methods."""
-        from clam.data.tsne_visualization import (
+        from clam.viz.tsne_functions import (
             create_tsne_visualization,
             create_tsne_3d_visualization,
             create_combined_tsne_plot,
             create_combined_tsne_3d_plot,
             create_tsne_plot_with_knn,
-            create_tsne_3d_plot_with_knn
+            create_tsne_3d_plot_with_knn,
+            create_regression_tsne_visualization,
+            create_regression_tsne_3d_visualization,
+            create_combined_regression_tsne_plot,
+            create_combined_regression_tsne_3d_plot,
+            create_regression_tsne_plot_with_knn,
+            create_regression_tsne_3d_plot_with_knn
         )
         return {
             'create_tsne_visualization': create_tsne_visualization,
@@ -323,7 +329,13 @@ class ClamTsneClassifier:
             'create_combined_tsne_plot': create_combined_tsne_plot,
             'create_combined_tsne_3d_plot': create_combined_tsne_3d_plot,
             'create_tsne_plot_with_knn': create_tsne_plot_with_knn,
-            'create_tsne_3d_plot_with_knn': create_tsne_3d_plot_with_knn
+            'create_tsne_3d_plot_with_knn': create_tsne_3d_plot_with_knn,
+            'create_regression_tsne_visualization': create_regression_tsne_visualization,
+            'create_regression_tsne_3d_visualization': create_regression_tsne_3d_visualization,
+            'create_combined_regression_tsne_plot': create_combined_regression_tsne_plot,
+            'create_combined_regression_tsne_3d_plot': create_combined_regression_tsne_3d_plot,
+            'create_regression_tsne_plot_with_knn': create_regression_tsne_plot_with_knn,
+            'create_regression_tsne_3d_plot_with_knn': create_regression_tsne_3d_plot_with_knn
         }
     
     def _load_vlm(self):
@@ -875,10 +887,11 @@ class ClamTsneClassifier:
                             })
                         
                         # Generate enhanced multi-viz regression prompt
+                        highlight_count = len(highlight_indices) if highlight_indices is not None else 0
                         prompt = create_regression_prompt(
                             target_stats=self.target_stats,
                             modality=self.modality,
-                            dataset_description=f"{self.modality.title()} data with {len(highlight_indices)} highlighted test point(s)",
+                            dataset_description=f"{self.modality.title()} data with {highlight_count} highlighted test point(s)",
                             multi_viz_info=multi_viz_info,
                             dataset_metadata=self._get_metadata_for_prompt()
                         )
@@ -907,10 +920,12 @@ class ClamTsneClassifier:
                             })
                         
                         # Generate enhanced multi-viz classification prompt
+                        class_count = len(self.unique_classes) if self.unique_classes is not None else 0
+                        highlight_count = len(highlight_indices) if highlight_indices is not None else 0
                         prompt = create_classification_prompt(
                             class_names=visible_semantic_names,
                             modality=self.modality,
-                            dataset_description=f"{self.modality.title()} data with {len(self.unique_classes)} classes and {len(highlight_indices)} highlighted test point(s)",
+                            dataset_description=f"{self.modality.title()} data with {class_count} classes and {highlight_count} highlighted test point(s)",
                             use_semantic_names=True,
                             multi_viz_info=multi_viz_info,
                             dataset_metadata=self._get_metadata_for_prompt()
@@ -933,7 +948,7 @@ class ClamTsneClassifier:
                                 k=self.knn_k,
                                 figsize=(12, 9),
                                 viewing_angles=viewing_angles,
-                                zoom_factor=self.tsne_zoom_factor
+                                zoom_factor=self.zoom_factor
                             )
                             else:
                                 fig, legend_text, metadata = viz_methods['create_regression_tsne_plot_with_knn'](
@@ -942,7 +957,7 @@ class ClamTsneClassifier:
                                 highlight_test_idx=i,
                                 k=self.knn_k,
                                 figsize=(10, 8),
-                                zoom_factor=self.tsne_zoom_factor
+                                zoom_factor=self.zoom_factor
                             )
                         else:
                             # Create standard regression visualization
@@ -952,14 +967,14 @@ class ClamTsneClassifier:
                                 highlight_test_idx=i,
                                 figsize=(12, 9),
                                 viewing_angles=viewing_angles,
-                                zoom_factor=self.tsne_zoom_factor
+                                zoom_factor=self.zoom_factor
                             )
                             else:
                                 fig, legend_text, metadata = viz_methods['create_combined_regression_tsne_plot'](
                                 self.train_tsne, self.test_tsne, self.y_train_sample,
                                 highlight_test_idx=i,
                                 figsize=(8, 6),
-                                zoom_factor=self.tsne_zoom_factor
+                                zoom_factor=self.zoom_factor
                             )
                     else:
                         # Use classification visualization methods
@@ -973,7 +988,7 @@ class ClamTsneClassifier:
                                 k=self.knn_k,
                                 figsize=(12, 9),
                                 viewing_angles=viewing_angles,
-                                zoom_factor=self.tsne_zoom_factor
+                                zoom_factor=self.zoom_factor
                             )
                             else:
                                 fig, legend_text, metadata = viz_methods['create_tsne_plot_with_knn'](
@@ -982,7 +997,7 @@ class ClamTsneClassifier:
                                 highlight_test_idx=i,
                                 k=self.knn_k,
                                 figsize=(10, 8),
-                                zoom_factor=self.tsne_zoom_factor
+                                zoom_factor=self.zoom_factor
                             )
                         else:
                             # Create standard visualization
@@ -992,14 +1007,14 @@ class ClamTsneClassifier:
                                 highlight_test_idx=i,
                                 figsize=(12, 9),
                                 viewing_angles=viewing_angles,
-                                zoom_factor=self.tsne_zoom_factor
+                                zoom_factor=self.zoom_factor
                             )
                             else:
                                 fig, legend_text, metadata = viz_methods['create_combined_tsne_plot'](
                                 self.train_tsne, self.test_tsne, self.y_train_sample,
                                 highlight_test_idx=i,
                                 figsize=(8, 6),
-                                zoom_factor=self.tsne_zoom_factor
+                                zoom_factor=self.zoom_factor
                             )
                 
                 # Convert plot to image (only for legacy single visualization)
@@ -1223,7 +1238,11 @@ class ClamTsneClassifier:
             except Exception as e:
                 self.logger.error(f"VLM prediction failed for test point {i}: {e}")
                 # Use random prediction as fallback
-                prediction = np.random.choice(self.unique_classes)
+                if self.unique_classes is not None and len(self.unique_classes) > 0:
+                    prediction = np.random.choice(self.unique_classes)
+                else:
+                    # For regression or when classes are not available, use a default value
+                    prediction = 0 if self.task_type == 'regression' else 0
                 predictions.append(prediction)
                 completed_samples = i + 1
         
@@ -1305,7 +1324,7 @@ class ClamTsneClassifier:
             'num_test_samples': len(X_test) if hasattr(X_test, '__len__') else len(self.test_tsne),
             'completed_samples': completed_samples,
             'completion_rate': detailed_results['completion_rate'],
-            'num_classes': len(self.unique_classes),
+            'num_classes': len(self.unique_classes) if self.unique_classes is not None else 0,
             'predictions': predictions_converted if 'predictions_converted' in locals() else predictions,
             'ground_truth': (y_test[:completed_samples].tolist() if hasattr(y_test[:completed_samples], 'tolist')
                            else list(y_test)[:completed_samples]) if completed_samples > 0 else [],
@@ -1341,7 +1360,7 @@ class ClamTsneClassifier:
             'max_vlm_image_size': self.max_vlm_image_size,
             'image_dpi': self.image_dpi,
             'force_rgb_mode': self.force_rgb_mode,
-            'tsne_zoom_factor': self.tsne_zoom_factor,
+            'zoom_factor': self.zoom_factor,
             'max_tabpfn_samples': self.max_tabpfn_samples,
             'use_semantic_names': self.use_semantic_names,
             'device': self.device,
@@ -1403,7 +1422,7 @@ def evaluate_clam_tsne(dataset, args):
             max_vlm_image_size=getattr(args, 'max_vlm_image_size', 2048),
             image_dpi=getattr(args, 'image_dpi', 100),
             force_rgb_mode=getattr(args, 'force_rgb_mode', True),
-            tsne_zoom_factor=getattr(args, 'tsne_zoom_factor', 2.0),
+            zoom_factor=getattr(args, 'zoom_factor', getattr(args, 'tsne_zoom_factor', 2.0)),  # Backward compatibility
             max_tabpfn_samples=getattr(args, 'max_tabpfn_samples', 3000),
             cache_dir=getattr(args, 'cache_dir', None),
             use_semantic_names=getattr(args, 'use_semantic_names', False),

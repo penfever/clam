@@ -14,7 +14,7 @@ from PIL import Image
 import logging
 
 # Import JSON serialization utility
-from .json_utils import convert_for_json_serialization
+from ...utils.json_utils import convert_for_json_serialization
 
 logger = logging.getLogger(__name__)
 

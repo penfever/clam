@@ -120,7 +120,7 @@ def test_dataset(dataset_class, dataset_name, data_dir, args, use_wandb_logging=
                     use_knn_connections=args.use_knn_connections,
                     knn_k=args.knn_k,
                     max_vlm_image_size=1024,
-                    tsne_zoom_factor=args.tsne_zoom_factor,
+                    zoom_factor=args.zoom_factor,
                     use_pca_backend=args.use_pca_backend,
                     include_spectrogram=args.include_spectrogram,
                     audio_duration=audio_duration,
@@ -357,7 +357,7 @@ def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names:
             f"{model_name}/use_pca_backend": config.get('use_pca_backend', False),
             f"{model_name}/include_spectrogram": config.get('include_spectrogram', False),
             f"{model_name}/audio_duration": config.get('audio_duration', None),
-            f"{model_name}/tsne_zoom_factor": config.get('tsne_zoom_factor', 1.0),
+            f"{model_name}/zoom_factor": config.get('zoom_factor', 1.0),
             f"{model_name}/vlm_model": config.get('vlm_model_id', 'unknown'),
         })
     elif 'whisper_knn' in model_name:
@@ -640,7 +640,7 @@ def parse_args_old_implementation():
         help="Skip automatic dataset downloads"
     )
     parser.add_argument(
-        "--tsne_zoom_factor",
+        "--zoom_factor",
         type=float,
         default=4.0,
         help="Zoom factor for t-SNE visualizations"

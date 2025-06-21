@@ -556,7 +556,7 @@ python test_esc50.py --models clam_tsne --save_outputs --save_every_n 5
 python test_esc50.py \
   --models clam_tsne whisper_knn clap_zero_shot \
   --k_shot 4 \
-  --tsne_zoom_factor 8.0 \
+  --zoom_factor 8.0 \
   --use_knn_connections \
   --knn_k 30 \
   --save_every_n 10 \
@@ -608,7 +608,7 @@ When `return_detailed=True`, includes:
     "use_3d_tsne": false,
     "use_knn_connections": true,
     "knn_k": 30,
-    "tsne_zoom_factor": 8.0,
+    "zoom_factor": 8.0,
     "max_train_plot_samples": 500,
     "whisper_model": "large-v2",
     "include_spectrogram": true

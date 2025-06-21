@@ -25,7 +25,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 from clam.utils.vlm_prompting import create_classification_prompt, parse_vlm_response, create_vlm_conversation
 from clam.utils.class_name_utils import get_semantic_class_names_or_fallback
-from clam.utils.visualization_utils import (
+from clam.viz.utils.common import (
     plot_to_image, save_visualization_with_metadata, create_output_directories,
     generate_visualization_filename, close_figure_safely
 )
@@ -39,7 +39,7 @@ from clam.utils.audio_utils import (
 )
 
 from clam.data.audio_embeddings import get_whisper_embeddings, get_clap_embeddings
-from clam.data.tsne_visualization import (
+from clam.viz.tsne_functions import (
     create_tsne_visualization,
     create_tsne_3d_visualization,
     create_combined_tsne_plot,
@@ -72,7 +72,7 @@ class ClamAudioTsneClassifier:
         knn_k: int = 5,
         max_vlm_image_size: int = 1024,
         image_dpi: int = 100,
-        tsne_zoom_factor: float = 4.0,
+        zoom_factor: float = 4.0,
         use_pca_backend: bool = False,
         include_spectrogram: bool = True,
         audio_duration: Optional[float] = None,
@@ -99,7 +99,7 @@ class ClamAudioTsneClassifier:
             knn_k: Number of nearest neighbors to show
             max_vlm_image_size: Maximum image size for VLM
             image_dpi: DPI for saving visualizations
-            tsne_zoom_factor: Zoom factor for t-SNE visualizations
+            zoom_factor: Zoom factor for t-SNE visualizations
             use_pca_backend: Use PCA instead of t-SNE
             include_spectrogram: Include spectrogram in visualization
             audio_duration: Max audio duration to process (seconds)
@@ -125,7 +125,7 @@ class ClamAudioTsneClassifier:
         self.knn_k = knn_k
         self.max_vlm_image_size = max_vlm_image_size
         self.image_dpi = image_dpi
-        self.tsne_zoom_factor = tsne_zoom_factor
+        self.zoom_factor = zoom_factor
         self.use_pca_backend = use_pca_backend
         self.include_spectrogram = include_spectrogram
         self.audio_duration = audio_duration
@@ -366,7 +366,7 @@ class ClamAudioTsneClassifier:
                         'use_3d_tsne': self.use_3d_tsne,
                         'use_knn_connections': self.use_knn_connections,
                         'knn_k': self.knn_k if self.use_knn_connections else None,
-                        'tsne_zoom_factor': self.tsne_zoom_factor,
+                        'zoom_factor': self.zoom_factor,
                         'whisper_model': self.whisper_model,
                         'include_spectrogram': self.include_spectrogram
                     }
@@ -401,7 +401,7 @@ class ClamAudioTsneClassifier:
                         'use_3d_tsne': self.use_3d_tsne,
                         'use_knn_connections': self.use_knn_connections,
                         'knn_k': self.knn_k if self.use_knn_connections else None,
-                        'tsne_zoom_factor': self.tsne_zoom_factor,
+                        'zoom_factor': self.zoom_factor,
                         'whisper_model': self.whisper_model,
                         'include_spectrogram': self.include_spectrogram
                     }
@@ -452,7 +452,7 @@ class ClamAudioTsneClassifier:
                     test_embedding_2d,         # test_embeddings
                     highlight_test_idx=0,      # highlight_test_idx (we only have 1 test point)
                     k=self.knn_k,
-                    zoom_factor=self.tsne_zoom_factor,
+                    zoom_factor=self.zoom_factor,
                     figsize=(16, 10),
                     class_names=self.class_names,
                     use_semantic_names=self.use_semantic_names

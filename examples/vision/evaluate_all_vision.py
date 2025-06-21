@@ -469,7 +469,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
                 use_knn_connections=args.use_knn_connections,
                 knn_k=args.knn_k,
                 max_vlm_image_size=1024,
-                tsne_zoom_factor=args.tsne_zoom_factor,
+                zoom_factor=args.zoom_factor,
                 use_pca_backend=args.use_pca_backend,
                 max_train_plot_samples=args.max_train_plot_samples,
                 cache_dir=args.cache_dir,
@@ -792,7 +792,7 @@ def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names:
             f"{model_name}/use_knn_connections": config.get('use_knn_connections', False),
             f"{model_name}/knn_k": config.get('knn_k', 0),
             f"{model_name}/use_pca_backend": config.get('use_pca_backend', False),
-            f"{model_name}/tsne_zoom_factor": config.get('tsne_zoom_factor', 1.0),
+            f"{model_name}/zoom_factor": config.get('zoom_factor', 1.0),
             f"{model_name}/max_train_plot_samples": config.get('max_train_plot_samples', 0),
             f"{model_name}/vlm_model": config.get('vlm_model_id', 'unknown'),
             f"{model_name}/dinov2_model": config.get('dinov2_model', 'unknown'),
@@ -1015,7 +1015,7 @@ def parse_args_old():
         help="Number of nearest neighbors for KNN connections"
     )
     tsne_group.add_argument(
-        "--tsne_zoom_factor",
+        "--zoom_factor",
         type=float,
         default=4.0,
         help="Zoom factor for t-SNE visualizations"

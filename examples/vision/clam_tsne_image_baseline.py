@@ -25,7 +25,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from clam.utils.vlm_prompting import create_classification_prompt, parse_vlm_response, create_vlm_conversation
-from clam.utils.visualization_utils import (
+from clam.viz.utils.common import (
     plot_to_image, save_visualization_with_metadata, create_output_directories,
     generate_visualization_filename, close_figure_safely
 )
@@ -36,7 +36,7 @@ from clam.utils.platform_utils import (
 from clam.utils.json_utils import convert_for_json_serialization
 
 from clam.data.embeddings import get_dinov2_embeddings
-from clam.data.tsne_visualization import (
+from clam.viz.tsne_functions import (
     create_tsne_visualization,
     create_tsne_3d_visualization,
     create_combined_tsne_plot,
@@ -68,7 +68,7 @@ class ClamImageTsneClassifier:
         max_vlm_image_size: int = 1024,
         image_dpi: int = 100,
         force_rgb_mode: bool = True,
-        tsne_zoom_factor: float = 4.0,
+        zoom_factor: float = 4.0,
         use_pca_backend: bool = False,
         max_train_plot_samples: int = 1000,
         cache_dir: Optional[str] = None,
@@ -95,7 +95,7 @@ class ClamImageTsneClassifier:
             max_vlm_image_size: Maximum image size for VLM
             image_dpi: DPI for saving visualizations
             force_rgb_mode: Convert images to RGB mode
-            tsne_zoom_factor: Zoom factor for t-SNE visualizations
+            zoom_factor: Zoom factor for t-SNE visualizations
             use_pca_backend: Use PCA instead of t-SNE for dimensionality reduction
             max_train_plot_samples: Maximum training samples to include in plots
             cache_dir: Directory for caching embeddings
@@ -113,7 +113,7 @@ class ClamImageTsneClassifier:
         self.max_vlm_image_size = max_vlm_image_size
         self.image_dpi = image_dpi
         self.force_rgb_mode = force_rgb_mode
-        self.tsne_zoom_factor = tsne_zoom_factor
+        self.zoom_factor = zoom_factor
         self.use_pca_backend = use_pca_backend
         self.max_train_plot_samples = max_train_plot_samples
         self.cache_dir = cache_dir
@@ -477,7 +477,7 @@ class ClamImageTsneClassifier:
                             highlight_test_idx=i,
                             k=self.knn_k,
                             figsize=(12, 9),
-                            zoom_factor=self.tsne_zoom_factor,
+                            zoom_factor=self.zoom_factor,
                             class_names=self.class_names,
                             use_semantic_names=self.use_semantic_names
                         )
@@ -488,7 +488,7 @@ class ClamImageTsneClassifier:
                             highlight_test_idx=i,
                             k=self.knn_k,
                             figsize=(10, 8),
-                            zoom_factor=self.tsne_zoom_factor,
+                            zoom_factor=self.zoom_factor,
                             class_names=self.class_names,
                             use_semantic_names=self.use_semantic_names
                         )
@@ -499,7 +499,7 @@ class ClamImageTsneClassifier:
                             self.train_tsne, self.test_tsne, self.y_train_plot, 
                             highlight_test_idx=i,
                             figsize=(12, 9),
-                            zoom_factor=self.tsne_zoom_factor,
+                            zoom_factor=self.zoom_factor,
                             class_names=self.class_names,
                             use_semantic_names=self.use_semantic_names
                         )
@@ -508,7 +508,7 @@ class ClamImageTsneClassifier:
                             self.train_tsne, self.test_tsne, self.y_train_plot, 
                             highlight_test_idx=i,
                             figsize=(8, 6),
-                            zoom_factor=self.tsne_zoom_factor,
+                            zoom_factor=self.zoom_factor,
                             class_names=self.class_names,
                             use_semantic_names=self.use_semantic_names
                         )
@@ -620,7 +620,7 @@ class ClamImageTsneClassifier:
                         'use_3d_tsne': self.use_3d_tsne,
                         'use_knn_connections': self.use_knn_connections,
                         'knn_k': self.knn_k if self.use_knn_connections else None,
-                        'tsne_zoom_factor': self.tsne_zoom_factor,
+                        'zoom_factor': self.zoom_factor,
                         'max_train_plot_samples': self.max_train_plot_samples
                     }
                 })
@@ -658,7 +658,7 @@ class ClamImageTsneClassifier:
                         'use_3d_tsne': self.use_3d_tsne,
                         'use_knn_connections': self.use_knn_connections,
                         'knn_k': self.knn_k if self.use_knn_connections else None,
-                        'tsne_zoom_factor': self.tsne_zoom_factor,
+                        'zoom_factor': self.zoom_factor,
                         'max_train_plot_samples': self.max_train_plot_samples
                     }
                 })
@@ -748,7 +748,7 @@ class ClamImageTsneClassifier:
             'max_vlm_image_size': self.max_vlm_image_size,
             'image_dpi': self.image_dpi,
             'force_rgb_mode': self.force_rgb_mode,
-            'tsne_zoom_factor': self.tsne_zoom_factor,
+            'zoom_factor': self.zoom_factor,
             'use_pca_backend': self.use_pca_backend,
             'max_train_plot_samples': self.max_train_plot_samples,
             'device': self.device

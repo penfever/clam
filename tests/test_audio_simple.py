@@ -57,7 +57,7 @@ def test_tsne_visualization():
     logger.info("Testing t-SNE visualization...")
     
     try:
-        from clam.data.tsne_visualization import create_tsne_visualization
+        from clam.viz.tsne_functions import create_tsne_visualization
         
         # Create dummy embeddings
         n_samples = 20
@@ -368,7 +368,7 @@ def test_clam_audio_minimal():
             use_knn_connections=True,  # Test the KNN fix
             knn_k=1,              # Only 1 neighbor available
             max_vlm_image_size=512,
-            tsne_zoom_factor=2.0,
+            zoom_factor=2.0,
             use_pca_backend=False,
             include_spectrogram=False,
             audio_duration=1.0,

@@ -200,7 +200,7 @@ python examples/vision/evaluate_all_vision.py \
     --use_3d_tsne \
     --use_knn_connections \
     --knn_k 20 \
-    --tsne_zoom_factor 7.0 \
+    --zoom_factor 7.0 \
     --use_semantic_names \
     --output_dir ./full_features_results
 ```

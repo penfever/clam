@@ -24,6 +24,12 @@ from .embeddings.pca import PCAVisualization
 from .decision.regions import DecisionRegionsVisualization
 from .patterns.frequent import FrequentPatternsVisualization
 
+# t-SNE visualization functions
+from .tsne_functions import *
+
+# Utilities
+from .utils.common import plot_to_image, save_visualization_with_metadata, create_output_directories, generate_visualization_filename, close_figure_safely
+
 __all__ = [
     # Base classes
     'BaseVisualization',
@@ -43,6 +49,27 @@ __all__ = [
     # Decision and pattern visualizations
     'DecisionRegionsVisualization',
     'FrequentPatternsVisualization',
+    
+    # t-SNE functions (automatically imported from tsne_functions)
+    'create_tsne_visualization',
+    'create_tsne_3d_visualization', 
+    'create_combined_tsne_plot',
+    'create_combined_tsne_3d_plot',
+    'create_tsne_plot_with_knn',
+    'create_tsne_3d_plot_with_knn',
+    'create_regression_tsne_visualization',
+    'create_regression_tsne_3d_visualization',
+    'create_combined_regression_tsne_plot',
+    'create_combined_regression_tsne_3d_plot',
+    'create_regression_tsne_plot_with_knn',
+    'create_regression_tsne_3d_plot_with_knn',
+    
+    # Utilities
+    'plot_to_image',
+    'save_visualization_with_metadata',
+    'create_output_directories', 
+    'generate_visualization_filename',
+    'close_figure_safely',
 ]
 
 # Version

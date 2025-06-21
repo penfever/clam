@@ -40,3 +40,35 @@ Embedding Visualizations
 .. automodule:: clam.viz.embeddings.umap
    :members:
    :undoc-members:
+
+.. automodule:: clam.viz.embeddings.manifold
+   :members:
+   :undoc-members:
+
+Decision Boundary Visualizations
+--------------------------------
+
+.. automodule:: clam.viz.decision.regions
+   :members:
+   :undoc-members:
+
+Pattern Analysis
+----------------
+
+.. automodule:: clam.viz.patterns.frequent
+   :members:
+   :undoc-members:
+
+t-SNE Functions
+---------------
+
+.. automodule:: clam.viz.tsne_functions
+   :members:
+   :undoc-members:
+
+Utilities
+---------
+
+.. automodule:: clam.viz.utils.common
+   :members:
+   :undoc-members:

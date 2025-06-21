@@ -341,7 +341,7 @@ class BioClip2ClamClassifier(ClamImageTsneClassifier):
             logger.info(f"Creating {'3D' if self.use_3d_tsne else '2D'} t-SNE visualization...")
             
             if self.use_3d_tsne:
-                from clam.data.tsne_visualization import create_tsne_3d_visualization
+                from clam.viz.tsne_functions import create_tsne_3d_visualization
                 train_tsne, test_tsne, base_fig = create_tsne_3d_visualization(
                     self.train_embeddings_plot,
                     self.y_train_plot,
@@ -352,7 +352,7 @@ class BioClip2ClamClassifier(ClamImageTsneClassifier):
                     class_names=self.class_names
                 )
             else:
-                from clam.data.tsne_visualization import create_tsne_visualization
+                from clam.viz.tsne_functions import create_tsne_visualization
                 train_tsne, test_tsne, base_fig = create_tsne_visualization(
                     self.train_embeddings_plot,
                     self.y_train_plot,
@@ -997,7 +997,7 @@ def test_single_dataset(dataset_name: str, args):
                 use_knn_connections=args.use_knn_connections,
                 knn_k=args.knn_k,
                 max_vlm_image_size=1024,
-                tsne_zoom_factor=args.tsne_zoom_factor,
+                zoom_factor=args.zoom_factor,
                 use_pca_backend=args.use_pca_backend,
                 max_train_plot_samples=args.max_train_plot_samples,
                 cache_dir=args.cache_dir,
@@ -1275,7 +1275,7 @@ def parse_args():
     
     # CLAM t-SNE parameters (matching CIFAR script)
     parser.add_argument(
-        "--tsne_zoom_factor",
+        "--zoom_factor",
         type=float,
         default=4.0,
         help="Zoom factor for t-SNE visualizations (default: 4.0)"

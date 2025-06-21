@@ -509,10 +509,10 @@ def add_tsne_visualization_args(parser: argparse.ArgumentParser):
         help="Number of iterations for t-SNE"
     )
     parser.add_argument(
-        "--tsne_zoom_factor",
+        "--zoom_factor",
         type=float,
         default=4.0,
-        help="Zoom factor for t-SNE visualization"
+        help="Zoom factor for all visualizations"
     )
     parser.add_argument(
         "--use_pca_backend",

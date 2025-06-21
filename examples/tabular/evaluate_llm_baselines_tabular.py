@@ -294,7 +294,7 @@ def parse_args_old():
         help="Disable saving of sample t-SNE visualizations (CLAM-T-SNe baseline)"
     )
     parser.add_argument(
-        "--tsne_zoom_factor",
+        "--zoom_factor",
         type=float,
         default=4.0,
         help="Zoom factor for t-SNE visualizations (2.0 = 200%% zoom, showing 50%% of the range) (CLAM-T-SNe baseline)"

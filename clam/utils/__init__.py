@@ -81,13 +81,8 @@ from .vlm_utils import (
     create_classification_prompt,
     create_vlm_conversation
 )
-from .visualization_utils import (
-    plot_to_image,
-    save_visualization_with_metadata,
-    create_output_directories,
-    generate_visualization_filename,
-    close_figure_safely
-)
+# Visualization utilities moved to clam.viz.utils.common
+# from .visualization_utils import (...)  # Now in clam.viz.utils.common
 from .platform_utils import (
     get_optimal_device,
     get_platform_compatible_dtype,
@@ -199,12 +194,7 @@ __all__ = [
     "create_classification_prompt", 
     "create_vlm_conversation",
     
-    # Visualization utilities
-    "plot_to_image",
-    "save_visualization_with_metadata",
-    "create_output_directories", 
-    "generate_visualization_filename",
-    "close_figure_safely",
+    # Visualization utilities moved to clam.viz.utils.common
     
     # Platform utilities
     "get_optimal_device",

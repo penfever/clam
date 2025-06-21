@@ -26,10 +26,14 @@ Audio Processing
    :members:
    :undoc-members:
 
-Visualization
--------------
+Visualization (Moved to clam.viz)
+----------------------------------
 
-.. automodule:: clam.data.tsne_visualization
+.. note::
+   t-SNE visualization functions have been moved to :mod:`clam.viz.tsne_functions`.
+   This module reference is kept for backward compatibility.
+
+.. automodule:: clam.viz.tsne_functions
    :members:
    :undoc-members:
 
