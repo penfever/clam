@@ -473,15 +473,16 @@ class TransformersModelWrapper(BaseModelWrapper):
                 'device_map': self.device_map
             })
         elif actual_device == "mps" and hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
-            # MPS configuration
+            # MPS configuration - don't use device_map, load to CPU then move to MPS
             model_kwargs.update({
                 'torch_dtype': torch.float32,  # MPS works better with float32
-                'device_map': actual_device
+                'device_map': None,  # Don't use device_map with MPS
+                'low_cpu_mem_usage': True  # Use CPU-efficient loading
             })
             logger.info("Using MPS (Metal Performance Shaders) for GPU acceleration")
         elif actual_device == "cpu":
             model_kwargs.update({
-                'torch_dtype': torch.float32,
+                'torch_dtype': torch.float32,  # Use float32 for CPU
                 'device_map': 'cpu'
             })
         
@@ -500,6 +501,12 @@ class TransformersModelWrapper(BaseModelWrapper):
                 self.model_name,
                 **model_kwargs
             )
+            
+            # Manually move to MPS if needed (since we loaded to CPU first)
+            if actual_device == "mps" and hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+                logger.info(f"Moving model to MPS device...")
+                self._model = self._model.to(torch.device('mps'))
+                
             logger.info(f"Successfully loaded {self.model_name} with transformers")
         except Exception as e:
             logger.error(f"Failed to load {self.model_name} with transformers: {e}")
@@ -633,10 +640,11 @@ class VisionLanguageModelWrapper(BaseModelWrapper):
                 'device_map': self.device_map
             })
         elif actual_device == "mps" and hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
-            # MPS configuration
+            # MPS configuration - don't use device_map, load to CPU then move to MPS
             model_kwargs.update({
-                'torch_dtype': torch.float32,  # MPS works better with float32
-                'device_map': actual_device
+                'torch_dtype': torch.float32,
+                'device_map': None,  # Don't use device_map with MPS
+                'low_cpu_mem_usage': True  # Use CPU-efficient loading
             })
             logger.info("Using MPS (Metal Performance Shaders) for GPU acceleration")
         elif actual_device == "cpu":
@@ -660,6 +668,12 @@ class VisionLanguageModelWrapper(BaseModelWrapper):
                 self.model_name,
                 **model_kwargs
             )
+            
+            # Manually move to MPS if needed (since we loaded to CPU first)
+            if actual_device == "mps" and hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+                logger.info(f"Moving model to MPS device...")
+                self._model = self._model.to(torch.device('mps'))
+                
             logger.info(f"Successfully loaded {self.model_name} with transformers VLM")
         except Exception as e:
             logger.error(f"Failed to load {self.model_name} with transformers VLM: {e}")

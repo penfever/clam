@@ -374,7 +374,7 @@ class ClamTsneClassifier:
                 })
             elif actual_device == "mps" and hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
                 vlm_kwargs.update({
-                    'torch_dtype': torch.float32,  # MPS works better with float32
+                    'torch_dtype': torch.float16,
                     'device_map': actual_device,
                     'low_cpu_mem_usage': True
                 })
