@@ -213,11 +213,11 @@ class VLMPromptingTestSuite:
             'precision_weighted': float(precision_weighted),
             'recall_weighted': float(recall_weighted),
             'f1_weighted': float(f1_weighted),
-            'confusion_matrix': cm.tolist(),
+            'confusion_matrix': cm.tolist() if cm is not None else [],
             'completion_rate': float(completion_rate),
             'num_test_samples': len(predictions),
             'num_classes': len(np.unique(true_labels)),
-            'support': support.tolist()
+            'support': support.tolist() if support is not None else []
         }
     
     def _load_dataset(self):
@@ -676,7 +676,7 @@ class VLMPromptingTestSuite:
                         'ground_truth': ground_truth_labels,
                         'prediction_details': results['prediction_details'],
                         'completion_rate': results.get('completion_rate', 1.0),
-                        'test_indices': self.test_indices.tolist()
+                        'test_indices': self.test_indices.tolist() if self.test_indices is not None else []
                     }
                     
                     detailed_output_path = test_dir / "detailed_vlm_outputs.json"
@@ -776,7 +776,7 @@ class VLMPromptingTestSuite:
             
             ground_truth_path = self.output_dir / "ground_truth" / f"test_{test_idx:02d}_{config['name']}.json"
             ground_truth_data = {
-                'test_indices': self.test_indices.tolist(),
+                'test_indices': self.test_indices.tolist() if self.test_indices is not None else [],
                 'ground_truth_labels': ground_truth_labels,
                 'class_names': gt_class_names
             }
@@ -803,7 +803,7 @@ class VLMPromptingTestSuite:
                 'config_name': config['name'],
                 'success': True,
                 'num_test_samples': len(X_test),
-                'test_indices': self.test_indices.tolist(),
+                'test_indices': self.test_indices.tolist() if self.test_indices is not None else [],
                 'ground_truth_labels': ground_truth_labels,
                 'avg_prompt_length': np.mean([len(p) for p in all_prompts]),
                 'visualization_path': str(viz_path.relative_to(self.output_dir)),
