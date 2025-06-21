@@ -333,7 +333,8 @@ def create_combined_tsne_plot(
     zoom_factor: float = 2.0,
     class_names: Optional[List[str]] = None,
     use_semantic_names: bool = False,
-    use_3d: bool = False
+    use_3d: bool = False,
+    semantic_axes_labels: Optional[Dict[str, str]] = None
 ) -> Tuple[plt.Figure, str, Dict]:
     """
     Create a t-SNE plot with optional highlighting of a specific test point.
@@ -494,10 +495,22 @@ def create_combined_tsne_plot(
                 zorder=10
             )
     
-    ax.set_xlabel('t-SNE Dimension 1')
-    ax.set_ylabel('t-SNE Dimension 2')
+    # Set axis labels with semantic information if available
+    if semantic_axes_labels and 'X' in semantic_axes_labels:
+        ax.set_xlabel(semantic_axes_labels['X'])
+    else:
+        ax.set_xlabel('t-SNE Dimension 1')
+    
+    if semantic_axes_labels and 'Y' in semantic_axes_labels:
+        ax.set_ylabel(semantic_axes_labels['Y'])
+    else:
+        ax.set_ylabel('t-SNE Dimension 2')
+    
     if use_3d and hasattr(ax, 'set_zlabel'):
-        ax.set_zlabel('t-SNE Dimension 3')
+        if semantic_axes_labels and 'Z' in semantic_axes_labels:
+            ax.set_zlabel(semantic_axes_labels['Z'])
+        else:
+            ax.set_zlabel('t-SNE Dimension 3')
     
     if highlight_test_idx is not None:
         if zoom_factor > 1.0:
@@ -539,7 +552,8 @@ def create_combined_tsne_3d_plot(
     viewing_angles: Optional[List[Tuple[int, int]]] = None,
     zoom_factor: float = 2.0,
     class_names: Optional[List[str]] = None,
-    use_semantic_names: bool = False
+    use_semantic_names: bool = False,
+    semantic_axes_labels: Optional[Dict[str, str]] = None
 ) -> Tuple[plt.Figure, str, Dict]:
     """
     Create multiple 3D t-SNE plots with different viewing angles for comprehensive spatial understanding.
@@ -675,10 +689,21 @@ def create_combined_tsne_3d_plot(
             ax.set_ylim(y_min, y_max)
             ax.set_zlim(z_min, z_max)
         
-        # Labels and title
-        ax.set_xlabel('t-SNE Dim 1')
-        ax.set_ylabel('t-SNE Dim 2')
-        ax.set_zlabel('t-SNE Dim 3')
+        # Labels and title with semantic information if available
+        if semantic_axes_labels and 'X' in semantic_axes_labels:
+            ax.set_xlabel(semantic_axes_labels['X'])
+        else:
+            ax.set_xlabel('t-SNE Dim 1')
+        
+        if semantic_axes_labels and 'Y' in semantic_axes_labels:
+            ax.set_ylabel(semantic_axes_labels['Y'])
+        else:
+            ax.set_ylabel('t-SNE Dim 2')
+        
+        if semantic_axes_labels and 'Z' in semantic_axes_labels:
+            ax.set_zlabel(semantic_axes_labels['Z'])
+        else:
+            ax.set_zlabel('t-SNE Dim 3')
         
         # Use shorter view names if available
         view_name = view_names[i] if i < len(view_names) else f'View {i+1}'
@@ -1242,10 +1267,21 @@ def create_tsne_3d_plot_with_knn(
             ax.set_ylim(y_min, y_max)
             ax.set_zlim(z_min, z_max)
         
-        # Labels and title
-        ax.set_xlabel('t-SNE Dim 1')
-        ax.set_ylabel('t-SNE Dim 2')
-        ax.set_zlabel('t-SNE Dim 3')
+        # Labels and title with semantic information if available
+        if semantic_axes_labels and 'X' in semantic_axes_labels:
+            ax.set_xlabel(semantic_axes_labels['X'])
+        else:
+            ax.set_xlabel('t-SNE Dim 1')
+        
+        if semantic_axes_labels and 'Y' in semantic_axes_labels:
+            ax.set_ylabel(semantic_axes_labels['Y'])
+        else:
+            ax.set_ylabel('t-SNE Dim 2')
+        
+        if semantic_axes_labels and 'Z' in semantic_axes_labels:
+            ax.set_zlabel(semantic_axes_labels['Z'])
+        else:
+            ax.set_zlabel('t-SNE Dim 3')
         
         # Use shorter view names if available
         view_name = view_names[i] if i < len(view_names) else f'View {i+1}'

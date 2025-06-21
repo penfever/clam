@@ -276,6 +276,7 @@ class ClamTsneClassifier:
         self.class_names = None
         self.unique_classes = None
         self.class_to_semantic = None
+        self.semantic_axes_labels = None
         
         # Multi-visualization context composer
         self.context_composer = None
@@ -512,16 +513,28 @@ class ClamTsneClassifier:
                 # Try to detect from dataset_info if available
                 if dataset_info and isinstance(dataset_info, dict):
                     dataset_id = dataset_info.get('dataset_id') or dataset_info.get('openml_id') or dataset_info.get('task_id')
+                    self.logger.info(f"Trying to load metadata for dataset_id: {dataset_id} from dataset_info: {dataset_info}")
                 
                 # Try to load metadata using detected ID
                 if dataset_id:
-                    metadata = load_dataset_metadata(
-                        dataset_id, 
-                        metadata_base_dir=self.metadata_base_dir
-                    )
-                    if metadata:
-                        self.logger.info(f"Auto-loaded metadata for dataset ID '{dataset_id}': {metadata.dataset_name}")
+                    try:
+                        metadata = load_dataset_metadata(
+                            dataset_id, 
+                            metadata_base_dir=self.metadata_base_dir
+                        )
+                        if metadata:
+                            self.logger.info(f"Auto-loaded metadata for dataset ID '{dataset_id}': {metadata.dataset_name}")
+                        else:
+                            self.logger.info(f"No metadata found for dataset ID '{dataset_id}'")
+                    except Exception as e:
+                        self.logger.warning(f"Failed to load metadata for dataset ID '{dataset_id}': {e}")
                 
+            # If no metadata was loaded but we have dataset info and feature names, create basic metadata
+            if metadata is None and dataset_info and self.use_metadata:
+                metadata = self._create_basic_metadata_from_dataset_info(dataset_info)
+                if metadata:
+                    self.logger.info(f"Created basic metadata from dataset info: {metadata.dataset_name}")
+            
             # Store loaded metadata
             self._loaded_metadata = metadata
             
@@ -537,13 +550,68 @@ class ClamTsneClassifier:
             self.logger.warning(f"Failed to load metadata: {e}")
             self._loaded_metadata = None
     
+    def _create_basic_metadata_from_dataset_info(self, dataset_info):
+        """Create basic metadata from dataset_info when no metadata file exists."""
+        try:
+            from clam.utils.metadata_loader import DatasetMetadata, ColumnMetadata, TargetClassMetadata
+            
+            # Extract basic info
+            dataset_name = dataset_info.get('name', 'Unknown Dataset')
+            feature_names = dataset_info.get('feature_names', [])
+            n_features = dataset_info.get('n_features', 0)
+            n_classes = dataset_info.get('n_classes', 0)
+            
+            # Create basic column metadata
+            columns = []
+            for i, feature_name in enumerate(feature_names):
+                if feature_name:
+                    columns.append(ColumnMetadata(
+                        name=feature_name,
+                        semantic_description=f"Feature {i}: {feature_name}",
+                        data_type="numeric"
+                    ))
+            
+            # Create basic target class metadata
+            target_classes = []
+            if hasattr(self, 'class_names') and self.class_names:
+                for i, class_name in enumerate(self.class_names):
+                    target_classes.append(TargetClassMetadata(
+                        name=class_name,
+                        meaning=f"Class {i}: {class_name}"
+                    ))
+            else:
+                for i in range(n_classes):
+                    target_classes.append(TargetClassMetadata(
+                        name=f"Class_{i}",
+                        meaning=f"Target class {i}"
+                    ))
+            
+            # Create basic description
+            description = f"Dataset with {n_features} features and {n_classes} classes"
+            if dataset_info.get('data_source') == 'openml':
+                description += f" from OpenML task {dataset_info.get('task_id', 'unknown')}"
+            
+            return DatasetMetadata(
+                dataset_name=dataset_name,
+                description=description,
+                columns=columns,
+                target_classes=target_classes
+            )
+            
+        except Exception as e:
+            self.logger.warning(f"Failed to create basic metadata: {e}")
+            return None
+    
     def _get_metadata_for_prompt(self):
         """Get metadata summary for use in VLM prompts."""
+        self.logger.info(f"Getting metadata for prompt: use_metadata={self.use_metadata}, _loaded_metadata={'loaded' if self._loaded_metadata else 'None'}")
         if not self.use_metadata or self._loaded_metadata is None:
             return None
             
         try:
-            return create_metadata_summary(self._loaded_metadata)
+            summary = create_metadata_summary(self._loaded_metadata)
+            self.logger.info(f"Created metadata summary: {len(summary) if summary else 0} chars")
+            return summary
         except Exception as e:
             self.logger.warning(f"Failed to create metadata summary: {e}")
             return None
@@ -565,6 +633,22 @@ class ClamTsneClassifier:
         except Exception as e:
             self.logger.warning(f"Failed to create semantic axes legend: {e}")
             return ""
+    
+    def _compute_semantic_axes_labels(self, embeddings, reduced_coords, labels, feature_names=None):
+        """Compute semantic axes labels for plot axes."""
+        if not self.semantic_axes:
+            return None
+            
+        try:
+            from clam.utils.semantic_axes import SemanticAxesComputer
+            computer = SemanticAxesComputer(method="pca_loadings")
+            semantic_axes = computer.compute_semantic_axes(
+                embeddings, reduced_coords, labels, feature_names, self._loaded_metadata
+            )
+            return semantic_axes
+        except Exception as e:
+            self.logger.warning(f"Failed to compute semantic axes labels: {e}")
+            return None
     
     def fit(self, X_train, y_train, X_test=None, class_names=None, task_type=None, **kwargs):
         """
@@ -836,6 +920,17 @@ class ClamTsneClassifier:
             self.class_to_semantic = None
             self.class_names = None
         
+        # Compute semantic axes labels if enabled
+        if self.semantic_axes and self.train_embeddings is not None and self.train_tsne is not None:
+            self.semantic_axes_labels = self._compute_semantic_axes_labels(
+                self.train_embeddings, 
+                self.train_tsne, 
+                self.y_train_sample,
+                feature_names=self.feature_names
+            )
+            if self.semantic_axes_labels:
+                self.logger.info(f"Computed semantic axes: X={self.semantic_axes_labels.get('X', 'N/A')}, Y={self.semantic_axes_labels.get('Y', 'N/A')}")
+        
         # Initialize multi-visualization framework if enabled
         if self.enable_multi_viz:
             # Use the reduced training data for multi-visualization
@@ -1078,7 +1173,8 @@ class ClamTsneClassifier:
                                 viewing_angles=viewing_angles,
                                 zoom_factor=self.zoom_factor,
                                 class_names=self.class_names,
-                                use_semantic_names=self.use_semantic_names
+                                use_semantic_names=self.use_semantic_names,
+                                semantic_axes_labels=self.semantic_axes_labels
                             )
                             else:
                                 fig, legend_text, metadata = viz_methods['create_combined_tsne_plot'](
@@ -1087,7 +1183,8 @@ class ClamTsneClassifier:
                                 figsize=(8, 6),
                                 zoom_factor=self.zoom_factor,
                                 class_names=self.class_names,
-                                use_semantic_names=self.use_semantic_names
+                                use_semantic_names=self.use_semantic_names,
+                                semantic_axes_labels=self.semantic_axes_labels
                             )
                 
                 # Convert plot to image (only for legacy single visualization)

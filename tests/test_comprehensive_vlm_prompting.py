@@ -292,6 +292,7 @@ class VLMPromptingTestSuite:
                 'n_features': X.shape[1],
                 'n_classes': len(np.unique(y)),
                 'openml_id': self.task_id,
+                'task_id': self.task_id,  # Add task_id for metadata loading
                 'data_source': 'openml',
                 'feature_names': feature_names
             }
@@ -313,6 +314,7 @@ class VLMPromptingTestSuite:
                 'n_features': X.shape[1], 
                 'n_classes': len(np.unique(y)),
                 'openml_id': None,
+                'task_id': None,
                 'data_source': 'synthetic',
                 'feature_names': [f'feature_{i}' for i in range(X.shape[1])]
             }
@@ -672,7 +674,9 @@ class VLMPromptingTestSuite:
             
             # Fit the classifier first
             # Pass semantic class names if provided
-            fit_kwargs = {}
+            fit_kwargs = {
+                'dataset_info': self.dataset_info  # Pass dataset info for metadata loading
+            }
             if config.get('use_semantic_names', False) and config.get('semantic_class_names'):
                 fit_kwargs['class_names'] = config['semantic_class_names'][:len(np.unique(y_train))]
             
