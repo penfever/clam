@@ -33,16 +33,16 @@ Usage examples:
     python evaluate_llm_baselines.py --dataset_name adult --models tabllm
     
     # Using 3D t-SNE with multiple viewing angles for CLAM-T-SNe
-    python evaluate_llm_baselines.py --dataset_name diabetes --models clam_tsne --use_3d --output_dir ./results
+    python evaluate_llm_baselines.py --dataset_name diabetes --models clam_tsne --use_3d_tsne --output_dir ./results
     
     # Custom viewing angles for 3D t-SNE
-    python evaluate_llm_baselines.py --dataset_name har --models clam_tsne --use_3d --viewing_angles "20,45;0,0;90,0" --output_dir ./results
+    python evaluate_llm_baselines.py --dataset_name har --models clam_tsne --use_3d_tsne --viewing_angles "20,45;0,0;90,0" --output_dir ./results
     
     # Using KNN connections to show nearest neighbors in embedding space
     python evaluate_llm_baselines.py --dataset_name adult --models clam_tsne --use_knn_connections --nn_k 7 --output_dir ./results
     
     # Combining 3D t-SNE with KNN connections for maximum information
-    python evaluate_llm_baselines.py --dataset_name diabetes --models clam_tsne --use_3d --use_knn_connections --nn_k 5 --output_dir ./results
+    python evaluate_llm_baselines.py --dataset_name diabetes --models clam_tsne --use_3d_tsne --use_knn_connections --nn_k 5 --output_dir ./results
     
     # Customizing image size and DPI for VLM compatibility
     python evaluate_llm_baselines.py --dataset_name adult --models clam_tsne --max_vlm_image_size 1024 --image_dpi 72 --output_dir ./results
@@ -236,7 +236,7 @@ def parse_args_old():
         help="Force recomputation of cached embeddings for CLAM-T-SNe baseline"
     )
     parser.add_argument(
-        "--use_3d",
+        "--use_3d_tsne",
         action="store_true",
         help="Use 3D t-SNE with multiple viewing angles instead of 2D (CLAM-T-SNe baseline)"
     )

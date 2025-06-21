@@ -107,7 +107,7 @@ class ClamImageTsneClassifier:
         self.tsne_perplexity = tsne_perplexity
         self.tsne_n_iter = tsne_n_iter
         self.vlm_model_id = vlm_model_id
-        self.use_3d = use_3d_tsne
+        self.use_3d_tsne = use_3d_tsne
         self.use_knn_connections = use_knn_connections
         self.knn_k = knn_k
         self.max_vlm_image_size = max_vlm_image_size

@@ -242,7 +242,9 @@ class ClassNameExtractor:
         if 'target_values' in data:
             target_values = data['target_values']
             if isinstance(target_values, dict):
-                return sorted(target_values.keys())
+                # Sort by numeric key to get correct order, return the values (semantic names)
+                sorted_items = sorted(target_values.items(), key=lambda x: int(x[0]))
+                return [item[1] for item in sorted_items]
             elif isinstance(target_values, list):
                 return [str(val) for val in target_values]
         
