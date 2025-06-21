@@ -892,7 +892,6 @@ class ClamTsneClassifier:
                         viz_filename = f"multi_visualization_test_{i:03d}.png"
                         viz_path = os.path.join(self.temp_dir, viz_filename)
                         composed_image.save(viz_path)
-                        self.logger.info(f"Saved multi-visualization to {viz_path}")
                     
                     # Create multi-visualization reasoning prompt using enhanced VLM utilities
                     if self.task_type == 'regression':

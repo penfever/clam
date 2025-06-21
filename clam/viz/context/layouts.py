@@ -85,9 +85,7 @@ class LayoutManager:
             raise ValueError("No visualization results provided")
         
         layout_strategy = strategy or self.layout_config.strategy
-        
-        self.logger.info(f"Composing {len(results)} visualizations using {layout_strategy.value} layout")
-        
+                
         # Route to appropriate layout method
         if layout_strategy == LayoutStrategy.GRID:
             return self._compose_grid_layout(results)
