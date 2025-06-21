@@ -168,6 +168,11 @@ class BaseModelWrapper(ABC):
             self._tokenizer = None
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
+        elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+            # MPS doesn't have a direct cache clearing method like CUDA
+            # But we can suggest garbage collection
+            import gc
+            gc.collect()
     
     def get_model(self):
         """Get the underlying model for compatibility with legacy code."""
@@ -452,10 +457,32 @@ class TransformersModelWrapper(BaseModelWrapper):
         }
         
         # Device and dtype configuration
-        if torch.cuda.is_available() and self.device != "cpu":
+        # Import platform utilities for proper device detection
+        from .platform_utils import get_optimal_device
+        
+        # Resolve device if set to auto
+        actual_device = self.device
+        if self.device == "auto":
+            actual_device = get_optimal_device(prefer_mps=True)
+            logger.info(f"Auto-detected device: {actual_device}")
+        
+        # Configure based on device
+        if actual_device == "cuda" and torch.cuda.is_available():
             model_kwargs.update({
                 'torch_dtype': self.torch_dtype,
                 'device_map': self.device_map
+            })
+        elif actual_device == "mps" and hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+            # MPS configuration
+            model_kwargs.update({
+                'torch_dtype': torch.float32,  # MPS works better with float32
+                'device_map': actual_device
+            })
+            logger.info("Using MPS (Metal Performance Shaders) for GPU acceleration")
+        elif actual_device == "cpu":
+            model_kwargs.update({
+                'torch_dtype': torch.float32,
+                'device_map': 'cpu'
             })
         
         # Filter out wrapper-specific kwargs that shouldn't be passed to the model
@@ -498,9 +525,19 @@ class TransformersModelWrapper(BaseModelWrapper):
             truncation=True
         )
         
-        # Move to device
-        if torch.cuda.is_available() and self.device != "cpu":
-            tokenized = {k: v.to(self._model.device) for k, v in tokenized.items()}
+        # Move to device  
+        if hasattr(self._model, 'device'):
+            device = self._model.device
+        else:
+            # Try to infer device from model parameters
+            try:
+                device = next(self._model.parameters()).device
+            except:
+                device = torch.device('cpu')
+        
+        # Move inputs to the appropriate device
+        if device.type != 'cpu':
+            tokenized = {k: v.to(device) for k, v in tokenized.items()}
         
         # Generate
         gen_kwargs = config.to_transformers_kwargs()
@@ -580,10 +617,32 @@ class VisionLanguageModelWrapper(BaseModelWrapper):
         }
         
         # Device and dtype configuration
-        if torch.cuda.is_available() and self.device != "cpu":
+        # Import platform utilities for proper device detection
+        from .platform_utils import get_optimal_device
+        
+        # Resolve device if set to auto
+        actual_device = self.device
+        if self.device == "auto":
+            actual_device = get_optimal_device(prefer_mps=True)
+            logger.info(f"Auto-detected device: {actual_device}")
+        
+        # Configure based on device
+        if actual_device == "cuda" and torch.cuda.is_available():
             model_kwargs.update({
                 'torch_dtype': self.torch_dtype,
                 'device_map': self.device_map
+            })
+        elif actual_device == "mps" and hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+            # MPS configuration
+            model_kwargs.update({
+                'torch_dtype': torch.float32,  # MPS works better with float32
+                'device_map': actual_device
+            })
+            logger.info("Using MPS (Metal Performance Shaders) for GPU acceleration")
+        elif actual_device == "cpu":
+            model_kwargs.update({
+                'torch_dtype': torch.float32,
+                'device_map': 'cpu'
             })
         
         # Filter out wrapper-specific kwargs that shouldn't be passed to the model
@@ -633,8 +692,18 @@ class VisionLanguageModelWrapper(BaseModelWrapper):
         inputs = self._processor(text=formatted_text, images=image, return_tensors="pt")
         
         # Move to device
-        if torch.cuda.is_available() and self.device != "cpu":
-            inputs = {k: v.to(self._model.device) if torch.is_tensor(v) else v 
+        if hasattr(self._model, 'device'):
+            device = self._model.device
+        else:
+            # Try to infer device from model parameters
+            try:
+                device = next(self._model.parameters()).device
+            except:
+                device = torch.device('cpu')
+        
+        # Move inputs to the appropriate device
+        if device.type != 'cpu':
+            inputs = {k: v.to(device) if torch.is_tensor(v) else v 
                      for k, v in inputs.items()}
         
         # Generate

@@ -53,6 +53,10 @@ class VisualizationConfig:
     # Task-specific options
     task_type: str = 'classification'  # 'classification' or 'regression'
     
+    # KNN connections support
+    use_knn_connections: bool = False
+    nn_k: int = 5  # Number of nearest neighbors (unified parameter)
+    
     # Additional options for specific visualizations
     extra_params: Dict[str, Any] = field(default_factory=dict)
 
@@ -198,6 +202,12 @@ class BaseVisualization(ABC):
         
         self._fitted = True
         
+        # Store embeddings for KNN analysis if enabled
+        if self.config.use_knn_connections:
+            self._training_embeddings = X.copy()
+            if y is not None:
+                self._training_labels = y.copy()
+        
         # Store timing information
         self._last_fit_time = fit_time
         self._last_transform_time = 0.0  # Included in fit_transform
@@ -226,6 +236,10 @@ class BaseVisualization(ABC):
         start_time = time.time()
         
         transformed = self._transformer.transform(X)
+        
+        # Store test embeddings for KNN analysis if enabled
+        if self.config.use_knn_connections:
+            self._test_embeddings = X.copy()
         
         self._last_transform_time = time.time() - start_time
         
@@ -347,7 +361,7 @@ class BaseVisualization(ABC):
         use_semantic_names = getattr(self, '_use_semantic_names', False)
         
         # Use the shared styling utilities for consistent appearance
-        return apply_consistent_point_styling(
+        plot_result = apply_consistent_point_styling(
             ax=ax,
             transformed_data=transformed_data,
             y=y,
@@ -358,6 +372,52 @@ class BaseVisualization(ABC):
             class_names=class_names,
             use_semantic_names=use_semantic_names
         )
+        
+        # Add KNN connections if enabled and we have test data
+        if (self.config.use_knn_connections and 
+            test_data is not None and 
+            highlight_test_indices and 
+            y is not None and
+            hasattr(self, '_training_embeddings')):
+            
+            # For each highlighted test point, add KNN connections
+            for test_idx in highlight_test_indices:
+                if test_idx < len(test_data):
+                    query_coord = test_data[test_idx]
+                    query_embedding = getattr(self, '_test_embeddings', test_data)[test_idx]
+                    
+                    # Compute KNN analysis in embedding space
+                    knn_info = self._compute_knn_analysis(
+                        query_point=query_embedding,
+                        training_data=self._training_embeddings,
+                        training_labels=y,
+                        k=self.config.nn_k
+                    )
+                    
+                    # Get coordinates of neighbors in visualization space
+                    neighbor_coords = transformed_data[knn_info['neighbor_indices']]
+                    
+                    # Add connection lines
+                    self._add_knn_connections_to_plot(
+                        ax=ax,
+                        query_coord=query_coord,
+                        neighbor_coords=neighbor_coords,
+                        neighbor_distances=knn_info['neighbor_distances'],
+                        use_3d=use_3d,
+                        max_connections=self.config.nn_k
+                    )
+                    
+                    # Add KNN information to metadata
+                    if 'knn_info' not in plot_result.get('metadata', {}):
+                        plot_result.setdefault('metadata', {})['knn_info'] = []
+                    plot_result['metadata']['knn_info'].append({
+                        'test_idx': test_idx,
+                        'neighbor_classes': knn_info['neighbor_labels'].tolist(),
+                        'class_distribution': knn_info['class_distribution'],
+                        'neighbor_distances': knn_info['neighbor_distances'].tolist()
+                    })
+        
+        return plot_result
     
     def _plot_regression(
         self,
@@ -543,3 +603,103 @@ class BaseVisualization(ABC):
                 base_desc += f" The target values range from {np.min(y):.2f} to {np.max(y):.2f} (range: {target_range:.2f})."
         
         return base_desc
+    
+    def _compute_knn_analysis(
+        self,
+        query_point: np.ndarray,
+        training_data: np.ndarray,
+        training_labels: np.ndarray,
+        k: Optional[int] = None
+    ) -> Dict[str, Any]:
+        """
+        Compute KNN analysis for a query point.
+        
+        Args:
+            query_point: Query point in embedding space [n_features]
+            training_data: Training data in embedding space [n_samples, n_features]
+            training_labels: Training labels [n_samples]
+            k: Number of nearest neighbors (uses config.nn_k if None)
+            
+        Returns:
+            Dictionary with neighbor information
+        """
+        from sklearn.neighbors import NearestNeighbors
+        import numpy as np
+        
+        if k is None:
+            k = self.config.nn_k
+        
+        # Fit KNN on training data
+        knn = NearestNeighbors(n_neighbors=min(k, len(training_data)), metric='euclidean')
+        knn.fit(training_data)
+        
+        # Find neighbors for query point
+        distances, indices = knn.kneighbors([query_point])
+        
+        # Get neighbor information
+        neighbor_indices = indices[0]
+        neighbor_distances = distances[0]
+        neighbor_labels = training_labels[neighbor_indices]
+        
+        # Compute class distribution
+        unique_labels, counts = np.unique(neighbor_labels, return_counts=True)
+        class_distribution = dict(zip(unique_labels, counts))
+        
+        return {
+            'neighbor_indices': neighbor_indices,
+            'neighbor_distances': neighbor_distances,
+            'neighbor_labels': neighbor_labels,
+            'class_distribution': class_distribution,
+            'k': len(neighbor_indices)
+        }
+    
+    def _add_knn_connections_to_plot(
+        self,
+        ax,
+        query_coord: np.ndarray,
+        neighbor_coords: np.ndarray,
+        neighbor_distances: np.ndarray,
+        use_3d: bool = False,
+        max_connections: int = 5
+    ):
+        """
+        Add KNN connection lines to a plot.
+        
+        Args:
+            ax: Matplotlib axis
+            query_coord: Query point coordinates [n_dims]
+            neighbor_coords: Neighbor coordinates [n_neighbors, n_dims]
+            neighbor_distances: Distances to neighbors [n_neighbors]
+            use_3d: Whether this is a 3D plot
+            max_connections: Maximum number of connections to draw
+        """
+        # Limit number of connections for visual clarity
+        n_connections = min(max_connections, len(neighbor_coords))
+        
+        for i in range(n_connections):
+            neighbor_coord = neighbor_coords[i]
+            distance = neighbor_distances[i]
+            
+            # Line alpha based on distance (closer = more opaque)
+            max_distance = np.max(neighbor_distances) if len(neighbor_distances) > 1 else 1.0
+            alpha = max(0.1, 1.0 - (distance / max_distance)) if max_distance > 0 else 0.5
+            
+            if use_3d:
+                ax.plot3D(
+                    [query_coord[0], neighbor_coord[0]],
+                    [query_coord[1], neighbor_coord[1]],
+                    [query_coord[2], neighbor_coord[2]],
+                    color='gray',
+                    alpha=alpha,
+                    linewidth=1.0,
+                    linestyle='--'
+                )
+            else:
+                ax.plot(
+                    [query_coord[0], neighbor_coord[0]],
+                    [query_coord[1], neighbor_coord[1]],
+                    color='gray',
+                    alpha=alpha,
+                    linewidth=1.0,
+                    linestyle='--'
+                )

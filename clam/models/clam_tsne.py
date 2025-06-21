@@ -357,12 +357,28 @@ class ClamTsneClassifier:
             # Local model - configure hardware parameters
             self.logger.info("Using local VLM")
             vlm_kwargs = {}
-            if torch.cuda.is_available() and self.device != "cpu":
+            # Import platform utilities for proper device detection
+            from clam.utils.platform_utils import get_optimal_device
+            
+            # Resolve device if set to auto
+            actual_device = self.device
+            if self.device == "auto":
+                actual_device = get_optimal_device(prefer_mps=True)
+                self.logger.info(f"Auto-detected device for VLM: {actual_device}")
+            
+            if actual_device == "cuda" and torch.cuda.is_available():
                 vlm_kwargs.update({
                     'torch_dtype': torch.float16,
                     'device_map': "auto",
                     'low_cpu_mem_usage': True
                 })
+            elif actual_device == "mps" and hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+                vlm_kwargs.update({
+                    'torch_dtype': torch.float32,  # MPS works better with float32
+                    'device_map': actual_device,
+                    'low_cpu_mem_usage': True
+                })
+                self.logger.info("Configured VLM for MPS (Metal Performance Shaders)")
             else:
                 vlm_kwargs.update({
                     'low_cpu_mem_usage': True
@@ -410,7 +426,9 @@ class ClamTsneClassifier:
                 title=f"{viz_method.upper()} - {self.modality.title()} Data",
                 random_state=self.seed,
                 figsize=(8, 6),
-                point_size=50
+                point_size=50,
+                use_knn_connections=self.use_knn_connections,
+                nn_k=self.knn_k
             )
             
             # Get method-specific configuration
