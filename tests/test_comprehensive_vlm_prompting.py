@@ -44,7 +44,7 @@ class VLMPromptingTestSuite:
     """Comprehensive test suite for VLM prompting with various configurations."""
     
     def __init__(self, output_dir: str, dataset_id: int = 23, vlm_model: str = "Qwen/Qwen2-VL-2B-Instruct", 
-                 num_tests: int = 16, num_samples_per_test: int = 10, backend: str = "auto"):
+                 num_tests: int = 16, num_samples_per_test: int = 10, backend: str = "auto", zoom_factor: float = 6.5):
         """
         Initialize the test suite.
         
@@ -55,6 +55,7 @@ class VLMPromptingTestSuite:
             num_tests: Number of test configurations to run (default: 16)
             num_samples_per_test: Number of test samples per configuration (default: 10)
             backend: Backend to use for VLM inference (default: auto)
+            zoom_factor: Zoom factor for t-SNE visualizations (default: 6.5)
         """
         self.output_dir = Path(output_dir)
         self.dataset_id = dataset_id
@@ -62,6 +63,7 @@ class VLMPromptingTestSuite:
         self.num_tests = num_tests
         self.num_samples_per_test = num_samples_per_test
         self.backend = backend
+        self.zoom_factor = zoom_factor
         
         # Create output directories with nested structure
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -486,9 +488,9 @@ class VLMPromptingTestSuite:
             }
         ]
         
-        # Combine all configurations
-        all_configs = (single_viz_configs + multi_viz_configs + 
-                      semantic_configs + parameter_configs)
+        # Combine all configurations - semantic tests first
+        all_configs = (semantic_configs + single_viz_configs + multi_viz_configs + 
+                      parameter_configs)
         
         # Limit to 25 configurations to include new mlxtend and metadata tests
         return all_configs[:25]
@@ -543,7 +545,7 @@ class VLMPromptingTestSuite:
                 'seed': 42,
                 'max_vlm_image_size': 1024,  # Reduced for speed
                 'image_dpi': config.get('image_dpi', 100),
-                'zoom_factor': config.get('zoom_factor', config.get('tsne_zoom_factor', 2.0)),  # Backward compatibility
+                'zoom_factor': config.get('zoom_factor', self.zoom_factor),  # Use instance variable as default
                 'use_semantic_names': config.get('use_semantic_names', False),
                 # VLM model parameters to avoid KV cache issues
                 'max_model_len': 16384,
@@ -1012,6 +1014,8 @@ def main():
     parser.add_argument("--backend", type=str, default="auto",
                        choices=["auto", "vllm", "transformers"],
                        help="Backend to use for VLM inference (default: auto)")
+    parser.add_argument("--zoom_factor", type=float, default=6.5,
+                       help="Zoom factor for t-SNE visualizations (default: 6.5)")
     
     args = parser.parse_args()
     
@@ -1025,7 +1029,8 @@ def main():
         vlm_model=args.vlm_model,
         num_tests=args.num_tests,
         num_samples_per_test=args.num_samples_per_test,
-        backend=args.backend
+        backend=args.backend,
+        zoom_factor=args.zoom_factor
     )
     
     summary = test_suite.run_all_tests()
