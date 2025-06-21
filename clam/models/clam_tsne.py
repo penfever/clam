@@ -1009,7 +1009,9 @@ class ClamTsneClassifier:
                                 k=self.knn_k,
                                 figsize=(12, 9),
                                 viewing_angles=viewing_angles,
-                                zoom_factor=self.zoom_factor
+                                zoom_factor=self.zoom_factor,
+                                class_names=self.class_names,
+                                use_semantic_names=self.use_semantic_names
                             )
                             else:
                                 fig, legend_text, metadata = viz_methods['create_tsne_plot_with_knn'](
@@ -1018,7 +1020,9 @@ class ClamTsneClassifier:
                                 highlight_test_idx=i,
                                 k=self.knn_k,
                                 figsize=(10, 8),
-                                zoom_factor=self.zoom_factor
+                                zoom_factor=self.zoom_factor,
+                                class_names=self.class_names,
+                                use_semantic_names=self.use_semantic_names
                             )
                         else:
                             # Create standard visualization
@@ -1028,14 +1032,18 @@ class ClamTsneClassifier:
                                 highlight_test_idx=i,
                                 figsize=(12, 9),
                                 viewing_angles=viewing_angles,
-                                zoom_factor=self.zoom_factor
+                                zoom_factor=self.zoom_factor,
+                                class_names=self.class_names,
+                                use_semantic_names=self.use_semantic_names
                             )
                             else:
                                 fig, legend_text, metadata = viz_methods['create_combined_tsne_plot'](
                                 self.train_tsne, self.test_tsne, self.y_train_sample,
                                 highlight_test_idx=i,
                                 figsize=(8, 6),
-                                zoom_factor=self.zoom_factor
+                                zoom_factor=self.zoom_factor,
+                                class_names=self.class_names,
+                                use_semantic_names=self.use_semantic_names
                             )
                 
                 # Convert plot to image (only for legacy single visualization)

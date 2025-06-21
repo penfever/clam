@@ -625,8 +625,10 @@ class VLMPromptingTestSuite:
                                 })
                         
                         from clam.utils.vlm_prompting import create_classification_prompt
+                        # Use semantic class names if available, otherwise generic ones
+                        prompt_class_names = config.get('semantic_class_names', [f"Class_{i}" for i in range(len(np.unique(y_train)))])
                         sample_prompt = create_classification_prompt(
-                            class_names=[f"Class_{i}" for i in range(len(np.unique(y_train)))],
+                            class_names=prompt_class_names,
                             modality='tabular',
                             dataset_description=f"Test dataset with {len(np.unique(y_train))} classes",
                             use_semantic_names=config.get('use_semantic_names', False),
@@ -635,8 +637,10 @@ class VLMPromptingTestSuite:
                     else:
                         # Single viz prompt
                         from clam.utils.vlm_prompting import create_classification_prompt
+                        # Use semantic class names if available, otherwise generic ones
+                        prompt_class_names = config.get('semantic_class_names', [f"Class_{i}" for i in range(len(np.unique(y_train)))])
                         sample_prompt = create_classification_prompt(
-                            class_names=[f"Class_{i}" for i in range(len(np.unique(y_train)))],
+                            class_names=prompt_class_names,
                             modality='tabular',
                             use_knn=config.get('use_knn_connections', False),
                             use_3d=config.get('use_3d_tsne', False),
