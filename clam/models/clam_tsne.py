@@ -468,6 +468,15 @@ class ClamTsneClassifier:
                 })
             elif viz_method == 'isomap':
                 method_config.setdefault('n_neighbors', 10)
+            elif viz_method == 'decision_regions':
+                # Pass through any decision_classifier config from multi_viz_config
+                method_config.setdefault('decision_classifier', 'svm')
+                method_config.setdefault('embedding_method', 'pca')
+            elif viz_method == 'frequent_patterns':
+                # Configure frequent patterns analysis
+                method_config.setdefault('min_support', 0.1)
+                method_config.setdefault('min_confidence', 0.6)
+                method_config.setdefault('n_bins', 5)
                 
             self.context_composer.add_visualization(
                 viz_method,

@@ -1,0 +1,20 @@
+{
+  "name": "multi_semantic_axes_metadata",
+  "enable_multi_viz": true,
+  "visualization_methods": [
+    "pca",
+    "tsne"
+  ],
+  "layout_strategy": "sequential",
+  "reasoning_focus": "comparison",
+  "use_semantic_names": true,
+  "load_semantic_from_cc18": true,
+  "semantic_axes": true,
+  "use_metadata": true,
+  "auto_load_metadata": true,
+  "semantic_class_names": [
+    "No-use",
+    "Long-term methods",
+    "Short-term methods"
+  ]
+}

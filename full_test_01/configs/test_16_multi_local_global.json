@@ -1,0 +1,11 @@
+{
+  "name": "multi_local_global",
+  "enable_multi_viz": true,
+  "visualization_methods": [
+    "tsne",
+    "isomap",
+    "mds"
+  ],
+  "layout_strategy": "sequential",
+  "reasoning_focus": "comparison"
+}

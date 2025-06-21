@@ -30,15 +30,20 @@ class DecisionRegionsVisualization(BaseVisualization):
     the feature space.
     """
     
-    def __init__(self, classifier=None, **kwargs):
+    def __init__(self, classifier=None, config=None, **kwargs):
         """
         Initialize decision regions visualization.
         
         Args:
             classifier: Trained classifier to visualize (e.g., SVM, RandomForest)
+            config: VisualizationConfig object
             **kwargs: Additional arguments for BaseVisualization
         """
-        super().__init__(**kwargs)
+        # Handle both old style (kwargs) and new style (config) initialization
+        if config is not None:
+            super().__init__(config)
+        else:
+            super().__init__(**kwargs)
         self.classifier = classifier
         self._embedding_method = None
     
@@ -120,6 +125,7 @@ class DecisionRegionsVisualization(BaseVisualization):
         y: Optional[np.ndarray] = None,
         highlight_indices: Optional[list] = None,
         test_data: Optional[np.ndarray] = None,
+        highlight_test_indices: Optional[list] = None,
         **kwargs
     ) -> VisualizationResult:
         """Generate decision regions plot."""
@@ -166,6 +172,16 @@ class DecisionRegionsVisualization(BaseVisualization):
                 c='black', s=self.config.point_size * 1.5, alpha=0.8,
                 marker='^', label='Test points'
             )
+            
+            # Highlight specific test points with red X markers
+            if highlight_test_indices:
+                highlighted_test_data = test_data[highlight_test_indices]
+                ax.scatter(
+                    highlighted_test_data[:, 0],
+                    highlighted_test_data[:, 1],
+                    c='red', s=self.config.point_size * 3, alpha=1.0,
+                    marker='x', linewidths=4, label='Query points'
+                )
         
         # Apply styling
         self._apply_plot_styling(ax, use_3d=False)

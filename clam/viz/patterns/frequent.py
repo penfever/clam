@@ -81,12 +81,16 @@ class FrequentPatternsVisualization(BaseVisualization):
     
     def fit_transform(self, X: np.ndarray, y: Optional[np.ndarray] = None, **kwargs) -> np.ndarray:
         """Discretize data and analyze patterns."""
+        import time
+        start_time = time.time()
+        
         # Create transformer if not exists
         if self._transformer is None:
             merged_kwargs = {**self.config.extra_params, **kwargs}
             self._transformer = self._create_transformer(**merged_kwargs)
         
         # Discretize the data
+        fit_start = time.time()
         discrete_data = self._transformer.fit_transform(X)
         
         # Convert to DataFrame for easier handling
@@ -118,9 +122,16 @@ class FrequentPatternsVisualization(BaseVisualization):
         else:
             self.rules = pd.DataFrame()
         
+        # Mark as fitted - IMPORTANT!
+        self._fitted = True
+        
+        # Store timing information
+        self._last_fit_time = time.time() - fit_start
+        self._last_transform_time = 0.0
+        
         self.logger.info(
             f"Found {len(self.frequent_itemsets)} frequent itemsets "
-            f"and {len(self.rules)} association rules"
+            f"and {len(self.rules)} association rules in {self._last_fit_time:.2f}s"
         )
         
         return discrete_data

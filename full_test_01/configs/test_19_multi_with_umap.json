@@ -1,0 +1,11 @@
+{
+  "name": "multi_with_umap",
+  "enable_multi_viz": true,
+  "visualization_methods": [
+    "pca",
+    "tsne",
+    "umap"
+  ],
+  "layout_strategy": "sequential",
+  "reasoning_focus": "comparison"
+}

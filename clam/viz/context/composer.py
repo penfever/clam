@@ -107,8 +107,28 @@ class ContextComposer:
             if config:
                 viz_config.extra_params.update(config)
         
-        # Create visualization instance
-        visualization = viz_class(viz_config)
+        # Handle special cases that require additional parameters
+        if viz_type == 'decision_regions':
+            # Decision regions requires a classifier instance
+            from sklearn.svm import SVC
+            from sklearn.ensemble import RandomForestClassifier
+            
+            # Get classifier type from config
+            classifier_type = (config or {}).get('decision_classifier', 'svm')
+            
+            if classifier_type == 'svm':
+                classifier = SVC(kernel='rbf', random_state=viz_config.random_state)
+            elif classifier_type == 'rf':
+                classifier = RandomForestClassifier(n_estimators=100, random_state=viz_config.random_state)
+            else:
+                # Default to SVM
+                classifier = SVC(kernel='rbf', random_state=viz_config.random_state)
+            
+            # Create visualization instance with classifier
+            visualization = viz_class(classifier=classifier, config=viz_config)
+        else:
+            # Create standard visualization instance
+            visualization = viz_class(viz_config)
         
         self.visualizations.append(visualization)
         self.visualization_configs.append({

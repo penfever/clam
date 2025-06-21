@@ -1,0 +1,10 @@
+{
+  "name": "multi_grid_layout",
+  "enable_multi_viz": true,
+  "visualization_methods": [
+    "pca",
+    "tsne"
+  ],
+  "layout_strategy": "grid",
+  "reasoning_focus": "comparison"
+}

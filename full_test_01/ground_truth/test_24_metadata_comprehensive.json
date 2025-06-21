@@ -1,0 +1,54 @@
+{
+  "test_indices": [
+    0,
+    7,
+    15,
+    25,
+    34,
+    43,
+    45,
+    95,
+    107,
+    111,
+    113,
+    118,
+    132,
+    138,
+    142
+  ],
+  "ground_truth_labels": [
+    0,
+    1,
+    0,
+    0,
+    2,
+    0,
+    1,
+    1,
+    0,
+    1,
+    2,
+    2,
+    0,
+    1,
+    2
+  ],
+  "class_names": [
+    "Class_0",
+    "Class_1",
+    "Class_2"
+  ],
+  "metadata_config": {
+    "metadata_types": [
+      "quality_metrics",
+      "timing_info",
+      "method_params"
+    ],
+    "visualization_methods": [
+      "pca",
+      "tsne",
+      "isomap"
+    ],
+    "note": "This test includes comprehensive metadata from visualization methods"
+  }
+}

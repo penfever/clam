@@ -1,0 +1,1 @@
+Class: Class_0 | Reasoning: The query point is closer to the cluster of Class_0 neighbors (3 neighbors) compared to Class_2 neighbors (2 neighbors). Additionally, the average distance to Class_0 neighbors (5.2) is lower than to Class_2 neighbors (6.1), indicating higher similarity.

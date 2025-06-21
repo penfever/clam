@@ -643,12 +643,22 @@ class VLMPromptingTestSuite:
             
             # Add single or multi-viz specific parameters
             if config.get('enable_multi_viz', False):
+                # Build multi_viz_config with method-specific parameters
+                multi_viz_config = {}
+                
+                # Check if decision_regions is in the visualization methods
+                if 'decision_regions' in config.get('visualization_methods', []):
+                    multi_viz_config['decision_regions'] = {
+                        'decision_classifier': config.get('decision_classifier', 'svm'),
+                        'embedding_method': 'pca'
+                    }
+                
                 classifier_config.update({
                     'enable_multi_viz': True,
                     'visualization_methods': config.get('visualization_methods', ['tsne']),
                     'layout_strategy': config.get('layout_strategy', 'sequential'),
                     'reasoning_focus': config.get('reasoning_focus', 'classification'),
-                    'multi_viz_config': {}
+                    'multi_viz_config': multi_viz_config
                 })
             else:
                 classifier_config.update({

@@ -1,0 +1,2197 @@
+[
+  {
+    "test_idx": 0,
+    "config_name": "tsne_semantic",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 961.0,
+    "visualization_path": "visualizations/test_00_tsne_semantic.png",
+    "prompt_path": "prompts/test_00_tsne_semantic_all.txt",
+    "response_path": "responses/test_00_tsne_semantic_all.txt",
+    "ground_truth_path": "ground_truth/test_00_tsne_semantic.json",
+    "config_path": "configs/test_00_tsne_semantic.json",
+    "test_directory": "test_00_tsne_semantic",
+    "is_multi_viz": false,
+    "visualization_methods": [
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "tsne_semantic",
+      "accuracy": 0.4666666666666667,
+      "balanced_accuracy": 0.4666666666666666,
+      "precision_macro": 0.5619047619047618,
+      "recall_macro": 0.4666666666666666,
+      "f1_macro": 0.48148148148148145,
+      "precision_micro": 0.4666666666666667,
+      "recall_micro": 0.4666666666666667,
+      "f1_micro": 0.4666666666666667,
+      "precision_weighted": 0.6019047619047619,
+      "recall_weighted": 0.4666666666666667,
+      "f1_weighted": 0.49629629629629624,
+      "confusion_matrix": [
+        [
+          3,
+          3,
+          0
+        ],
+        [
+          0,
+          2,
+          3
+        ],
+        [
+          0,
+          2,
+          2
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 1,
+    "config_name": "multi_semantic",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 1478.0,
+    "visualization_path": "visualizations/test_01_multi_semantic.png",
+    "prompt_path": "prompts/test_01_multi_semantic_all.txt",
+    "response_path": "responses/test_01_multi_semantic_all.txt",
+    "ground_truth_path": "ground_truth/test_01_multi_semantic.json",
+    "config_path": "configs/test_01_multi_semantic.json",
+    "test_directory": "test_01_multi_semantic",
+    "is_multi_viz": true,
+    "visualization_methods": [
+      "pca",
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "multi_semantic",
+      "accuracy": 0.4,
+      "balanced_accuracy": 0.4666666666666666,
+      "precision_macro": 0.2814814814814815,
+      "recall_macro": 0.4666666666666666,
+      "f1_macro": 0.3384615384615384,
+      "precision_micro": 0.4,
+      "recall_micro": 0.4,
+      "f1_micro": 0.4,
+      "precision_weighted": 0.2518518518518518,
+      "recall_weighted": 0.4,
+      "f1_weighted": 0.29743589743589743,
+      "confusion_matrix": [
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          1,
+          2,
+          2
+        ],
+        [
+          0,
+          0,
+          4
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 2,
+    "config_name": "tsne_semantic",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 961.0,
+    "visualization_path": "visualizations/test_02_tsne_semantic.png",
+    "prompt_path": "prompts/test_02_tsne_semantic_all.txt",
+    "response_path": "responses/test_02_tsne_semantic_all.txt",
+    "ground_truth_path": "ground_truth/test_02_tsne_semantic.json",
+    "config_path": "configs/test_02_tsne_semantic.json",
+    "test_directory": "test_02_tsne_semantic",
+    "is_multi_viz": false,
+    "visualization_methods": [
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "tsne_semantic",
+      "accuracy": 0.4666666666666667,
+      "balanced_accuracy": 0.4666666666666666,
+      "precision_macro": 0.5619047619047618,
+      "recall_macro": 0.4666666666666666,
+      "f1_macro": 0.48148148148148145,
+      "precision_micro": 0.4666666666666667,
+      "recall_micro": 0.4666666666666667,
+      "f1_micro": 0.4666666666666667,
+      "precision_weighted": 0.6019047619047619,
+      "recall_weighted": 0.4666666666666667,
+      "f1_weighted": 0.49629629629629624,
+      "confusion_matrix": [
+        [
+          3,
+          3,
+          0
+        ],
+        [
+          0,
+          2,
+          3
+        ],
+        [
+          0,
+          2,
+          2
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 3,
+    "config_name": "tsne_semantic_axes",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 961.0,
+    "visualization_path": "visualizations/test_03_tsne_semantic_axes.png",
+    "prompt_path": "prompts/test_03_tsne_semantic_axes_all.txt",
+    "response_path": "responses/test_03_tsne_semantic_axes_all.txt",
+    "ground_truth_path": "ground_truth/test_03_tsne_semantic_axes.json",
+    "config_path": "configs/test_03_tsne_semantic_axes.json",
+    "test_directory": "test_03_tsne_semantic_axes",
+    "is_multi_viz": false,
+    "visualization_methods": [
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "tsne_semantic_axes",
+      "accuracy": 0.4,
+      "balanced_accuracy": 0.3833333333333333,
+      "precision_macro": 0.5,
+      "recall_macro": 0.3833333333333333,
+      "f1_macro": 0.40811965811965817,
+      "precision_micro": 0.4,
+      "recall_micro": 0.4,
+      "f1_micro": 0.4,
+      "precision_weighted": 0.55,
+      "recall_weighted": 0.4,
+      "f1_weighted": 0.4358974358974359,
+      "confusion_matrix": [
+        [
+          3,
+          3,
+          0
+        ],
+        [
+          0,
+          2,
+          3
+        ],
+        [
+          0,
+          3,
+          1
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 4,
+    "config_name": "tsne_use_metadata",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 961.0,
+    "visualization_path": "visualizations/test_04_tsne_use_metadata.png",
+    "prompt_path": "prompts/test_04_tsne_use_metadata_all.txt",
+    "response_path": "responses/test_04_tsne_use_metadata_all.txt",
+    "ground_truth_path": "ground_truth/test_04_tsne_use_metadata.json",
+    "config_path": "configs/test_04_tsne_use_metadata.json",
+    "test_directory": "test_04_tsne_use_metadata",
+    "is_multi_viz": false,
+    "visualization_methods": [
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "tsne_use_metadata",
+      "accuracy": 0.4666666666666667,
+      "balanced_accuracy": 0.4666666666666666,
+      "precision_macro": 0.5619047619047618,
+      "recall_macro": 0.4666666666666666,
+      "f1_macro": 0.48148148148148145,
+      "precision_micro": 0.4666666666666667,
+      "recall_micro": 0.4666666666666667,
+      "f1_micro": 0.4666666666666667,
+      "precision_weighted": 0.6019047619047619,
+      "recall_weighted": 0.4666666666666667,
+      "f1_weighted": 0.49629629629629624,
+      "confusion_matrix": [
+        [
+          3,
+          3,
+          0
+        ],
+        [
+          0,
+          2,
+          3
+        ],
+        [
+          0,
+          2,
+          2
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 5,
+    "config_name": "tsne_semantic_metadata_combined",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 961.0,
+    "visualization_path": "visualizations/test_05_tsne_semantic_metadata_combined.png",
+    "prompt_path": "prompts/test_05_tsne_semantic_metadata_combined_all.txt",
+    "response_path": "responses/test_05_tsne_semantic_metadata_combined_all.txt",
+    "ground_truth_path": "ground_truth/test_05_tsne_semantic_metadata_combined.json",
+    "config_path": "configs/test_05_tsne_semantic_metadata_combined.json",
+    "test_directory": "test_05_tsne_semantic_metadata_combined",
+    "is_multi_viz": false,
+    "visualization_methods": [
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "tsne_semantic_metadata_combined",
+      "accuracy": 0.4,
+      "balanced_accuracy": 0.3833333333333333,
+      "precision_macro": 0.5,
+      "recall_macro": 0.3833333333333333,
+      "f1_macro": 0.40811965811965817,
+      "precision_micro": 0.4,
+      "recall_micro": 0.4,
+      "f1_micro": 0.4,
+      "precision_weighted": 0.55,
+      "recall_weighted": 0.4,
+      "f1_weighted": 0.4358974358974359,
+      "confusion_matrix": [
+        [
+          3,
+          3,
+          0
+        ],
+        [
+          0,
+          2,
+          3
+        ],
+        [
+          0,
+          3,
+          1
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 6,
+    "config_name": "multi_tsne_semantic",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 1478.0,
+    "visualization_path": "visualizations/test_06_multi_tsne_semantic.png",
+    "prompt_path": "prompts/test_06_multi_tsne_semantic_all.txt",
+    "response_path": "responses/test_06_multi_tsne_semantic_all.txt",
+    "ground_truth_path": "ground_truth/test_06_multi_tsne_semantic.json",
+    "config_path": "configs/test_06_multi_tsne_semantic.json",
+    "test_directory": "test_06_multi_tsne_semantic",
+    "is_multi_viz": true,
+    "visualization_methods": [
+      "pca",
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "multi_tsne_semantic",
+      "accuracy": 0.4,
+      "balanced_accuracy": 0.4666666666666666,
+      "precision_macro": 0.2814814814814815,
+      "recall_macro": 0.4666666666666666,
+      "f1_macro": 0.3384615384615384,
+      "precision_micro": 0.4,
+      "recall_micro": 0.4,
+      "f1_micro": 0.4,
+      "precision_weighted": 0.2518518518518518,
+      "recall_weighted": 0.4,
+      "f1_weighted": 0.29743589743589743,
+      "confusion_matrix": [
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          1,
+          2,
+          2
+        ],
+        [
+          0,
+          0,
+          4
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 7,
+    "config_name": "multi_semantic_axes_metadata",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 1478.0,
+    "visualization_path": "visualizations/test_07_multi_semantic_axes_metadata.png",
+    "prompt_path": "prompts/test_07_multi_semantic_axes_metadata_all.txt",
+    "response_path": "responses/test_07_multi_semantic_axes_metadata_all.txt",
+    "ground_truth_path": "ground_truth/test_07_multi_semantic_axes_metadata.json",
+    "config_path": "configs/test_07_multi_semantic_axes_metadata.json",
+    "test_directory": "test_07_multi_semantic_axes_metadata",
+    "is_multi_viz": true,
+    "visualization_methods": [
+      "pca",
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "multi_semantic_axes_metadata",
+      "accuracy": 0.4,
+      "balanced_accuracy": 0.4666666666666666,
+      "precision_macro": 0.2814814814814815,
+      "recall_macro": 0.4666666666666666,
+      "f1_macro": 0.3384615384615384,
+      "precision_micro": 0.4,
+      "recall_micro": 0.4,
+      "f1_micro": 0.4,
+      "precision_weighted": 0.2518518518518518,
+      "recall_weighted": 0.4,
+      "f1_weighted": 0.29743589743589743,
+      "confusion_matrix": [
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          1,
+          2,
+          2
+        ],
+        [
+          0,
+          0,
+          4
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 8,
+    "config_name": "basic_tsne",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 937.0,
+    "visualization_path": "visualizations/test_08_basic_tsne.png",
+    "prompt_path": "prompts/test_08_basic_tsne_all.txt",
+    "response_path": "responses/test_08_basic_tsne_all.txt",
+    "ground_truth_path": "ground_truth/test_08_basic_tsne.json",
+    "config_path": "configs/test_08_basic_tsne.json",
+    "test_directory": "test_08_basic_tsne",
+    "is_multi_viz": false,
+    "visualization_methods": [
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "basic_tsne",
+      "accuracy": 0.4666666666666667,
+      "balanced_accuracy": 0.48333333333333334,
+      "precision_macro": 0.5555555555555555,
+      "recall_macro": 0.48333333333333334,
+      "f1_macro": 0.4594017094017094,
+      "precision_micro": 0.4666666666666667,
+      "recall_micro": 0.4666666666666667,
+      "f1_micro": 0.4666666666666667,
+      "precision_weighted": 0.6,
+      "recall_weighted": 0.4666666666666667,
+      "f1_weighted": 0.4730769230769231,
+      "confusion_matrix": [
+        [
+          3,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          4
+        ],
+        [
+          0,
+          1,
+          3
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 9,
+    "config_name": "tsne_knn",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 1440.0,
+    "visualization_path": "visualizations/test_09_tsne_knn.png",
+    "prompt_path": "prompts/test_09_tsne_knn_all.txt",
+    "response_path": "responses/test_09_tsne_knn_all.txt",
+    "ground_truth_path": "ground_truth/test_09_tsne_knn.json",
+    "config_path": "configs/test_09_tsne_knn.json",
+    "test_directory": "test_09_tsne_knn",
+    "is_multi_viz": false,
+    "visualization_methods": [
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "tsne_knn",
+      "accuracy": 0.5333333333333333,
+      "balanced_accuracy": 0.5055555555555555,
+      "precision_macro": 0.5317460317460317,
+      "recall_macro": 0.5055555555555555,
+      "f1_macro": 0.49999999999999994,
+      "precision_micro": 0.5333333333333333,
+      "recall_micro": 0.5333333333333333,
+      "f1_micro": 0.5333333333333333,
+      "precision_weighted": 0.5428571428571428,
+      "recall_weighted": 0.5333333333333333,
+      "f1_weighted": 0.5222222222222223,
+      "confusion_matrix": [
+        [
+          4,
+          2,
+          0
+        ],
+        [
+          1,
+          3,
+          1
+        ],
+        [
+          1,
+          2,
+          1
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 10,
+    "config_name": "tsne_3d",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 1101.0,
+    "visualization_path": "visualizations/test_10_tsne_3d.png",
+    "prompt_path": "prompts/test_10_tsne_3d_all.txt",
+    "response_path": "responses/test_10_tsne_3d_all.txt",
+    "ground_truth_path": "ground_truth/test_10_tsne_3d.json",
+    "config_path": "configs/test_10_tsne_3d.json",
+    "test_directory": "test_10_tsne_3d",
+    "is_multi_viz": false,
+    "visualization_methods": [
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "tsne_3d",
+      "accuracy": 0.5333333333333333,
+      "balanced_accuracy": 0.5666666666666667,
+      "precision_macro": 0.5833333333333334,
+      "recall_macro": 0.5666666666666667,
+      "f1_macro": 0.5185185185185185,
+      "precision_micro": 0.5333333333333333,
+      "recall_micro": 0.5333333333333333,
+      "f1_micro": 0.5333333333333333,
+      "precision_weighted": 0.6166666666666667,
+      "recall_weighted": 0.5333333333333333,
+      "f1_weighted": 0.5185185185185185,
+      "confusion_matrix": [
+        [
+          3,
+          3,
+          0
+        ],
+        [
+          0,
+          1,
+          4
+        ],
+        [
+          0,
+          0,
+          4
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 11,
+    "config_name": "tsne_3d_knn",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 1534.0,
+    "visualization_path": "visualizations/test_11_tsne_3d_knn.png",
+    "prompt_path": "prompts/test_11_tsne_3d_knn_all.txt",
+    "response_path": "responses/test_11_tsne_3d_knn_all.txt",
+    "ground_truth_path": "ground_truth/test_11_tsne_3d_knn.json",
+    "config_path": "configs/test_11_tsne_3d_knn.json",
+    "test_directory": "test_11_tsne_3d_knn",
+    "is_multi_viz": false,
+    "visualization_methods": [
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "tsne_3d_knn",
+      "accuracy": 0.6,
+      "balanced_accuracy": 0.6055555555555555,
+      "precision_macro": 0.6333333333333333,
+      "recall_macro": 0.6055555555555555,
+      "f1_macro": 0.6000000000000001,
+      "precision_micro": 0.6,
+      "recall_micro": 0.6,
+      "f1_micro": 0.6,
+      "precision_weighted": 0.6666666666666666,
+      "recall_weighted": 0.6,
+      "f1_weighted": 0.6133333333333334,
+      "confusion_matrix": [
+        [
+          4,
+          2,
+          0
+        ],
+        [
+          0,
+          2,
+          3
+        ],
+        [
+          0,
+          1,
+          3
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 12,
+    "config_name": "tsne_high_perplexity",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 937.0,
+    "visualization_path": "visualizations/test_12_tsne_high_perplexity.png",
+    "prompt_path": "prompts/test_12_tsne_high_perplexity_all.txt",
+    "response_path": "responses/test_12_tsne_high_perplexity_all.txt",
+    "ground_truth_path": "ground_truth/test_12_tsne_high_perplexity.json",
+    "config_path": "configs/test_12_tsne_high_perplexity.json",
+    "test_directory": "test_12_tsne_high_perplexity",
+    "is_multi_viz": false,
+    "visualization_methods": [
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "tsne_high_perplexity",
+      "accuracy": 0.4,
+      "balanced_accuracy": 0.4166666666666667,
+      "precision_macro": 0.43333333333333335,
+      "recall_macro": 0.4166666666666667,
+      "f1_macro": 0.36507936507936506,
+      "precision_micro": 0.4,
+      "recall_micro": 0.4,
+      "f1_micro": 0.4,
+      "precision_weighted": 0.48000000000000004,
+      "recall_weighted": 0.4,
+      "f1_weighted": 0.380952380952381,
+      "confusion_matrix": [
+        [
+          3,
+          1,
+          2
+        ],
+        [
+          0,
+          0,
+          5
+        ],
+        [
+          0,
+          1,
+          3
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 13,
+    "config_name": "multi_pca_tsne",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 1454.0,
+    "visualization_path": "visualizations/test_13_multi_pca_tsne.png",
+    "prompt_path": "prompts/test_13_multi_pca_tsne_all.txt",
+    "response_path": "responses/test_13_multi_pca_tsne_all.txt",
+    "ground_truth_path": "ground_truth/test_13_multi_pca_tsne.json",
+    "config_path": "configs/test_13_multi_pca_tsne.json",
+    "test_directory": "test_13_multi_pca_tsne",
+    "is_multi_viz": true,
+    "visualization_methods": [
+      "pca",
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "multi_pca_tsne",
+      "accuracy": 0.3333333333333333,
+      "balanced_accuracy": 0.3333333333333333,
+      "precision_macro": 0.12820512820512822,
+      "recall_macro": 0.3333333333333333,
+      "f1_macro": 0.1851851851851852,
+      "precision_micro": 0.3333333333333333,
+      "recall_micro": 0.3333333333333333,
+      "f1_micro": 0.3333333333333333,
+      "precision_weighted": 0.12820512820512822,
+      "recall_weighted": 0.3333333333333333,
+      "f1_weighted": 0.18518518518518517,
+      "confusion_matrix": [
+        [
+          0,
+          4,
+          2
+        ],
+        [
+          0,
+          5,
+          0
+        ],
+        [
+          0,
+          4,
+          0
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 14,
+    "config_name": "multi_pca_tsne_spectral",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 1559.0,
+    "visualization_path": "visualizations/test_14_multi_pca_tsne_spectral.png",
+    "prompt_path": "prompts/test_14_multi_pca_tsne_spectral_all.txt",
+    "response_path": "responses/test_14_multi_pca_tsne_spectral_all.txt",
+    "ground_truth_path": "ground_truth/test_14_multi_pca_tsne_spectral.json",
+    "config_path": "configs/test_14_multi_pca_tsne_spectral.json",
+    "test_directory": "test_14_multi_pca_tsne_spectral",
+    "is_multi_viz": true,
+    "visualization_methods": [
+      "pca",
+      "tsne",
+      "spectral"
+    ],
+    "metrics": {
+      "config_name": "multi_pca_tsne_spectral",
+      "accuracy": 0.3333333333333333,
+      "balanced_accuracy": 0.3333333333333333,
+      "precision_macro": 0.1111111111111111,
+      "recall_macro": 0.3333333333333333,
+      "f1_macro": 0.16666666666666666,
+      "precision_micro": 0.3333333333333333,
+      "recall_micro": 0.3333333333333333,
+      "f1_micro": 0.3333333333333333,
+      "precision_weighted": 0.1111111111111111,
+      "recall_weighted": 0.3333333333333333,
+      "f1_weighted": 0.16666666666666666,
+      "confusion_matrix": [
+        [
+          0,
+          6,
+          0
+        ],
+        [
+          0,
+          5,
+          0
+        ],
+        [
+          0,
+          4,
+          0
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 15,
+    "config_name": "multi_linear_nonlinear",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 1647.0,
+    "visualization_path": "visualizations/test_15_multi_linear_nonlinear.png",
+    "prompt_path": "prompts/test_15_multi_linear_nonlinear_all.txt",
+    "response_path": "responses/test_15_multi_linear_nonlinear_all.txt",
+    "ground_truth_path": "ground_truth/test_15_multi_linear_nonlinear.json",
+    "config_path": "configs/test_15_multi_linear_nonlinear.json",
+    "test_directory": "test_15_multi_linear_nonlinear",
+    "is_multi_viz": true,
+    "visualization_methods": [
+      "pca",
+      "tsne",
+      "isomap"
+    ],
+    "metrics": {
+      "config_name": "multi_linear_nonlinear",
+      "accuracy": 0.3333333333333333,
+      "balanced_accuracy": 0.3333333333333333,
+      "precision_macro": 0.1111111111111111,
+      "recall_macro": 0.3333333333333333,
+      "f1_macro": 0.16666666666666666,
+      "precision_micro": 0.3333333333333333,
+      "recall_micro": 0.3333333333333333,
+      "f1_micro": 0.3333333333333333,
+      "precision_weighted": 0.1111111111111111,
+      "recall_weighted": 0.3333333333333333,
+      "f1_weighted": 0.16666666666666666,
+      "confusion_matrix": [
+        [
+          0,
+          6,
+          0
+        ],
+        [
+          0,
+          5,
+          0
+        ],
+        [
+          0,
+          4,
+          0
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 16,
+    "config_name": "multi_local_global",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 1532.0,
+    "visualization_path": "visualizations/test_16_multi_local_global.png",
+    "prompt_path": "prompts/test_16_multi_local_global_all.txt",
+    "response_path": "responses/test_16_multi_local_global_all.txt",
+    "ground_truth_path": "ground_truth/test_16_multi_local_global.json",
+    "config_path": "configs/test_16_multi_local_global.json",
+    "test_directory": "test_16_multi_local_global",
+    "is_multi_viz": true,
+    "visualization_methods": [
+      "tsne",
+      "isomap",
+      "mds"
+    ],
+    "metrics": {
+      "config_name": "multi_local_global",
+      "accuracy": 0.3333333333333333,
+      "balanced_accuracy": 0.3333333333333333,
+      "precision_macro": 0.1111111111111111,
+      "recall_macro": 0.3333333333333333,
+      "f1_macro": 0.16666666666666666,
+      "precision_micro": 0.3333333333333333,
+      "recall_micro": 0.3333333333333333,
+      "f1_micro": 0.3333333333333333,
+      "precision_weighted": 0.1111111111111111,
+      "recall_weighted": 0.3333333333333333,
+      "f1_weighted": 0.16666666666666666,
+      "confusion_matrix": [
+        [
+          0,
+          6,
+          0
+        ],
+        [
+          0,
+          5,
+          0
+        ],
+        [
+          0,
+          4,
+          0
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 17,
+    "config_name": "multi_comprehensive",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 1752.0,
+    "visualization_path": "visualizations/test_17_multi_comprehensive.png",
+    "prompt_path": "prompts/test_17_multi_comprehensive_all.txt",
+    "response_path": "responses/test_17_multi_comprehensive_all.txt",
+    "ground_truth_path": "ground_truth/test_17_multi_comprehensive.json",
+    "config_path": "configs/test_17_multi_comprehensive.json",
+    "test_directory": "test_17_multi_comprehensive",
+    "is_multi_viz": true,
+    "visualization_methods": [
+      "pca",
+      "tsne",
+      "spectral",
+      "isomap"
+    ],
+    "metrics": {
+      "config_name": "multi_comprehensive",
+      "accuracy": 0.3333333333333333,
+      "balanced_accuracy": 0.3333333333333333,
+      "precision_macro": 0.1111111111111111,
+      "recall_macro": 0.3333333333333333,
+      "f1_macro": 0.16666666666666666,
+      "precision_micro": 0.3333333333333333,
+      "recall_micro": 0.3333333333333333,
+      "f1_micro": 0.3333333333333333,
+      "precision_weighted": 0.1111111111111111,
+      "recall_weighted": 0.3333333333333333,
+      "f1_weighted": 0.16666666666666666,
+      "confusion_matrix": [
+        [
+          0,
+          6,
+          0
+        ],
+        [
+          0,
+          5,
+          0
+        ],
+        [
+          0,
+          4,
+          0
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 18,
+    "config_name": "multi_grid_layout",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 1454.0,
+    "visualization_path": "visualizations/test_18_multi_grid_layout.png",
+    "prompt_path": "prompts/test_18_multi_grid_layout_all.txt",
+    "response_path": "responses/test_18_multi_grid_layout_all.txt",
+    "ground_truth_path": "ground_truth/test_18_multi_grid_layout.json",
+    "config_path": "configs/test_18_multi_grid_layout.json",
+    "test_directory": "test_18_multi_grid_layout",
+    "is_multi_viz": true,
+    "visualization_methods": [
+      "pca",
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "multi_grid_layout",
+      "accuracy": 0.3333333333333333,
+      "balanced_accuracy": 0.3333333333333333,
+      "precision_macro": 0.1111111111111111,
+      "recall_macro": 0.3333333333333333,
+      "f1_macro": 0.16666666666666666,
+      "precision_micro": 0.3333333333333333,
+      "recall_micro": 0.3333333333333333,
+      "f1_micro": 0.3333333333333333,
+      "precision_weighted": 0.1111111111111111,
+      "recall_weighted": 0.3333333333333333,
+      "f1_weighted": 0.16666666666666666,
+      "confusion_matrix": [
+        [
+          0,
+          6,
+          0
+        ],
+        [
+          0,
+          5,
+          0
+        ],
+        [
+          0,
+          4,
+          0
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 19,
+    "config_name": "multi_with_umap",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 1660.0,
+    "visualization_path": "visualizations/test_19_multi_with_umap.png",
+    "prompt_path": "prompts/test_19_multi_with_umap_all.txt",
+    "response_path": "responses/test_19_multi_with_umap_all.txt",
+    "ground_truth_path": "ground_truth/test_19_multi_with_umap.json",
+    "config_path": "configs/test_19_multi_with_umap.json",
+    "test_directory": "test_19_multi_with_umap",
+    "is_multi_viz": true,
+    "visualization_methods": [
+      "pca",
+      "tsne",
+      "umap"
+    ],
+    "metrics": {
+      "config_name": "multi_with_umap",
+      "accuracy": 0.3333333333333333,
+      "balanced_accuracy": 0.3333333333333333,
+      "precision_macro": 0.1111111111111111,
+      "recall_macro": 0.3333333333333333,
+      "f1_macro": 0.16666666666666666,
+      "precision_micro": 0.3333333333333333,
+      "recall_micro": 0.3333333333333333,
+      "f1_micro": 0.3333333333333333,
+      "precision_weighted": 0.1111111111111111,
+      "recall_weighted": 0.3333333333333333,
+      "f1_weighted": 0.16666666666666666,
+      "confusion_matrix": [
+        [
+          0,
+          6,
+          0
+        ],
+        [
+          0,
+          5,
+          0
+        ],
+        [
+          0,
+          4,
+          0
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 20,
+    "config_name": "tsne_high_dpi",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 937.0,
+    "visualization_path": "visualizations/test_20_tsne_high_dpi.png",
+    "prompt_path": "prompts/test_20_tsne_high_dpi_all.txt",
+    "response_path": "responses/test_20_tsne_high_dpi_all.txt",
+    "ground_truth_path": "ground_truth/test_20_tsne_high_dpi.json",
+    "config_path": "configs/test_20_tsne_high_dpi.json",
+    "test_directory": "test_20_tsne_high_dpi",
+    "is_multi_viz": false,
+    "visualization_methods": [
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "tsne_high_dpi",
+      "accuracy": 0.4,
+      "balanced_accuracy": 0.38888888888888884,
+      "precision_macro": 0.2962962962962963,
+      "recall_macro": 0.38888888888888884,
+      "f1_macro": 0.3247863247863248,
+      "precision_micro": 0.4,
+      "recall_micro": 0.4,
+      "f1_micro": 0.4,
+      "precision_weighted": 0.32592592592592595,
+      "recall_weighted": 0.4,
+      "f1_weighted": 0.3487179487179487,
+      "confusion_matrix": [
+        [
+          4,
+          0,
+          2
+        ],
+        [
+          0,
+          0,
+          5
+        ],
+        [
+          2,
+          0,
+          2
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 21,
+    "config_name": "tsne_zoomed",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 937.0,
+    "visualization_path": "visualizations/test_21_tsne_zoomed.png",
+    "prompt_path": "prompts/test_21_tsne_zoomed_all.txt",
+    "response_path": "responses/test_21_tsne_zoomed_all.txt",
+    "ground_truth_path": "ground_truth/test_21_tsne_zoomed.json",
+    "config_path": "configs/test_21_tsne_zoomed.json",
+    "test_directory": "test_21_tsne_zoomed",
+    "is_multi_viz": false,
+    "visualization_methods": [
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "tsne_zoomed",
+      "accuracy": 0.4666666666666667,
+      "balanced_accuracy": 0.48333333333333334,
+      "precision_macro": 0.5555555555555555,
+      "recall_macro": 0.48333333333333334,
+      "f1_macro": 0.4594017094017094,
+      "precision_micro": 0.4666666666666667,
+      "recall_micro": 0.4666666666666667,
+      "f1_micro": 0.4666666666666667,
+      "precision_weighted": 0.6,
+      "recall_weighted": 0.4666666666666667,
+      "f1_weighted": 0.4730769230769231,
+      "confusion_matrix": [
+        [
+          3,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          4
+        ],
+        [
+          0,
+          1,
+          3
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 22,
+    "config_name": "frequent_patterns",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 1514.0,
+    "visualization_path": "visualizations/test_22_frequent_patterns.png",
+    "prompt_path": "prompts/test_22_frequent_patterns_all.txt",
+    "response_path": "responses/test_22_frequent_patterns_all.txt",
+    "ground_truth_path": "ground_truth/test_22_frequent_patterns.json",
+    "config_path": "configs/test_22_frequent_patterns.json",
+    "test_directory": "test_22_frequent_patterns",
+    "is_multi_viz": true,
+    "visualization_methods": [
+      "pca",
+      "frequent_patterns"
+    ],
+    "metrics": {
+      "config_name": "frequent_patterns",
+      "accuracy": 0.4,
+      "balanced_accuracy": 0.45,
+      "precision_macro": 0.27777777777777773,
+      "recall_macro": 0.45,
+      "f1_macro": 0.3428571428571428,
+      "precision_micro": 0.4,
+      "recall_micro": 0.4,
+      "f1_micro": 0.4,
+      "precision_weighted": 0.24444444444444444,
+      "recall_weighted": 0.4,
+      "f1_weighted": 0.3028571428571428,
+      "confusion_matrix": [
+        [
+          0,
+          5,
+          1
+        ],
+        [
+          0,
+          3,
+          2
+        ],
+        [
+          0,
+          1,
+          3
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 23,
+    "config_name": "decision_regions_svm",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 1569.0,
+    "visualization_path": "visualizations/test_23_decision_regions_svm.png",
+    "prompt_path": "prompts/test_23_decision_regions_svm_all.txt",
+    "response_path": "responses/test_23_decision_regions_svm_all.txt",
+    "ground_truth_path": "ground_truth/test_23_decision_regions_svm.json",
+    "config_path": "configs/test_23_decision_regions_svm.json",
+    "test_directory": "test_23_decision_regions_svm",
+    "is_multi_viz": true,
+    "visualization_methods": [
+      "pca",
+      "decision_regions"
+    ],
+    "metrics": {
+      "config_name": "decision_regions_svm",
+      "accuracy": 0.26666666666666666,
+      "balanced_accuracy": 0.3333333333333333,
+      "precision_macro": 0.08888888888888889,
+      "recall_macro": 0.3333333333333333,
+      "f1_macro": 0.14035087719298245,
+      "precision_micro": 0.26666666666666666,
+      "recall_micro": 0.26666666666666666,
+      "f1_micro": 0.26666666666666666,
+      "precision_weighted": 0.07111111111111111,
+      "recall_weighted": 0.26666666666666666,
+      "f1_weighted": 0.11228070175438595,
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          6
+        ],
+        [
+          0,
+          0,
+          5
+        ],
+        [
+          0,
+          0,
+          4
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  },
+  {
+    "test_idx": 24,
+    "config_name": "metadata_comprehensive",
+    "success": true,
+    "num_test_samples": 15,
+    "test_indices": [
+      0,
+      7,
+      15,
+      25,
+      34,
+      43,
+      45,
+      95,
+      107,
+      111,
+      113,
+      118,
+      132,
+      138,
+      142
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2
+    ],
+    "avg_prompt_length": 1647.0,
+    "visualization_path": "visualizations/test_24_metadata_comprehensive.png",
+    "prompt_path": "prompts/test_24_metadata_comprehensive_all.txt",
+    "response_path": "responses/test_24_metadata_comprehensive_all.txt",
+    "ground_truth_path": "ground_truth/test_24_metadata_comprehensive.json",
+    "config_path": "configs/test_24_metadata_comprehensive.json",
+    "test_directory": "test_24_metadata_comprehensive",
+    "is_multi_viz": true,
+    "visualization_methods": [
+      "pca",
+      "tsne",
+      "isomap"
+    ],
+    "metrics": {
+      "config_name": "metadata_comprehensive",
+      "accuracy": 0.26666666666666666,
+      "balanced_accuracy": 0.3333333333333333,
+      "precision_macro": 0.08888888888888889,
+      "recall_macro": 0.3333333333333333,
+      "f1_macro": 0.14035087719298245,
+      "precision_micro": 0.26666666666666666,
+      "recall_micro": 0.26666666666666666,
+      "f1_micro": 0.26666666666666666,
+      "precision_weighted": 0.07111111111111111,
+      "recall_weighted": 0.26666666666666666,
+      "f1_weighted": 0.11228070175438595,
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          6
+        ],
+        [
+          0,
+          0,
+          5
+        ],
+        [
+          0,
+          0,
+          4
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 15,
+      "num_classes": 3,
+      "support": []
+    },
+    "error": null
+  }
+]
