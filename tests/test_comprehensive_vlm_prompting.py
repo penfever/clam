@@ -43,14 +43,14 @@ logger = logging.getLogger(__name__)
 class VLMPromptingTestSuite:
     """Comprehensive test suite for VLM prompting with various configurations."""
     
-    def __init__(self, output_dir: str, dataset_id: int = 23, vlm_model: str = "Qwen/Qwen2-VL-2B-Instruct", 
+    def __init__(self, output_dir: str, task_id: int = 23, vlm_model: str = "Qwen/Qwen2-VL-2B-Instruct", 
                  num_tests: int = None, num_samples_per_test: int = 10, backend: str = "auto", zoom_factor: float = 6.5):
         """
         Initialize the test suite.
         
         Args:
             output_dir: Directory to save outputs
-            dataset_id: OpenML task ID (default: 23 = cmc contraceptive method choice)
+            task_id: OpenML task ID (default: 23 = cmc contraceptive method choice)
             vlm_model: VLM model to use (default: small Qwen model)
             num_tests: Number of test configurations to run (default: None, runs all available)
             num_samples_per_test: Number of test samples per configuration (default: 10)
@@ -58,7 +58,7 @@ class VLMPromptingTestSuite:
             zoom_factor: Zoom factor for t-SNE visualizations (default: 6.5)
         """
         self.output_dir = Path(output_dir)
-        self.dataset_id = dataset_id
+        self.task_id = task_id
         self.vlm_model = vlm_model
         self.num_tests = num_tests
         self.num_samples_per_test = num_samples_per_test
@@ -85,7 +85,7 @@ class VLMPromptingTestSuite:
         # Load dataset
         self.X, self.y, self.dataset_info = self._load_dataset()
         
-        logger.info(f"Initialized test suite with dataset {dataset_id}")
+        logger.info(f"Initialized test suite with task {task_id}")
         logger.info(f"Dataset shape: {self.X.shape}, Classes: {len(np.unique(self.y))}")
     
     def _load_semantic_class_names(self, task_id: int, num_classes: int) -> Optional[List[str]]:
@@ -232,7 +232,7 @@ class VLMPromptingTestSuite:
         """Load OpenML dataset with robust error handling."""
         try:
             # Load dataset from OpenML
-            dataset = fetch_openml(data_id=self.dataset_id, as_frame=True, parser='auto')
+            dataset = fetch_openml(data_id=self.task_id, as_frame=True, parser='auto')
             X = dataset.data
             y = dataset.target
             
@@ -287,20 +287,20 @@ class VLMPromptingTestSuite:
                 feature_names = list(dataset.data.columns)
             
             dataset_info = {
-                'name': dataset.DESCR if hasattr(dataset, 'DESCR') else f'OpenML_{self.dataset_id}',
+                'name': dataset.DESCR if hasattr(dataset, 'DESCR') else f'OpenML_{self.task_id}',
                 'n_samples': len(X),
                 'n_features': X.shape[1],
                 'n_classes': len(np.unique(y)),
-                'openml_id': self.dataset_id,
+                'openml_id': self.task_id,
                 'data_source': 'openml',
                 'feature_names': feature_names
             }
             
-            logger.info(f"Successfully loaded OpenML dataset {self.dataset_id}")
+            logger.info(f"Successfully loaded OpenML dataset {self.task_id}")
             return X, y, dataset_info
             
         except Exception as e:
-            logger.warning(f"Failed to load OpenML dataset {self.dataset_id}: {e}")
+            logger.warning(f"Failed to load OpenML dataset {self.task_id}: {e}")
             logger.info("Using synthetic dataset as fallback")
             
             # Fallback to synthetic data
@@ -609,12 +609,12 @@ class VLMPromptingTestSuite:
             # Load semantic class names if requested
             semantic_class_names = None
             if config.get('load_semantic_from_cc18', False):
-                semantic_class_names = self._load_semantic_class_names(self.dataset_id, len(np.unique(y_train)))
+                semantic_class_names = self._load_semantic_class_names(self.task_id, len(np.unique(y_train)))
                 if semantic_class_names:
                     config['semantic_class_names'] = semantic_class_names
                     logger.info(f"Loaded semantic class names for test {test_idx + 1}: {semantic_class_names}")
                 else:
-                    logger.info(f"No semantic class names found for task {self.dataset_id}, using Class_<NUM> fallback")
+                    logger.info(f"No semantic class names found for task {self.task_id}, using Class_<NUM> fallback")
                     config['semantic_class_names'] = [f"Class_{i}" for i in range(len(np.unique(y_train)))]
                     config['use_semantic_names'] = False  # Disable semantic names since we couldn't load them
             
@@ -792,7 +792,7 @@ class VLMPromptingTestSuite:
                         # Log metrics using unified metrics logger
                         metrics_logger = MetricsLogger(
                             model_name=f"CLAM-{config['name']}",
-                            dataset_name=self.dataset_info.get('name', f'dataset_{self.dataset_id}'),
+                            dataset_name=self.dataset_info.get('name', f'dataset_{self.task_id}'),
                             use_wandb=False,  # Disable W&B for test script
                             logger=logger
                         )
@@ -932,7 +932,7 @@ class VLMPromptingTestSuite:
     def run_all_tests(self) -> Dict[str, Any]:
         """Run all test configurations."""
         logger.info("Starting comprehensive VLM prompting test suite")
-        logger.info(f"Dataset: {self.dataset_info['name']} (OpenML ID: {self.dataset_id})")
+        logger.info(f"Dataset: {self.dataset_info['name']} (OpenML ID: {self.task_id})")
         logger.info(f"VLM Model: {self.vlm_model}")
         logger.info(f"Output Directory: {self.output_dir}")
         
@@ -1093,8 +1093,8 @@ def main():
     parser = argparse.ArgumentParser(description="Comprehensive VLM Prompting Test Suite")
     parser.add_argument("--output_dir", type=str, default="./test_vlm_outputs",
                        help="Directory to save test outputs")
-    parser.add_argument("--dataset_id", type=int, default=23,
-                       help="OpenML dataset ID (default: 23 = cmc, alternatives: 61=iris, 1046=wine, 1461=banknote)")
+    parser.add_argument("--task_id", type=int, default=23,
+                       help="OpenML task ID (default: 23 = cmc, alternatives: 61=iris, 1046=wine, 1461=banknote)")
     parser.add_argument("--vlm_model", type=str, default="Qwen/Qwen2.5-VL-3B-Instruct",
                        help="VLM model to use")
     parser.add_argument("--seed", type=int, default=42,
@@ -1117,7 +1117,7 @@ def main():
     # Create and run test suite
     test_suite = VLMPromptingTestSuite(
         output_dir=args.output_dir,
-        dataset_id=args.dataset_id,
+        task_id=args.task_id,
         vlm_model=args.vlm_model,
         num_tests=args.num_tests,
         num_samples_per_test=args.num_samples_per_test,
