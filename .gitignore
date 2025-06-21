@@ -11,6 +11,7 @@
 !/secrets/.gitkeep
 
 .claude
+CLAUDE.md
 catboost_info
 openml_cc18_analysis_wandb
 cifar10_data

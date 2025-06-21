@@ -43,14 +43,14 @@ logger = logging.getLogger(__name__)
 class VLMPromptingTestSuite:
     """Comprehensive test suite for VLM prompting with various configurations."""
     
-    def __init__(self, output_dir: str, dataset_id: int = 31, vlm_model: str = "Qwen/Qwen2-VL-2B-Instruct", 
+    def __init__(self, output_dir: str, dataset_id: int = 23, vlm_model: str = "Qwen/Qwen2-VL-2B-Instruct", 
                  num_tests: int = 16, num_samples_per_test: int = 10):
         """
         Initialize the test suite.
         
         Args:
             output_dir: Directory to save outputs
-            dataset_id: OpenML dataset ID (default: 31 = credit-g)
+            dataset_id: OpenML task ID (default: 23 = cmc contraceptive method choice)
             vlm_model: VLM model to use (default: small Qwen model)
             num_tests: Number of test configurations to run (default: 16)
             num_samples_per_test: Number of test samples per configuration (default: 10)
@@ -358,7 +358,7 @@ class VLMPromptingTestSuite:
                 'name': 'multi_pca_tsne',
                 'enable_multi_viz': True,
                 'visualization_methods': ['pca', 'tsne'],
-                'layout_strategy': 'adaptive_grid',
+                'layout_strategy': 'sequential',
                 'reasoning_focus': 'comparison'
             },
             # Three methods
@@ -366,7 +366,7 @@ class VLMPromptingTestSuite:
                 'name': 'multi_pca_tsne_spectral',
                 'enable_multi_viz': True,
                 'visualization_methods': ['pca', 'tsne', 'spectral'],
-                'layout_strategy': 'adaptive_grid',
+                'layout_strategy': 'sequential',
                 'reasoning_focus': 'consensus'
             },
             # Linear vs nonlinear focus
@@ -374,7 +374,7 @@ class VLMPromptingTestSuite:
                 'name': 'multi_linear_nonlinear',
                 'enable_multi_viz': True,
                 'visualization_methods': ['pca', 'tsne', 'isomap'],
-                'layout_strategy': 'hierarchical',
+                'layout_strategy': 'sequential',
                 'reasoning_focus': 'divergence'
             },
             # Local vs global methods
@@ -390,7 +390,7 @@ class VLMPromptingTestSuite:
                 'name': 'multi_comprehensive',
                 'enable_multi_viz': True,
                 'visualization_methods': ['pca', 'tsne', 'spectral', 'isomap'],
-                'layout_strategy': 'focus_plus_context',
+                'layout_strategy': 'sequential',
                 'reasoning_focus': 'consensus'
             },
             # Different layout strategies
@@ -406,7 +406,7 @@ class VLMPromptingTestSuite:
                 'name': 'multi_with_umap',
                 'enable_multi_viz': True,
                 'visualization_methods': ['pca', 'tsne', 'umap'],
-                'layout_strategy': 'adaptive_grid',
+                'layout_strategy': 'sequential',
                 'reasoning_focus': 'comparison'
             }
         ]
@@ -428,7 +428,7 @@ class VLMPromptingTestSuite:
                 'name': 'multi_semantic',
                 'enable_multi_viz': True,
                 'visualization_methods': ['pca', 'tsne'],
-                'layout_strategy': 'adaptive_grid',
+                'layout_strategy': 'sequential',
                 'reasoning_focus': 'comparison',
                 'use_semantic_names': True,
                 'load_semantic_from_cc18': True  # Load from CC18 semantic directory
@@ -460,7 +460,7 @@ class VLMPromptingTestSuite:
                 'name': 'frequent_patterns',
                 'enable_multi_viz': True,
                 'visualization_methods': ['pca', 'frequent_patterns'],
-                'layout_strategy': 'adaptive_grid',
+                'layout_strategy': 'sequential',
                 'reasoning_focus': 'comparison'
             },
             # MLxtend decision regions with SVM
@@ -468,7 +468,7 @@ class VLMPromptingTestSuite:
                 'name': 'decision_regions_svm',
                 'enable_multi_viz': True,
                 'visualization_methods': ['pca', 'decision_regions'],
-                'layout_strategy': 'adaptive_grid',
+                'layout_strategy': 'sequential',
                 'reasoning_focus': 'comparison',
                 'decision_classifier': 'svm'
             },
@@ -553,7 +553,7 @@ class VLMPromptingTestSuite:
                 classifier_config.update({
                     'enable_multi_viz': True,
                     'visualization_methods': config.get('visualization_methods', ['tsne']),
-                    'layout_strategy': config.get('layout_strategy', 'adaptive_grid'),
+                    'layout_strategy': config.get('layout_strategy', 'sequential'),
                     'reasoning_focus': config.get('reasoning_focus', 'classification'),
                     'multi_viz_config': {}
                 })

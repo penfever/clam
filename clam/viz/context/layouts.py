@@ -256,23 +256,22 @@ class LayoutManager:
         if not results:
             return Image.new('RGB', (100, 100), (255, 255, 255))
         
-        # Use larger dimensions to match tsne_functions quality
-        target_height = 600  # Increased from 400 for better quality
+        # Use consistent dimensions for all visualizations
+        target_width = 600   # Fixed width for consistency
+        target_height = 600  # Fixed height for consistency (square format)
         spacing = 40  # Increased spacing for better separation
         padding = 50  # Increased padding for better framing
         
-        # Resize all images to same height while preserving aspect ratio
+        # Resize all images to same dimensions (square format)
         resized_results = []
-        total_width = 0
         
         for result in results:
-            aspect_ratio = result.image.width / result.image.height
-            new_width = int(target_height * aspect_ratio)
-            resized_image = result.image.resize((new_width, target_height), Image.Resampling.LANCZOS)
+            # Resize to exact target dimensions (square format for consistency)
+            resized_image = result.image.resize((target_width, target_height), Image.Resampling.LANCZOS)
             resized_results.append((resized_image, result))
-            total_width += new_width
         
-        total_width += (len(results) - 1) * spacing + 2 * padding
+        # Calculate total composition dimensions
+        total_width = len(results) * target_width + (len(results) - 1) * spacing + 2 * padding
         total_height = target_height + 2 * padding + 60  # Extra space for labels
         
         # Create composition with white background matching tsne_functions
@@ -287,12 +286,12 @@ class LayoutManager:
             self._add_text_label(
                 composition, 
                 result.method_name,
-                current_x + resized_image.width // 2,
+                current_x + target_width // 2,
                 padding + target_height + 15,
                 font_size=18  # Larger font for better readability
             )
             
-            current_x += resized_image.width + spacing
+            current_x += target_width + spacing
         
         return composition
     
