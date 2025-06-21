@@ -766,25 +766,26 @@ class ClamTsneClassifier:
             if not hasattr(self, 'unique_classes') or self.unique_classes is None:
                 self.unique_classes = np.unique(self.y_train_sample)
             
-            # Extract semantic class names with fallback
-            semantic_class_names, _ = extract_class_names_from_labels(
-                labels=self.unique_classes.tolist() if self.unique_classes is not None else [],
-                dataset_name=kwargs.get('dataset_name', None),
-                semantic_data_dir=kwargs.get('semantic_data_dir', None),
-                use_semantic=self.use_semantic_names
-            )
+            # Use provided class_names if available, otherwise extract semantic class names
+            if class_names is not None:
+                # Use explicitly provided class names (highest priority)
+                semantic_class_names = class_names
+                self.class_names = class_names
+            else:
+                # Extract semantic class names with fallback
+                semantic_class_names, _ = extract_class_names_from_labels(
+                    labels=self.unique_classes.tolist() if self.unique_classes is not None else [],
+                    dataset_name=kwargs.get('dataset_name', None),
+                    semantic_data_dir=kwargs.get('semantic_data_dir', None),
+                    use_semantic=self.use_semantic_names
+                )
+                self.class_names = semantic_class_names
             
             # Create mapping from numeric labels to semantic names
             if self.unique_classes is not None:
                 self.class_to_semantic = {cls: name for cls, name in zip(sorted(self.unique_classes), semantic_class_names)}
             else:
                 self.class_to_semantic = {}
-            
-            # Store class names
-            if class_names is not None:
-                self.class_names = class_names
-            else:
-                self.class_names = semantic_class_names
         else:
             # For regression, we don't have class names
             self.unique_classes = None
