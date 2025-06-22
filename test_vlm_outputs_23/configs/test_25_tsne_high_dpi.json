@@ -1,9 +1,0 @@
-{
-  "name": "tsne_high_dpi",
-  "enable_multi_viz": false,
-  "use_3d_tsne": false,
-  "use_knn_connections": false,
-  "nn_k": 30,
-  "tsne_perplexity": 15,
-  "image_dpi": 150
-}

@@ -1,1 +1,0 @@
-Class: No-use | Reasoning: The red star query point is closest to the blue "No-use" class cluster in the t-SNE visualization.

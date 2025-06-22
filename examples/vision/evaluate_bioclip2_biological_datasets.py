@@ -243,9 +243,6 @@ class BioClip2KNNBaseline(GenericKNNBaseline):
         super().__init__(embedding_extractor, n_neighbors, metric, standardize)
 
 
-
-
-
 def download_and_prepare_awa2(data_dir: str = "./awa2_data") -> tuple:
     """Download and prepare AwA2 dataset."""
     data_dir = Path(data_dir)
