@@ -11,22 +11,32 @@ import random
 from pathlib import Path
 from typing import Dict, List, Any, Tuple
 
-# Define paths (dynamically resolve based on script location)
+# Define paths using resource manager
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..', '..'))
-OUTPUT_DIR = current_dir
 
-# Initialize metadata loader for general semantic file search
+# Initialize resource manager and metadata loader
 try:
     import sys
     sys.path.insert(0, project_root)
+    from clam.utils.resource_manager import get_resource_manager
     from clam.utils.metadata_loader import get_metadata_loader
+    
+    RESOURCE_MANAGER = get_resource_manager()
     METADATA_LOADER = get_metadata_loader()
+    
+    # Use resource manager for output directory
+    OUTPUT_DIR = RESOURCE_MANAGER.path_resolver.get_configs_dir() / 'jolt'
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    print(f"Using resource manager output directory: {OUTPUT_DIR}")
+    
 except Exception as e:
-    print(f"Warning: Could not initialize metadata loader: {e}")
+    print(f"Warning: Could not initialize resource manager: {e}")
+    RESOURCE_MANAGER = None
     METADATA_LOADER = None
-    # Fallback to hardcoded path
-    SEMANTIC_DIR = os.path.join(project_root, "data", "cc18_semantic")
+    # Fallback to current directory
+    OUTPUT_DIR = current_dir
+    print(f"Using fallback output directory: {OUTPUT_DIR}")
 
 
 def extract_column_descriptions(semantic_info: Dict[str, Any]) -> Dict[str, str]:
@@ -468,7 +478,7 @@ def process_semantic_files():
                 
                 # Save individual config using task_id for consistent lookup
                 config_filename = f"jolt_config_task_{task_id}.json"
-                config_path = os.path.join(OUTPUT_DIR, config_filename)
+                config_path = OUTPUT_DIR / config_filename
                 
                 with open(config_path, 'w') as f:
                     json.dump(jolt_config, f, indent=2)
@@ -498,7 +508,7 @@ def process_semantic_files():
                     }
                     
                     config_filename = f"jolt_config_task_{task_id}.json"
-                    config_path = os.path.join(OUTPUT_DIR, config_filename)
+                    config_path = OUTPUT_DIR / config_filename
                     
                     with open(config_path, 'w') as f:
                         json.dump(fallback_config, f, indent=2)
@@ -530,7 +540,7 @@ def process_semantic_files():
                 }
                 
                 config_filename = f"jolt_config_task_{task_id}.json"
-                config_path = os.path.join(OUTPUT_DIR, config_filename)
+                config_path = OUTPUT_DIR / config_filename
                 
                 with open(config_path, 'w') as f:
                     json.dump(minimal_config, f, indent=2)
@@ -544,7 +554,7 @@ def process_semantic_files():
                 continue
     
     # Save aggregated config
-    aggregated_path = os.path.join(OUTPUT_DIR, "all_jolt_configs.json")
+    aggregated_path = OUTPUT_DIR / "all_jolt_configs.json"
     with open(aggregated_path, 'w') as f:
         json.dump(all_configs, f, indent=2)
     

@@ -22,21 +22,32 @@ except ImportError:
     OPENML_AVAILABLE = False
     print("Warning: OpenML not installed. Will generate synthetic examples only.")
 
-# Define paths (dynamically resolve based on script location)
+# Define paths using resource manager
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..', '..'))
-# Initialize metadata loader for general semantic file search
+
+# Initialize resource manager and metadata loader
 try:
     import sys
     sys.path.insert(0, project_root)
+    from clam.utils.resource_manager import get_resource_manager
     from clam.utils.metadata_loader import get_metadata_loader
+    
+    RESOURCE_MANAGER = get_resource_manager()
     METADATA_LOADER = get_metadata_loader()
+    
+    # Use resource manager for output directory
+    OUTPUT_DIR = RESOURCE_MANAGER.path_resolver.get_configs_dir() / 'tabllm_like'
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    print(f"Using resource manager output directory: {OUTPUT_DIR}")
+    
 except Exception as e:
-    print(f"Warning: Could not initialize metadata loader: {e}")
+    print(f"Warning: Could not initialize resource manager: {e}")
+    RESOURCE_MANAGER = None
     METADATA_LOADER = None
-    # Fallback to hardcoded path
-    SEMANTIC_DIR = os.path.join(project_root, "data", "cc18_semantic")
-OUTPUT_DIR = current_dir
+    # Fallback to current directory
+    OUTPUT_DIR = current_dir
+    print(f"Using fallback output directory: {OUTPUT_DIR}")
 NOTES_PER_DATASET = 100  # Number of example notes to generate per dataset
 
 
@@ -309,7 +320,7 @@ def create_notes_bank_files():
             # Create and save YAML template using task_id for consistent lookup
             template_data = create_template_for_dataset(semantic_info, dataset_name)
             template_filename = f"templates_task_{task_id}.yaml"
-            template_path = os.path.join(OUTPUT_DIR, template_filename)
+            template_path = OUTPUT_DIR / template_filename
             
             write_yaml_template(template_data, template_path)
             templates_created += 1
@@ -327,10 +338,9 @@ def create_notes_bank_files():
     # Write individual dataset note files
     for dataset_name, notes in dataset_notes.items():
         notes_filename = f"notes_{dataset_name}.jsonl"
-        notes_path = os.path.join(OUTPUT_DIR, "notes", notes_filename)
-        
-        # Ensure directory exists
-        os.makedirs(os.path.dirname(notes_path), exist_ok=True)
+        notes_dir = OUTPUT_DIR / "notes"
+        notes_dir.mkdir(exist_ok=True)
+        notes_path = notes_dir / notes_filename
         
         with open(notes_path, 'w') as f:
             for note_item in notes:
@@ -338,21 +348,21 @@ def create_notes_bank_files():
         
         # Also create simple text version
         text_filename = f"notes_{dataset_name}.txt"
-        text_path = os.path.join(OUTPUT_DIR, "notes", text_filename)
+        text_path = notes_dir / text_filename
         
         with open(text_path, 'w') as f:
             for note_item in notes:
                 f.write(f"['{note_item['note']}'] -> {note_item['target']}\n")
     
     # Write combined notes file
-    combined_path = os.path.join(OUTPUT_DIR, "notes", "all_notes.jsonl")
+    combined_path = notes_dir / "all_notes.jsonl"
     with open(combined_path, 'w') as f:
         for note_item in all_notes:
             f.write(json.dumps(note_item) + '\n')
     
     print(f"\nCreated note files for {len(dataset_notes)} datasets")
     print(f"Total notes generated: {len(all_notes)}")
-    print(f"Notes directory: {os.path.join(OUTPUT_DIR, 'notes')}")
+    print(f"Notes directory: {notes_dir}")
     print(f"Created {templates_created} YAML template files")
     print(f"Templates directory: {OUTPUT_DIR}")
 
@@ -490,9 +500,9 @@ def create_template_for_dataset(semantic_info: Dict[str, Any], dataset_name: str
 
 def main():
     """Main function."""
-    # Ensure output directories exist
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    os.makedirs(os.path.join(OUTPUT_DIR, "notes"), exist_ok=True)
+    # Ensure output directories exist (OUTPUT_DIR is already created in initialization)
+    notes_dir = OUTPUT_DIR / "notes"
+    notes_dir.mkdir(exist_ok=True)
     
     print("Synthesizing TabLLM notes and YAML templates from OpenML CC18 datasets...")
     create_notes_bank_files()

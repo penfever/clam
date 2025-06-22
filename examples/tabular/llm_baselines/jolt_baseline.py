@@ -31,15 +31,27 @@ def load_jolt_config_by_openml_id(openml_task_id, original_feature_count=None):
     """
     logger = logging.getLogger(__name__)
     
-    # Use relative path from current script location
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    jolt_dir = os.path.join(current_dir, "jolt")
-    
-    # Try direct task ID lookup first (new approach)
-    jolt_config_path = os.path.join(jolt_dir, f"jolt_config_task_{openml_task_id}.json")
+    # Use resource manager for path resolution
+    try:
+        from clam.utils.resource_manager import get_resource_manager
+        resource_manager = get_resource_manager()
+        jolt_dir = resource_manager.path_resolver.get_config_path('jolt', '')
+        
+        if jolt_dir and jolt_dir.exists():
+            # Try direct task ID lookup first (new approach)
+            jolt_config_path = jolt_dir / f"jolt_config_task_{openml_task_id}.json"
+        else:
+            jolt_config_path = None
+            
+    except Exception as e:
+        logger.warning(f"Could not use resource manager for JOLT config lookup: {e}")
+        # Fallback to relative path from current script location
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        jolt_dir = os.path.join(current_dir, "jolt")
+        jolt_config_path = os.path.join(jolt_dir, f"jolt_config_task_{openml_task_id}.json")
     
     try:
-        if os.path.exists(jolt_config_path):
+        if jolt_config_path and jolt_config_path.exists():
             with open(jolt_config_path, 'r') as f:
                 config_data = json.load(f)
             
@@ -83,7 +95,11 @@ def load_jolt_config_by_openml_id(openml_task_id, original_feature_count=None):
             return config_data, feature_mapping
         
         # Fallback: try old dataset name-based approach for backward compatibility
-        return _load_jolt_config_by_dataset_name_fallback(openml_task_id, jolt_dir, original_feature_count)
+        if isinstance(jolt_dir, Path):
+            jolt_dir_str = str(jolt_dir)
+        else:
+            jolt_dir_str = jolt_dir
+        return _load_jolt_config_by_dataset_name_fallback(openml_task_id, jolt_dir_str, original_feature_count)
         
     except ValueError:
         # Re-raise validation errors (like feature count mismatch)

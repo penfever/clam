@@ -123,14 +123,28 @@ def load_tabllm_config_by_openml_id(openml_task_id, original_feature_count=None)
     """
     logger = logging.getLogger(__name__)
     
-    # Try direct task ID lookup first (new approach)
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    tabllm_dir = os.path.join(current_dir, "tabllm_like")
-    template_path = os.path.join(tabllm_dir, f"templates_task_{openml_task_id}.yaml")
+    # Use resource manager for path resolution
+    try:
+        from clam.utils.resource_manager import get_resource_manager
+        resource_manager = get_resource_manager()
+        tabllm_dir = resource_manager.path_resolver.get_config_path('tabllm_like', '')
+        
+        if tabllm_dir and tabllm_dir.exists():
+            # Try direct task ID lookup first (new approach)
+            template_path = tabllm_dir / f"templates_task_{openml_task_id}.yaml"
+        else:
+            template_path = None
+            
+    except Exception as e:
+        logger.warning(f"Could not use resource manager for TabLLM template lookup: {e}")
+        # Fallback to relative path from current script location
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        tabllm_dir = os.path.join(current_dir, "tabllm_like")
+        template_path = os.path.join(tabllm_dir, f"templates_task_{openml_task_id}.yaml")
     
     template_data = None
     try:
-        if os.path.exists(template_path):
+        if template_path and template_path.exists():
             import yaml
             
             # Define constructors for custom YAML tags

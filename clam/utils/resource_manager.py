@@ -972,43 +972,90 @@ class ClamResourceManager:
             'dataset_name': None
         }
         
-        # Get task mapping
-        task_mapping = self.config_manager.get_openml_task_mapping(model_type)
-        if not task_mapping:
-            result['valid'] = False
-            result['errors'].append(f"OpenML task mapping not found for {model_type}")
-            return result
-        
-        # Find dataset name for this task ID
-        dataset_name = None
-        for name, task_id in task_mapping.items():
-            if task_id == openml_task_id:
-                dataset_name = name
-                break
-        
-        if dataset_name is None:
-            result['valid'] = False
-            result['errors'].append(f"No {model_type} config found for OpenML task ID {openml_task_id}")
-            return result
-        
-        result['dataset_name'] = dataset_name
-        
-        # Check model-specific files
+        # Handle JOLT with new task ID-based approach
         if model_type == 'jolt':
-            config_path = self.config_manager.find_jolt_config(dataset_name)
-            if not config_path:
+            # For JOLT, check directly for task ID-based config file
+            jolt_dir = self.path_resolver.get_config_path('jolt', '')
+            if jolt_dir and jolt_dir.exists():
+                config_path = jolt_dir / f"jolt_config_task_{openml_task_id}.json"
+                if config_path.exists():
+                    # Try to load and validate the config
+                    try:
+                        with open(config_path, 'r') as f:
+                            config_data = json.load(f)
+                        result['dataset_name'] = config_data.get('dataset_name', f'task_{openml_task_id}')
+                        logger.debug(f"Found JOLT config for task {openml_task_id}: {config_path}")
+                    except Exception as e:
+                        result['valid'] = False
+                        result['errors'].append(f"JOLT config file is invalid for task {openml_task_id}: {e}")
+                else:
+                    # Try fallback to old dataset name approach
+                    task_mapping = self.config_manager.get_openml_task_mapping('jolt')
+                    if task_mapping:
+                        dataset_name = None
+                        for name, task_id in task_mapping.items():
+                            if task_id == openml_task_id:
+                                dataset_name = name
+                                break
+                        
+                        if dataset_name:
+                            old_config_path = jolt_dir / f"jolt_config_{dataset_name}.json"
+                            if old_config_path.exists():
+                                result['dataset_name'] = dataset_name
+                                result['warnings'].append(f"Using old JOLT config format for {dataset_name}")
+                            else:
+                                result['valid'] = False
+                                result['errors'].append(f"No JOLT config found for OpenML task ID {openml_task_id}")
+                        else:
+                            result['valid'] = False
+                            result['errors'].append(f"No JOLT config found for OpenML task ID {openml_task_id}")
+                    else:
+                        result['valid'] = False
+                        result['errors'].append(f"No JOLT config found for OpenML task ID {openml_task_id}")
+            else:
                 result['valid'] = False
-                result['errors'].append(f"JOLT config file not found for {dataset_name}")
+                result['errors'].append(f"JOLT directory not found")
         
+        # Handle TabLLM with new task ID-based approach  
         elif model_type == 'tabllm':
-            template_path = self.config_manager.find_tabllm_template(dataset_name)
-            if not template_path:
+            # For TabLLM, check directly for task ID-based template file
+            tabllm_dir = self.path_resolver.get_config_path('tabllm_like', '')
+            if tabllm_dir and tabllm_dir.exists():
+                template_path = tabllm_dir / f"templates_task_{openml_task_id}.yaml"
+                if template_path.exists():
+                    result['dataset_name'] = f'task_{openml_task_id}'
+                    logger.debug(f"Found TabLLM template for task {openml_task_id}: {template_path}")
+                else:
+                    # Try fallback to old dataset name approach
+                    task_mapping = self.config_manager.get_openml_task_mapping('tabllm')
+                    if task_mapping:
+                        dataset_name = None
+                        for name, task_id in task_mapping.items():
+                            if task_id == openml_task_id:
+                                dataset_name = name
+                                break
+                        
+                        if dataset_name:
+                            old_template_path = tabllm_dir / f"templates_{dataset_name}.yaml"
+                            if old_template_path.exists():
+                                result['dataset_name'] = dataset_name
+                                result['warnings'].append(f"Using old TabLLM template format for {dataset_name}")
+                            else:
+                                result['valid'] = False
+                                result['errors'].append(f"No TabLLM template found for OpenML task ID {openml_task_id}")
+                        else:
+                            result['valid'] = False
+                            result['errors'].append(f"No TabLLM template found for OpenML task ID {openml_task_id}")
+                    else:
+                        result['valid'] = False
+                        result['errors'].append(f"No TabLLM template found for OpenML task ID {openml_task_id}")
+            else:
                 result['valid'] = False
-                result['errors'].append(f"TabLLM template file not found for {dataset_name}")
-            
-            notes_path = self.config_manager.find_tabllm_notes(dataset_name)
-            if not notes_path:
-                result['warnings'].append(f"TabLLM notes file not found for {dataset_name}")
+                result['errors'].append(f"TabLLM directory not found")
+        
+        else:
+            result['valid'] = False
+            result['errors'].append(f"Unknown model type: {model_type}")
         
         return result
     
