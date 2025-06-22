@@ -1,0 +1,11 @@
+{
+  "name": "multi_pca_tsne",
+  "enable_multi_viz": true,
+  "visualization_methods": [
+    "pca",
+    "tsne"
+  ],
+  "layout_strategy": "sequential",
+  "nn_k": 30,
+  "reasoning_focus": "comparison"
+}

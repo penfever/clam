@@ -1,0 +1,12 @@
+{
+  "name": "multi_pca_tsne_spectral",
+  "enable_multi_viz": true,
+  "visualization_methods": [
+    "pca",
+    "tsne",
+    "spectral"
+  ],
+  "layout_strategy": "sequential",
+  "nn_k": 30,
+  "reasoning_focus": "consensus"
+}

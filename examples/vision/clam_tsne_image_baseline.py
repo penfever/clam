@@ -48,6 +48,82 @@ from clam.viz.tsne_functions import (
 logger = logging.getLogger(__name__)
 
 
+class BioClip2EmbeddingExtractor:
+    """Extract embeddings using BioCLIP-2 model."""
+    
+    def __init__(self, model_name: str = "hf-hub:imageomics/bioclip-2", device: str = "auto"):
+        self.model_name = model_name
+        self.device = device if device != "auto" else ("cuda" if torch.cuda.is_available() else "cpu")
+        self.model = None
+        self.preprocess = None
+        
+    def load_model(self):
+        """Load BioCLIP model using OpenCLIP."""
+        try:
+            import open_clip
+            
+            logger.info(f"Loading BioCLIP model: {self.model_name}")
+            
+            # Load BioCLIP model with OpenCLIP
+            model, preprocess_train, preprocess_val = open_clip.create_model_and_transforms(self.model_name)
+            
+            # Move to appropriate device
+            self.model = model.to(self.device)
+            
+            # Use validation preprocessing for inference
+            self.preprocess = preprocess_val
+            
+            # Set to eval mode
+            self.model.eval()
+            
+            logger.info(f"BioCLIP model loaded successfully on {self.device}")
+            
+        except ImportError as e:
+            raise RuntimeError(f"BioCLIP requires open_clip library: {e}. Install with: pip install open-clip-torch")
+        except Exception as e:
+            raise RuntimeError(f"Failed to load BioCLIP model: {e}")
+    
+    def extract_embeddings(self, image_paths: list) -> np.ndarray:
+        """Extract embeddings from images."""
+        if self.model is None:
+            self.load_model()
+        
+        embeddings = []
+        logger.info(f"Extracting BioClip2 embeddings for {len(image_paths)} images")
+        
+        for i, image_path in enumerate(image_paths):
+            if i % 100 == 0:
+                logger.info(f"Processing image {i+1}/{len(image_paths)}")
+            
+            try:
+                embedding = self._extract_single_embedding(image_path)
+                embeddings.append(embedding)
+                
+            except Exception as e:
+                logger.error(f"Error processing image {image_path}: {e}")
+                raise RuntimeError(f"Failed to extract embedding for {image_path}: {e}")
+        
+        return np.array(embeddings)
+    
+    def _extract_single_embedding(self, image_path: str) -> np.ndarray:
+        """Extract embedding from single image."""
+        # Load image
+        image = Image.open(image_path).convert('RGB')
+        
+        # Preprocess image
+        image_tensor = self.preprocess(image).unsqueeze(0).to(self.device)
+        
+        # Extract features
+        with torch.no_grad():
+            image_features = self.model.encode_image(image_tensor)
+            # Normalize features (standard for CLIP models)
+            image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+            
+        # Convert to numpy
+        embedding = image_features.cpu().numpy().flatten()
+        return embedding
+
+
 class ClamImageTsneClassifier:
     """
     CLAM t-SNE classifier for image classification.
@@ -57,7 +133,9 @@ class ClamImageTsneClassifier:
     
     def __init__(
         self,
+        embedding_backend: str = "dinov2",
         dinov2_model: str = "dinov2_vitb14",
+        bioclip2_model: str = "hf-hub:imageomics/bioclip-2",
         embedding_size: int = 1000,
         tsne_perplexity: float = 30.0,
         tsne_n_iter: int = 1000,
@@ -84,8 +162,10 @@ class ClamImageTsneClassifier:
         Initialize CLAM image t-SNE classifier.
         
         Args:
-            dinov2_model: DINOV2 model variant to use
-            embedding_size: Target embedding size
+            embedding_backend: Embedding backend to use ("dinov2" or "bioclip2")
+            dinov2_model: DINOV2 model variant to use (if embedding_backend="dinov2")
+            bioclip2_model: BioClip2 model variant to use (if embedding_backend="bioclip2")
+            embedding_size: Target embedding size (only used for DINOV2)
             tsne_perplexity: t-SNE perplexity parameter
             tsne_n_iter: Number of t-SNE iterations
             vlm_model_id: Vision Language Model ID
@@ -102,7 +182,9 @@ class ClamImageTsneClassifier:
             device: Device for model inference
             seed: Random seed
         """
+        self.embedding_backend = embedding_backend
         self.dinov2_model = dinov2_model
+        self.bioclip2_model = bioclip2_model
         self.embedding_size = embedding_size
         self.tsne_perplexity = tsne_perplexity
         self.tsne_n_iter = tsne_n_iter
@@ -128,6 +210,17 @@ class ClamImageTsneClassifier:
         # Determine the effective model to use (API models take precedence)
         self.effective_model_id = self._determine_effective_model()
         self.is_api_model = self._is_api_model(self.effective_model_id)
+        
+        # Initialize embedding extractor based on backend
+        if self.embedding_backend == "bioclip2":
+            self.embedding_extractor = BioClip2EmbeddingExtractor(
+                model_name=self.bioclip2_model,
+                device=self.device
+            )
+        elif self.embedding_backend == "dinov2":
+            self.embedding_extractor = None  # Will use get_dinov2_embeddings function
+        else:
+            raise ValueError(f"Unsupported embedding backend: {self.embedding_backend}. Supported: 'dinov2', 'bioclip2'")
         
         # State variables
         self.is_fitted = False
@@ -190,16 +283,20 @@ class ClamImageTsneClassifier:
         self.unique_classes = np.unique(self.y_train)
         self.class_names = class_names
         
-        # Extract DINOV2 embeddings for training and test sets
-        logger.info("Extracting DINOV2 embeddings for training set...")
-        self.train_embeddings = get_dinov2_embeddings(
-            train_image_paths,
-            model_name=self.dinov2_model,
-            embedding_size=self.embedding_size,
-            cache_dir=self.cache_dir,
-            dataset_name="train",
-            device=self.device
-        )
+        # Extract embeddings for training set using selected backend
+        if self.embedding_backend == "bioclip2":
+            logger.info("Extracting BioClip2 embeddings for training set...")
+            self.train_embeddings = self.embedding_extractor.extract_embeddings(train_image_paths)
+        else:  # dinov2
+            logger.info("Extracting DINOV2 embeddings for training set...")
+            self.train_embeddings = get_dinov2_embeddings(
+                train_image_paths,
+                model_name=self.dinov2_model,
+                embedding_size=self.embedding_size,
+                cache_dir=self.cache_dir,
+                dataset_name="train",
+                device=self.device
+            )
         
         # Limit training samples for plotting if needed
         if len(self.train_embeddings) > self.max_train_plot_samples:
@@ -219,15 +316,20 @@ class ClamImageTsneClassifier:
             self.train_embeddings_plot = self.train_embeddings
             self.y_train_plot = self.y_train
         
-        logger.info("Extracting DINOV2 embeddings for test set...")
-        self.test_embeddings = get_dinov2_embeddings(
-            test_image_paths,
-            model_name=self.dinov2_model,
-            embedding_size=self.embedding_size,
-            cache_dir=self.cache_dir,
-            dataset_name="test",
-            device=self.device
-        )
+        # Extract embeddings for test set using selected backend
+        if self.embedding_backend == "bioclip2":
+            logger.info("Extracting BioClip2 embeddings for test set...")
+            self.test_embeddings = self.embedding_extractor.extract_embeddings(test_image_paths)
+        else:  # dinov2
+            logger.info("Extracting DINOV2 embeddings for test set...")
+            self.test_embeddings = get_dinov2_embeddings(
+                test_image_paths,
+                model_name=self.dinov2_model,
+                embedding_size=self.embedding_size,
+                cache_dir=self.cache_dir,
+                dataset_name="test",
+                device=self.device
+            )
         
         # Create dimensionality reduction visualization
         if self.use_pca_backend:
@@ -300,7 +402,16 @@ class ClamImageTsneClassifier:
         
         # Load VLM model
         logger.info(f"Loading Vision Language Model: {self.vlm_model_id}")
-        self.vlm_wrapper = self._load_vlm_model()
+        loaded_wrapper = self._load_vlm_model()
+        
+        # Debug: Check what we got back from loading
+        logger.info(f"_load_vlm_model returned: {type(loaded_wrapper) if loaded_wrapper else 'None'}")
+        
+        # Assign to instance variable
+        self.vlm_wrapper = loaded_wrapper
+        
+        # Debug: Verify assignment worked
+        logger.info(f"self.vlm_wrapper after assignment: {type(self.vlm_wrapper) if self.vlm_wrapper else 'None'}")
         
         # Ensure VLM wrapper was loaded successfully
         if self.vlm_wrapper is None:
@@ -782,7 +893,9 @@ class ClamImageTsneClassifier:
     def get_config(self) -> Dict[str, Any]:
         """Get configuration parameters."""
         return {
+            'embedding_backend': self.embedding_backend,
             'dinov2_model': self.dinov2_model,
+            'bioclip2_model': self.bioclip2_model,
             'embedding_size': self.embedding_size,
             'tsne_perplexity': self.tsne_perplexity,
             'tsne_n_iter': self.tsne_n_iter,

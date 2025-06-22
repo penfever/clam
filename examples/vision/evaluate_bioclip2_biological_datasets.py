@@ -244,164 +244,6 @@ class BioClip2KNNBaseline(GenericKNNBaseline):
 
 
 
-class BioClip2ClamClassifier(ClamImageTsneClassifier):
-    """CLAM t-SNE classifier using BioClip2 backend instead of DINOV2."""
-    
-    def __init__(self, bioclip2_model: str = "hf-hub:imageomics/bioclip-2", **kwargs):
-        # Remove dinov2_model if present and set a default
-        kwargs.pop('bioclip2_model', None)
-        if 'dinov2_model' not in kwargs:
-            kwargs['dinov2_model'] = "dinov2_vitb14"  # Default value
-        
-        # Initialize parent class
-        super().__init__(**kwargs)
-        
-        # Store BioClip2 model name
-        self.bioclip2_model = bioclip2_model
-        
-        # Create BioClip2 extractor
-        self.bioclip2_extractor = BioClip2EmbeddingExtractor(
-            model_name=bioclip2_model,
-            device=self.device
-        )
-    
-    def fit(self, train_image_paths: list, train_labels: list, test_image_paths: list, class_names: list):
-        """Fit the classifier using BioClip2 embeddings instead of DINOV2."""
-        # Store training data
-        self.train_image_paths = train_image_paths
-        self.y_train = np.array(train_labels)
-        self.test_image_paths = test_image_paths
-        self.class_names = class_names
-        
-        logger.info("Extracting BioClip2 embeddings for training set...")
-        self.train_embeddings = self.bioclip2_extractor.extract_embeddings(train_image_paths)
-        
-        # Handle plot sampling
-        if len(train_image_paths) > self.max_train_plot_samples:
-            logger.info(f"Sampling {self.max_train_plot_samples} training samples for visualization...")
-            plot_indices = np.random.RandomState(self.seed).choice(
-                len(train_image_paths), self.max_train_plot_samples, replace=False
-            )
-            
-            self.train_embeddings_plot = self.train_embeddings[plot_indices]
-            self.y_train_plot = self.y_train[plot_indices]
-        else:
-            self.train_embeddings_plot = self.train_embeddings
-            self.y_train_plot = self.y_train
-        
-        logger.info("Extracting BioClip2 embeddings for test set...")
-        self.test_embeddings = self.bioclip2_extractor.extract_embeddings(test_image_paths)
-        
-        # Now call the parent's dimensionality reduction and VLM setup
-        # We'll copy the relevant parts from the parent's fit method
-        self._create_dimensionality_reduction()
-        self._setup_vlm()
-    
-    def _create_dimensionality_reduction(self):
-        """Create t-SNE/PCA visualization using BioClip2 embeddings."""
-        if self.use_pca_backend:
-            logger.info("Creating PCA visualization...")
-            from sklearn.decomposition import PCA
-            from sklearn.preprocessing import StandardScaler
-            
-            # Combine embeddings for joint processing
-            combined_embeddings = np.vstack([self.train_embeddings_plot, self.test_embeddings])
-            n_train_plot = len(self.train_embeddings_plot)
-            
-            # Standardize embeddings
-            logger.info("Standardizing embeddings for PCA...")
-            scaler = StandardScaler()
-            combined_embeddings_scaled = scaler.fit_transform(combined_embeddings)
-            
-            # Apply PCA
-            n_components = 3 if self.use_3d else 2
-            pca = PCA(n_components=n_components, random_state=self.seed)
-            pca_results = pca.fit_transform(combined_embeddings_scaled)
-            
-            # Split back into train and test
-            self.train_tsne = pca_results[:n_train_plot]
-            self.test_tsne = pca_results[n_train_plot:]
-            
-            logger.info(f"PCA explained variance ratio: {pca.explained_variance_ratio_}")
-            
-        else:
-            # Use t-SNE
-            from sklearn.preprocessing import StandardScaler
-            
-            # Combine embeddings for joint standardization
-            combined_embeddings = np.vstack([self.train_embeddings_plot, self.test_embeddings])
-            n_train_plot = len(self.train_embeddings_plot)
-            
-            # Standardize embeddings
-            logger.info("Standardizing embeddings for t-SNE...")
-            scaler = StandardScaler()
-            combined_embeddings_scaled = scaler.fit_transform(combined_embeddings)
-            
-            # Create t-SNE visualization
-            logger.info(f"Creating {'3D' if self.use_3d else '2D'} t-SNE visualization...")
-            
-            if self.use_3d:
-                from clam.viz.tsne_functions import create_tsne_3d_visualization
-                train_tsne, test_tsne, base_fig = create_tsne_3d_visualization(
-                    self.train_embeddings_plot,
-                    self.y_train_plot,
-                    self.test_embeddings,
-                    perplexity=self.tsne_perplexity,
-                    n_iter=self.tsne_n_iter,
-                    random_state=self.seed,
-                    class_names=self.class_names
-                )
-            else:
-                from clam.viz.tsne_functions import create_tsne_visualization
-                train_tsne, test_tsne, base_fig = create_tsne_visualization(
-                    self.train_embeddings_plot,
-                    self.y_train_plot,
-                    self.test_embeddings,
-                    perplexity=self.tsne_perplexity,
-                    n_iter=self.tsne_n_iter,
-                    random_state=self.seed,
-                    class_names=self.class_names
-                )
-            
-            # Store results
-            self.train_tsne = train_tsne
-            self.test_tsne = test_tsne
-    
-    def _setup_vlm(self):
-        """Setup VLM for classification."""
-        # Set up attributes that parent class expects
-        self.is_fitted = True
-        
-        # Import VLM modules
-        try:
-            from transformers import AutoModelForVision2Seq, AutoProcessor
-            
-            logger.info(f"Loading VLM: {self.vlm_model_id}")
-            
-            # Configure for platform
-            if sys.platform == "darwin" or self.device == "cpu":
-                torch_dtype = torch.float32
-                device_map = "cpu"
-            else:
-                torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
-                device_map = "auto" if torch.cuda.is_available() else "cpu"
-            
-            self.vlm_model = AutoModelForVision2Seq.from_pretrained(
-                self.vlm_model_id,
-                torch_dtype=torch_dtype,
-                device_map=device_map,
-                trust_remote_code=True
-            )
-            
-            self.vlm_processor = AutoProcessor.from_pretrained(
-                self.vlm_model_id,
-                trust_remote_code=True
-            )
-            
-            logger.info("VLM loaded successfully")
-            
-        except Exception as e:
-            raise RuntimeError(f"Failed to load VLM: {e}")
 
 
 def download_and_prepare_awa2(data_dir: str = "./awa2_data") -> tuple:
@@ -987,9 +829,10 @@ def test_single_dataset(dataset_name: str, args):
     if 'clam_tsne_bioclip2' in args.models:
         logger.info("Testing CLAM t-SNE with BioClip2 backend...")
         try:
-            classifier = BioClip2ClamClassifier(
+            classifier = ClamImageTsneClassifier(
+                embedding_backend="bioclip2",
                 bioclip2_model=getattr(args, 'bioclip2_model', 'hf-hub:imageomics/bioclip-2'),
-                embedding_size=512,
+                embedding_size=512,  # Not used for BioClip2 but kept for compatibility
                 tsne_perplexity=min(30.0, len(train_paths) / 4),
                 tsne_n_iter=1000,
                 vlm_model_id=args.vlm_model_id,
