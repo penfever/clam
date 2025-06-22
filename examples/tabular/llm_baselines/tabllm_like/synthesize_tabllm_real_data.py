@@ -157,14 +157,35 @@ def process_dataset_to_notes(json_file: str, max_notes: int = NOTES_PER_DATASET)
         with open(json_file, 'r') as f:
             semantic_info = json.load(f)
         
-        # Extract dataset info
+        # Extract dataset info - filename is actually task_id, not dataset_id
         dataset_name = semantic_info.get('dataset_name', semantic_info.get('dataset', Path(json_file).stem))
-        dataset_id = int(Path(json_file).stem)
+        task_id = semantic_info.get('_metadata', {}).get('task_id') or Path(json_file).stem
         
-        print(f"Processing dataset {dataset_name} (ID: {dataset_id})...")
+        # Resolve task_id to dataset_id using resource manager
+        dataset_id = None
+        if RESOURCE_MANAGER:
+            try:
+                task_id_int = int(task_id)
+                identifiers = RESOURCE_MANAGER.resolve_openml_identifiers(task_id=task_id_int)
+                dataset_id = identifiers.get('dataset_id')
+                if dataset_id:
+                    print(f"Processing dataset {dataset_name} (Task ID: {task_id}, Dataset ID: {dataset_id})...")
+                else:
+                    print(f"Processing dataset {dataset_name} (Task ID: {task_id}, could not resolve to dataset ID)...")
+            except (ValueError, TypeError) as e:
+                print(f"Processing dataset {dataset_name} (Task ID: {task_id}, error resolving: {e})...")
+        else:
+            # Fallback: assume task_id is dataset_id (old behavior)
+            try:
+                dataset_id = int(task_id)
+                print(f"Processing dataset {dataset_name} (ID: {dataset_id}, assuming task_id=dataset_id)...")
+            except (ValueError, TypeError):
+                print(f"Processing dataset {dataset_name} (invalid ID: {task_id})...")
         
-        # Try to load actual data
-        df = load_openml_dataset(dataset_id)
+        # Try to load actual data if we have a valid dataset_id
+        df = None
+        if dataset_id:
+            df = load_openml_dataset(dataset_id)
         
         if df is not None and len(df) > 0:
             # Sample rows for notes
@@ -177,6 +198,7 @@ def process_dataset_to_notes(json_file: str, max_notes: int = NOTES_PER_DATASET)
                 
                 notes_data.append({
                     'dataset': dataset_name,
+                    'task_id': task_id,
                     'dataset_id': dataset_id,
                     'note': note,
                     'target': target,
@@ -247,6 +269,7 @@ def process_dataset_to_notes(json_file: str, max_notes: int = NOTES_PER_DATASET)
                 
                 notes_data.append({
                     'dataset': dataset_name,
+                    'task_id': task_id,
                     'dataset_id': dataset_id,
                     'note': note,
                     'target': target,
