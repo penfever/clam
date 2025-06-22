@@ -69,7 +69,7 @@ class ClamAudioTsneClassifier:
         vlm_model_id: str = "Qwen/Qwen2.5-VL-3B-Instruct",
         use_3d: bool = False,
         use_knn_connections: bool = False,
-        knn_k: int = 5,
+        nn_k: int = 5,
         max_vlm_image_size: int = 1024,
         image_dpi: int = 100,
         zoom_factor: float = 4.0,
@@ -96,7 +96,7 @@ class ClamAudioTsneClassifier:
             vlm_model_id: Vision Language Model ID
             use_3d: Whether to use 3D t-SNE
             use_knn_connections: Whether to show KNN connections
-            knn_k: Number of nearest neighbors to show
+            nn_k: Number of nearest neighbors to show
             max_vlm_image_size: Maximum image size for VLM
             image_dpi: DPI for saving visualizations
             zoom_factor: Zoom factor for t-SNE visualizations
@@ -122,7 +122,7 @@ class ClamAudioTsneClassifier:
         self.vlm_model_id = vlm_model_id
         self.use_3d = use_3d
         self.use_knn_connections = use_knn_connections
-        self.knn_k = knn_k
+        self.nn_k = nn_k
         self.max_vlm_image_size = max_vlm_image_size
         self.image_dpi = image_dpi
         self.zoom_factor = zoom_factor
@@ -330,7 +330,7 @@ class ClamAudioTsneClassifier:
                         backend=backend_name,
                         dimensions='3d' if self.use_3d else '2d',
                         use_knn=self.use_knn_connections and not self.use_pca_backend,
-                        knn_k=self.knn_k if self.use_knn_connections else None
+                        nn_k=self.nn_k if self.use_knn_connections else None
                     )
                     
                     viz_path = os.path.join(viz_dir, viz_filename)
@@ -365,7 +365,7 @@ class ClamAudioTsneClassifier:
                         'use_pca_backend': self.use_pca_backend,
                         'use_3d': self.use_3d,
                         'use_knn_connections': self.use_knn_connections,
-                        'knn_k': self.knn_k if self.use_knn_connections else None,
+                        'nn_k': self.nn_k if self.use_knn_connections else None,
                         'zoom_factor': self.zoom_factor,
                         'whisper_model': self.whisper_model,
                         'include_spectrogram': self.include_spectrogram
@@ -400,7 +400,7 @@ class ClamAudioTsneClassifier:
                         'use_pca_backend': self.use_pca_backend,
                         'use_3d': self.use_3d,
                         'use_knn_connections': self.use_knn_connections,
-                        'knn_k': self.knn_k if self.use_knn_connections else None,
+                        'nn_k': self.nn_k if self.use_knn_connections else None,
                         'zoom_factor': self.zoom_factor,
                         'whisper_model': self.whisper_model,
                         'include_spectrogram': self.include_spectrogram
@@ -451,7 +451,7 @@ class ClamAudioTsneClassifier:
                     self.plot_embeddings,      # train_embeddings  
                     test_embedding_2d,         # test_embeddings
                     highlight_test_idx=0,      # highlight_test_idx (we only have 1 test point)
-                    k=self.knn_k,
+                    k=self.nn_k,
                     zoom_factor=self.zoom_factor,
                     figsize=(16, 10),
                     class_names=self.class_names,
@@ -567,7 +567,7 @@ class ClamAudioTsneClassifier:
             modality="audio",
             use_knn=self.use_knn_connections and not self.use_pca_backend,
             use_3d=self.use_3d,
-            knn_k=self.knn_k if self.use_knn_connections else None,
+            nn_k=self.nn_k if self.use_knn_connections else None,
             legend_text=legend_text,
             include_spectrogram=self.include_spectrogram,
             dataset_description=dataset_description,
@@ -745,7 +745,7 @@ class ClamAudioTsneClassifier:
             'vlm_model_id': self.vlm_model_id,
             'use_3d': self.use_3d,
             'use_knn_connections': self.use_knn_connections,
-            'knn_k': self.knn_k,
+            'nn_k': self.nn_k,
             'use_pca_backend': self.use_pca_backend,
             'include_spectrogram': self.include_spectrogram,
             'audio_duration': self.audio_duration,

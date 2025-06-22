@@ -447,7 +447,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
     if 'clam_tsne' in args.models:
         backend_name = "PCA" if args.use_pca_backend else "t-SNE"
         features = []
-        if args.use_3d_tsne:
+        if args.use_3d:
             features.append("3D")
         if args.use_knn_connections:
             features.append(f"KNN-{args.nn_k}")
@@ -465,9 +465,9 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
                 tsne_perplexity=min(30.0, len(train_paths) / 4),
                 tsne_n_iter=1000,
                 vlm_model_id="Qwen/Qwen2.5-VL-3B-Instruct",
-                use_3d=args.use_3d_tsne,
+                use_3d=args.use_3d,
                 use_knn_connections=args.use_knn_connections,
-                knn_k=args.nn_k,
+                nn_k=args.nn_k,
                 max_vlm_image_size=1024,
                 zoom_factor=args.zoom_factor,
                 use_pca_backend=args.use_pca_backend,
@@ -788,7 +788,7 @@ def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names:
     if model_name == 'clam_tsne':
         config = eval_results.get('config', {})
         metrics.update({
-            f"{model_name}/use_3d_tsne": config.get('use_3d_tsne', False),
+            f"{model_name}/use_3d": config.get('use_3d', False),
             f"{model_name}/use_knn_connections": config.get('use_knn_connections', False),
             f"{model_name}/nn_k": config.get('nn_k', 0),
             f"{model_name}/use_pca_backend": config.get('use_pca_backend', False),
@@ -1130,7 +1130,7 @@ def run_all_image_tests(args):
                 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
                 if args.wandb_name is None:
                     feature_suffix = ""
-                    if args.use_3d_tsne:
+                    if args.use_3d:
                         feature_suffix += "_3d"
                     if args.use_knn_connections:
                         feature_suffix += f"_knn{args.nn_k}"

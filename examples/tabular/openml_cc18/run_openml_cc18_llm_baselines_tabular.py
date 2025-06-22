@@ -267,7 +267,7 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
     ])
     
     # Add CLAM-T-SNe boolean flags
-    if args.use_3d_tsne:
+    if args.use_3d:
         cmd.append("--use_3d")
     if args.use_knn_connections:
         cmd.append("--use_knn_connections")
@@ -370,7 +370,7 @@ def process_task(task, args):
                     "tsne_perplexity": args.tsne_perplexity,
                     "tsne_n_iter": args.tsne_n_iter,
                     "max_tabpfn_samples": args.max_tabpfn_samples,
-                    "use_3d_tsne": args.use_3d_tsne,
+                    "use_3d": args.use_3d,
                     "viewing_angles": args.viewing_angles,
                     "use_knn_connections": args.use_knn_connections,
                     "nn_k": args.nn_k,

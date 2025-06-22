@@ -62,9 +62,9 @@ class ClamImageTsneClassifier:
         tsne_perplexity: float = 30.0,
         tsne_n_iter: int = 1000,
         vlm_model_id: str = "Qwen/Qwen2.5-VL-3B-Instruct",
-        use_3d_tsne: bool = False,
+        use_3d: bool = False,
         use_knn_connections: bool = False,
-        knn_k: int = 5,
+        nn_k: int = 5,
         max_vlm_image_size: int = 1024,
         image_dpi: int = 100,
         force_rgb_mode: bool = True,
@@ -89,9 +89,9 @@ class ClamImageTsneClassifier:
             tsne_perplexity: t-SNE perplexity parameter
             tsne_n_iter: Number of t-SNE iterations
             vlm_model_id: Vision Language Model ID
-            use_3d_tsne: Whether to use 3D t-SNE
+            use_3d: Whether to use 3D t-SNE
             use_knn_connections: Whether to show KNN connections
-            knn_k: Number of nearest neighbors to show
+            nn_k: Number of nearest neighbors to show
             max_vlm_image_size: Maximum image size for VLM
             image_dpi: DPI for saving visualizations
             force_rgb_mode: Convert images to RGB mode
@@ -107,9 +107,9 @@ class ClamImageTsneClassifier:
         self.tsne_perplexity = tsne_perplexity
         self.tsne_n_iter = tsne_n_iter
         self.vlm_model_id = vlm_model_id
-        self.use_3d = use_3d_tsne
+        self.use_3d = use_3d
         self.use_knn_connections = use_knn_connections
-        self.knn_k = knn_k
+        self.nn_k = nn_k
         self.max_vlm_image_size = max_vlm_image_size
         self.image_dpi = image_dpi
         self.force_rgb_mode = force_rgb_mode
@@ -246,7 +246,7 @@ class ClamImageTsneClassifier:
             combined_embeddings_scaled = scaler.fit_transform(combined_embeddings)
             
             # Apply PCA to standardized data
-            n_components = 3 if self.use_3d_tsne else 2
+            n_components = 3 if self.use_3d else 2
             pca = PCA(n_components=n_components, random_state=self.seed)
             pca_results = pca.fit_transform(combined_embeddings_scaled)
             
@@ -273,7 +273,7 @@ class ClamImageTsneClassifier:
             train_embeddings_scaled = combined_embeddings_scaled[:n_train_plot]
             test_embeddings_scaled = combined_embeddings_scaled[n_train_plot:]
             
-            if self.use_3d_tsne:
+            if self.use_3d:
                 logger.info("Creating 3D t-SNE visualization...")
                 self.train_tsne, self.test_tsne, base_fig = create_tsne_3d_visualization(
                     train_embeddings_scaled, self.y_train_plot, test_embeddings_scaled,
@@ -472,12 +472,12 @@ class ClamImageTsneClassifier:
                 # Create visualization highlighting current test point
                 if self.use_knn_connections and not self.use_pca_backend:
                     # Create visualization with KNN connections (only for t-SNE)
-                    if self.use_3d_tsne:
+                    if self.use_3d:
                         fig, legend_text, metadata = create_tsne_3d_plot_with_knn(
                             self.train_tsne, self.test_tsne, self.y_train_plot,
                             self.train_embeddings_plot, self.test_embeddings,
                             highlight_test_idx=i,
-                            k=self.knn_k,
+                            k=self.nn_k,
                             figsize=(12, 9),
                             zoom_factor=self.zoom_factor,
                             class_names=self.class_names,
@@ -488,7 +488,7 @@ class ClamImageTsneClassifier:
                             self.train_tsne, self.test_tsne, self.y_train_plot,
                             self.train_embeddings_plot, self.test_embeddings,
                             highlight_test_idx=i,
-                            k=self.knn_k,
+                            k=self.nn_k,
                             figsize=(10, 8),
                             zoom_factor=self.zoom_factor,
                             class_names=self.class_names,
@@ -496,7 +496,7 @@ class ClamImageTsneClassifier:
                         )
                 else:
                     # Create standard visualization
-                    if self.use_3d_tsne:
+                    if self.use_3d:
                         fig, legend_text, metadata = create_combined_tsne_3d_plot(
                             self.train_tsne, self.test_tsne, self.y_train_plot, 
                             highlight_test_idx=i,
@@ -528,8 +528,8 @@ class ClamImageTsneClassifier:
                     class_names=self.class_names if self.use_semantic_names else self.unique_classes.tolist(),
                     modality="image",
                     use_knn=self.use_knn_connections and not self.use_pca_backend,
-                    use_3d=self.use_3d_tsne,
-                    knn_k=self.knn_k if self.use_knn_connections else None,
+                    use_3d=self.use_3d,
+                    nn_k=self.nn_k if self.use_knn_connections else None,
                     legend_text=legend_text,
                     dataset_description="Image data embedded using DINOV2 features",
                     use_semantic_names=self.use_semantic_names
@@ -583,9 +583,9 @@ class ClamImageTsneClassifier:
                     viz_filename = generate_visualization_filename(
                         sample_index=i,
                         backend=backend_name,
-                        dimensions='3d' if self.use_3d_tsne else '2d',
+                        dimensions='3d' if self.use_3d else '2d',
                         use_knn=self.use_knn_connections and not self.use_pca_backend,
-                        knn_k=self.knn_k if self.use_knn_connections else None
+                        nn_k=self.nn_k if self.use_knn_connections else None
                     )
                     
                     viz_path = os.path.join(viz_dir, viz_filename)
@@ -596,7 +596,7 @@ class ClamImageTsneClassifier:
                         metadata=convert_for_json_serialization({
                             'sample_index': i,
                             'backend': backend_name,
-                            'use_3d': self.use_3d_tsne,
+                            'use_3d': self.use_3d,
                             'use_knn': self.use_knn_connections and not self.use_pca_backend,
                             'prediction': prediction,
                             'vlm_model': self.vlm_model_id
@@ -619,9 +619,9 @@ class ClamImageTsneClassifier:
                     'visualization_path': viz_path if should_save_viz else None,
                     'backend_params': {
                         'use_pca_backend': self.use_pca_backend,
-                        'use_3d_tsne': self.use_3d_tsne,
+                        'use_3d': self.use_3d,
                         'use_knn_connections': self.use_knn_connections,
-                        'knn_k': self.knn_k if self.use_knn_connections else None,
+                        'nn_k': self.nn_k if self.use_knn_connections else None,
                         'zoom_factor': self.zoom_factor,
                         'max_train_plot_samples': self.max_train_plot_samples
                     }
@@ -657,9 +657,9 @@ class ClamImageTsneClassifier:
                     'visualization_saved': False,
                     'backend_params': {
                         'use_pca_backend': self.use_pca_backend,
-                        'use_3d_tsne': self.use_3d_tsne,
+                        'use_3d': self.use_3d,
                         'use_knn_connections': self.use_knn_connections,
-                        'knn_k': self.knn_k if self.use_knn_connections else None,
+                        'nn_k': self.nn_k if self.use_knn_connections else None,
                         'zoom_factor': self.zoom_factor,
                         'max_train_plot_samples': self.max_train_plot_samples
                     }
@@ -744,9 +744,9 @@ class ClamImageTsneClassifier:
             'tsne_perplexity': self.tsne_perplexity,
             'tsne_n_iter': self.tsne_n_iter,
             'vlm_model_id': self.vlm_model_id,
-            'use_3d_tsne': self.use_3d_tsne,
+            'use_3d': self.use_3d,
             'use_knn_connections': self.use_knn_connections,
-            'knn_k': self.knn_k,
+            'nn_k': self.nn_k,
             'max_vlm_image_size': self.max_vlm_image_size,
             'image_dpi': self.image_dpi,
             'force_rgb_mode': self.force_rgb_mode,
