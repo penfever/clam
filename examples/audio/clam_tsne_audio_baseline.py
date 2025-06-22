@@ -330,7 +330,7 @@ class ClamAudioTsneClassifier:
                         backend=backend_name,
                         dimensions='3d' if self.use_3d else '2d',
                         use_knn=self.use_knn_connections and not self.use_pca_backend,
-                        nn_k=self.nn_k if self.use_knn_connections else None
+                        knn_k=self.nn_k if self.use_knn_connections else None
                     )
                     
                     viz_path = os.path.join(viz_dir, viz_filename)
@@ -567,7 +567,7 @@ class ClamAudioTsneClassifier:
             modality="audio",
             use_knn=self.use_knn_connections and not self.use_pca_backend,
             use_3d=self.use_3d,
-            nn_k=self.nn_k if self.use_knn_connections else None,
+            knn_k=self.nn_k if self.use_knn_connections else None,
             legend_text=legend_text,
             include_spectrogram=self.include_spectrogram,
             dataset_description=dataset_description,

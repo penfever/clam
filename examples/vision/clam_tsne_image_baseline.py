@@ -529,7 +529,7 @@ class ClamImageTsneClassifier:
                     modality="image",
                     use_knn=self.use_knn_connections and not self.use_pca_backend,
                     use_3d=self.use_3d,
-                    nn_k=self.nn_k if self.use_knn_connections else None,
+                    knn_k=self.nn_k if self.use_knn_connections else None,
                     legend_text=legend_text,
                     dataset_description="Image data embedded using DINOV2 features",
                     use_semantic_names=self.use_semantic_names
@@ -585,7 +585,7 @@ class ClamImageTsneClassifier:
                         backend=backend_name,
                         dimensions='3d' if self.use_3d else '2d',
                         use_knn=self.use_knn_connections and not self.use_pca_backend,
-                        nn_k=self.nn_k if self.use_knn_connections else None
+                        knn_k=self.nn_k if self.use_knn_connections else None
                     )
                     
                     viz_path = os.path.join(viz_dir, viz_filename)

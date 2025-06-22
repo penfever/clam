@@ -194,7 +194,28 @@ def extract_class_information(semantic_info: Dict[str, Any]) -> Tuple[List[str],
     class_names = []
     class_description = ""
     
-    if 'target_values' in semantic_info:
+    # Check for regression tasks first
+    if 'target_description' in semantic_info:
+        # This is a regression task with continuous target
+        target_desc = semantic_info['target_description']
+        target_name = target_desc.get('name', 'target')
+        target_meaning = target_desc.get('meaning', 'continuous target variable')
+        target_units = target_desc.get('units', '')
+        target_range = target_desc.get('range', '')
+        
+        # For regression, we don't have discrete classes
+        # Instead, we describe the continuous target variable
+        class_names = ["continuous_value"]
+        
+        description_parts = [f"Target: {target_name} - {target_meaning}"]
+        if target_units:
+            description_parts.append(f"Units: {target_units}")
+        if target_range:
+            description_parts.append(f"Range: {target_range}")
+        
+        class_description = ". ".join(description_parts)
+        
+    elif 'target_values' in semantic_info:
         # Multi-class classification - this covers both old and new formats
         target_values = semantic_info['target_values']
         
@@ -283,11 +304,19 @@ def create_task_context_prefix(semantic_info: Dict[str, Any], column_description
         else:
             num_cols = semantic_info.get('features', 'several')
         
+        # Check if this is a regression task
+        is_regression = 'target_description' in semantic_info
+        
         # Create task prefix based on description and use case
         if use_case:
             return f"{base_description} Each example contains {num_cols} features. {use_case.split(',')[0].strip()}."
         else:
-            return f"{base_description} Each example contains {num_cols} features. Predict the target class."
+            if is_regression:
+                target_desc = semantic_info.get('target_description', {})
+                target_name = target_desc.get('name', 'target value')
+                return f"{base_description} Each example contains {num_cols} features. Predict the {target_name}."
+            else:
+                return f"{base_description} Each example contains {num_cols} features. Predict the target class."
     
     # Fallback to original logic
     # Create column list description
@@ -337,9 +366,21 @@ def create_task_context_prefix(semantic_info: Dict[str, Any], column_description
     elif 'sensor' in feat_desc.lower() or 'acceleration' in feat_desc.lower():
         return f"Each example contains {num_cols} sensor measurement features. Predict the activity or state being measured."
     elif 'medical' in str(semantic_info).lower() or 'patient' in str(semantic_info).lower():
-        return f"Each example contains {num_cols} medical features: {column_list}. Predict the patient outcome or diagnosis."
+        # Check if regression for medical data
+        if 'target_description' in semantic_info:
+            target_desc = semantic_info.get('target_description', {})
+            target_name = target_desc.get('name', 'target value')
+            return f"Each example contains {num_cols} medical features: {column_list}. Predict the {target_name}."
+        else:
+            return f"Each example contains {num_cols} medical features: {column_list}. Predict the patient outcome or diagnosis."
     else:
-        return f"Each example contains {num_cols} features: {column_list}. {class_description}"
+        # Final fallback - check if regression
+        if 'target_description' in semantic_info:
+            target_desc = semantic_info.get('target_description', {})
+            target_name = target_desc.get('name', 'target value')
+            return f"Each example contains {num_cols} features: {column_list}. Predict the {target_name}."
+        else:
+            return f"Each example contains {num_cols} features: {column_list}. {class_description}"
 
 def create_jolt_config_for_dataset(semantic_info: Dict[str, Any]) -> Dict[str, Any]:
     """Create a JOLT configuration for a dataset."""
