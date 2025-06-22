@@ -525,7 +525,7 @@ class ClamImageTsneClassifier:
                 
                 # Create prompt using utility function
                 prompt = create_classification_prompt(
-                    class_names=self.class_names if self.use_semantic_names else self.unique_classes.tolist(),
+                    class_names=self.class_names if self.use_semantic_names else (self.unique_classes.tolist() if hasattr(self.unique_classes, 'tolist') else self.unique_classes),
                     modality="image",
                     use_knn=self.use_knn_connections and not self.use_pca_backend,
                     use_3d=self.use_3d,
@@ -642,7 +642,10 @@ class ClamImageTsneClassifier:
                 if 'fig' in locals():
                     close_figure_safely(fig)
                 # Use random prediction as fallback
-                prediction = np.random.choice(self.unique_classes)
+                if len(self.unique_classes) > 0:
+                    prediction = np.random.choice(self.unique_classes)
+                else:
+                    prediction = "unknown"
                 predictions.append(prediction)
                 
                 # Store error details
