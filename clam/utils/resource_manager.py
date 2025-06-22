@@ -799,12 +799,55 @@ class ClamResourceManager:
         
         self.config = config
         self.path_resolver = PathResolver(config)
+        
+        # Check for data directory changes and invalidate caches if needed
+        self._check_and_invalidate_caches()
+        
         self.dataset_registry = DatasetRegistry(self.path_resolver)
         self.config_manager = ConfigManager(self.path_resolver)
         self.cache_manager = CacheManager(self.path_resolver)
         self.dataset_preparer = DatasetPreparer(self.path_resolver, self.dataset_registry)
         
         logger.debug(f"Initialized CLAM resource manager with base dir: {self.path_resolver.get_base_dir()}")
+    
+    def _check_and_invalidate_caches(self) -> None:
+        """
+        Check if data directory has changed and invalidate caches if needed.
+        
+        This method is called during resource manager initialization to ensure
+        that all caches are up-to-date with the current data directory state.
+        """
+        try:
+            from .cache_invalidation import check_and_invalidate_caches
+            
+            # Get data directory from project structure
+            base_dir = self.path_resolver.get_base_dir()
+            data_dir = base_dir / "data"
+            cache_dir = Path.home() / ".clam" / "cache"
+            
+            # Define cache patterns to check
+            cache_patterns = [
+                "openml_mappings.pkl",
+                "metadata_cache.pkl",
+                "dataset_cache.pkl",
+                "*.cache",  # Any other cache files
+                "*.pkl"     # Any pickle cache files
+            ]
+            
+            # Check and invalidate if needed
+            caches_invalidated = check_and_invalidate_caches(
+                data_dir=data_dir,
+                cache_dir=cache_dir,
+                cache_patterns=cache_patterns,
+                force=False  # Respect check interval
+            )
+            
+            if caches_invalidated:
+                logger.info("Data directory changes detected, caches have been invalidated")
+            
+        except Exception as e:
+            # Don't fail initialization if cache checking fails
+            logger.warning(f"Could not check data directory for cache invalidation: {e}")
     
     def get_dataset_workspace(self, dataset_id: str) -> Path:
         """Get workspace directory for a dataset."""

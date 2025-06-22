@@ -28,6 +28,9 @@ def get_openml_cc18_mapping() -> Dict[int, Dict[str, Any]]:
     """
     Get comprehensive mapping of OpenML CC18 tasks with task_id, dataset_id, and dataset_name.
     
+    The centralized cache invalidation system automatically handles cache invalidation
+    when the data directory changes, so this function focuses on cache loading/saving.
+    
     Returns:
         Dictionary mapping task_id to {'dataset_id': int, 'dataset_name': str, 'num_classes': int, etc.}
     """
@@ -42,7 +45,7 @@ def get_openml_cc18_mapping() -> Dict[int, Dict[str, Any]]:
             logger.warning(f"Failed to load cached mapping: {e}")
     
     # If cache doesn't exist or failed to load, create new mapping
-    logger.info("Creating OpenML CC18 mapping from scratch")
+    logger.info("Creating OpenML mapping from scratch (cache miss or invalidated)")
     mapping = _create_openml_mapping()
     
     # Save to cache
@@ -55,70 +58,148 @@ def get_openml_cc18_mapping() -> Dict[int, Dict[str, Any]]:
     
     return mapping
 
+def _discover_tasks_from_data_directory() -> Dict[int, Dict[str, Any]]:
+    """
+    Discover OpenML task IDs from JSON files in the data directory.
+    
+    Returns:
+        Dictionary mapping task_id to basic task information
+    """
+    import json
+    from pathlib import Path
+    
+    discovered_tasks = {}
+    
+    # Get the project root and data directory
+    current_file = Path(__file__)
+    project_root = current_file.parent.parent.parent  # Go up to project root
+    data_dir = project_root / "data"
+    
+    if not data_dir.exists():
+        logger.warning(f"Data directory not found: {data_dir}")
+        return discovered_tasks
+    
+    # Find all JSON files in data directory and subdirectories
+    json_files = list(data_dir.rglob("*.json"))
+    logger.info(f"Found {len(json_files)} JSON files in data directory")
+    
+    for json_file in json_files:
+        # Try to extract task ID from filename (common pattern is <task_id>.json)
+        filename = json_file.stem
+        try:
+            # Check if filename is a number (task ID)
+            if filename.isdigit():
+                task_id = int(filename)
+                
+                # Try to load the JSON file to get metadata
+                try:
+                    with open(json_file, 'r') as f:
+                        metadata = json.load(f)
+                    
+                    # Extract relevant information
+                    dataset_name = metadata.get('dataset_name', metadata.get('dataset', f'task_{task_id}'))
+                    dataset_id = metadata.get('dataset_id')
+                    target_attr = metadata.get('target_variable', {}).get('name') if isinstance(metadata.get('target_variable'), dict) else metadata.get('target_attribute')
+                    
+                    # Determine task type
+                    task_type = metadata.get('task_type', 'classification')
+                    if 'regression' in str(metadata).lower() or task_id > 361000:  # Regression tasks typically have higher IDs
+                        task_type = 'regression'
+                    
+                    discovered_tasks[task_id] = {
+                        'dataset_id': dataset_id,
+                        'dataset_name': dataset_name,
+                        'task_type': task_type,
+                        'target_attribute': target_attr,
+                        'source_file': str(json_file.relative_to(project_root))
+                    }
+                    
+                    logger.debug(f"Discovered task {task_id}: {dataset_name} ({task_type})")
+                    
+                except Exception as e:
+                    logger.warning(f"Could not parse JSON file {json_file}: {e}")
+                    # Still add minimal entry
+                    discovered_tasks[task_id] = {
+                        'dataset_id': None,
+                        'dataset_name': f'task_{task_id}',
+                        'task_type': 'unknown',
+                        'target_attribute': None,
+                        'source_file': str(json_file.relative_to(project_root))
+                    }
+                    
+        except ValueError:
+            # Filename is not a number, skip
+            continue
+    
+    return discovered_tasks
+
 def _create_openml_mapping() -> Dict[int, Dict[str, Any]]:
     """
-    Create OpenML mapping by querying the API or using fallback data.
+    Create OpenML mapping by:
+    1. Starting with fallback mapping (includes hardcoded tasks)
+    2. Discovering task IDs from data directory JSON files
+    3. Optionally querying OpenML API for additional details
     
     Returns:
         Dictionary mapping task_id to task information
     """
+    # Start with fallback mapping which includes our manually added tasks
+    mapping = _get_fallback_mapping()
+    logger.info(f"Starting with {len(mapping)} tasks from fallback mapping")
+    
+    # Discover tasks from data directory
+    discovered_tasks = _discover_tasks_from_data_directory()
+    logger.info(f"Discovered {len(discovered_tasks)} unique task IDs from data directory")
+    
+    # Add discovered tasks to mapping if not already present
+    for task_id, metadata in discovered_tasks.items():
+        if task_id not in mapping:
+            mapping[task_id] = metadata
+            logger.debug(f"Added discovered task {task_id}: {metadata.get('dataset_name', 'unknown')}")
+        else:
+            # Update existing entry with discovered metadata if it has more info
+            if metadata.get('dataset_id') and not mapping[task_id].get('dataset_id'):
+                mapping[task_id]['dataset_id'] = metadata['dataset_id']
+            if metadata.get('source_file'):
+                mapping[task_id]['source_file'] = metadata['source_file']
+    
+    # Optionally try to enrich with OpenML API data
     try:
         import openml
-        logger.info("Attempting to fetch CC18 tasks from OpenML API")
+        logger.info("Attempting to enrich mapping with OpenML API data")
         
-        # Try to get CC18 study
+        # Try to get CC18 study for additional tasks
         try:
             suite = openml.study.get_suite(99)  # 99 is the ID for CC18
-            task_ids = suite.tasks
-        except Exception as e1:
-            logger.warning(f"Error using get_suite: {e1}")
-            try:
-                study = openml.study.functions._get_study(99, entity_type='task')
-                task_ids = study.tasks
-            except Exception as e2:
-                logger.warning(f"Error using get_study: {e2}")
-                # Use hardcoded list as fallback
-                task_ids = _get_hardcoded_cc18_tasks()
-        
-        logger.info(f"Retrieved {len(task_ids)} task IDs from CC18")
-        
-        # Get detailed information for each task
-        mapping = {}
-        for task_id in task_ids:
-            try:
-                task = openml.tasks.get_task(task_id)
-                dataset = task.get_dataset()
-                
-                mapping[task_id] = {
-                    'dataset_id': task.dataset_id,
-                    'dataset_name': dataset.name,
-                    'num_classes': len(task.class_labels) if hasattr(task, 'class_labels') else None,
-                    'num_features': len(dataset.features) if hasattr(dataset, 'features') and isinstance(dataset.features, dict) else None,
-                    'target_attribute': task.target_name if hasattr(task, 'target_name') else None
-                }
-                
-                logger.debug(f"Task {task_id}: {dataset.name} (dataset_id: {task.dataset_id})")
-                
-            except Exception as e:
-                logger.warning(f"Failed to get details for task {task_id}: {e}")
-                # Add minimal entry
-                mapping[task_id] = {
-                    'dataset_id': None,
-                    'dataset_name': f"task_{task_id}",
-                    'num_classes': None,
-                    'num_features': None,
-                    'target_attribute': None
-                }
-        
-        logger.info(f"Successfully created mapping for {len(mapping)} tasks")
-        return mapping
-        
+            cc18_task_ids = suite.tasks
+            logger.info(f"Found {len(cc18_task_ids)} CC18 tasks from OpenML")
+            
+            # Add CC18 tasks if not already in mapping
+            for task_id in cc18_task_ids:
+                if task_id not in mapping:
+                    try:
+                        task = openml.tasks.get_task(task_id)
+                        dataset = task.get_dataset()
+                        
+                        mapping[task_id] = {
+                            'dataset_id': task.dataset_id,
+                            'dataset_name': dataset.name,
+                            'num_classes': len(task.class_labels) if hasattr(task, 'class_labels') else None,
+                            'num_features': len(dataset.features) if hasattr(dataset, 'features') and isinstance(dataset.features, dict) else None,
+                            'target_attribute': task.target_name if hasattr(task, 'target_name') else None
+                        }
+                        logger.debug(f"Added CC18 task {task_id}: {dataset.name}")
+                    except Exception as e:
+                        logger.warning(f"Failed to get details for CC18 task {task_id}: {e}")
+                        
+        except Exception as e:
+            logger.warning(f"Could not fetch CC18 tasks from OpenML: {e}")
+            
     except ImportError:
-        logger.warning("OpenML not available, using fallback mapping")
-        return _get_fallback_mapping()
-    except Exception as e:
-        logger.error(f"Error creating OpenML mapping: {e}")
-        return _get_fallback_mapping()
+        logger.info("OpenML not available, skipping API enrichment")
+    
+    logger.info(f"Final mapping contains {len(mapping)} tasks")
+    return mapping
 
 def _get_hardcoded_cc18_tasks() -> list:
     """Get hardcoded list of CC18 task IDs as fallback."""
