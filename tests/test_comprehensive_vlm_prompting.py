@@ -842,7 +842,7 @@ class VLMPromptingTestSuite:
                             modality='tabular',
                             use_knn=config.get('use_knn_connections', False),
                             use_3d=config.get('use_3d_tsne', False),
-                            knn_k=config.get('knn_k', 5),
+                            nn_k=config.get('knn_k', 5),
                             dataset_description=f"Test dataset with {len(np.unique(y_train))} classes",
                             use_semantic_names=config.get('use_semantic_names', False)
                         )

@@ -77,7 +77,7 @@ class ClamTsneClassifier:
         tsne_n_iter: int = 1000,
         use_3d: bool = False,  # Unified 3D parameter (backward compatibility: use_3d_tsne is deprecated)
         use_knn_connections: bool = False,
-        knn_k: int = 5,
+        nn_k: int = 5,
         max_vlm_image_size: int = 2048,
         image_dpi: int = 100,
         force_rgb_mode: bool = True,
@@ -197,7 +197,7 @@ class ClamTsneClassifier:
             use_3d = kwargs.pop('use_3d_tsne', use_3d)
         self.use_3d = use_3d
         self.use_knn_connections = use_knn_connections
-        self.knn_k = knn_k
+        self.knn_k = nn_k
         self.max_vlm_image_size = max_vlm_image_size
         self.image_dpi = image_dpi
         self.force_rgb_mode = force_rgb_mode
@@ -1360,7 +1360,7 @@ class ClamTsneClassifier:
                             modality=self.modality,
                             use_knn=self.use_knn_connections,
                             use_3d=self.use_3d,
-                            knn_k=self.knn_k if self.use_knn_connections else None,
+                            nn_k=self.knn_k if self.use_knn_connections else None,
                             legend_text=enhanced_legend,
                             dataset_description=f"{self.modality.title()} data embedded using appropriate features",
                             dataset_metadata=self._get_metadata_for_prompt()
@@ -1417,7 +1417,7 @@ class ClamTsneClassifier:
                             modality=self.modality,
                             use_knn=self.use_knn_connections,
                             use_3d=self.use_3d,
-                            knn_k=self.knn_k if self.use_knn_connections else None,
+                            nn_k=self.knn_k if self.use_knn_connections else None,
                             legend_text=enhanced_legend,
                             dataset_description=f"{self.modality.title()} data embedded using appropriate features",
                             use_semantic_names=self.use_semantic_names,
@@ -1667,7 +1667,7 @@ class ClamTsneClassifier:
             'tsne_n_iter': self.tsne_n_iter,
             'use_3d': self.use_3d,
             'use_knn_connections': self.use_knn_connections,
-            'knn_k': self.knn_k,
+            'nn_k': self.knn_k,
             'max_vlm_image_size': self.max_vlm_image_size,
             'image_dpi': self.image_dpi,
             'force_rgb_mode': self.force_rgb_mode,
@@ -1729,7 +1729,7 @@ def evaluate_clam_tsne(dataset, args):
             tsne_n_iter=getattr(args, 'tsne_n_iter', 1000),
             use_3d=getattr(args, 'use_3d', False),
             use_knn_connections=getattr(args, 'use_knn_connections', False),
-            knn_k=getattr(args, 'nn_k', 5),
+            nn_k=getattr(args, 'nn_k', 5),
             max_vlm_image_size=getattr(args, 'max_vlm_image_size', 2048),
             image_dpi=getattr(args, 'image_dpi', 100),
             force_rgb_mode=getattr(args, 'force_rgb_mode', True),

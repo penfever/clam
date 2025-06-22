@@ -63,7 +63,7 @@ def vision_example():
         tsne_perplexity=30,
         use_3d_tsne=False,
         use_knn_connections=True,
-        knn_k=5
+        nn_k=5
     )
     
     # Option 2: Using the convenience class (equivalent to above)
@@ -73,7 +73,7 @@ def vision_example():
         tsne_perplexity=30,
         use_3d_tsne=False,
         use_knn_connections=True,
-        knn_k=5
+        nn_k=5
     )
     
     # image_paths = ["path/to/image1.jpg", "path/to/image2.jpg", ...]

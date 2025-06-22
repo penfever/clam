@@ -133,7 +133,7 @@ def generate_visualization_filename(
     backend: str = "tsne",
     dimensions: str = "2d", 
     use_knn: bool = False,
-    knn_k: Optional[int] = None,
+    nn_k: Optional[int] = None,
     extension: str = "png"
 ) -> str:
     """
@@ -144,7 +144,7 @@ def generate_visualization_filename(
         backend: Backend used (tsne, pca, etc.)
         dimensions: Dimensionality (2d, 3d)
         use_knn: Whether KNN connections are shown
-        knn_k: Number of KNN neighbors (if use_knn=True)
+        nn_k: Number of KNN neighbors (if use_knn=True)
         extension: File extension
         
     Returns:
@@ -152,8 +152,8 @@ def generate_visualization_filename(
     """
     filename = f"sample_{sample_index:03d}_{backend}_{dimensions}"
     
-    if use_knn and knn_k is not None:
-        filename += f"_knn{knn_k}"
+    if use_knn and nn_k is not None:
+        filename += f"_knn{nn_k}"
     
     filename += f".{extension}"
     

@@ -366,7 +366,7 @@ def test_clam_audio_minimal():
             vlm_model_id="Qwen/Qwen2.5-VL-3B-Instruct",
             use_3d_tsne=False,
             use_knn_connections=True,  # Test the KNN fix
-            knn_k=1,              # Only 1 neighbor available
+            nn_k=1,              # Only 1 neighbor available
             max_vlm_image_size=512,
             zoom_factor=2.0,
             use_pca_backend=False,

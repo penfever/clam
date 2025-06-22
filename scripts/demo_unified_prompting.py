@@ -29,7 +29,7 @@ def demo_single_viz_prompts():
         class_names=class_names,
         modality="tabular",
         use_knn=True,
-        knn_k=5,
+        nn_k=5,
         use_3d=True,
         legend_text="Training: colored circles, Test: gray squares, Query: red star",
         dataset_description="Iris flower classification dataset with 3 species"
@@ -46,7 +46,7 @@ def demo_single_viz_prompts():
         target_stats=target_stats,
         modality="tabular",
         use_knn=True,
-        knn_k=5,
+        nn_k=5,
         dataset_description="House price prediction dataset"
     )
     

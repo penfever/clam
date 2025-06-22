@@ -142,7 +142,7 @@ def create_classification_prompt(
     modality: str = "tabular",
     use_knn: bool = False,
     use_3d: bool = False,
-    knn_k: Optional[int] = None,
+    nn_k: Optional[int] = None,
     legend_text: Optional[str] = None,
     include_spectrogram: bool = False,
     dataset_description: Optional[str] = None,
@@ -158,7 +158,7 @@ def create_classification_prompt(
         modality: Type of data ("tabular", "audio", "image")
         use_knn: Whether KNN connections are shown
         use_3d: Whether 3D visualization is used
-        knn_k: Number of nearest neighbors (if use_knn=True)
+        nn_k: Number of nearest neighbors (if use_knn=True)
         legend_text: Legend text from the visualization
         include_spectrogram: Whether spectrogram is included (for audio)
         dataset_description: Optional description of the dataset/task
@@ -192,8 +192,8 @@ def create_classification_prompt(
         if use_3d:
             data_description += "\n4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)"
             
-        if use_knn and knn_k:
-            data_description += f"\n{5 if use_3d else 4}. A pie chart showing the distribution of the {knn_k} nearest neighbors by class"
+        if use_knn and nn_k:
+            data_description += f"\n{5 if use_3d else 4}. A pie chart showing the distribution of the {nn_k} nearest neighbors by class"
             data_description += f"\n{6 if use_3d else 5}. The pie chart includes class counts, percentages, and average distances to neighbors"
             
         if include_spectrogram:
@@ -242,8 +242,8 @@ The multiple visualizations provide different perspectives on the same underlyin
         if use_3d:
             data_description += "\n4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)"
             
-        if use_knn and knn_k:
-            data_description += f"\n{5 if use_3d else 4}. A pie chart showing the distribution of the {knn_k} nearest neighbors by class"
+        if use_knn and nn_k:
+            data_description += f"\n{5 if use_3d else 4}. A pie chart showing the distribution of the {nn_k} nearest neighbors by class"
             data_description += f"\n{6 if use_3d else 5}. The pie chart includes class counts, percentages, and average distances to neighbors"
             
     else:  # image or other
@@ -256,8 +256,8 @@ The multiple visualizations provide different perspectives on the same underlyin
         if use_3d:
             data_description += "\n4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)"
             
-        if use_knn and knn_k:
-            data_description += f"\n{5 if use_3d else 4}. A pie chart showing the distribution of the {knn_k} nearest neighbors by class"
+        if use_knn and nn_k:
+            data_description += f"\n{5 if use_3d else 4}. A pie chart showing the distribution of the {nn_k} nearest neighbors by class"
             data_description += f"\n{6 if use_3d else 5}. The pie chart includes class counts, percentages, and average distances to neighbors"
 
     # Add legend text if provided
@@ -276,7 +276,7 @@ The multiple visualizations provide different perspectives on the same underlyin
 
     # Create modality-specific important notes
     if use_knn:
-        important_note = f"\nIMPORTANT: The pie chart shows the class distribution of the {knn_k} nearest neighbors found in the original {'Whisper ' if modality == 'audio' else ''}{'high-dimensional ' if modality == 'tabular' else ''}embedding space, NOT just based on the {'3D' if use_3d else '2D'} visualization space. Smaller average distances indicate higher similarity."
+        important_note = f"\nIMPORTANT: The pie chart shows the class distribution of the {nn_k} nearest neighbors found in the original {'Whisper ' if modality == 'audio' else ''}{'high-dimensional ' if modality == 'tabular' else ''}embedding space, NOT just based on the {'3D' if use_3d else '2D'} visualization space. Smaller average distances indicate higher similarity."
     else:
         important_note = ""
 
@@ -363,7 +363,7 @@ def create_regression_prompt(
     modality: str = "tabular",
     use_knn: bool = False,
     use_3d: bool = False,
-    knn_k: Optional[int] = None,
+    nn_k: Optional[int] = None,
     legend_text: Optional[str] = None,
     include_spectrogram: bool = False,
     dataset_description: Optional[str] = None,
@@ -378,7 +378,7 @@ def create_regression_prompt(
         modality: Type of data ("tabular", "audio", "image")
         use_knn: Whether KNN connections are shown
         use_3d: Whether 3D visualization is used
-        knn_k: Number of nearest neighbors (if use_knn=True)
+        nn_k: Number of nearest neighbors (if use_knn=True)
         legend_text: Legend text from the visualization
         include_spectrogram: Whether spectrogram is included (for audio)
         dataset_description: Optional description of the dataset/task
@@ -411,8 +411,8 @@ def create_regression_prompt(
         if use_3d:
             data_description += "\n4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)"
             
-        if use_knn and knn_k:
-            data_description += f"\n{5 if use_3d else 4}. A summary showing the {knn_k} nearest neighbors with their target values and distances"
+        if use_knn and nn_k:
+            data_description += f"\n{5 if use_3d else 4}. A summary showing the {nn_k} nearest neighbors with their target values and distances"
             
         if include_spectrogram:
             data_description += f"\n{6 if use_knn and use_3d else 5 if use_knn or use_3d else 4}. Audio spectrogram of the query sample shown below the t-SNE plot"
@@ -460,8 +460,8 @@ The multiple visualizations provide different perspectives on how the target val
             if use_3d:
                 data_description += "\n4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)"
                 
-            if use_knn and knn_k:
-                data_description += f"\n{5 if use_3d else 4}. A summary showing the {knn_k} nearest neighbors with their target values and distances"
+            if use_knn and nn_k:
+                data_description += f"\n{5 if use_3d else 4}. A summary showing the {nn_k} nearest neighbors with their target values and distances"
             
     else:  # image or other
         data_description = f"""Looking at this{'enhanced' if use_knn else ''} {'3D ' if use_3d else ''}t-SNE visualization of {modality} regression data, you can see:
@@ -473,8 +473,8 @@ The multiple visualizations provide different perspectives on how the target val
         if use_3d:
             data_description += "\n4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)"
             
-        if use_knn and knn_k:
-            data_description += f"\n{5 if use_3d else 4}. A summary showing the {knn_k} nearest neighbors with their target values and distances"
+        if use_knn and nn_k:
+            data_description += f"\n{5 if use_3d else 4}. A summary showing the {nn_k} nearest neighbors with their target values and distances"
 
     # Add legend text if provided
     if legend_text:
@@ -487,7 +487,7 @@ The multiple visualizations provide different perspectives on how the target val
 
     # Create modality-specific important notes
     if use_knn:
-        important_note = f"\nIMPORTANT: The neighbor analysis shows the target values of the {knn_k} nearest neighbors found in the original {'Whisper ' if modality == 'audio' else ''}{'high-dimensional ' if modality == 'tabular' else ''}embedding space, NOT just based on the {'3D' if use_3d else '2D'} visualization space. Smaller distances indicate higher similarity."
+        important_note = f"\nIMPORTANT: The neighbor analysis shows the target values of the {nn_k} nearest neighbors found in the original {'Whisper ' if modality == 'audio' else ''}{'high-dimensional ' if modality == 'tabular' else ''}embedding space, NOT just based on the {'3D' if use_3d else '2D'} visualization space. Smaller distances indicate higher similarity."
     else:
         important_note = f"\nIMPORTANT: The color gradient in the visualization represents the target values, with the colormap typically ranging from low values (cooler colors) to high values (warmer colors)."
 
