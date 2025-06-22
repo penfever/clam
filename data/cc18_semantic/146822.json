@@ -89,99 +89,99 @@
   },
   "columns": [
     {
-      "name": "feature_1",
-      "semantic_description": "Feature 1",
+      "name": "region-centroid-col",
+      "semantic_description": "Column of the center pixel of the region",
+      "data_type": "numeric"
+    },
+    {
+      "name": "region-centroid-row",
+      "semantic_description": "Row of the center pixel of the region",
+      "data_type": "numeric"
+    },
+    {
+      "name": "region-pixel-count",
+      "semantic_description": "Number of pixels in a region (always 9 for 3x3)",
+      "data_type": "integer"
+    },
+    {
+      "name": "short-line-density-5",
+      "semantic_description": "Line extraction result for low contrast lines of length 5",
+      "data_type": "numeric"
+    },
+    {
+      "name": "short-line-density-2",
+      "semantic_description": "Line extraction result for high contrast lines",
+      "data_type": "numeric"
+    },
+    {
+      "name": "vedge-mean",
+      "semantic_description": "Mean of contrast of horizontally adjacent pixels (vertical edge)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "vedge-sd",
+      "semantic_description": "Standard deviation of vertical edge contrast",
+      "data_type": "numeric"
+    },
+    {
+      "name": "hedge-mean",
+      "semantic_description": "Mean of contrast of vertically adjacent pixels (horizontal edge)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "hedge-sd",
+      "semantic_description": "Standard deviation of horizontal edge contrast",
+      "data_type": "numeric"
+    },
+    {
+      "name": "intensity-mean",
+      "semantic_description": "Mean intensity (R+G+B)/3 over the region",
+      "data_type": "numeric"
+    },
+    {
+      "name": "rawred-mean",
+      "semantic_description": "Mean of red channel over the region",
+      "data_type": "numeric"
+    },
+    {
+      "name": "rawblue-mean",
+      "semantic_description": "Mean of blue channel over the region",
+      "data_type": "numeric"
+    },
+    {
+      "name": "rawgreen-mean",
+      "semantic_description": "Mean of green channel over the region",
+      "data_type": "numeric"
+    },
+    {
+      "name": "exred-mean",
+      "semantic_description": "Mean of (2R - (G + B)) measure of excess red",
       "data_type": "continuous"
     },
     {
-      "name": "feature_2",
-      "semantic_description": "Feature 2",
+      "name": "exblue-mean",
+      "semantic_description": "Mean of (2B - (G + R)) measure of excess blue",
       "data_type": "continuous"
     },
     {
-      "name": "feature_3",
-      "semantic_description": "Feature 3",
+      "name": "exgreen-mean",
+      "semantic_description": "Mean of (2G - (R + B)) measure of excess green",
       "data_type": "continuous"
     },
     {
-      "name": "feature_4",
-      "semantic_description": "Feature 4",
+      "name": "value-mean",
+      "semantic_description": "Mean of value (from HSV color space)",
+      "data_type": "numeric"
+    },
+    {
+      "name": "saturation-mean",
+      "semantic_description": "Mean of saturation (from HSV color space)",
       "data_type": "continuous"
     },
     {
-      "name": "feature_5",
-      "semantic_description": "Feature 5",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_6",
-      "semantic_description": "Feature 6",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_7",
-      "semantic_description": "Feature 7",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_8",
-      "semantic_description": "Feature 8",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_9",
-      "semantic_description": "Feature 9",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_10",
-      "semantic_description": "Feature 10",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_11",
-      "semantic_description": "Feature 11",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_12",
-      "semantic_description": "Feature 12",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_13",
-      "semantic_description": "Feature 13",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_14",
-      "semantic_description": "Feature 14",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_15",
-      "semantic_description": "Feature 15",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_16",
-      "semantic_description": "Feature 16",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_17",
-      "semantic_description": "Feature 17",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_18",
-      "semantic_description": "Feature 18",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_19",
-      "semantic_description": "Feature 19",
-      "data_type": "continuous"
+      "name": "hue-mean",
+      "semantic_description": "Mean of hue (from HSV color space)",
+      "data_type": "numeric"
     }
   ],
   "target_classes": [

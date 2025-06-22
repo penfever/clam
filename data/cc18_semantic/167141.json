@@ -73,104 +73,104 @@
   "dataset_name": "churn",
   "columns": [
     {
-      "name": "feature_1",
-      "semantic_description": "Feature 1",
+      "name": "state",
+      "semantic_description": "State code (numeric encoding)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_2",
-      "semantic_description": "Feature 2",
+      "name": "account_length",
+      "semantic_description": "Length of account in days",
+      "data_type": "integer"
+    },
+    {
+      "name": "area_code",
+      "semantic_description": "Telephone area code (408, 415, 510)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_3",
-      "semantic_description": "Feature 3",
+      "name": "phone_number",
+      "semantic_description": "Phone number (numeric)",
+      "data_type": "integer"
+    },
+    {
+      "name": "international_plan",
+      "semantic_description": "International plan subscription (0=no, 1=yes)",
+      "data_type": "binary"
+    },
+    {
+      "name": "voice_mail_plan",
+      "semantic_description": "Voice mail plan subscription (0=no, 1=yes)",
+      "data_type": "binary"
+    },
+    {
+      "name": "number_vmail_messages",
+      "semantic_description": "Number of voice mail messages",
+      "data_type": "integer"
+    },
+    {
+      "name": "total_day_minutes",
+      "semantic_description": "Total minutes used during day",
       "data_type": "numeric"
     },
     {
-      "name": "feature_4",
-      "semantic_description": "Feature 4",
+      "name": "total_day_calls",
+      "semantic_description": "Total number of calls during day",
+      "data_type": "integer"
+    },
+    {
+      "name": "total_day_charge",
+      "semantic_description": "Total charges for day usage",
+      "data_type": "integer"
+    },
+    {
+      "name": "total_eve_minutes",
+      "semantic_description": "Total minutes used during evening",
       "data_type": "numeric"
     },
     {
-      "name": "feature_5",
-      "semantic_description": "Feature 5",
+      "name": "total_eve_calls",
+      "semantic_description": "Total number of calls during evening",
+      "data_type": "integer"
+    },
+    {
+      "name": "total_eve_charge",
+      "semantic_description": "Total charges for evening usage",
+      "data_type": "integer"
+    },
+    {
+      "name": "total_night_minutes",
+      "semantic_description": "Total minutes used during night",
       "data_type": "numeric"
     },
     {
-      "name": "feature_6",
-      "semantic_description": "Feature 6",
+      "name": "total_night_calls",
+      "semantic_description": "Total number of calls during night",
+      "data_type": "integer"
+    },
+    {
+      "name": "total_night_charge",
+      "semantic_description": "Total charges for night usage",
+      "data_type": "integer"
+    },
+    {
+      "name": "total_intl_minutes",
+      "semantic_description": "Total international minutes",
       "data_type": "numeric"
     },
     {
-      "name": "feature_7",
-      "semantic_description": "Feature 7",
+      "name": "total_intl_calls",
+      "semantic_description": "Total international calls",
       "data_type": "numeric"
     },
     {
-      "name": "feature_8",
-      "semantic_description": "Feature 8",
+      "name": "total_intl_charge",
+      "semantic_description": "Total international charges",
       "data_type": "numeric"
     },
     {
-      "name": "feature_9",
-      "semantic_description": "Feature 9",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_10",
-      "semantic_description": "Feature 10",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_11",
-      "semantic_description": "Feature 11",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_12",
-      "semantic_description": "Feature 12",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_13",
-      "semantic_description": "Feature 13",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_14",
-      "semantic_description": "Feature 14",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_15",
-      "semantic_description": "Feature 15",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_16",
-      "semantic_description": "Feature 16",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_17",
-      "semantic_description": "Feature 17",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_18",
-      "semantic_description": "Feature 18",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_19",
-      "semantic_description": "Feature 19",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_20",
-      "semantic_description": "Feature 20",
-      "data_type": "numeric"
+      "name": "number_customer_service_calls",
+      "semantic_description": "Number of calls to customer service",
+      "data_type": "integer"
     }
   ],
   "target_classes": [

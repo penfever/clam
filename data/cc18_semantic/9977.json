@@ -72,598 +72,598 @@
   "columns": [
     {
       "name": "feature_1",
-      "semantic_description": "Feature 1 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 1",
+      "data_type": "continuous"
     },
     {
       "name": "feature_2",
-      "semantic_description": "Feature 2 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 2",
+      "data_type": "continuous"
     },
     {
       "name": "feature_3",
-      "semantic_description": "Feature 3 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 3",
+      "data_type": "continuous"
     },
     {
       "name": "feature_4",
-      "semantic_description": "Feature 4 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 4",
+      "data_type": "continuous"
     },
     {
       "name": "feature_5",
-      "semantic_description": "Feature 5 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 5",
+      "data_type": "continuous"
     },
     {
       "name": "feature_6",
-      "semantic_description": "Feature 6 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 6",
+      "data_type": "continuous"
     },
     {
       "name": "feature_7",
-      "semantic_description": "Feature 7 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 7",
+      "data_type": "continuous"
     },
     {
       "name": "feature_8",
-      "semantic_description": "Feature 8 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 8",
+      "data_type": "continuous"
     },
     {
       "name": "feature_9",
-      "semantic_description": "Feature 9 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 9",
+      "data_type": "continuous"
     },
     {
       "name": "feature_10",
-      "semantic_description": "Feature 10 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 10",
+      "data_type": "continuous"
     },
     {
       "name": "feature_11",
-      "semantic_description": "Feature 11 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 11",
+      "data_type": "continuous"
     },
     {
       "name": "feature_12",
-      "semantic_description": "Feature 12 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 12",
+      "data_type": "continuous"
     },
     {
       "name": "feature_13",
-      "semantic_description": "Feature 13 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 13",
+      "data_type": "continuous"
     },
     {
       "name": "feature_14",
-      "semantic_description": "Feature 14 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 14",
+      "data_type": "continuous"
     },
     {
       "name": "feature_15",
-      "semantic_description": "Feature 15 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 15",
+      "data_type": "continuous"
     },
     {
       "name": "feature_16",
-      "semantic_description": "Feature 16 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 16",
+      "data_type": "continuous"
     },
     {
       "name": "feature_17",
-      "semantic_description": "Feature 17 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 17",
+      "data_type": "continuous"
     },
     {
       "name": "feature_18",
-      "semantic_description": "Feature 18 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 18",
+      "data_type": "continuous"
     },
     {
       "name": "feature_19",
-      "semantic_description": "Feature 19 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 19",
+      "data_type": "continuous"
     },
     {
       "name": "feature_20",
-      "semantic_description": "Feature 20 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 20",
+      "data_type": "continuous"
     },
     {
       "name": "feature_21",
-      "semantic_description": "Feature 21 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 21",
+      "data_type": "continuous"
     },
     {
       "name": "feature_22",
-      "semantic_description": "Feature 22 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 22",
+      "data_type": "continuous"
     },
     {
       "name": "feature_23",
-      "semantic_description": "Feature 23 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 23",
+      "data_type": "continuous"
     },
     {
       "name": "feature_24",
-      "semantic_description": "Feature 24 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 24",
+      "data_type": "continuous"
     },
     {
       "name": "feature_25",
-      "semantic_description": "Feature 25 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 25",
+      "data_type": "continuous"
     },
     {
       "name": "feature_26",
-      "semantic_description": "Feature 26 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 26",
+      "data_type": "continuous"
     },
     {
       "name": "feature_27",
-      "semantic_description": "Feature 27 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 27",
+      "data_type": "continuous"
     },
     {
       "name": "feature_28",
-      "semantic_description": "Feature 28 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 28",
+      "data_type": "continuous"
     },
     {
       "name": "feature_29",
-      "semantic_description": "Feature 29 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 29",
+      "data_type": "continuous"
     },
     {
       "name": "feature_30",
-      "semantic_description": "Feature 30 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 30",
+      "data_type": "continuous"
     },
     {
       "name": "feature_31",
-      "semantic_description": "Feature 31 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 31",
+      "data_type": "continuous"
     },
     {
       "name": "feature_32",
-      "semantic_description": "Feature 32 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 32",
+      "data_type": "continuous"
     },
     {
       "name": "feature_33",
-      "semantic_description": "Feature 33 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 33",
+      "data_type": "continuous"
     },
     {
       "name": "feature_34",
-      "semantic_description": "Feature 34 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 34",
+      "data_type": "continuous"
     },
     {
       "name": "feature_35",
-      "semantic_description": "Feature 35 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 35",
+      "data_type": "continuous"
     },
     {
       "name": "feature_36",
-      "semantic_description": "Feature 36 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 36",
+      "data_type": "continuous"
     },
     {
       "name": "feature_37",
-      "semantic_description": "Feature 37 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 37",
+      "data_type": "continuous"
     },
     {
       "name": "feature_38",
-      "semantic_description": "Feature 38 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 38",
+      "data_type": "continuous"
     },
     {
       "name": "feature_39",
-      "semantic_description": "Feature 39 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 39",
+      "data_type": "continuous"
     },
     {
       "name": "feature_40",
-      "semantic_description": "Feature 40 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 40",
+      "data_type": "continuous"
     },
     {
       "name": "feature_41",
-      "semantic_description": "Feature 41 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 41",
+      "data_type": "continuous"
     },
     {
       "name": "feature_42",
-      "semantic_description": "Feature 42 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 42",
+      "data_type": "continuous"
     },
     {
       "name": "feature_43",
-      "semantic_description": "Feature 43 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 43",
+      "data_type": "continuous"
     },
     {
       "name": "feature_44",
-      "semantic_description": "Feature 44 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 44",
+      "data_type": "continuous"
     },
     {
       "name": "feature_45",
-      "semantic_description": "Feature 45 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 45",
+      "data_type": "continuous"
     },
     {
       "name": "feature_46",
-      "semantic_description": "Feature 46 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 46",
+      "data_type": "continuous"
     },
     {
       "name": "feature_47",
-      "semantic_description": "Feature 47 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 47",
+      "data_type": "continuous"
     },
     {
       "name": "feature_48",
-      "semantic_description": "Feature 48 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 48",
+      "data_type": "continuous"
     },
     {
       "name": "feature_49",
-      "semantic_description": "Feature 49 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 49",
+      "data_type": "continuous"
     },
     {
       "name": "feature_50",
-      "semantic_description": "Feature 50 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 50",
+      "data_type": "continuous"
     },
     {
       "name": "feature_51",
-      "semantic_description": "Feature 51 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 51",
+      "data_type": "continuous"
     },
     {
       "name": "feature_52",
-      "semantic_description": "Feature 52 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 52",
+      "data_type": "continuous"
     },
     {
       "name": "feature_53",
-      "semantic_description": "Feature 53 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 53",
+      "data_type": "continuous"
     },
     {
       "name": "feature_54",
-      "semantic_description": "Feature 54 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 54",
+      "data_type": "continuous"
     },
     {
       "name": "feature_55",
-      "semantic_description": "Feature 55 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 55",
+      "data_type": "continuous"
     },
     {
       "name": "feature_56",
-      "semantic_description": "Feature 56 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 56",
+      "data_type": "continuous"
     },
     {
       "name": "feature_57",
-      "semantic_description": "Feature 57 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 57",
+      "data_type": "continuous"
     },
     {
       "name": "feature_58",
-      "semantic_description": "Feature 58 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 58",
+      "data_type": "continuous"
     },
     {
       "name": "feature_59",
-      "semantic_description": "Feature 59 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 59",
+      "data_type": "continuous"
     },
     {
       "name": "feature_60",
-      "semantic_description": "Feature 60 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 60",
+      "data_type": "continuous"
     },
     {
       "name": "feature_61",
-      "semantic_description": "Feature 61 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 61",
+      "data_type": "continuous"
     },
     {
       "name": "feature_62",
-      "semantic_description": "Feature 62 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 62",
+      "data_type": "continuous"
     },
     {
       "name": "feature_63",
-      "semantic_description": "Feature 63 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 63",
+      "data_type": "continuous"
     },
     {
       "name": "feature_64",
-      "semantic_description": "Feature 64 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 64",
+      "data_type": "continuous"
     },
     {
       "name": "feature_65",
-      "semantic_description": "Feature 65 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 65",
+      "data_type": "continuous"
     },
     {
       "name": "feature_66",
-      "semantic_description": "Feature 66 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 66",
+      "data_type": "continuous"
     },
     {
       "name": "feature_67",
-      "semantic_description": "Feature 67 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 67",
+      "data_type": "continuous"
     },
     {
       "name": "feature_68",
-      "semantic_description": "Feature 68 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 68",
+      "data_type": "continuous"
     },
     {
       "name": "feature_69",
-      "semantic_description": "Feature 69 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 69",
+      "data_type": "continuous"
     },
     {
       "name": "feature_70",
-      "semantic_description": "Feature 70 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 70",
+      "data_type": "continuous"
     },
     {
       "name": "feature_71",
-      "semantic_description": "Feature 71 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 71",
+      "data_type": "continuous"
     },
     {
       "name": "feature_72",
-      "semantic_description": "Feature 72 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 72",
+      "data_type": "continuous"
     },
     {
       "name": "feature_73",
-      "semantic_description": "Feature 73 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 73",
+      "data_type": "continuous"
     },
     {
       "name": "feature_74",
-      "semantic_description": "Feature 74 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 74",
+      "data_type": "continuous"
     },
     {
       "name": "feature_75",
-      "semantic_description": "Feature 75 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 75",
+      "data_type": "continuous"
     },
     {
       "name": "feature_76",
-      "semantic_description": "Feature 76 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 76",
+      "data_type": "continuous"
     },
     {
       "name": "feature_77",
-      "semantic_description": "Feature 77 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 77",
+      "data_type": "continuous"
     },
     {
       "name": "feature_78",
-      "semantic_description": "Feature 78 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 78",
+      "data_type": "continuous"
     },
     {
       "name": "feature_79",
-      "semantic_description": "Feature 79 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 79",
+      "data_type": "continuous"
     },
     {
       "name": "feature_80",
-      "semantic_description": "Feature 80 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 80",
+      "data_type": "continuous"
     },
     {
       "name": "feature_81",
-      "semantic_description": "Feature 81 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 81",
+      "data_type": "continuous"
     },
     {
       "name": "feature_82",
-      "semantic_description": "Feature 82 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 82",
+      "data_type": "continuous"
     },
     {
       "name": "feature_83",
-      "semantic_description": "Feature 83 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 83",
+      "data_type": "continuous"
     },
     {
       "name": "feature_84",
-      "semantic_description": "Feature 84 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 84",
+      "data_type": "continuous"
     },
     {
       "name": "feature_85",
-      "semantic_description": "Feature 85 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 85",
+      "data_type": "continuous"
     },
     {
       "name": "feature_86",
-      "semantic_description": "Feature 86 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 86",
+      "data_type": "continuous"
     },
     {
       "name": "feature_87",
-      "semantic_description": "Feature 87 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 87",
+      "data_type": "continuous"
     },
     {
       "name": "feature_88",
-      "semantic_description": "Feature 88 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 88",
+      "data_type": "continuous"
     },
     {
       "name": "feature_89",
-      "semantic_description": "Feature 89 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 89",
+      "data_type": "continuous"
     },
     {
       "name": "feature_90",
-      "semantic_description": "Feature 90 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 90",
+      "data_type": "continuous"
     },
     {
       "name": "feature_91",
-      "semantic_description": "Feature 91 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 91",
+      "data_type": "continuous"
     },
     {
       "name": "feature_92",
-      "semantic_description": "Feature 92 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 92",
+      "data_type": "continuous"
     },
     {
       "name": "feature_93",
-      "semantic_description": "Feature 93 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 93",
+      "data_type": "continuous"
     },
     {
       "name": "feature_94",
-      "semantic_description": "Feature 94 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 94",
+      "data_type": "continuous"
     },
     {
       "name": "feature_95",
-      "semantic_description": "Feature 95 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 95",
+      "data_type": "continuous"
     },
     {
       "name": "feature_96",
-      "semantic_description": "Feature 96 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 96",
+      "data_type": "continuous"
     },
     {
       "name": "feature_97",
-      "semantic_description": "Feature 97 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 97",
+      "data_type": "continuous"
     },
     {
       "name": "feature_98",
-      "semantic_description": "Feature 98 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 98",
+      "data_type": "continuous"
     },
     {
       "name": "feature_99",
-      "semantic_description": "Feature 99 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 99",
+      "data_type": "continuous"
     },
     {
       "name": "feature_100",
-      "semantic_description": "Feature 100 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 100",
+      "data_type": "continuous"
     },
     {
       "name": "feature_101",
-      "semantic_description": "Feature 101 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 101",
+      "data_type": "continuous"
     },
     {
       "name": "feature_102",
-      "semantic_description": "Feature 102 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 102",
+      "data_type": "continuous"
     },
     {
       "name": "feature_103",
-      "semantic_description": "Feature 103 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 103",
+      "data_type": "continuous"
     },
     {
       "name": "feature_104",
-      "semantic_description": "Feature 104 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 104",
+      "data_type": "continuous"
     },
     {
       "name": "feature_105",
-      "semantic_description": "Feature 105 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 105",
+      "data_type": "continuous"
     },
     {
       "name": "feature_106",
-      "semantic_description": "Feature 106 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 106",
+      "data_type": "continuous"
     },
     {
       "name": "feature_107",
-      "semantic_description": "Feature 107 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 107",
+      "data_type": "continuous"
     },
     {
       "name": "feature_108",
-      "semantic_description": "Feature 108 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 108",
+      "data_type": "continuous"
     },
     {
       "name": "feature_109",
-      "semantic_description": "Feature 109 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 109",
+      "data_type": "continuous"
     },
     {
       "name": "feature_110",
-      "semantic_description": "Feature 110 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 110",
+      "data_type": "continuous"
     },
     {
       "name": "feature_111",
-      "semantic_description": "Feature 111 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 111",
+      "data_type": "continuous"
     },
     {
       "name": "feature_112",
-      "semantic_description": "Feature 112 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 112",
+      "data_type": "continuous"
     },
     {
       "name": "feature_113",
-      "semantic_description": "Feature 113 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 113",
+      "data_type": "continuous"
     },
     {
       "name": "feature_114",
-      "semantic_description": "Feature 114 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 114",
+      "data_type": "continuous"
     },
     {
       "name": "feature_115",
-      "semantic_description": "Feature 115 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 115",
+      "data_type": "continuous"
     },
     {
       "name": "feature_116",
-      "semantic_description": "Feature 116 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 116",
+      "data_type": "continuous"
     },
     {
       "name": "feature_117",
-      "semantic_description": "Feature 117 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 117",
+      "data_type": "continuous"
     },
     {
       "name": "feature_118",
-      "semantic_description": "Feature 118 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 118",
+      "data_type": "continuous"
     },
     {
       "name": "feature_119",
-      "semantic_description": "Feature 119 from categories: name_similarity, address_similarity, phone_similarity, location_similarity, metadata_similarity",
-      "data_type": "mixed"
+      "semantic_description": "Feature 119",
+      "data_type": "continuous"
     }
   ],
   "target_classes": [

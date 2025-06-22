@@ -1,0 +1,15 @@
+{
+  "test_indices": [
+    34,
+    111
+  ],
+  "ground_truth_labels": [
+    2,
+    1
+  ],
+  "class_names": [
+    "No-use",
+    "Long-term methods",
+    "Short-term methods"
+  ]
+}

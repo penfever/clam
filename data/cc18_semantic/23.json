@@ -63,49 +63,49 @@
   },
   "columns": [
     {
-      "name": "feature_1",
-      "semantic_description": "Feature 1",
-      "data_type": "numeric"
+      "name": "Wife's age",
+      "semantic_description": "Age of wife in years (numerical)",
+      "data_type": "integer"
     },
     {
-      "name": "feature_2",
-      "semantic_description": "Feature 2",
-      "data_type": "numeric"
+      "name": "Wife's education",
+      "semantic_description": "Education level (1=low, 2, 3, 4=high)",
+      "data_type": "binary"
     },
     {
-      "name": "feature_3",
-      "semantic_description": "Feature 3",
-      "data_type": "numeric"
+      "name": "Husband's education",
+      "semantic_description": "Education level (1=low, 2, 3, 4=high)",
+      "data_type": "binary"
     },
     {
-      "name": "feature_4",
-      "semantic_description": "Feature 4",
-      "data_type": "numeric"
+      "name": "Number of children ever born",
+      "semantic_description": "Number of children (numerical)",
+      "data_type": "integer"
     },
     {
-      "name": "feature_5",
-      "semantic_description": "Feature 5",
-      "data_type": "numeric"
+      "name": "Wife's religion",
+      "semantic_description": "Religion (0=Non-Islam, 1=Islam)",
+      "data_type": "binary"
     },
     {
-      "name": "feature_6",
-      "semantic_description": "Feature 6",
-      "data_type": "numeric"
+      "name": "Wife's now working?",
+      "semantic_description": "Employment status (0=Yes, 1=No)",
+      "data_type": "binary"
     },
     {
-      "name": "feature_7",
-      "semantic_description": "Feature 7",
-      "data_type": "numeric"
+      "name": "Husband's occupation",
+      "semantic_description": "Occupation category (1, 2, 3, 4)",
+      "data_type": "categorical"
     },
     {
-      "name": "feature_8",
-      "semantic_description": "Feature 8",
-      "data_type": "numeric"
+      "name": "Standard-of-living index",
+      "semantic_description": "Living standard (1=low, 2, 3, 4=high)",
+      "data_type": "binary"
     },
     {
-      "name": "feature_9",
-      "semantic_description": "Feature 9",
-      "data_type": "numeric"
+      "name": "Media exposure",
+      "semantic_description": "Exposure to media (0=Good, 1=Not good)",
+      "data_type": "binary"
     }
   ],
   "target_classes": [

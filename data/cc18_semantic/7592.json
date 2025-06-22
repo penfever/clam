@@ -87,73 +87,73 @@
   },
   "columns": [
     {
-      "name": "feature_1",
-      "semantic_description": "Feature 1",
+      "name": "age",
+      "semantic_description": "continuous",
+      "data_type": "continuous"
+    },
+    {
+      "name": "workclass",
+      "semantic_description": "Private, Self-emp-not-inc, Self-emp-inc, Federal-gov, Local-gov, State-gov, Without-pay, Never-worked",
       "data_type": "numeric"
     },
     {
-      "name": "feature_2",
-      "semantic_description": "Feature 2",
+      "name": "fnlwgt",
+      "semantic_description": "continuous (final weight)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "education",
+      "semantic_description": "Bachelors, Some-college, 11th, HS-grad, Prof-school, Assoc-acdm, Assoc-voc, 9th, 7th-8th, 12th, Masters, 1st-4th, 10th, Doctorate, 5th-6th, Preschool",
       "data_type": "numeric"
     },
     {
-      "name": "feature_3",
-      "semantic_description": "Feature 3",
+      "name": "education-num",
+      "semantic_description": "continuous",
+      "data_type": "continuous"
+    },
+    {
+      "name": "marital-status",
+      "semantic_description": "Married-civ-spouse, Divorced, Never-married, Separated, Widowed, Married-spouse-absent, Married-AF-spouse",
       "data_type": "numeric"
     },
     {
-      "name": "feature_4",
-      "semantic_description": "Feature 4",
+      "name": "occupation",
+      "semantic_description": "Tech-support, Craft-repair, Other-service, Sales, Exec-managerial, Prof-specialty, Handlers-cleaners, Machine-op-inspct, Adm-clerical, Farming-fishing, Transport-moving, Priv-house-serv, Protective-serv, Armed-Forces",
+      "data_type": "integer"
+    },
+    {
+      "name": "relationship",
+      "semantic_description": "Wife, Own-child, Husband, Not-in-family, Other-relative, Unmarried",
       "data_type": "numeric"
     },
     {
-      "name": "feature_5",
-      "semantic_description": "Feature 5",
+      "name": "race",
+      "semantic_description": "White, Asian-Pac-Islander, Amer-Indian-Eskimo, Other, Black",
       "data_type": "numeric"
     },
     {
-      "name": "feature_6",
-      "semantic_description": "Feature 6",
+      "name": "sex",
+      "semantic_description": "Female, Male",
       "data_type": "numeric"
     },
     {
-      "name": "feature_7",
-      "semantic_description": "Feature 7",
-      "data_type": "numeric"
+      "name": "capital-gain",
+      "semantic_description": "continuous",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_8",
-      "semantic_description": "Feature 8",
-      "data_type": "numeric"
+      "name": "capital-loss",
+      "semantic_description": "continuous",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_9",
-      "semantic_description": "Feature 9",
-      "data_type": "numeric"
+      "name": "hours-per-week",
+      "semantic_description": "continuous",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_10",
-      "semantic_description": "Feature 10",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_11",
-      "semantic_description": "Feature 11",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_12",
-      "semantic_description": "Feature 12",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_13",
-      "semantic_description": "Feature 13",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_14",
-      "semantic_description": "Feature 14",
+      "name": "native-country",
+      "semantic_description": "United-States, Cambodia, England, Puerto-Rico, Canada, Germany, Outlying-US(Guam-USVI-etc), India, Japan, Greece, South, China, Cuba, Iran, Honduras, Philippines, Italy, Poland, Jamaica, Vietnam, Mexico, Portugal, Ireland, France, Dominican-Republic, Laos, Ecuador, Taiwan, Haiti, Columbia, Hungary, Guatemala, Nicaragua, Scotland, Thailand, Yugoslavia, El-Salvador, Trinadad&Tobago, Peru, Hong, Holand-Netherlands",
       "data_type": "numeric"
     }
   ],

@@ -224,6 +224,7 @@ class ClamTsneClassifier:
         self.semantic_axes = semantic_axes
         self.semantic_axes_method = semantic_axes_method
         self._loaded_metadata = None  # Cached loaded metadata
+        self._embedding_model = None  # For perturbation method (tabular modality)
         
         # New multi-visualization parameters
         self.enable_multi_viz = enable_multi_viz
@@ -347,12 +348,22 @@ class ClamTsneClassifier:
         """
         from sklearn.manifold import TSNE
         
-        # Use same parameters as the main t-SNE computation
+        # Use same parameters as the main t-SNE computation, with fallbacks
+        if hasattr(self, '_tsne_params'):
+            perplexity = self._tsne_params['perplexity']
+            n_iter = self._tsne_params['n_iter']
+            random_state = self._tsne_params['random_state']
+        else:
+            # Fallback to instance parameters
+            perplexity = self.tsne_perplexity
+            n_iter = self.tsne_n_iter
+            random_state = self.seed
+        
         tsne = TSNE(
             n_components=n_components,
-            perplexity=min(self._tsne_params['perplexity'], len(embeddings) // 4),
-            n_iter=self._tsne_params['n_iter'],
-            random_state=self._tsne_params['random_state']
+            perplexity=min(perplexity, len(embeddings) // 4),
+            n_iter=n_iter,
+            random_state=random_state
         )
         
         return tsne.fit_transform(embeddings)

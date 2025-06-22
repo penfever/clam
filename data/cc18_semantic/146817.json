@@ -103,139 +103,139 @@
   },
   "columns": [
     {
-      "name": "feature_1",
-      "semantic_description": "Feature 1",
-      "data_type": "mixed"
+      "name": "X_Minimum",
+      "semantic_description": "Minimum X-coordinate of defect region",
+      "data_type": "numeric"
     },
     {
-      "name": "feature_2",
-      "semantic_description": "Feature 2",
-      "data_type": "mixed"
+      "name": "X_Maximum",
+      "semantic_description": "Maximum X-coordinate of defect region",
+      "data_type": "numeric"
     },
     {
-      "name": "feature_3",
-      "semantic_description": "Feature 3",
-      "data_type": "mixed"
+      "name": "Y_Minimum",
+      "semantic_description": "Minimum Y-coordinate of defect region",
+      "data_type": "numeric"
     },
     {
-      "name": "feature_4",
-      "semantic_description": "Feature 4",
-      "data_type": "mixed"
+      "name": "Y_Maximum",
+      "semantic_description": "Maximum Y-coordinate of defect region",
+      "data_type": "numeric"
     },
     {
-      "name": "feature_5",
-      "semantic_description": "Feature 5",
-      "data_type": "mixed"
+      "name": "Pixels_Areas",
+      "semantic_description": "Area of defect region in pixels",
+      "data_type": "numeric"
     },
     {
-      "name": "feature_6",
-      "semantic_description": "Feature 6",
-      "data_type": "mixed"
+      "name": "X_Perimeter",
+      "semantic_description": "Perimeter measurement along X-axis",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_7",
-      "semantic_description": "Feature 7",
-      "data_type": "mixed"
+      "name": "Y_Perimeter",
+      "semantic_description": "Perimeter measurement along Y-axis",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_8",
-      "semantic_description": "Feature 8",
-      "data_type": "mixed"
+      "name": "Sum_of_Luminosity",
+      "semantic_description": "Total luminosity value across defect region",
+      "data_type": "numeric"
     },
     {
-      "name": "feature_9",
-      "semantic_description": "Feature 9",
-      "data_type": "mixed"
+      "name": "Minimum_of_Luminosity",
+      "semantic_description": "Minimum luminosity value in defect region",
+      "data_type": "numeric"
     },
     {
-      "name": "feature_10",
-      "semantic_description": "Feature 10",
-      "data_type": "mixed"
+      "name": "Maximum_of_Luminosity",
+      "semantic_description": "Maximum luminosity value in defect region",
+      "data_type": "numeric"
     },
     {
-      "name": "feature_11",
-      "semantic_description": "Feature 11",
-      "data_type": "mixed"
+      "name": "Length_of_Conveyer",
+      "semantic_description": "Conveyor length measurement",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_12",
-      "semantic_description": "Feature 12",
-      "data_type": "mixed"
+      "name": "TypeOfSteel_A300",
+      "semantic_description": "Steel type indicator (A300)",
+      "data_type": "numeric"
     },
     {
-      "name": "feature_13",
-      "semantic_description": "Feature 13",
-      "data_type": "mixed"
+      "name": "TypeOfSteel_A400",
+      "semantic_description": "Steel type indicator (A400)",
+      "data_type": "numeric"
     },
     {
-      "name": "feature_14",
-      "semantic_description": "Feature 14",
-      "data_type": "mixed"
+      "name": "Steel_Plate_Thickness",
+      "semantic_description": "Thickness of the steel plate",
+      "data_type": "numeric"
     },
     {
-      "name": "feature_15",
-      "semantic_description": "Feature 15",
-      "data_type": "mixed"
+      "name": "Edges_Index",
+      "semantic_description": "Index measuring edge characteristics",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_16",
-      "semantic_description": "Feature 16",
-      "data_type": "mixed"
+      "name": "Empty_Index",
+      "semantic_description": "Index measuring empty regions",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_17",
-      "semantic_description": "Feature 17",
-      "data_type": "mixed"
+      "name": "Square_Index",
+      "semantic_description": "Index measuring square-like properties",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_18",
-      "semantic_description": "Feature 18",
-      "data_type": "mixed"
+      "name": "Outside_X_Index",
+      "semantic_description": "Index for outside X boundaries",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_19",
-      "semantic_description": "Feature 19",
-      "data_type": "mixed"
+      "name": "Edges_X_Index",
+      "semantic_description": "Edge index along X-axis",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_20",
-      "semantic_description": "Feature 20",
-      "data_type": "mixed"
+      "name": "Edges_Y_Index",
+      "semantic_description": "Edge index along Y-axis",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_21",
-      "semantic_description": "Feature 21",
-      "data_type": "mixed"
+      "name": "Outside_Global_Index",
+      "semantic_description": "Global outside boundary index",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_22",
-      "semantic_description": "Feature 22",
-      "data_type": "mixed"
+      "name": "LogOfAreas",
+      "semantic_description": "Logarithm of defect area",
+      "data_type": "numeric"
     },
     {
-      "name": "feature_23",
-      "semantic_description": "Feature 23",
-      "data_type": "mixed"
+      "name": "Log_X_Index",
+      "semantic_description": "Logarithmic X index",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_24",
-      "semantic_description": "Feature 24",
-      "data_type": "mixed"
+      "name": "Log_Y_Index",
+      "semantic_description": "Logarithmic Y index",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_25",
-      "semantic_description": "Feature 25",
-      "data_type": "mixed"
+      "name": "Orientation_Index",
+      "semantic_description": "Defect orientation measurement",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_26",
-      "semantic_description": "Feature 26",
-      "data_type": "mixed"
+      "name": "Luminosity_Index",
+      "semantic_description": "Index based on luminosity characteristics",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_27",
-      "semantic_description": "Feature 27",
-      "data_type": "mixed"
+      "name": "SigmoidOfAreas",
+      "semantic_description": "Sigmoid transformation of defect area",
+      "data_type": "numeric"
     }
   ],
   "target_classes": [

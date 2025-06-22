@@ -75,68 +75,23 @@
   },
   "columns": [
     {
-      "name": "feature_1",
-      "semantic_description": "Feature 1",
+      "name": "F0-F9",
+      "semantic_description": "10 features representing formant frequencies extracted from vowel utterances",
       "data_type": "numeric"
     },
     {
-      "name": "feature_2",
-      "semantic_description": "Feature 2",
+      "name": "Sex",
+      "semantic_description": "Speaker gender (Male/Female)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_3",
-      "semantic_description": "Feature 3",
+      "name": "Speaker",
+      "semantic_description": "Speaker identifier",
       "data_type": "numeric"
     },
     {
-      "name": "feature_4",
-      "semantic_description": "Feature 4",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_5",
-      "semantic_description": "Feature 5",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_6",
-      "semantic_description": "Feature 6",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_7",
-      "semantic_description": "Feature 7",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_8",
-      "semantic_description": "Feature 8",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_9",
-      "semantic_description": "Feature 9",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_10",
-      "semantic_description": "Feature 10",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_11",
-      "semantic_description": "Feature 11",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_12",
-      "semantic_description": "Feature 12",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_13",
-      "semantic_description": "Feature 13",
+      "name": "Train_or_Test",
+      "semantic_description": "Dataset split indicator (removed in OpenML version)",
       "data_type": "numeric"
     }
   ],

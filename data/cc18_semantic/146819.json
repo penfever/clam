@@ -69,94 +69,9 @@
   },
   "columns": [
     {
-      "name": "feature_1",
-      "semantic_description": "Feature 1",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_2",
-      "semantic_description": "Feature 2",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_3",
-      "semantic_description": "Feature 3",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_4",
-      "semantic_description": "Feature 4",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_5",
-      "semantic_description": "Feature 5",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_6",
-      "semantic_description": "Feature 6",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_7",
-      "semantic_description": "Feature 7",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_8",
-      "semantic_description": "Feature 8",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_9",
-      "semantic_description": "Feature 9",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_10",
-      "semantic_description": "Feature 10",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_11",
-      "semantic_description": "Feature 11",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_12",
-      "semantic_description": "Feature 12",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_13",
-      "semantic_description": "Feature 13",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_14",
-      "semantic_description": "Feature 14",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_15",
-      "semantic_description": "Feature 15",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_16",
-      "semantic_description": "Feature 16",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_17",
-      "semantic_description": "Feature 17",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_18",
-      "semantic_description": "Feature 18",
-      "data_type": "continuous"
+      "name": "parameter_1_to_18",
+      "semantic_description": "18 climate model parameters scaled to the interval [0,1], representing various physical and numerical settings in the Parallel Ocean Program (POP2)",
+      "data_type": "numeric"
     }
   ],
   "target_classes": [

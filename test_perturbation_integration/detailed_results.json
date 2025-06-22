@@ -1,0 +1,56 @@
+[
+  {
+    "test_idx": 0,
+    "config_name": "tsne_semantic",
+    "success": true,
+    "num_test_samples": 2,
+    "test_indices": [
+      34,
+      111
+    ],
+    "ground_truth_labels": [
+      2,
+      1
+    ],
+    "avg_prompt_length": 961.0,
+    "visualization_path": "visualizations/test_00_tsne_semantic.png",
+    "prompt_path": "prompts/test_00_tsne_semantic_all.txt",
+    "response_path": "responses/test_00_tsne_semantic_all.txt",
+    "ground_truth_path": "ground_truth/test_00_tsne_semantic.json",
+    "config_path": "configs/test_00_tsne_semantic.json",
+    "test_directory": "test_00_tsne_semantic",
+    "is_multi_viz": false,
+    "visualization_methods": [
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "tsne_semantic",
+      "accuracy": 0.0,
+      "balanced_accuracy": 0.0,
+      "precision_macro": 0.0,
+      "recall_macro": 0.0,
+      "f1_macro": 0.0,
+      "precision_micro": 0.0,
+      "recall_micro": 0.0,
+      "f1_micro": 0.0,
+      "precision_weighted": 0.0,
+      "recall_weighted": 0.0,
+      "f1_weighted": 0.0,
+      "confusion_matrix": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 2,
+      "num_classes": 2,
+      "support": []
+    },
+    "error": null
+  }
+]

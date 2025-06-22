@@ -89,148 +89,148 @@
   },
   "columns": [
     {
-      "name": "feature_1",
-      "semantic_description": "Feature 1",
+      "name": "age",
+      "semantic_description": "Patient age in years (continuous)",
+      "data_type": "integer"
+    },
+    {
+      "name": "sex",
+      "semantic_description": "Gender (M/F)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_2",
-      "semantic_description": "Feature 2",
+      "name": "on_thyroxine",
+      "semantic_description": "Currently on thyroxine medication (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_3",
-      "semantic_description": "Feature 3",
+      "name": "query_on_thyroxine",
+      "semantic_description": "Query about thyroxine (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_4",
-      "semantic_description": "Feature 4",
+      "name": "on_antithyroid_medication",
+      "semantic_description": "On antithyroid medication (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_5",
-      "semantic_description": "Feature 5",
+      "name": "sick",
+      "semantic_description": "Patient sick (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_6",
-      "semantic_description": "Feature 6",
+      "name": "pregnant",
+      "semantic_description": "Pregnancy status (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_7",
-      "semantic_description": "Feature 7",
+      "name": "thyroid_surgery",
+      "semantic_description": "Previous thyroid surgery (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_8",
-      "semantic_description": "Feature 8",
+      "name": "I131_treatment",
+      "semantic_description": "Radioactive iodine treatment (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_9",
-      "semantic_description": "Feature 9",
+      "name": "query_hypothyroid",
+      "semantic_description": "Query about hypothyroid (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_10",
-      "semantic_description": "Feature 10",
+      "name": "query_hyperthyroid",
+      "semantic_description": "Query about hyperthyroid (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_11",
-      "semantic_description": "Feature 11",
+      "name": "lithium",
+      "semantic_description": "Taking lithium (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_12",
-      "semantic_description": "Feature 12",
+      "name": "goitre",
+      "semantic_description": "Presence of goitre (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_13",
-      "semantic_description": "Feature 13",
+      "name": "tumor",
+      "semantic_description": "Thyroid tumor (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_14",
-      "semantic_description": "Feature 14",
+      "name": "hypopituitary",
+      "semantic_description": "Hypopituitary condition (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_15",
-      "semantic_description": "Feature 15",
+      "name": "psych",
+      "semantic_description": "Psychological symptoms (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_16",
-      "semantic_description": "Feature 16",
+      "name": "TSH_measured",
+      "semantic_description": "TSH test performed (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_17",
-      "semantic_description": "Feature 17",
+      "name": "TSH",
+      "semantic_description": "Thyroid stimulating hormone level (continuous)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "T3_measured",
+      "semantic_description": "T3 test performed (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_18",
-      "semantic_description": "Feature 18",
+      "name": "T3",
+      "semantic_description": "Triiodothyronine level (continuous)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "TT4_measured",
+      "semantic_description": "Total T4 test performed (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_19",
-      "semantic_description": "Feature 19",
+      "name": "TT4",
+      "semantic_description": "Total thyroxine level (continuous)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "T4U_measured",
+      "semantic_description": "T4U test performed (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_20",
-      "semantic_description": "Feature 20",
+      "name": "T4U",
+      "semantic_description": "Thyroxine utilization rate (continuous)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "FTI_measured",
+      "semantic_description": "FTI test performed (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_21",
-      "semantic_description": "Feature 21",
+      "name": "FTI",
+      "semantic_description": "Free Thyroxine Index (continuous)",
+      "data_type": "continuous"
+    },
+    {
+      "name": "TBG_measured",
+      "semantic_description": "TBG test performed (f/t)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_22",
-      "semantic_description": "Feature 22",
-      "data_type": "numeric"
+      "name": "TBG",
+      "semantic_description": "Thyroid binding globulin (continuous)",
+      "data_type": "continuous"
     },
     {
-      "name": "feature_23",
-      "semantic_description": "Feature 23",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_24",
-      "semantic_description": "Feature 24",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_25",
-      "semantic_description": "Feature 25",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_26",
-      "semantic_description": "Feature 26",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_27",
-      "semantic_description": "Feature 27",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_28",
-      "semantic_description": "Feature 28",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_29",
-      "semantic_description": "Feature 29",
+      "name": "referral_source",
+      "semantic_description": "Source of referral (WEST, STMW, SVHC, SVI, SVHD, other)",
       "data_type": "numeric"
     }
   ],

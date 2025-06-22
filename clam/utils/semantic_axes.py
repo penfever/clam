@@ -269,23 +269,64 @@ class SemanticAxesComputer:
             feature_sensitivities = np.zeros((n_features, n_dims))
             
             # Compute standard deviations for perturbation scaling
-            feature_stds = np.std(original_features, axis=0)
+            # Ensure we're working with numeric data
+            if hasattr(original_features, 'values'):
+                # It's a pandas DataFrame, get numeric values
+                original_features_numeric = original_features.values
+            else:
+                original_features_numeric = original_features
+            
+            # Ensure we have numeric data only
+            try:
+                original_features_numeric = original_features_numeric.astype(float)
+            except (ValueError, TypeError) as e:
+                logger.warning(f"Could not convert features to numeric: {e}")
+                # Try to select only numeric columns if it's a pandas DataFrame
+                if hasattr(original_features, 'select_dtypes'):
+                    numeric_features = original_features.select_dtypes(include=[np.number])
+                    if numeric_features.empty:
+                        logger.error("No numeric features found for perturbation analysis")
+                        return {name: f"{name}-axis" for name in axis_names}
+                    original_features_numeric = numeric_features.values
+                    # Update feature names to match numeric columns
+                    if len(feature_names) != numeric_features.shape[1]:
+                        logger.warning(f"Feature names length mismatch: {len(feature_names)} vs {numeric_features.shape[1]}")
+                        feature_names = list(numeric_features.columns)
+                        n_features = len(feature_names)
+                else:
+                    logger.error("Cannot handle non-numeric features")
+                    return {name: f"{name}-axis" for name in axis_names}
+            
+            feature_stds = np.std(original_features_numeric, axis=0)
             
             for feature_idx in range(n_features):
-                logger.debug(f"Processing feature {feature_idx+1}/{n_features}: {feature_names[feature_idx] if feature_idx < len(feature_names) else f'feature_{feature_idx}'}")
-                
                 perturbation_shifts = []
                 
                 for sample_idx in range(self.perturbation_samples):
                     # Create perturbed version of the data
-                    X_perturbed = original_features.copy()
+                    X_perturbed = original_features_numeric.copy()
                     
                     # Add noise to this feature
                     feature_std = feature_stds[feature_idx]
+                    
+                    # Ensure feature_std is numeric
+                    if isinstance(feature_std, str):
+                        # Skip non-numeric features
+                        continue
+                        
                     if feature_std > 0:  # Avoid division by zero for constant features
-                        noise = np.random.normal(0, self.perturbation_strength * feature_std, 
-                                               original_features.shape[0])
+                        noise = np.random.normal(0, self.perturbation_strength * float(feature_std), 
+                                               original_features_numeric.shape[0])
                         X_perturbed[:, feature_idx] += noise
+                    
+                    # Ensure perturbed data is clean numeric data
+                    try:
+                        X_perturbed = X_perturbed.astype(float)
+                        # Check for any invalid values using robust checks
+                        if not np.all(np.isfinite(X_perturbed)):
+                            continue
+                    except (ValueError, TypeError):
+                        continue
                     
                     try:
                         # Get perturbed embeddings and reduced coordinates
@@ -302,7 +343,7 @@ class SemanticAxesComputer:
                         perturbation_shifts.append(coordinate_shift)
                         
                     except Exception as e:
-                        logger.debug(f"Error in perturbation sample {sample_idx} for feature {feature_idx}: {e}")
+                        logger.warning(f"Error in perturbation sample {sample_idx} for feature {feature_idx}: {e}")
                         continue
                 
                 if perturbation_shifts:

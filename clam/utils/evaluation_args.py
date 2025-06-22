@@ -307,6 +307,13 @@ def add_evaluation_control_args(parser: argparse.ArgumentParser):
         action="store_true",
         help="Compute factor weighting of named features to improve visualization legends with semantic axis labels"
     )
+    parser.add_argument(
+        "--semantic_axes_method",
+        type=str,
+        choices=["pca_loadings", "feature_importance", "perturbation"],
+        default="pca_loadings",
+        help="Method for computing semantic axes: 'pca_loadings' for direct PCA analysis, 'feature_importance' for supervised feature selection, 'perturbation' for TabPFN embedding sensitivity analysis"
+    )
 
 
 def add_audio_args(parser: argparse.ArgumentParser):

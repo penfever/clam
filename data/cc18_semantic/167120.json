@@ -61,109 +61,14 @@
   },
   "columns": [
     {
-      "name": "feature_1",
-      "semantic_description": "Feature 1",
-      "data_type": "continuous"
+      "name": "feature1_to_feature21",
+      "semantic_description": "21 anonymized features representing cleaned and regularized global equity market data",
+      "data_type": "numeric"
     },
     {
-      "name": "feature_2",
-      "semantic_description": "Feature 2",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_3",
-      "semantic_description": "Feature 3",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_4",
-      "semantic_description": "Feature 4",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_5",
-      "semantic_description": "Feature 5",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_6",
-      "semantic_description": "Feature 6",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_7",
-      "semantic_description": "Feature 7",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_8",
-      "semantic_description": "Feature 8",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_9",
-      "semantic_description": "Feature 9",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_10",
-      "semantic_description": "Feature 10",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_11",
-      "semantic_description": "Feature 11",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_12",
-      "semantic_description": "Feature 12",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_13",
-      "semantic_description": "Feature 13",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_14",
-      "semantic_description": "Feature 14",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_15",
-      "semantic_description": "Feature 15",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_16",
-      "semantic_description": "Feature 16",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_17",
-      "semantic_description": "Feature 17",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_18",
-      "semantic_description": "Feature 18",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_19",
-      "semantic_description": "Feature 19",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_20",
-      "semantic_description": "Feature 20",
-      "data_type": "continuous"
-    },
-    {
-      "name": "feature_21",
-      "semantic_description": "Feature 21",
-      "data_type": "continuous"
+      "name": "note",
+      "semantic_description": "Feature meanings are intentionally obscured as part of the tournament design",
+      "data_type": "numeric"
     }
   ],
   "target_classes": [

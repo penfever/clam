@@ -100,82 +100,82 @@
   },
   "columns": [
     {
-      "name": "feature_1",
+      "name": "Feature 1",
       "semantic_description": "16 features representing 8 (x,y) coordinate pairs sampled along the pen trajectory. Features are resampled spatially at regular arc-length intervals rather than temporal intervals for better alignment. (feature 1)",
       "data_type": "integer"
     },
     {
-      "name": "feature_2",
+      "name": "Feature 2",
       "semantic_description": "16 features representing 8 (x,y) coordinate pairs sampled along the pen trajectory. Features are resampled spatially at regular arc-length intervals rather than temporal intervals for better alignment. (feature 2)",
       "data_type": "integer"
     },
     {
-      "name": "feature_3",
+      "name": "Feature 3",
       "semantic_description": "16 features representing 8 (x,y) coordinate pairs sampled along the pen trajectory. Features are resampled spatially at regular arc-length intervals rather than temporal intervals for better alignment. (feature 3)",
       "data_type": "integer"
     },
     {
-      "name": "feature_4",
+      "name": "Feature 4",
       "semantic_description": "16 features representing 8 (x,y) coordinate pairs sampled along the pen trajectory. Features are resampled spatially at regular arc-length intervals rather than temporal intervals for better alignment. (feature 4)",
       "data_type": "integer"
     },
     {
-      "name": "feature_5",
+      "name": "Feature 5",
       "semantic_description": "16 features representing 8 (x,y) coordinate pairs sampled along the pen trajectory. Features are resampled spatially at regular arc-length intervals rather than temporal intervals for better alignment. (feature 5)",
       "data_type": "integer"
     },
     {
-      "name": "feature_6",
+      "name": "Feature 6",
       "semantic_description": "16 features representing 8 (x,y) coordinate pairs sampled along the pen trajectory. Features are resampled spatially at regular arc-length intervals rather than temporal intervals for better alignment. (feature 6)",
       "data_type": "integer"
     },
     {
-      "name": "feature_7",
+      "name": "Feature 7",
       "semantic_description": "16 features representing 8 (x,y) coordinate pairs sampled along the pen trajectory. Features are resampled spatially at regular arc-length intervals rather than temporal intervals for better alignment. (feature 7)",
       "data_type": "integer"
     },
     {
-      "name": "feature_8",
+      "name": "Feature 8",
       "semantic_description": "16 features representing 8 (x,y) coordinate pairs sampled along the pen trajectory. Features are resampled spatially at regular arc-length intervals rather than temporal intervals for better alignment. (feature 8)",
       "data_type": "integer"
     },
     {
-      "name": "feature_9",
+      "name": "Feature 9",
       "semantic_description": "16 features representing 8 (x,y) coordinate pairs sampled along the pen trajectory. Features are resampled spatially at regular arc-length intervals rather than temporal intervals for better alignment. (feature 9)",
       "data_type": "integer"
     },
     {
-      "name": "feature_10",
+      "name": "Feature 10",
       "semantic_description": "16 features representing 8 (x,y) coordinate pairs sampled along the pen trajectory. Features are resampled spatially at regular arc-length intervals rather than temporal intervals for better alignment. (feature 10)",
       "data_type": "integer"
     },
     {
-      "name": "feature_11",
+      "name": "Feature 11",
       "semantic_description": "16 features representing 8 (x,y) coordinate pairs sampled along the pen trajectory. Features are resampled spatially at regular arc-length intervals rather than temporal intervals for better alignment. (feature 11)",
       "data_type": "integer"
     },
     {
-      "name": "feature_12",
+      "name": "Feature 12",
       "semantic_description": "16 features representing 8 (x,y) coordinate pairs sampled along the pen trajectory. Features are resampled spatially at regular arc-length intervals rather than temporal intervals for better alignment. (feature 12)",
       "data_type": "integer"
     },
     {
-      "name": "feature_13",
+      "name": "Feature 13",
       "semantic_description": "16 features representing 8 (x,y) coordinate pairs sampled along the pen trajectory. Features are resampled spatially at regular arc-length intervals rather than temporal intervals for better alignment. (feature 13)",
       "data_type": "integer"
     },
     {
-      "name": "feature_14",
+      "name": "Feature 14",
       "semantic_description": "16 features representing 8 (x,y) coordinate pairs sampled along the pen trajectory. Features are resampled spatially at regular arc-length intervals rather than temporal intervals for better alignment. (feature 14)",
       "data_type": "integer"
     },
     {
-      "name": "feature_15",
+      "name": "Feature 15",
       "semantic_description": "16 features representing 8 (x,y) coordinate pairs sampled along the pen trajectory. Features are resampled spatially at regular arc-length intervals rather than temporal intervals for better alignment. (feature 15)",
       "data_type": "integer"
     },
     {
-      "name": "feature_16",
+      "name": "Feature 16",
       "semantic_description": "16 features representing 8 (x,y) coordinate pairs sampled along the pen trajectory. Features are resampled spatially at regular arc-length intervals rather than temporal intervals for better alignment. (feature 16)",
       "data_type": "integer"
     }

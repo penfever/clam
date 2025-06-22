@@ -84,109 +84,109 @@
   },
   "columns": [
     {
-      "name": "feature_1",
-      "semantic_description": "Feature 1",
+      "name": "loc",
+      "semantic_description": "McCabe's line count of code",
+      "data_type": "integer"
+    },
+    {
+      "name": "v(g)",
+      "semantic_description": "McCabe's cyclomatic complexity",
       "data_type": "numeric"
     },
     {
-      "name": "feature_2",
-      "semantic_description": "Feature 2",
+      "name": "ev(g)",
+      "semantic_description": "McCabe's essential complexity",
       "data_type": "numeric"
     },
     {
-      "name": "feature_3",
-      "semantic_description": "Feature 3",
+      "name": "iv(g)",
+      "semantic_description": "McCabe's design complexity",
       "data_type": "numeric"
     },
     {
-      "name": "feature_4",
-      "semantic_description": "Feature 4",
+      "name": "n",
+      "semantic_description": "Halstead's total operators + operands",
       "data_type": "numeric"
     },
     {
-      "name": "feature_5",
-      "semantic_description": "Feature 5",
+      "name": "v",
+      "semantic_description": "Halstead's volume",
       "data_type": "numeric"
     },
     {
-      "name": "feature_6",
-      "semantic_description": "Feature 6",
+      "name": "l",
+      "semantic_description": "Halstead's program length",
       "data_type": "numeric"
     },
     {
-      "name": "feature_7",
-      "semantic_description": "Feature 7",
+      "name": "d",
+      "semantic_description": "Halstead's difficulty",
       "data_type": "numeric"
     },
     {
-      "name": "feature_8",
-      "semantic_description": "Feature 8",
+      "name": "i",
+      "semantic_description": "Halstead's intelligence",
       "data_type": "numeric"
     },
     {
-      "name": "feature_9",
-      "semantic_description": "Feature 9",
+      "name": "e",
+      "semantic_description": "Halstead's effort",
       "data_type": "numeric"
     },
     {
-      "name": "feature_10",
-      "semantic_description": "Feature 10",
+      "name": "b",
+      "semantic_description": "Halstead's delivered bugs estimate",
       "data_type": "numeric"
     },
     {
-      "name": "feature_11",
-      "semantic_description": "Feature 11",
+      "name": "t",
+      "semantic_description": "Halstead's time estimator",
       "data_type": "numeric"
     },
     {
-      "name": "feature_12",
-      "semantic_description": "Feature 12",
+      "name": "lOCode",
+      "semantic_description": "Halstead's line count",
+      "data_type": "integer"
+    },
+    {
+      "name": "lOComment",
+      "semantic_description": "Halstead's count of lines of comments",
+      "data_type": "integer"
+    },
+    {
+      "name": "lOBlank",
+      "semantic_description": "Halstead's count of blank lines",
+      "data_type": "integer"
+    },
+    {
+      "name": "lOCodeAndComment",
+      "semantic_description": "Lines of code and comment",
       "data_type": "numeric"
     },
     {
-      "name": "feature_13",
-      "semantic_description": "Feature 13",
+      "name": "uniq_Op",
+      "semantic_description": "Unique operators",
       "data_type": "numeric"
     },
     {
-      "name": "feature_14",
-      "semantic_description": "Feature 14",
+      "name": "uniq_Opnd",
+      "semantic_description": "Unique operands",
       "data_type": "numeric"
     },
     {
-      "name": "feature_15",
-      "semantic_description": "Feature 15",
+      "name": "total_Op",
+      "semantic_description": "Total operators",
       "data_type": "numeric"
     },
     {
-      "name": "feature_16",
-      "semantic_description": "Feature 16",
+      "name": "total_Opnd",
+      "semantic_description": "Total operands",
       "data_type": "numeric"
     },
     {
-      "name": "feature_17",
-      "semantic_description": "Feature 17",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_18",
-      "semantic_description": "Feature 18",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_19",
-      "semantic_description": "Feature 19",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_20",
-      "semantic_description": "Feature 20",
-      "data_type": "numeric"
-    },
-    {
-      "name": "feature_21",
-      "semantic_description": "Feature 21",
-      "data_type": "numeric"
+      "name": "branchCount",
+      "semantic_description": "Number of branches in flow graph",
+      "data_type": "integer"
     }
   ],
   "target_classes": [

@@ -83,34 +83,34 @@
   },
   "columns": [
     {
-      "name": "feature_1",
-      "semantic_description": "Feature 1",
-      "data_type": "categorical/ordinal"
+      "name": "buying",
+      "semantic_description": "Buying price (vhigh, high, med, low)",
+      "data_type": "numeric"
     },
     {
-      "name": "feature_2",
-      "semantic_description": "Feature 2",
-      "data_type": "categorical/ordinal"
+      "name": "maint",
+      "semantic_description": "Maintenance price (vhigh, high, med, low)",
+      "data_type": "numeric"
     },
     {
-      "name": "feature_3",
-      "semantic_description": "Feature 3",
-      "data_type": "categorical/ordinal"
+      "name": "doors",
+      "semantic_description": "Number of doors (2, 3, 4, 5more)",
+      "data_type": "integer"
     },
     {
-      "name": "feature_4",
-      "semantic_description": "Feature 4",
-      "data_type": "categorical/ordinal"
+      "name": "persons",
+      "semantic_description": "Capacity in terms of persons to carry (2, 4, more)",
+      "data_type": "numeric"
     },
     {
-      "name": "feature_5",
-      "semantic_description": "Feature 5",
-      "data_type": "categorical/ordinal"
+      "name": "lug_boot",
+      "semantic_description": "Size of luggage boot (small, med, big)",
+      "data_type": "integer"
     },
     {
-      "name": "feature_6",
-      "semantic_description": "Feature 6",
-      "data_type": "categorical/ordinal"
+      "name": "safety",
+      "semantic_description": "Estimated safety of the car (low, med, high)",
+      "data_type": "numeric"
     }
   ],
   "target_classes": [

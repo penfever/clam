@@ -1,0 +1,249 @@
+{
+  "dataset": "sick",
+  "description": "Thyroid disease dataset for predicting various thyroid conditions. Contains clinical measurements and patient information to classify thyroid function as sick (various thyroid conditions) or negative (normal).",
+  "source": "UCI Machine Learning Repository / Garavan Institute",
+  "source_url": "https://archive.ics.uci.edu/ml/datasets/Thyroid+Disease",
+  "openml_task": 3021,
+  "openml_dataset": 57,
+  "date_donated": "1987",
+  "creator": "Garavan Institute and J. Ross Quinlan (New South Wales Institute, Sydney, Australia)",
+  "instances": 3772,
+  "features": 29,
+  "target": "Class",
+  "target_type": "binary",
+  "missing_values": true,
+  "missing_values_count": 6064,
+  "feature_types": {
+    "continuous": 7,
+    "categorical": 22
+  },
+  "feature_description": {
+    "age": "Patient age in years (continuous)",
+    "sex": "Gender (M/F)",
+    "on_thyroxine": "Currently on thyroxine medication (f/t)",
+    "query_on_thyroxine": "Query about thyroxine (f/t)",
+    "on_antithyroid_medication": "On antithyroid medication (f/t)",
+    "sick": "Patient sick (f/t)",
+    "pregnant": "Pregnancy status (f/t)",
+    "thyroid_surgery": "Previous thyroid surgery (f/t)",
+    "I131_treatment": "Radioactive iodine treatment (f/t)",
+    "query_hypothyroid": "Query about hypothyroid (f/t)",
+    "query_hyperthyroid": "Query about hyperthyroid (f/t)",
+    "lithium": "Taking lithium (f/t)",
+    "goitre": "Presence of goitre (f/t)",
+    "tumor": "Thyroid tumor (f/t)",
+    "hypopituitary": "Hypopituitary condition (f/t)",
+    "psych": "Psychological symptoms (f/t)",
+    "TSH_measured": "TSH test performed (f/t)",
+    "TSH": "Thyroid stimulating hormone level (continuous)",
+    "T3_measured": "T3 test performed (f/t)",
+    "T3": "Triiodothyronine level (continuous)",
+    "TT4_measured": "Total T4 test performed (f/t)",
+    "TT4": "Total thyroxine level (continuous)",
+    "T4U_measured": "T4U test performed (f/t)",
+    "T4U": "Thyroxine utilization rate (continuous)",
+    "FTI_measured": "FTI test performed (f/t)",
+    "FTI": "Free Thyroxine Index (continuous)",
+    "TBG_measured": "TBG test performed (f/t)",
+    "TBG": "Thyroid binding globulin (continuous)",
+    "referral_source": "Source of referral (WEST, STMW, SVHC, SVI, SVHD, other)"
+  },
+  "target_values": {
+    "negative": "Normal thyroid function",
+    "sick": "Thyroid disease present"
+  },
+  "domain": "Medical/Endocrinology",
+  "use_case": "Clinical decision support, thyroid disease screening, medical diagnosis assistance, healthcare analytics",
+  "clinical_context": "Thyroid hormones regulate metabolism. Abnormal levels indicate conditions like hypothyroidism (underactive) or hyperthyroidism (overactive thyroid)",
+  "data_collection": "Clinical data from patients referred for thyroid testing at medical facilities in Sydney, Australia",
+  "laboratory_tests": {
+    "TSH": "Primary screening test for thyroid function",
+    "T3/T4": "Thyroid hormone levels",
+    "FTI": "Calculated index of free thyroxine"
+  },
+  "challenges": "Significant missing values (5.4%), class imbalance, dated (1987), regional specificity to Australian population",
+  "clinical_significance": "Early detection of thyroid disorders crucial for treatment. Conditions range from benign to requiring immediate intervention",
+  "ethical_considerations": "Medical data privacy, potential bias in referral patterns, need for clinical validation before deployment",
+  "citations": [
+    {
+      "author": "J. Ross Quinlan",
+      "title": "Simplifying decision trees",
+      "venue": "International Journal of Man-Machine Studies",
+      "volume": "27",
+      "pages": "221-234",
+      "year": "1987"
+    },
+    {
+      "author": "J. Ross Quinlan",
+      "title": "C4.5: Programs for Machine Learning",
+      "publisher": "Morgan Kaufmann",
+      "year": "1993"
+    }
+  ],
+  "dataset_name": "sick",
+  "original_source": {
+    "creator": "Garavan Institute and J. Ross Quinlan (New South Wales Institute, Sydney, Australia)",
+    "institution": "UCI Machine Learning Repository / Garavan Institute",
+    "date": "1987",
+    "publication": "J. Ross Quinlan: Simplifying decision trees"
+  },
+  "columns": [
+    {
+      "name": "feature_1",
+      "semantic_description": "Feature 1",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_2",
+      "semantic_description": "Feature 2",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_3",
+      "semantic_description": "Feature 3",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_4",
+      "semantic_description": "Feature 4",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_5",
+      "semantic_description": "Feature 5",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_6",
+      "semantic_description": "Feature 6",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_7",
+      "semantic_description": "Feature 7",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_8",
+      "semantic_description": "Feature 8",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_9",
+      "semantic_description": "Feature 9",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_10",
+      "semantic_description": "Feature 10",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_11",
+      "semantic_description": "Feature 11",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_12",
+      "semantic_description": "Feature 12",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_13",
+      "semantic_description": "Feature 13",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_14",
+      "semantic_description": "Feature 14",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_15",
+      "semantic_description": "Feature 15",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_16",
+      "semantic_description": "Feature 16",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_17",
+      "semantic_description": "Feature 17",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_18",
+      "semantic_description": "Feature 18",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_19",
+      "semantic_description": "Feature 19",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_20",
+      "semantic_description": "Feature 20",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_21",
+      "semantic_description": "Feature 21",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_22",
+      "semantic_description": "Feature 22",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_23",
+      "semantic_description": "Feature 23",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_24",
+      "semantic_description": "Feature 24",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_25",
+      "semantic_description": "Feature 25",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_26",
+      "semantic_description": "Feature 26",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_27",
+      "semantic_description": "Feature 27",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_28",
+      "semantic_description": "Feature 28",
+      "data_type": "numeric"
+    },
+    {
+      "name": "feature_29",
+      "semantic_description": "Feature 29",
+      "data_type": "numeric"
+    }
+  ],
+  "target_classes": [
+    {
+      "name": "negative",
+      "meaning": "Normal thyroid function"
+    },
+    {
+      "name": "sick",
+      "meaning": "Thyroid disease present"
+    }
+  ],
+  "dataset_history": "Data Collection: Clinical data from patients referred for thyroid testing at medical facilities in Sydney, Australia",
+  "inference_notes": "Challenges: Significant missing values (5.4%), class imbalance, dated (1987), regional specificity to Australian population. Use Case: Clinical decision support, thyroid disease screening, medical diagnosis assistance, healthcare analytics"
+}

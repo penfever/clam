@@ -518,6 +518,68 @@ class VLMPromptingTestSuite:
                 'semantic_axes': True,  # NEW: Enable semantic axes
                 'use_metadata': True,   # NEW: Enable metadata
                 'auto_load_metadata': True
+            },
+            # Perturbation semantic axes test - single visualization with perturbation method
+            {
+                'name': 'tsne_perturbation_axes',
+                'enable_multi_viz': False,
+                'use_semantic_names': True,
+                'load_semantic_from_cc18': True,
+                'semantic_axes': True,
+                'semantic_axes_method': 'perturbation',  # NEW: Use perturbation method
+                'use_3d_tsne': False,
+                'use_knn_connections': False,
+                'tsne_perplexity': 15
+            },
+            # Feature importance semantic axes test - alternative method
+            {
+                'name': 'tsne_importance_axes',
+                'enable_multi_viz': False,
+                'use_semantic_names': True,
+                'load_semantic_from_cc18': True,
+                'semantic_axes': True,
+                'semantic_axes_method': 'feature_importance',  # NEW: Use feature importance method
+                'use_3d_tsne': False,
+                'use_knn_connections': False,
+                'tsne_perplexity': 15
+            },
+            # Perturbation + metadata test - combine perturbation method with metadata
+            {
+                'name': 'tsne_perturbation_metadata',
+                'enable_multi_viz': False,
+                'use_semantic_names': True,
+                'load_semantic_from_cc18': True,
+                'semantic_axes': True,
+                'semantic_axes_method': 'perturbation',  # NEW: Use perturbation method
+                'use_metadata': True,  # NEW: Enable metadata
+                'auto_load_metadata': True,
+                'use_3d_tsne': False,
+                'use_knn_connections': False,
+                'tsne_perplexity': 15
+            },
+            # 3D perturbation test - test perturbation method with 3D visualization
+            {
+                'name': 'tsne_3d_perturbation',
+                'enable_multi_viz': False,
+                'use_semantic_names': True,
+                'load_semantic_from_cc18': True,
+                'semantic_axes': True,
+                'semantic_axes_method': 'perturbation',  # NEW: Use perturbation method
+                'use_3d_tsne': True,  # NEW: 3D visualization
+                'use_knn_connections': False,
+                'tsne_perplexity': 15
+            },
+            # Multi-viz with perturbation method
+            {
+                'name': 'multi_perturbation_axes',
+                'enable_multi_viz': True,
+                'visualization_methods': ['pca', 'tsne'],
+                'layout_strategy': 'sequential',
+                'reasoning_focus': 'comparison',
+                'use_semantic_names': True,
+                'load_semantic_from_cc18': True,
+                'semantic_axes': True,
+                'semantic_axes_method': 'perturbation'  # NEW: Use perturbation method
             }
         ]
         
@@ -631,6 +693,7 @@ class VLMPromptingTestSuite:
                 'use_semantic_names': config.get('use_semantic_names', False),
                 # NEW: Add semantic axes and metadata parameters
                 'semantic_axes': config.get('semantic_axes', False),
+                'semantic_axes_method': config.get('semantic_axes_method', 'pca_loadings'),  # NEW: Support different semantic axes methods
                 'use_metadata': config.get('use_metadata', False),
                 # Pass feature names for semantic axes computation
                 'feature_names': self.dataset_info.get('feature_names', None),
@@ -950,10 +1013,20 @@ class VLMPromptingTestSuite:
         
         configs = self._get_test_configurations()
         
-        # Limit the number of test configurations if specified
-        if self.num_tests is not None and self.num_tests < len(configs):
-            configs = configs[:self.num_tests]
-            logger.info(f"Limited to {self.num_tests} test configurations (out of {len(self._get_test_configurations())} available)")
+        # Handle specific target config selection
+        if hasattr(self, '_target_config') and self._target_config:
+            matching_configs = [config for config in configs if config['name'] == self._target_config]
+            if matching_configs:
+                configs = [matching_configs[0]]
+                logger.info(f"Running specific test configuration: {self._target_config}")
+            else:
+                logger.error(f"Target configuration '{self._target_config}' not found")
+                return {}
+        else:
+            # Limit the number of test configurations if specified
+            if self.num_tests is not None and self.num_tests < len(configs):
+                configs = configs[:self.num_tests]
+                logger.info(f"Limited to {self.num_tests} test configurations (out of {len(self._get_test_configurations())} available)")
         
         logger.info(f"Running {len(configs)} test configurations with {self.num_samples_per_test} samples each...")
         
@@ -1120,13 +1193,17 @@ def main():
                        help="Backend to use for VLM inference (default: auto)")
     parser.add_argument("--zoom_factor", type=float, default=6.5,
                        help="Zoom factor for t-SNE visualizations (default: 6.5)")
+    parser.add_argument("--test_config", type=str, default=None,
+                       help="Run only a specific test configuration by name (e.g., 'tsne_perturbation_axes')")
+    parser.add_argument("--list_configs", action="store_true",
+                       help="List all available test configuration names and exit")
     
     args = parser.parse_args()
     
     # Set random seed
     np.random.seed(args.seed)
     
-    # Create and run test suite
+    # Create test suite
     test_suite = VLMPromptingTestSuite(
         output_dir=args.output_dir,
         task_id=args.task_id,
@@ -1136,6 +1213,47 @@ def main():
         backend=args.backend,
         zoom_factor=args.zoom_factor
     )
+    
+    # Handle list_configs option
+    if args.list_configs:
+        test_configs = test_suite._get_test_configurations()
+        print("\nAvailable test configurations:")
+        print("=" * 50)
+        for i, config in enumerate(test_configs):
+            semantic_method = config.get('semantic_axes_method', 'pca_loadings')
+            semantic_axes = config.get('semantic_axes', False)
+            multi_viz = config.get('enable_multi_viz', False)
+            metadata = config.get('use_metadata', False)
+            
+            status = []
+            if semantic_axes:
+                status.append(f"semantic_axes({semantic_method})")
+            if metadata:
+                status.append("metadata")
+            if multi_viz:
+                status.append("multi_viz")
+            
+            status_str = f" [{', '.join(status)}]" if status else ""
+            print(f"{i+1:2d}. {config['name']}{status_str}")
+        
+        print(f"\nTotal: {len(test_configs)} configurations")
+        print("\nUse --test_config <name> to run a specific configuration")
+        return
+    
+    # Handle specific test config option
+    if args.test_config:
+        test_configs = test_suite._get_test_configurations()
+        matching_configs = [config for config in test_configs if config['name'] == args.test_config]
+        
+        if not matching_configs:
+            print(f"Error: Test configuration '{args.test_config}' not found.")
+            print("Use --list_configs to see available configurations.")
+            return 1
+        
+        print(f"Running specific test configuration: {args.test_config}")
+        # Override num_tests to run only the specific config
+        test_suite.num_tests = 1
+        test_suite._target_config = args.test_config
     
     summary = test_suite.run_all_tests()
     

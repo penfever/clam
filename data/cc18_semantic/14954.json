@@ -92,198 +92,198 @@
   },
   "columns": [
     {
-      "name": "feature_1",
-      "semantic_description": "Feature 1",
+      "name": "timestamp",
+      "semantic_description": "Numeric (19500101 - 21001231)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_2",
-      "semantic_description": "Feature 2",
+      "name": "cylinder_number",
+      "semantic_description": "Nominal",
       "data_type": "numeric"
     },
     {
-      "name": "feature_3",
-      "semantic_description": "Feature 3",
+      "name": "customer",
+      "semantic_description": "Nominal",
       "data_type": "numeric"
     },
     {
-      "name": "feature_4",
-      "semantic_description": "Feature 4",
+      "name": "job_number",
+      "semantic_description": "Nominal",
       "data_type": "numeric"
     },
     {
-      "name": "feature_5",
-      "semantic_description": "Feature 5",
+      "name": "grain_screened",
+      "semantic_description": "Nominal (yes, no)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_6",
-      "semantic_description": "Feature 6",
+      "name": "ink_color",
+      "semantic_description": "Nominal (key, type)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_7",
-      "semantic_description": "Feature 7",
+      "name": "proof_on_ctd_ink",
+      "semantic_description": "Nominal (yes, no)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_8",
-      "semantic_description": "Feature 8",
+      "name": "blade_mfg",
+      "semantic_description": "Nominal (benton, daetwyler, uddeholm)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_9",
-      "semantic_description": "Feature 9",
+      "name": "cylinder_division",
+      "semantic_description": "Nominal (gallatin, warsaw, mattoon)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_10",
-      "semantic_description": "Feature 10",
+      "name": "paper_type",
+      "semantic_description": "Nominal (uncoated, coated, super)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_11",
-      "semantic_description": "Feature 11",
+      "name": "ink_type",
+      "semantic_description": "Nominal (uncoated, coated, cover)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_12",
-      "semantic_description": "Feature 12",
+      "name": "direct_steam",
+      "semantic_description": "Nominal (yes, no)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_13",
-      "semantic_description": "Feature 13",
+      "name": "solvent_type",
+      "semantic_description": "Nominal (xylol, lactol, naptha, line, other)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_14",
-      "semantic_description": "Feature 14",
+      "name": "type_on_cylinder",
+      "semantic_description": "Nominal (yes, no)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_15",
-      "semantic_description": "Feature 15",
+      "name": "press_type",
+      "semantic_description": "Nominal (70 wood hoe, 70 motter, 70 albert, 94 motter)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_16",
-      "semantic_description": "Feature 16",
+      "name": "press",
+      "semantic_description": "Nominal (821, 802, 813, 824, 815, 816, 827, 828)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_17",
-      "semantic_description": "Feature 17",
+      "name": "unit_number",
+      "semantic_description": "Nominal (1-10)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_18",
-      "semantic_description": "Feature 18",
+      "name": "cylinder_size",
+      "semantic_description": "Nominal (catalog, spiegel, tabloid)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_19",
-      "semantic_description": "Feature 19",
+      "name": "paper_mill_location",
+      "semantic_description": "Nominal (north us, south us, canadian, scandanavian, mid european)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_20",
-      "semantic_description": "Feature 20",
+      "name": "plating_tank",
+      "semantic_description": "Nominal (1910, 1911, other)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_21",
-      "semantic_description": "Feature 21",
+      "name": "proof_cut",
+      "semantic_description": "Numeric (0-100)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_22",
-      "semantic_description": "Feature 22",
+      "name": "viscosity",
+      "semantic_description": "Numeric (0-100)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_23",
-      "semantic_description": "Feature 23",
+      "name": "caliper",
+      "semantic_description": "Numeric (0-1.0)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_24",
-      "semantic_description": "Feature 24",
+      "name": "ink_temperature",
+      "semantic_description": "Numeric (5-30)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_25",
-      "semantic_description": "Feature 25",
+      "name": "humifity",
+      "semantic_description": "Numeric (5-120)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_26",
-      "semantic_description": "Feature 26",
+      "name": "roughness",
+      "semantic_description": "Numeric (0-2)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_27",
-      "semantic_description": "Feature 27",
+      "name": "blade_pressure",
+      "semantic_description": "Numeric (10-75)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_28",
-      "semantic_description": "Feature 28",
+      "name": "varnish_pct",
+      "semantic_description": "Numeric (0-100)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_29",
-      "semantic_description": "Feature 29",
+      "name": "press_speed",
+      "semantic_description": "Numeric (0-4000)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_30",
-      "semantic_description": "Feature 30",
+      "name": "ink_pct",
+      "semantic_description": "Numeric (0-100)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_31",
-      "semantic_description": "Feature 31",
+      "name": "solvent_pct",
+      "semantic_description": "Numeric (0-100)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_32",
-      "semantic_description": "Feature 32",
+      "name": "ESA_Voltage",
+      "semantic_description": "Numeric (0-16)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_33",
-      "semantic_description": "Feature 33",
+      "name": "ESA_Amperage",
+      "semantic_description": "Numeric (0-10)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_34",
-      "semantic_description": "Feature 34",
+      "name": "wax",
+      "semantic_description": "Numeric (0-4.0)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_35",
-      "semantic_description": "Feature 35",
+      "name": "hardener",
+      "semantic_description": "Numeric (0-3.0)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_36",
-      "semantic_description": "Feature 36",
+      "name": "roller_durometer",
+      "semantic_description": "Numeric (15-120)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_37",
-      "semantic_description": "Feature 37",
+      "name": "current_density",
+      "semantic_description": "Numeric (20-50)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_38",
-      "semantic_description": "Feature 38",
+      "name": "anode_space_ratio",
+      "semantic_description": "Numeric (70-130)",
       "data_type": "numeric"
     },
     {
-      "name": "feature_39",
-      "semantic_description": "Feature 39",
+      "name": "chrome_content",
+      "semantic_description": "Numeric (80-120)",
       "data_type": "numeric"
     }
   ],
