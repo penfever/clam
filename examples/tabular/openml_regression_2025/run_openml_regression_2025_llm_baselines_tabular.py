@@ -223,7 +223,6 @@ def evaluate_baseline_on_task(task, split_idx, model_name, args):
         "--task_ids", str(task_id),  # Pass task_id properly for regression
         "--output_dir", eval_output_dir,
         "--models", model_name,
-        "--task_type", "regression",  # Explicitly specify regression
         "--use_wandb",
         "--wandb_entity", "nyu-dice-lab",
         "--wandb_project", wandb_project,
@@ -255,21 +254,17 @@ def evaluate_baseline_on_task(task, split_idx, model_name, args):
     
     elif model_name == "tabllm":
         base_cmd.extend([
-            "--model_id", args.model_id,
-            "--batch_size", "1",  # Smaller batch for regression
-            "--max_tokens", "512"
+            "--model_id", args.model_id
         ])
     
     elif model_name == "jolt":
         base_cmd.extend([
-            "--model_id", args.model_id,
-            "--batch_size", "8"
+            "--model_id", args.model_id
         ])
     
     elif model_name == "tabula_8b":
         base_cmd.extend([
-            "--model_id", "approximatelabs/tabula-8b",
-            "--batch_size", "1"
+            "--model_id", "approximatelabs/tabula-8b"
         ])
     
     # Run evaluation command
