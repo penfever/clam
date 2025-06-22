@@ -210,6 +210,45 @@ def _get_hardcoded_cc18_tasks() -> list:
         40670, 40701
     ]
 
+def resolve_task_id_from_openml_api(task_id: int) -> Optional[Dict[str, Any]]:
+    """
+    Dynamically resolve a single task_id using OpenML API.
+    
+    Args:
+        task_id: OpenML task ID to resolve
+        
+    Returns:
+        Dictionary with task information if found, None otherwise
+    """
+    try:
+        import openml
+        logger.info(f"Attempting to resolve task {task_id} from OpenML API")
+        
+        # Get task from OpenML API
+        task = openml.tasks.get_task(task_id)
+        dataset = task.get_dataset()
+        
+        result = {
+            'dataset_id': task.dataset_id,
+            'dataset_name': dataset.name,
+            'task_type': str(getattr(task, 'task_type', 'unknown')),
+            'target_attribute': getattr(task, 'target_name', None),
+            'num_classes': len(task.class_labels) if hasattr(task, 'class_labels') and task.class_labels else None,
+            'num_features': len(dataset.features) if hasattr(dataset, 'features') and isinstance(dataset.features, dict) else None,
+            'source': 'openml_api'
+        }
+        
+        logger.info(f"Successfully resolved task {task_id}: {result['dataset_name']} (dataset_id: {result['dataset_id']})")
+        return result
+        
+    except ImportError:
+        logger.warning("OpenML package not available for dynamic task resolution")
+        return None
+    except Exception as e:
+        logger.warning(f"Failed to resolve task {task_id} from OpenML API: {e}")
+        return None
+
+
 def _get_fallback_mapping() -> Dict[int, Dict[str, Any]]:
     """
     Get fallback mapping with known OpenML CC18 relationships.

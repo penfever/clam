@@ -934,11 +934,29 @@ class ClamResourceManager:
         mapping = get_openml_cc18_mapping()
         
         # If we have task_id, get the rest from mapping
-        if task_id and task_id in mapping:
-            info = mapping[task_id]
-            result['dataset_id'] = info.get('dataset_id')
-            result['dataset_name'] = info.get('dataset_name')
-            return result
+        if task_id:
+            if task_id in mapping:
+                info = mapping[task_id]
+                result['dataset_id'] = info.get('dataset_id')
+                result['dataset_name'] = info.get('dataset_name')
+                
+                # If dataset_id is missing, try to resolve from OpenML API
+                if not result['dataset_id']:
+                    from clam.utils.openml_mapping import resolve_task_id_from_openml_api
+                    api_result = resolve_task_id_from_openml_api(task_id)
+                    if api_result:
+                        result['dataset_id'] = api_result.get('dataset_id')
+                        result['dataset_name'] = api_result.get('dataset_name')
+                
+                return result
+            else:
+                # Try to resolve from OpenML API if not in hardcoded mapping
+                from clam.utils.openml_mapping import resolve_task_id_from_openml_api
+                api_result = resolve_task_id_from_openml_api(task_id)
+                if api_result:
+                    result['dataset_id'] = api_result.get('dataset_id')
+                    result['dataset_name'] = api_result.get('dataset_name')
+                    return result
         
         # If we have dataset_id, find task_id first
         if dataset_id and not task_id:
