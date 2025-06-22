@@ -26,7 +26,8 @@ class SemanticAxesComputer:
                  top_k_features: int = 3,
                  min_loading_threshold: float = 0.05,
                  perturbation_samples: int = 50,
-                 perturbation_strength: float = 0.1):
+                 perturbation_strength: float = 0.1,
+                 max_perturbation_dataset_size: int = 200):
         """
         Initialize semantic axes computer.
         
@@ -36,12 +37,14 @@ class SemanticAxesComputer:
             min_loading_threshold: Minimum loading/importance to consider significant
             perturbation_samples: Number of perturbation samples for perturbation method
             perturbation_strength: Strength of perturbations as fraction of feature std
+            max_perturbation_dataset_size: Maximum dataset size for perturbation analysis (default: 200)
         """
         self.method = method
         self.top_k_features = top_k_features
         self.min_loading_threshold = min_loading_threshold
         self.perturbation_samples = perturbation_samples
         self.perturbation_strength = perturbation_strength
+        self.max_perturbation_dataset_size = max_perturbation_dataset_size
         
     def compute_semantic_axes(self,
                              embeddings: np.ndarray,
@@ -270,9 +273,20 @@ class SemanticAxesComputer:
         This works well with TabPFN embeddings where direct feature-factor relationships are lost.
         """
         try:
-            logger.info(f"Computing perturbation-based semantic axes with {self.perturbation_samples} samples")
+            # Limit dataset size for efficiency
+            if original_features.shape[0] > self.max_perturbation_dataset_size:
+                logger.info(f"Subsampling dataset from {original_features.shape[0]} to {self.max_perturbation_dataset_size} samples for perturbation analysis")
+                # Use random sampling to get a representative subset
+                sample_indices = np.random.choice(original_features.shape[0], self.max_perturbation_dataset_size, replace=False)
+                original_features_subset = original_features[sample_indices]
+                baseline_reduced_subset = baseline_reduced[sample_indices]
+            else:
+                original_features_subset = original_features
+                baseline_reduced_subset = baseline_reduced
             
-            n_features = original_features.shape[1]
+            logger.info(f"Computing perturbation-based semantic axes with {self.perturbation_samples} samples on {original_features_subset.shape[0]} data points")
+            
+            n_features = original_features_subset.shape[1]
             n_dims = len(axis_names)
             
             # Store sensitivities: [n_features, n_dims]
@@ -280,11 +294,11 @@ class SemanticAxesComputer:
             
             # Compute standard deviations for perturbation scaling
             # Ensure we're working with numeric data
-            if hasattr(original_features, 'values'):
+            if hasattr(original_features_subset, 'values'):
                 # It's a pandas DataFrame, get numeric values
-                original_features_numeric = original_features.values
+                original_features_numeric = original_features_subset.values
             else:
-                original_features_numeric = original_features
+                original_features_numeric = original_features_subset
             
             # Ensure we have numeric data only
             try:
@@ -343,13 +357,13 @@ class SemanticAxesComputer:
                         perturbed_embeddings = embedding_model.transform(X_perturbed)
                         perturbed_reduced = reduction_func(perturbed_embeddings)
                         
-                        # Ensure same shape as baseline
-                        if perturbed_reduced.shape != baseline_reduced.shape:
-                            logger.warning(f"Shape mismatch in perturbation: {perturbed_reduced.shape} vs {baseline_reduced.shape}")
+                        # Ensure same shape as baseline subset
+                        if perturbed_reduced.shape != baseline_reduced_subset.shape:
+                            logger.warning(f"Shape mismatch in perturbation: {perturbed_reduced.shape} vs {baseline_reduced_subset.shape}")
                             continue
                             
                         # Measure shift in reduced coordinates
-                        coordinate_shift = np.mean(np.abs(perturbed_reduced - baseline_reduced), axis=0)
+                        coordinate_shift = np.mean(np.abs(perturbed_reduced - baseline_reduced_subset), axis=0)
                         perturbation_shifts.append(coordinate_shift)
                         
                     except Exception as e:
