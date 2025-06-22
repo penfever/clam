@@ -302,6 +302,10 @@ class ClamImageTsneClassifier:
         logger.info(f"Loading Vision Language Model: {self.vlm_model_id}")
         self.vlm_wrapper = self._load_vlm_model()
         
+        # Ensure VLM wrapper was loaded successfully
+        if self.vlm_wrapper is None:
+            raise RuntimeError(f"Failed to load VLM model {self.vlm_model_id}. Cannot proceed with classification.")
+        
         self.is_fitted = True
         elapsed_time = time.time() - start_time
         logger.info(f"CLAM image t-SNE classifier fitted in {elapsed_time:.2f} seconds")
@@ -345,17 +349,27 @@ class ClamImageTsneClassifier:
             
             if vlm_wrapper is None:
                 logger.warning("CLAM model loader returned None, falling back to simple VLM implementation")
-                return self._create_simple_vlm()
+                fallback_wrapper = self._create_simple_vlm()
+                if fallback_wrapper is None:
+                    raise RuntimeError("Both CLAM model loader and simple VLM fallback failed to create a valid wrapper")
+                return fallback_wrapper
             
+            logger.info("VLM loaded successfully")
             return vlm_wrapper
             
-        except ImportError:
-            logger.warning("CLAM model loader not available, using simple VLM implementation")
-            return self._create_simple_vlm()
+        except ImportError as e:
+            logger.warning(f"CLAM model loader not available: {e}, using simple VLM implementation")
+            fallback_wrapper = self._create_simple_vlm()
+            if fallback_wrapper is None:
+                raise RuntimeError(f"Simple VLM fallback failed after ImportError: {e}")
+            return fallback_wrapper
         except Exception as e:
             logger.error(f"Failed to load VLM with CLAM model loader: {e}")
             logger.warning("Falling back to simple VLM implementation")
-            return self._create_simple_vlm()
+            fallback_wrapper = self._create_simple_vlm()
+            if fallback_wrapper is None:
+                raise RuntimeError(f"Simple VLM fallback failed after error: {e}")
+            return fallback_wrapper
     
     def _create_simple_vlm(self):
         """Create a simple VLM wrapper for testing."""
@@ -461,6 +475,10 @@ class ClamImageTsneClassifier:
         """
         if not self.is_fitted:
             raise ValueError("Classifier must be fitted before prediction")
+        
+        # Ensure VLM wrapper is still available
+        if self.vlm_wrapper is None:
+            raise RuntimeError("VLM wrapper is None. Model may have failed to load or been unloaded.")
         
         logger.info(f"Predicting labels for {len(test_image_paths)} test images using VLM")
         

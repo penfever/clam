@@ -1,0 +1,18 @@
+{
+  "name": "tsne_semantic_metadata_combined",
+  "enable_multi_viz": false,
+  "use_semantic_names": true,
+  "load_semantic_from_cc18": true,
+  "semantic_axes": true,
+  "use_metadata": true,
+  "auto_load_metadata": true,
+  "use_3d_tsne": false,
+  "use_knn_connections": false,
+  "nn_k": 30,
+  "tsne_perplexity": 15,
+  "semantic_class_names": [
+    "No-use",
+    "Long-term methods",
+    "Short-term methods"
+  ]
+}

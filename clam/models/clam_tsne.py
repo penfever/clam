@@ -1093,6 +1093,10 @@ class ClamTsneClassifier:
         # Load VLM
         self._load_vlm()
         
+        # Ensure VLM wrapper was loaded successfully
+        if self.vlm_wrapper is None:
+            raise RuntimeError(f"Failed to load VLM model {self.vlm_model_id}. Cannot proceed with classification.")
+        
         # Import required modules
         try:
             from PIL import Image
