@@ -478,6 +478,7 @@ def evaluate_tabllm(dataset, args):
         
         # Try to load semantic information for better feature descriptions
         semantic_info = None
+        semantic_dir = None  # Initialize semantic_dir outside try block to ensure it's always defined
         try:
             # Try using the general metadata loader first
             from clam.utils.metadata_loader import get_metadata_loader
@@ -500,7 +501,6 @@ def evaluate_tabllm(dataset, args):
                     os.path.join(clam_root, "data", "cc18_semantic_complete"),
                     os.path.join(clam_root, "data", "cc18_semantic")
                 ]
-                semantic_dir = None
                 for dir_path in semantic_dirs:
                     if os.path.exists(dir_path):
                         semantic_dir = dir_path
