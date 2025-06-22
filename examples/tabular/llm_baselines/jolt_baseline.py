@@ -50,16 +50,26 @@ def load_jolt_config_by_openml_id(openml_task_id, original_feature_count=None):
             if original_feature_count is not None:
                 # JOLT config stores feature count WITHOUT target, compare directly
                 config_feature_count = config_data.get('num_features')
-                if config_feature_count is not None and config_feature_count != original_feature_count:
-                    error_msg = (
-                        f"Feature count mismatch for OpenML task {openml_task_id}: "
-                        f"dataset has {original_feature_count} features but JOLT config expects {config_feature_count} features. "
-                        f"This indicates a version mismatch or preprocessing differences."
-                    )
-                    logger.error(error_msg)
-                    raise ValueError(error_msg)
-                
-                logger.info(f"Feature count validation passed: {original_feature_count} features")
+                if config_feature_count is not None:
+                    # Allow higher actual feature count (due to text preprocessing/encoding)
+                    # but warn if actual is significantly lower (potential data loss)
+                    if original_feature_count < config_feature_count:
+                        error_msg = (
+                            f"Feature count mismatch for OpenML task {openml_task_id}: "
+                            f"dataset has {original_feature_count} features but JOLT config expects {config_feature_count} features. "
+                            f"This indicates potential data loss or version mismatch."
+                        )
+                        logger.error(error_msg)
+                        raise ValueError(error_msg)
+                    elif original_feature_count > config_feature_count:
+                        logger.info(
+                            f"Feature count expanded: dataset has {original_feature_count} features "
+                            f"vs {config_feature_count} in config (likely due to text preprocessing/encoding)"
+                        )
+                    else:
+                        logger.info(f"Feature count validation passed: {original_feature_count} features")
+                else:
+                    logger.info(f"No feature count in config to validate against")
             
             # Create feature mapping to preserve semantic descriptions
             feature_mapping = None
@@ -124,13 +134,24 @@ def _load_jolt_config_by_dataset_name_fallback(openml_task_id, jolt_dir, origina
             # Feature validation and mapping creation (same as main function)
             if original_feature_count is not None:
                 config_feature_count = config_data.get('num_features')
-                if config_feature_count is not None and config_feature_count != original_feature_count:
-                    error_msg = (
-                        f"Feature count mismatch for OpenML task {openml_task_id}: "
-                        f"dataset has {original_feature_count} features but JOLT config expects {config_feature_count} features."
-                    )
-                    logger.error(error_msg)
-                    raise ValueError(error_msg)
+                if config_feature_count is not None:
+                    # Allow higher actual feature count (due to text preprocessing/encoding)
+                    # but warn if actual is significantly lower (potential data loss)
+                    if original_feature_count < config_feature_count:
+                        error_msg = (
+                            f"Feature count mismatch for OpenML task {openml_task_id}: "
+                            f"dataset has {original_feature_count} features but JOLT config expects {config_feature_count} features. "
+                            f"This indicates potential data loss or version mismatch."
+                        )
+                        logger.error(error_msg)
+                        raise ValueError(error_msg)
+                    elif original_feature_count > config_feature_count:
+                        logger.info(
+                            f"Feature count expanded: dataset has {original_feature_count} features "
+                            f"vs {config_feature_count} in config (likely due to text preprocessing/encoding)"
+                        )
+                    else:
+                        logger.info(f"Feature count validation passed: {original_feature_count} features")
             
             feature_mapping = None
             if 'column_descriptions' in config_data:
