@@ -343,10 +343,18 @@ class ClamImageTsneClassifier:
                 **vlm_kwargs
             )
             
+            if vlm_wrapper is None:
+                logger.warning("CLAM model loader returned None, falling back to simple VLM implementation")
+                return self._create_simple_vlm()
+            
             return vlm_wrapper
             
         except ImportError:
             logger.warning("CLAM model loader not available, using simple VLM implementation")
+            return self._create_simple_vlm()
+        except Exception as e:
+            logger.error(f"Failed to load VLM with CLAM model loader: {e}")
+            logger.warning("Falling back to simple VLM implementation")
             return self._create_simple_vlm()
     
     def _create_simple_vlm(self):
