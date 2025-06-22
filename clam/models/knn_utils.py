@@ -42,6 +42,11 @@ def find_knn_in_embedding_space(
         distances: Distance to k-nearest neighbors [n_query, k]
         indices: Indices of k-nearest neighbors in train_embeddings [n_query, k]
     """
+    # Ensure query_embeddings is always 2D (fix for single sample case)
+    if query_embeddings.ndim == 1:
+        query_embeddings = query_embeddings.reshape(1, -1)
+        logger.debug(f"Reshaped 1D query embedding to 2D: {query_embeddings.shape}")
+    
     # Reduce logging verbosity - only log for the first query or larger batches
     if len(query_embeddings) > 1:
         logger.info(f"Finding {k} nearest neighbors for {len(query_embeddings)} query points")

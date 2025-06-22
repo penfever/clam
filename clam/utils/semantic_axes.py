@@ -117,6 +117,11 @@ class SemanticAxesComputer:
                                axis_names: List[str]) -> Dict[str, str]:
         """Compute semantic axes using PCA loadings on original embeddings."""
         try:
+            # Ensure embeddings is 2D (fix for single sample case)
+            if embeddings.ndim == 1:
+                embeddings = embeddings.reshape(1, -1)
+                logger.debug(f"Reshaped 1D embeddings to 2D: {embeddings.shape}")
+            
             # Standardize embeddings
             scaler = StandardScaler()
             embeddings_scaled = scaler.fit_transform(embeddings)
