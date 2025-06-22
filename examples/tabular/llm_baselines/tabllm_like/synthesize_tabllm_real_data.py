@@ -304,10 +304,11 @@ def create_notes_bank_files():
                 semantic_info = json.load(f)
             
             dataset_name = semantic_info.get('dataset_name', semantic_info.get('dataset', Path(json_file).stem))
+            task_id = semantic_info.get('_metadata', {}).get('task_id') or Path(json_file).stem
             
-            # Create and save YAML template
+            # Create and save YAML template using task_id for consistent lookup
             template_data = create_template_for_dataset(semantic_info, dataset_name)
-            template_filename = f"templates_{dataset_name}.yaml"
+            template_filename = f"templates_task_{task_id}.yaml"
             template_path = os.path.join(OUTPUT_DIR, template_filename)
             
             write_yaml_template(template_data, template_path)

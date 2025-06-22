@@ -35,38 +35,15 @@ def load_jolt_config_by_openml_id(openml_task_id, original_feature_count=None):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     jolt_dir = os.path.join(current_dir, "jolt")
     
-    # Load OpenML task mapping
-    mapping_path = os.path.join(jolt_dir, "openml_task_mapping.json")
-    if not os.path.exists(mapping_path):
-        logger.warning(f"OpenML task mapping not found at {mapping_path}")
-        return None, None
-    
-    try:
-        with open(mapping_path, 'r') as f:
-            task_mapping = json.load(f)
-    except Exception as e:
-        logger.error(f"Error loading OpenML task mapping: {e}")
-        return None, None
-    
-    # Find dataset name that maps to this OpenML task ID
-    dataset_name = None
-    for name, task_id in task_mapping.items():
-        if task_id == openml_task_id:
-            dataset_name = name
-            break
-    
-    if dataset_name is None:
-        logger.debug(f"No JOLT config found for OpenML task ID {openml_task_id}")
-        return None, None
-    
-    # Load the corresponding config file
-    jolt_config_path = os.path.join(jolt_dir, f"jolt_config_{dataset_name}.json")
+    # Try direct task ID lookup first (new approach)
+    jolt_config_path = os.path.join(jolt_dir, f"jolt_config_task_{openml_task_id}.json")
     
     try:
         if os.path.exists(jolt_config_path):
             with open(jolt_config_path, 'r') as f:
                 config_data = json.load(f)
             
+            dataset_name = config_data.get('dataset_name', f'task_{openml_task_id}')
             logger.info(f"Found JOLT config for OpenML task {openml_task_id} (dataset: {dataset_name})")
             
             # Validate feature count if provided
@@ -95,6 +72,76 @@ def load_jolt_config_by_openml_id(openml_task_id, original_feature_count=None):
             
             return config_data, feature_mapping
         
+        # Fallback: try old dataset name-based approach for backward compatibility
+        return _load_jolt_config_by_dataset_name_fallback(openml_task_id, jolt_dir, original_feature_count)
+        
+    except ValueError:
+        # Re-raise validation errors (like feature count mismatch)
+        raise
+    except Exception as e:
+        logger.error(f"Error loading JOLT config for OpenML task {openml_task_id}: {e}")
+        return None, None
+
+
+def _load_jolt_config_by_dataset_name_fallback(openml_task_id, jolt_dir, original_feature_count=None):
+    """Fallback method using the old dataset name mapping approach."""
+    logger = logging.getLogger(__name__)
+    
+    # Load OpenML task mapping
+    mapping_path = os.path.join(jolt_dir, "openml_task_mapping.json")
+    if not os.path.exists(mapping_path):
+        logger.debug(f"OpenML task mapping not found at {mapping_path}")
+        return None, None
+    
+    try:
+        with open(mapping_path, 'r') as f:
+            task_mapping = json.load(f)
+    except Exception as e:
+        logger.debug(f"Error loading OpenML task mapping: {e}")
+        return None, None
+    
+    # Find dataset name that maps to this OpenML task ID
+    dataset_name = None
+    for name, task_id in task_mapping.items():
+        if task_id == openml_task_id:
+            dataset_name = name
+            break
+    
+    if dataset_name is None:
+        logger.debug(f"No JOLT config found for OpenML task ID {openml_task_id}")
+        return None, None
+    
+    # Load the corresponding config file
+    jolt_config_path = os.path.join(jolt_dir, f"jolt_config_{dataset_name}.json")
+    
+    try:
+        if os.path.exists(jolt_config_path):
+            with open(jolt_config_path, 'r') as f:
+                config_data = json.load(f)
+            
+            logger.info(f"Found JOLT config for OpenML task {openml_task_id} (dataset: {dataset_name}) via fallback")
+            
+            # Feature validation and mapping creation (same as main function)
+            if original_feature_count is not None:
+                config_feature_count = config_data.get('num_features')
+                if config_feature_count is not None and config_feature_count != original_feature_count:
+                    error_msg = (
+                        f"Feature count mismatch for OpenML task {openml_task_id}: "
+                        f"dataset has {original_feature_count} features but JOLT config expects {config_feature_count} features."
+                    )
+                    logger.error(error_msg)
+                    raise ValueError(error_msg)
+            
+            feature_mapping = None
+            if 'column_descriptions' in config_data:
+                feature_mapping = {
+                    'descriptions': config_data['column_descriptions'],
+                    'task_id': openml_task_id,
+                    'dataset_name': dataset_name
+                }
+            
+            return config_data, feature_mapping
+        
         logger.debug(f"JOLT config file not found: {jolt_config_path}")
         return None, None
         
@@ -102,7 +149,7 @@ def load_jolt_config_by_openml_id(openml_task_id, original_feature_count=None):
         # Re-raise validation errors (like feature count mismatch)
         raise
     except Exception as e:
-        logger.error(f"Error loading JOLT config for OpenML task {openml_task_id}: {e}")
+        logger.debug(f"Error loading JOLT config via fallback for OpenML task {openml_task_id}: {e}")
         return None, None
 
 def create_feature_mapping_after_preprocessing(original_feature_names, processed_feature_names, feature_mapping):

@@ -123,73 +123,14 @@ def load_tabllm_config_by_openml_id(openml_task_id, original_feature_count=None)
     """
     logger = logging.getLogger(__name__)
     
-    # Try to use the new resource manager first
-    task_mapping = None
-    try:
-        from clam.utils.resource_manager import get_resource_manager
-        rm = get_resource_manager()
-        mapping_path = rm.path_resolver.get_configs_dir() / 'tabllm' / 'openml_task_mapping.json'
-        
-        if mapping_path.exists():
-            with open(mapping_path, 'r') as f:
-                task_mapping = json.load(f)
-            logger.debug(f"Loaded OpenML task mapping from managed config")
-        else:
-            logger.debug(f"OpenML task mapping not found in managed config")
-    except Exception as e:
-        logger.debug(f"Could not load from managed config: {e}")
+    # Try direct task ID lookup first (new approach)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    tabllm_dir = os.path.join(current_dir, "tabllm_like")
+    template_path = os.path.join(tabllm_dir, f"templates_task_{openml_task_id}.yaml")
     
-    # Fallback to legacy method
-    if task_mapping is None:
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        tabllm_dir = os.path.join(current_dir, "tabllm_like")
-        
-        # Load OpenML task mapping
-        mapping_path = os.path.join(tabllm_dir, "openml_task_mapping.json")
-        if not os.path.exists(mapping_path):
-            logger.warning(f"OpenML task mapping not found at {mapping_path}")
-            return None, None
-        
-        try:
-            with open(mapping_path, 'r') as f:
-                task_mapping = json.load(f)
-        except Exception as e:
-            logger.error(f"Error loading OpenML task mapping: {e}")
-            return None, None
-    
-    # Find dataset name that maps to this OpenML task ID
-    dataset_name = None
-    for name, task_id in task_mapping.items():
-        if task_id == openml_task_id:
-            dataset_name = name
-            break
-    
-    if dataset_name is None:
-        logger.debug(f"No TabLLM config found for OpenML task ID {openml_task_id}")
-        return None, None
-    
-    # Load the corresponding template file using resource manager
     template_data = None
-    template_path = None
-    
     try:
-        # Try resource manager first
-        if 'rm' in locals():
-            template_path = rm.path_resolver.get_config_path('tabllm', dataset_name)
-    except:
-        pass
-    
-    # Fallback to legacy path
-    if template_path is None or not template_path.exists():
-        # Ensure tabllm_dir is defined for legacy fallback
-        if 'tabllm_dir' not in locals():
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            tabllm_dir = os.path.join(current_dir, "tabllm_like")
-        template_path = os.path.join(tabllm_dir, f"templates_{dataset_name}.yaml")
-    
-    try:
-        if (hasattr(template_path, 'exists') and template_path.exists()) or \
-           (isinstance(template_path, str) and os.path.exists(template_path)):
+        if os.path.exists(template_path):
             import yaml
             
             # Define constructors for custom YAML tags
@@ -206,6 +147,7 @@ def load_tabllm_config_by_openml_id(openml_task_id, original_feature_count=None)
             with open(template_path, 'r') as f:
                 template_data = yaml.load(f, Loader=CustomLoader)
             
+            dataset_name = template_data.get('dataset_name', f'task_{openml_task_id}')
             logger.info(f"Found TabLLM config for OpenML task {openml_task_id} (dataset: {dataset_name})")
             
             # Load semantic information for feature count validation
@@ -276,8 +218,8 @@ def load_tabllm_config_by_openml_id(openml_task_id, original_feature_count=None)
             
             return template_data, feature_mapping
         
-        logger.debug(f"TabLLM template file not found: {template_path}")
-        return None, None
+        # Fallback: try old dataset name-based approach for backward compatibility
+        return _load_tabllm_config_by_dataset_name_fallback(openml_task_id, original_feature_count)
         
     except ValueError:
         # Re-raise validation errors (like feature count mismatch)
@@ -285,6 +227,76 @@ def load_tabllm_config_by_openml_id(openml_task_id, original_feature_count=None)
     except Exception as e:
         logger.error(f"Error loading TabLLM config for OpenML task {openml_task_id}: {e}")
         return None, None
+
+
+def _load_tabllm_config_by_dataset_name_fallback(openml_task_id, original_feature_count=None):
+    """Fallback method using the old dataset name mapping approach."""
+    logger = logging.getLogger(__name__)
+    
+    # Try to use the new resource manager first
+    task_mapping = None
+    try:
+        from clam.utils.resource_manager import get_resource_manager
+        rm = get_resource_manager()
+        mapping_path = rm.path_resolver.get_configs_dir() / 'tabllm' / 'openml_task_mapping.json'
+        
+        if mapping_path.exists():
+            with open(mapping_path, 'r') as f:
+                task_mapping = json.load(f)
+            logger.debug(f"Loaded OpenML task mapping from managed config")
+        else:
+            logger.debug(f"OpenML task mapping not found in managed config")
+    except Exception as e:
+        logger.debug(f"Could not load from managed config: {e}")
+    
+    # Fallback to legacy method
+    if task_mapping is None:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        tabllm_dir = os.path.join(current_dir, "tabllm_like")
+        
+        # Load OpenML task mapping
+        mapping_path = os.path.join(tabllm_dir, "openml_task_mapping.json")
+        if not os.path.exists(mapping_path):
+            logger.debug(f"OpenML task mapping not found at {mapping_path}")
+            return None, None
+        
+        try:
+            with open(mapping_path, 'r') as f:
+                task_mapping = json.load(f)
+        except Exception as e:
+            logger.debug(f"Error loading OpenML task mapping: {e}")
+            return None, None
+    
+    # Find dataset name that maps to this OpenML task ID
+    dataset_name = None
+    for name, task_id in task_mapping.items():
+        if task_id == openml_task_id:
+            dataset_name = name
+            break
+    
+    if dataset_name is None:
+        logger.debug(f"No TabLLM config found for OpenML task ID {openml_task_id}")
+        return None, None
+    
+    # Load the corresponding template file using legacy approach
+    template_data = load_tabllm_template(dataset_name)
+    if template_data is None:
+        logger.debug(f"TabLLM template file not found for dataset: {dataset_name}")
+        return None, None
+    
+    logger.info(f"Found TabLLM config for OpenML task {openml_task_id} (dataset: {dataset_name}) via fallback")
+    
+    # Feature validation (simplified for fallback)
+    feature_mapping = None
+    if original_feature_count is not None:
+        # Basic feature mapping without extensive validation
+        feature_mapping = {
+            'task_id': openml_task_id,
+            'dataset_name': dataset_name
+        }
+    
+    return template_data, feature_mapping
+
 
 def load_tabllm_template(dataset_name):
     """Load TabLLM template if available for the dataset (legacy function)."""

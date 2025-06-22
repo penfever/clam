@@ -118,7 +118,8 @@ def parse_args():
         models=["clam_tsne", "tabllm", "jolt"],  # Remove tabula_8b for now as it may need adaptation
         model_id="Qwen/Qwen2.5-3B-Instruct",
         nn_k=7,
-        use_3d=True
+        use_3d=True,
+        preserve_regression=True  # Keep regression tasks as continuous targets
     )
     
     return parser.parse_args()

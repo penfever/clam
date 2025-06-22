@@ -439,18 +439,23 @@ def process_semantic_files():
                 empty_count += 1
                 continue
             
-            # Extract dataset name with better error handling
+            # Extract dataset name and task ID with better error handling
             dataset_name = semantic_info.get('dataset_name', semantic_info.get('dataset', Path(json_file).stem))
+            task_id = semantic_info.get('_metadata', {}).get('task_id') or Path(json_file).stem
             
             # Create JOLT config for this dataset with defensive programming
             try:
                 jolt_config = create_jolt_config_for_dataset(semantic_info)
+                
+                # Add task_id to the config for easier lookup
+                jolt_config['task_id'] = task_id
                 
                 # Validate that we got reasonable results
                 if jolt_config['num_features'] == 0 and jolt_config['num_classes'] <= 1:
                     print(f"  Warning: Generated config has no features or classes - using fallback")
                     # Create minimal fallback config
                     jolt_config = {
+                        'task_id': task_id,
                         'dataset_name': dataset_name,
                         'task_prefix': f"Dataset {dataset_name}: Predict the target class based on the input features.",
                         'column_descriptions': {"feature_1": "Feature 1", "feature_2": "Feature 2"},
@@ -461,14 +466,14 @@ def process_semantic_files():
                         'num_classes': 2
                     }
                 
-                # Save individual config
-                config_filename = f"jolt_config_{dataset_name}.json"
+                # Save individual config using task_id for consistent lookup
+                config_filename = f"jolt_config_task_{task_id}.json"
                 config_path = os.path.join(OUTPUT_DIR, config_filename)
                 
                 with open(config_path, 'w') as f:
                     json.dump(jolt_config, f, indent=2)
                 
-                all_configs[dataset_name] = jolt_config
+                all_configs[str(task_id)] = jolt_config
                 dataset_count += 1
                 
                 # Print summary for this dataset
@@ -481,6 +486,7 @@ def process_semantic_files():
                 # Try to create a minimal config as fallback
                 try:
                     fallback_config = {
+                        'task_id': task_id,
                         'dataset_name': dataset_name,
                         'task_prefix': f"Dataset {dataset_name}: Predict the target class.",
                         'column_descriptions': {"feature_1": "Feature 1"},
@@ -491,13 +497,13 @@ def process_semantic_files():
                         'num_classes': 2
                     }
                     
-                    config_filename = f"jolt_config_{dataset_name}.json"
+                    config_filename = f"jolt_config_task_{task_id}.json"
                     config_path = os.path.join(OUTPUT_DIR, config_filename)
                     
                     with open(config_path, 'w') as f:
                         json.dump(fallback_config, f, indent=2)
                     
-                    all_configs[dataset_name] = fallback_config
+                    all_configs[str(task_id)] = fallback_config
                     dataset_count += 1
                     print(f"  Created fallback config: 1 feature, 2 classes")
                     
@@ -510,7 +516,9 @@ def process_semantic_files():
             # Try to create a minimal config based on filename
             try:
                 dataset_name = Path(json_file).stem
+                task_id = dataset_name  # Use filename as task_id fallback
                 minimal_config = {
+                    'task_id': task_id,
                     'dataset_name': dataset_name,
                     'task_prefix': f"Dataset {dataset_name}: Predict the target class.",
                     'column_descriptions': {"feature_1": "Feature 1"},
@@ -521,13 +529,13 @@ def process_semantic_files():
                     'num_classes': 2
                 }
                 
-                config_filename = f"jolt_config_{dataset_name}.json"
+                config_filename = f"jolt_config_task_{task_id}.json"
                 config_path = os.path.join(OUTPUT_DIR, config_filename)
                 
                 with open(config_path, 'w') as f:
                     json.dump(minimal_config, f, indent=2)
                 
-                all_configs[dataset_name] = minimal_config
+                all_configs[str(task_id)] = minimal_config
                 dataset_count += 1
                 print(f"  Created minimal config from filename: 1 feature, 2 classes")
                 
