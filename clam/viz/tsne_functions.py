@@ -28,6 +28,16 @@ from .utils.styling import (
     get_standard_training_point_style
 )
 
+# Import semantic axes utilities
+try:
+    from ..utils.semantic_axes import create_compact_axis_labels, create_bottom_legend_text
+except ImportError:
+    # Fallback for cases where semantic_axes is not available
+    def create_compact_axis_labels(semantic_axes, **kwargs):
+        return {}
+    def create_bottom_legend_text(semantic_axes, **kwargs):
+        return ""
+
 __all__ = [
     'create_tsne_visualization',
     'create_tsne_3d_visualization',
@@ -50,6 +60,37 @@ __all__ = [
 ]
 
 logger = logging.getLogger(__name__)
+
+
+def add_semantic_legend_to_plot(fig, ax, semantic_axes_labels, max_chars_per_line=80, max_lines=2):
+    """
+    Add a bottom legend for semantic axes to prevent overlap with plot elements.
+    
+    Args:
+        fig: Matplotlib figure object
+        ax: Matplotlib axes object
+        semantic_axes_labels: Dictionary mapping axis names to semantic descriptions
+        max_chars_per_line: Maximum characters per line in legend
+        max_lines: Maximum number of lines in legend
+    """
+    if not semantic_axes_labels:
+        return
+    
+    # Create bottom legend text
+    legend_text = create_bottom_legend_text(
+        semantic_axes_labels,
+        max_chars_per_line=max_chars_per_line,
+        max_lines=max_lines
+    )
+    
+    if legend_text:
+        # Add space at bottom for legend
+        fig.subplots_adjust(bottom=0.15 + 0.05 * (legend_text.count('\n') + 1))
+        
+        # Add legend as text at bottom of figure
+        fig.text(0.5, 0.02, f"Semantic Axes: {legend_text}", 
+                ha='center', va='bottom', fontsize=9, 
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="lightgray", alpha=0.8))
 
 
 def create_tsne_visualization(
@@ -495,22 +536,27 @@ def create_combined_tsne_plot(
                 zorder=10
             )
     
-    # Set axis labels with semantic information if available
-    if semantic_axes_labels and 'X' in semantic_axes_labels:
-        ax.set_xlabel(semantic_axes_labels['X'])
+    # Set axis labels with compact semantic information to prevent overlap
+    compact_labels = create_compact_axis_labels(semantic_axes_labels, max_chars_per_line=30)
+    
+    if compact_labels and 'X' in compact_labels:
+        ax.set_xlabel(compact_labels['X'])
     else:
         ax.set_xlabel('t-SNE Dimension 1')
     
-    if semantic_axes_labels and 'Y' in semantic_axes_labels:
-        ax.set_ylabel(semantic_axes_labels['Y'])
+    if compact_labels and 'Y' in compact_labels:
+        ax.set_ylabel(compact_labels['Y'])
     else:
         ax.set_ylabel('t-SNE Dimension 2')
     
     if use_3d and hasattr(ax, 'set_zlabel'):
-        if semantic_axes_labels and 'Z' in semantic_axes_labels:
-            ax.set_zlabel(semantic_axes_labels['Z'])
+        if compact_labels and 'Z' in compact_labels:
+            ax.set_zlabel(compact_labels['Z'])
         else:
             ax.set_zlabel('t-SNE Dimension 3')
+    
+    # Add bottom legend for full semantic information
+    add_semantic_legend_to_plot(fig, ax, semantic_axes_labels)
     
     if highlight_test_idx is not None:
         if zoom_factor > 1.0:
@@ -689,21 +735,26 @@ def create_combined_tsne_3d_plot(
             ax.set_ylim(y_min, y_max)
             ax.set_zlim(z_min, z_max)
         
-        # Labels and title with semantic information if available
-        if semantic_axes_labels and 'X' in semantic_axes_labels:
-            ax.set_xlabel(semantic_axes_labels['X'])
+        # Labels and title with compact semantic information to prevent overlap
+        compact_labels = create_compact_axis_labels(semantic_axes_labels, max_chars_per_line=25)
+        
+        if compact_labels and 'X' in compact_labels:
+            ax.set_xlabel(compact_labels['X'])
         else:
             ax.set_xlabel('t-SNE Dim 1')
         
-        if semantic_axes_labels and 'Y' in semantic_axes_labels:
-            ax.set_ylabel(semantic_axes_labels['Y'])
+        if compact_labels and 'Y' in compact_labels:
+            ax.set_ylabel(compact_labels['Y'])
         else:
             ax.set_ylabel('t-SNE Dim 2')
         
-        if semantic_axes_labels and 'Z' in semantic_axes_labels:
-            ax.set_zlabel(semantic_axes_labels['Z'])
+        if compact_labels and 'Z' in compact_labels:
+            ax.set_zlabel(compact_labels['Z'])
         else:
             ax.set_zlabel('t-SNE Dim 3')
+        
+        # Add bottom legend for full semantic information
+        add_semantic_legend_to_plot(fig, ax, semantic_axes_labels, max_chars_per_line=60)
         
         # Use shorter view names if available
         view_name = view_names[i] if i < len(view_names) else f'View {i+1}'
@@ -1267,21 +1318,26 @@ def create_tsne_3d_plot_with_knn(
             ax.set_ylim(y_min, y_max)
             ax.set_zlim(z_min, z_max)
         
-        # Labels and title with semantic information if available
-        if semantic_axes_labels and 'X' in semantic_axes_labels:
-            ax.set_xlabel(semantic_axes_labels['X'])
+        # Labels and title with compact semantic information to prevent overlap
+        compact_labels = create_compact_axis_labels(semantic_axes_labels, max_chars_per_line=25)
+        
+        if compact_labels and 'X' in compact_labels:
+            ax.set_xlabel(compact_labels['X'])
         else:
             ax.set_xlabel('t-SNE Dim 1')
         
-        if semantic_axes_labels and 'Y' in semantic_axes_labels:
-            ax.set_ylabel(semantic_axes_labels['Y'])
+        if compact_labels and 'Y' in compact_labels:
+            ax.set_ylabel(compact_labels['Y'])
         else:
             ax.set_ylabel('t-SNE Dim 2')
         
-        if semantic_axes_labels and 'Z' in semantic_axes_labels:
-            ax.set_zlabel(semantic_axes_labels['Z'])
+        if compact_labels and 'Z' in compact_labels:
+            ax.set_zlabel(compact_labels['Z'])
         else:
             ax.set_zlabel('t-SNE Dim 3')
+        
+        # Add bottom legend for full semantic information
+        add_semantic_legend_to_plot(fig, ax, semantic_axes_labels, max_chars_per_line=60)
         
         # Use shorter view names if available
         view_name = view_names[i] if i < len(view_names) else f'View {i+1}'

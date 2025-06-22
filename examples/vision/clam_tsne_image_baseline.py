@@ -458,6 +458,8 @@ class ClamImageTsneClassifier:
         
         predictions = []
         detailed_outputs = []
+        if self.unique_classes is None:
+            self.unique_classes = []
         class_list_str = ", ".join([str(cls) for cls in self.unique_classes])
         
         # Setup output directories if saving

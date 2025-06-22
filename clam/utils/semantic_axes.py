@@ -377,9 +377,9 @@ class SemanticAxesComputer:
                             if len(description) > 40:
                                 description = description[:37] + "..."
                                 
-                            # Include sensitivity score in description
+                            # Include sensitivity score in description with + prefix (perturbations always show positive impact)
                             sensitivity_pct = (sensitivity / max_sensitivity * 100) if max_sensitivity > 0 else 0
-                            significant_features.append(f"{description} ({sensitivity_pct:.0f}%)")
+                            significant_features.append(f"+{description} ({sensitivity_pct:.0f}%)")
                 
                 # Create axis description
                 if significant_features:
@@ -394,7 +394,7 @@ class SemanticAxesComputer:
                             description = feature_descriptions.get(feature_name, feature_name)
                             if len(description) > 30:
                                 description = description[:27] + "..."
-                            fallback_features.append(description)
+                            fallback_features.append(f"+{description}")
                     
                     if fallback_features:
                         axis_description = f"{axis_name}-axis: {', '.join(fallback_features)} (weak)"
@@ -438,6 +438,116 @@ def create_semantic_axis_legend(semantic_axes: Dict[str, str],
     legend_text = "\n".join(legend_lines)
     
     return legend_text
+
+
+def create_compact_axis_labels(semantic_axes: Dict[str, str],
+                              max_chars_per_line: int = 40,
+                              max_lines: int = 3) -> Dict[str, str]:
+    """
+    Create compact axis labels for visualization to prevent overlap.
+    
+    Args:
+        semantic_axes: Dictionary mapping axis names to semantic descriptions
+        max_chars_per_line: Maximum characters per line
+        max_lines: Maximum number of lines in legend
+        
+    Returns:
+        Dictionary with simplified axis labels
+    """
+    if not semantic_axes:
+        return {}
+    
+    compact_labels = {}
+    
+    for axis_name in ["X", "Y", "Z"]:
+        if axis_name in semantic_axes:
+            full_label = semantic_axes[axis_name]
+            
+            # Extract just the feature names from the full description
+            # Remove variance percentages and axis prefixes
+            if ":" in full_label:
+                features_part = full_label.split(":", 1)[1].strip()
+            else:
+                features_part = full_label
+            
+            # Remove weak indicators and percentages in parentheses
+            features_part = features_part.replace(" (weak)", "")
+            
+            # Limit length
+            if len(features_part) > max_chars_per_line:
+                features_part = features_part[:max_chars_per_line-3] + "..."
+            
+            # Create simple label
+            compact_labels[axis_name] = f"{axis_name}: {features_part}"
+    
+    return compact_labels
+
+
+def create_bottom_legend_text(semantic_axes: Dict[str, str],
+                             max_chars_per_line: int = 80,
+                             max_lines: int = 3) -> str:
+    """
+    Create a bottom legend text that fits within specified constraints.
+    
+    Args:
+        semantic_axes: Dictionary mapping axis names to semantic descriptions
+        max_chars_per_line: Maximum characters per line
+        max_lines: Maximum number of lines total
+        
+    Returns:
+        Formatted legend text for bottom of plot
+    """
+    if not semantic_axes:
+        return ""
+    
+    legend_parts = []
+    
+    for axis_name in ["X", "Y", "Z"]:
+        if axis_name in semantic_axes:
+            full_label = semantic_axes[axis_name]
+            
+            # Extract features from full description
+            if ":" in full_label:
+                features_part = full_label.split(":", 1)[1].strip()
+            else:
+                features_part = full_label
+            
+            # Remove weak indicators but keep percentages
+            features_part = features_part.replace(" (weak)", "")
+            
+            legend_parts.append(f"{axis_name}: {features_part}")
+    
+    # Join parts and wrap if needed
+    if not legend_parts:
+        return ""
+    
+    # Try to fit all on one line first
+    single_line = " | ".join(legend_parts)
+    if len(single_line) <= max_chars_per_line:
+        return single_line
+    
+    # Split into multiple lines if needed
+    lines = []
+    current_line = ""
+    
+    for i, part in enumerate(legend_parts):
+        if len(current_line) + len(part) + 3 <= max_chars_per_line:  # +3 for " | "
+            if current_line:
+                current_line += " | " + part
+            else:
+                current_line = part
+        else:
+            if current_line:
+                lines.append(current_line)
+            current_line = part
+            
+            if len(lines) >= max_lines - 1:  # Save space for last line
+                break
+    
+    if current_line and len(lines) < max_lines:
+        lines.append(current_line)
+    
+    return "\n".join(lines)
 
 
 def enhance_visualization_with_semantic_axes(embeddings: np.ndarray,
