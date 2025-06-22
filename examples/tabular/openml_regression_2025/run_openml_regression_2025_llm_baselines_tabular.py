@@ -110,6 +110,16 @@ def parse_args():
         action="store_true",
         help="Save detailed VLM outputs and visualizations"
     )
+    parser.add_argument(
+        "--validate_metadata_only",
+        action="store_true",
+        help="Only validate metadata coverage, don't run evaluations"
+    )
+    parser.add_argument(
+        "--skip_missing_metadata",
+        action="store_true",
+        help="Automatically skip tasks with incomplete metadata instead of failing"
+    )
     
     # Override some defaults for OpenML regression 2025 context
     parser.set_defaults(
@@ -119,10 +129,18 @@ def parse_args():
         model_id="Qwen/Qwen2.5-3B-Instruct",
         nn_k=7,
         use_3d=True,
-        preserve_regression=True  # Keep regression tasks as continuous targets
+        preserve_regression=True,  # Keep regression tasks as continuous targets
+        num_few_shot_examples=16
     )
     
-    return parser.parse_args()
+    args = parser.parse_args()
+    
+    # Convert models back to comma-separated string for internal processing
+    if isinstance(args.models, list):
+        args.models = ",".join(args.models)
+    
+    return args
+    
 
 def set_seed(seed):
     """Set random seed for reproducibility."""
@@ -177,14 +195,13 @@ def get_openml_regression_2025_tasks():
     logger.info(f"Successfully retrieved {len(tasks)} regression tasks")
     return tasks
 
-def evaluate_baseline_on_task(task, split_idx, model_name, args):
+def evaluate_llm_baselines_on_task(task, split_idx, args):
     """
-    Evaluate a baseline model on a specific OpenML regression task and split.
+    Evaluate LLM baselines on a specific OpenML regression task and split.
     
     Args:
         task: OpenML task object
         split_idx: Index of the split to use
-        model_name: Name of the baseline model to evaluate
         args: Command line arguments
     
     Returns:
@@ -194,21 +211,21 @@ def evaluate_baseline_on_task(task, split_idx, model_name, args):
     dataset_id = task.dataset_id
     dataset_name = task.get_dataset().name
     
-    logger.info(f"Evaluating {model_name} on regression task {task_id} ({dataset_name}), split {split_idx+1}/{args.num_splits}")
+    logger.info(f"Evaluating LLM baselines on regression task {task_id} ({dataset_name}), split {split_idx+1}/{args.num_splits}")
     
     # Create output directory
     eval_output_dir = os.path.join(
         args.output_dir, 
         f"task_{task_id}", 
         f"split_{split_idx}", 
-        f"{model_name}_results"
+        "llm_baselines"
     )
     os.makedirs(eval_output_dir, exist_ok=True)
     
     # Check if results already exist and skip if not forcing rerun
     results_file = os.path.join(eval_output_dir, "aggregated_results.json")
-    if os.path.exists(results_file) and not args.force_rerun:
-        logger.info(f"Results already exist for {model_name} on task {task_id}, split {split_idx+1}. Skipping.")
+    if os.path.exists(results_file) and not getattr(args, 'force_rerun', False):
+        logger.info(f"Results already exist for task {task_id}, split {split_idx+1}. Skipping.")
         return eval_output_dir
     
     # Generate version tag based on date for W&B project
@@ -216,66 +233,109 @@ def evaluate_baseline_on_task(task, split_idx, model_name, args):
     version_by_date = f"v{today.strftime('%Y%m%d')}"
     wandb_project = f"{args.wandb_project}-{version_by_date}"
     
-    # Build evaluation command based on model type
+    # Build evaluation command using the LLM baselines script
     eval_script = os.path.join(args.clam_repo_path, "examples", "tabular", "evaluate_llm_baselines_tabular.py")
     
-    base_cmd = [
+    cmd = [
         "python", eval_script,
         "--task_ids", str(task_id),  # Pass task_id properly for regression
         "--output_dir", eval_output_dir,
-        "--models", model_name,
-        "--use_wandb",
-        "--wandb_entity", "nyu-dice-lab",
-        "--wandb_project", wandb_project,
-        "--wandb_name", f"{model_name}_regression_task{task_id}_split{split_idx}",
-        "--seed", str(args.seed + split_idx),  # Use consistent seed
-        "--feature_selection_threshold", str(args.feature_selection_threshold)
+        "--models"
     ]
     
+    # Add models as separate arguments (space-separated, not comma-separated)
+    models_list = [model.strip() for model in args.models.split(',')]
+    cmd.extend(models_list)
+    
+    cmd.extend([
+        "--num_few_shot_examples", str(args.num_few_shot_examples),
+        "--seed", str(args.seed + split_idx),  # Vary seed for different splits
+        "--device", args.device,
+        "--preserve_regression",  # Ensure regression tasks remain continuous
+    ])
+    
+    # Add optional parameters
+    if args.max_test_samples:
+        cmd.extend(["--max_test_samples", str(args.max_test_samples)])
+    
+    # Add feature selection parameter
+    cmd.extend(["--feature_selection_threshold", str(args.feature_selection_threshold)])
+    
+    # Add backend parameters
+    cmd.extend([
+        "--backend", args.backend,
+        "--tensor_parallel_size", str(args.tensor_parallel_size),
+        "--gpu_memory_utilization", str(args.gpu_memory_utilization),
+    ])
+    
+    # Add CLAM-T-SNe specific parameters
+    cmd.extend([
+        "--vlm_model_id", args.vlm_model_id,
+        "--embedding_size", str(args.embedding_size),
+        "--tsne_perplexity", str(args.tsne_perplexity),
+        "--tsne_n_iter", str(args.tsne_n_iter),
+        "--max_tabpfn_samples", str(args.max_tabpfn_samples),
+        "--nn_k", str(args.nn_k),
+        "--max_vlm_image_size", str(args.max_vlm_image_size),
+        "--image_dpi", str(args.image_dpi),
+    ])
+    
+    # Add CLAM-T-SNe boolean flags
+    if args.use_3d:
+        cmd.append("--use_3d")
+    if args.use_knn_connections:
+        cmd.append("--use_knn_connections")
+    if args.force_rgb_mode:
+        cmd.append("--force_rgb_mode")
+    else:
+        cmd.append("--no-force_rgb_mode")
+    if args.save_sample_visualizations:
+        cmd.append("--save_sample_visualizations")
+    else:
+        cmd.append("--no-save_sample_visualizations")
+    if args.use_semantic_names:
+        cmd.append("--use_semantic_names")
+    
+    # Add visualization save cadence
+    cmd.extend(["--visualization_save_cadence", str(args.visualization_save_cadence)])
+    
+    # Add custom viewing angles if specified
+    if args.viewing_angles:
+        cmd.extend(["--viewing_angles", args.viewing_angles])
+    
     # Add model-specific arguments
-    if model_name == "clam_tsne":
-        base_cmd.extend([
-            "--model_id", args.model_id,
-            "--nn_k", str(args.nn_k),
-            "--max_vlm_image_size", str(args.max_vlm_image_size),
-            "--image_dpi", str(args.image_dpi)
-        ])
-        
-        if args.use_3d:
-            base_cmd.append("--use_3d")
-        if args.use_knn_connections:
-            base_cmd.append("--use_knn_connections")
-        if not args.force_rgb_mode:
-            base_cmd.append("--no-force_rgb_mode")
-        if args.save_detailed_outputs:
-            base_cmd.extend([
-                "--save_outputs",
-                "--visualization_save_cadence", "10"
-            ])
+    cmd.extend([
+        "--tabllm_model", args.tabllm_model,
+        "--tabula_model", args.tabula_model,
+        "--jolt_model", args.jolt_model,
+    ])
     
-    elif model_name == "tabllm":
-        base_cmd.extend([
-            "--model_id", args.model_id
-        ])
+    # Add API model arguments if specified
+    if hasattr(args, 'openai_model') and args.openai_model:
+        cmd.extend(["--openai_model", args.openai_model])
+    if hasattr(args, 'gemini_model') and args.gemini_model:
+        cmd.extend(["--gemini_model", args.gemini_model])
+    if hasattr(args, 'enable_thinking'):
+        if args.enable_thinking:
+            cmd.append("--enable_thinking")
+        else:
+            cmd.append("--disable_thinking")
     
-    elif model_name == "jolt":
-        base_cmd.extend([
-            "--model_id", args.model_id
-        ])
-    
-    elif model_name == "tabula_8b":
-        base_cmd.extend([
-            "--model_id", "approximatelabs/tabula-8b"
-        ])
+    # Add W&B parameters
+    cmd.extend([
+        "--use_wandb",
+        "--wandb_project", wandb_project,
+        "--wandb_name", f"llm_baselines_regression_task{task_id}_split{split_idx}",
+    ])
     
     # Run evaluation command
-    logger.info(f"Running command: {' '.join(base_cmd)}")
+    logger.info(f"Running command: {' '.join(cmd)}")
     try:
-        subprocess.run(base_cmd, check=True)
-        logger.info(f"{model_name} evaluation completed for regression task {task_id}, split {split_idx+1}")
+        subprocess.run(cmd, check=True)
+        logger.info(f"LLM baseline evaluation completed for regression task {task_id}, split {split_idx+1}")
         return eval_output_dir
     except subprocess.CalledProcessError as e:
-        logger.error(f"{model_name} evaluation failed for regression task {task_id}, split {split_idx+1}: {e}")
+        logger.error(f"LLM baseline evaluation failed for regression task {task_id}, split {split_idx+1}: {e}")
         return None
 
 def process_task(task, args):
@@ -323,15 +383,12 @@ def process_task(task, args):
         }
         json.dump(task_info, f, indent=2)
     
-    # Process each split and model combination
+    # Process each split
     for split_idx in range(args.num_splits):
-        for model_name in args.models:
-            try:
-                eval_dir = evaluate_baseline_on_task(task, split_idx, model_name, args)
-                if eval_dir is None:
-                    logger.error(f"Evaluation failed for {model_name} on regression task {task_id}, split {split_idx+1}")
-            except Exception as e:
-                logger.error(f"Error evaluating {model_name} on regression task {task_id}, split {split_idx+1}: {e}")
+        # Evaluate LLM baselines
+        eval_dir = evaluate_llm_baselines_on_task(task, split_idx, args)
+        if eval_dir is None:
+            logger.error(f"LLM baseline evaluation failed for regression task {task_id}, split {split_idx+1}")
 
 def generate_metadata_report(tasks, args):
     """Generate a metadata coverage report for the regression tasks."""
@@ -365,6 +422,119 @@ def generate_metadata_report(tasks, args):
     logger.info(f"Metadata report saved to {report_path}")
     return task_summary
 
+def aggregate_results(args):
+    """
+    Aggregate results from all tasks and splits into summary files.
+    
+    Args:
+        args: Command line arguments
+    """
+    logger.info("Aggregating results from all regression tasks and splits")
+    
+    all_results = []
+    summary_by_model = {}
+    
+    # Walk through all result directories
+    for task_dir in os.listdir(args.output_dir):
+        if not task_dir.startswith("task_"):
+            continue
+        
+        task_path = os.path.join(args.output_dir, task_dir)
+        if not os.path.isdir(task_path):
+            continue
+        
+        task_id = task_dir.replace("task_", "")
+        
+        for split_dir in os.listdir(task_path):
+            if not split_dir.startswith("split_"):
+                continue
+            
+            split_path = os.path.join(task_path, split_dir)
+            if not os.path.isdir(split_path):
+                continue
+            
+            split_idx = split_dir.replace("split_", "")
+            
+            # Look for LLM baseline results
+            llm_baselines_path = os.path.join(split_path, "llm_baselines")
+            if not os.path.exists(llm_baselines_path):
+                continue
+            
+            # Check for aggregated results file
+            aggregated_file = os.path.join(llm_baselines_path, "aggregated_results.json")
+            if os.path.exists(aggregated_file):
+                try:
+                    with open(aggregated_file, 'r') as f:
+                        results = json.load(f)
+                    
+                    for result in results:
+                        result['task_id'] = task_id
+                        result['split_idx'] = split_idx
+                        all_results.append(result)
+                        
+                        # Update summary by model
+                        model_name = result.get('model_name', 'unknown')
+                        if model_name not in summary_by_model:
+                            summary_by_model[model_name] = {
+                                'r2_scores': [],
+                                'mae_scores': [],
+                                'mse_scores': [],
+                                'total_tasks': 0,
+                                'successful_tasks': 0
+                            }
+                        
+                        summary_by_model[model_name]['total_tasks'] += 1
+                        # For regression, track R², MAE, and MSE instead of accuracy
+                        if 'r2_score' in result:
+                            summary_by_model[model_name]['r2_scores'].append(result['r2_score'])
+                            summary_by_model[model_name]['successful_tasks'] += 1
+                        if 'mae' in result:
+                            summary_by_model[model_name]['mae_scores'].append(result['mae'])
+                        if 'mse' in result:
+                            summary_by_model[model_name]['mse_scores'].append(result['mse'])
+                
+                except Exception as e:
+                    logger.error(f"Error reading results from {aggregated_file}: {e}")
+    
+    # Save aggregated results
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    
+    # Save all results
+    all_results_file = os.path.join(args.output_dir, f"all_regression_results_{timestamp}.json")
+    with open(all_results_file, 'w') as f:
+        json.dump(all_results, f, indent=2)
+    
+    # Calculate and save summary statistics
+    summary_stats = {}
+    for model_name, stats in summary_by_model.items():
+        if stats['r2_scores']:
+            summary_stats[model_name] = {
+                'mean_r2_score': np.mean(stats['r2_scores']),
+                'std_r2_score': np.std(stats['r2_scores']),
+                'mean_mae': np.mean(stats['mae_scores']) if stats['mae_scores'] else None,
+                'std_mae': np.std(stats['mae_scores']) if stats['mae_scores'] else None,
+                'mean_mse': np.mean(stats['mse_scores']) if stats['mse_scores'] else None,
+                'std_mse': np.std(stats['mse_scores']) if stats['mse_scores'] else None,
+                'total_evaluations': stats['total_tasks'],
+                'successful_evaluations': stats['successful_tasks'],
+                'success_rate': stats['successful_tasks'] / stats['total_tasks'] if stats['total_tasks'] > 0 else 0
+            }
+    
+    summary_file = os.path.join(args.output_dir, f"regression_summary_stats_{timestamp}.json")
+    with open(summary_file, 'w') as f:
+        json.dump(summary_stats, f, indent=2)
+    
+    # Log summary
+    logger.info(f"Aggregation complete. Found {len(all_results)} total regression results.")
+    for model_name, stats in summary_stats.items():
+        logger.info(f"{model_name}: Mean R² = {stats['mean_r2_score']:.4f} ± {stats['std_r2_score']:.4f}")
+        if stats['mean_mae']:
+            logger.info(f"  Mean MAE = {stats['mean_mae']:.4f} ± {stats['std_mae']:.4f}")
+        logger.info(f"  ({stats['successful_evaluations']}/{stats['total_evaluations']} successful)")
+    
+    logger.info(f"All results saved to: {all_results_file}")
+    logger.info(f"Summary statistics saved to: {summary_file}")
+
 def main():
     args = parse_args()
     
@@ -396,6 +566,44 @@ def main():
     tasks = tasks[start_idx:end_idx]
     logger.info(f"Processing regression tasks from index {start_idx} to {end_idx} (total: {len(tasks)})")
     
+    # Parse models to check
+    models_to_check = [model.strip() for model in args.models.split(',')]
+    
+    # Handle metadata validation
+    if args.validate_metadata_only:
+        logger.info("Running metadata validation only...")
+        task_ids = [task.task_id for task in tasks]
+        report = generate_metadata_coverage_report(task_ids, models_to_check)
+        print_metadata_coverage_report(report)
+        
+        # Save detailed report
+        report_file = os.path.join(args.output_dir, "metadata_coverage_report.json")
+        with open(report_file, 'w') as f:
+            json.dump(report, f, indent=2)
+        logger.info(f"Detailed metadata report saved to: {report_file}")
+        return
+    
+    # Filter tasks based on metadata availability if requested
+    if args.skip_missing_metadata:
+        logger.info("Filtering regression tasks based on metadata availability...")
+        task_ids = [task.task_id for task in tasks]
+        report = generate_metadata_coverage_report(task_ids, models_to_check)
+        
+        # Keep only tasks where at least one model has valid metadata
+        valid_task_ids = []
+        for task_id, results in report['detailed_results'].items():
+            if any(result['valid'] for result in results.values()):
+                valid_task_ids.append(task_id)
+        
+        # Filter tasks list
+        original_count = len(tasks)
+        tasks = [task for task in tasks if task.task_id in valid_task_ids]
+        logger.info(f"Filtered {original_count} regression tasks to {len(tasks)} tasks with valid metadata")
+        
+        if len(tasks) == 0:
+            logger.error("No regression tasks have valid metadata for any of the requested models. Exiting.")
+            return
+    
     # Process each task
     for i, task in enumerate(tasks):
         try:
@@ -403,6 +611,12 @@ def main():
             process_task(task, args)
         except Exception as e:
             logger.error(f"Error processing regression task {task.task_id}: {e}")
+    
+    # Aggregate results at the end
+    try:
+        aggregate_results(args)
+    except Exception as e:
+        logger.error(f"Error aggregating regression results: {e}")
     
     logger.info("All regression tasks completed")
 
