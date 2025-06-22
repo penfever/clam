@@ -211,19 +211,24 @@ def load_tabllm_config_by_openml_id(openml_task_id, original_feature_count=None)
             # Load semantic information for feature count validation
             semantic_file = None
             try:
-                # Try resource manager first
+                # Try resource manager first with new general search
                 if 'rm' in locals():
-                    semantic_file = rm.path_resolver.get_config_path('cc18_semantic', str(openml_task_id))
+                    semantic_file = rm.find_semantic_metadata(openml_task_id)
+                    if semantic_file is None:
+                        # Fallback to old cc18_semantic method for backward compatibility
+                        semantic_file = rm.path_resolver.get_config_path('cc18_semantic', str(openml_task_id))
             except:
                 pass
             
-            # Fallback to legacy path
-            if semantic_file is None or not semantic_file.exists():
-                # Use relative path from current script location to project root
-                current_dir = os.path.dirname(os.path.abspath(__file__))
-                project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
-                semantic_dir = os.path.join(project_root, "data", "cc18_semantic")
-                semantic_file = os.path.join(semantic_dir, f"{openml_task_id}.json")
+            # Fallback to metadata loader
+            if semantic_file is None or (hasattr(semantic_file, 'exists') and not semantic_file.exists()):
+                try:
+                    from clam.utils.metadata_loader import get_metadata_loader
+                    loader = get_metadata_loader()
+                    semantic_file = loader.detect_metadata_file(openml_task_id)
+                except Exception as e:
+                    logger.debug(f"Could not use metadata loader: {e}")
+                    semantic_file = None
             
             semantic_file_exists = (hasattr(semantic_file, 'exists') and semantic_file.exists()) or \
                                    (isinstance(semantic_file, str) and os.path.exists(semantic_file))
@@ -472,24 +477,42 @@ def evaluate_tabllm(dataset, args):
         example_note = load_tabllm_note_examples(dataset['name'])
         
         # Try to load semantic information for better feature descriptions
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        # Go up three levels from examples/tabular/llm_baselines/ to clam root
-        clam_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
-        # Try both cc18_semantic_complete and cc18_semantic directories
-        semantic_dirs = [
-            os.path.join(clam_root, "data", "cc18_semantic_complete"),
-            os.path.join(clam_root, "data", "cc18_semantic")
-        ]
-        semantic_dir = None
-        for dir_path in semantic_dirs:
-            if os.path.exists(dir_path):
-                semantic_dir = dir_path
-                break
-        
-        if semantic_dir is None:
-            logger.warning(f"No semantic directory found. Tried: {semantic_dirs}")
-            semantic_dir = semantic_dirs[0]  # Use first as fallback
-        semantic_info = load_semantic_info(dataset['name'], semantic_dir)
+        semantic_info = None
+        try:
+            # Try using the general metadata loader first
+            from clam.utils.metadata_loader import get_metadata_loader
+            loader = get_metadata_loader()
+            
+            # Try with dataset name and also task_id if available
+            semantic_file = loader.detect_metadata_file(dataset['name'])
+            if semantic_file is None and 'task_id' in dataset:
+                semantic_file = loader.detect_metadata_file(dataset['task_id'])
+            
+            if semantic_file and semantic_file.exists():
+                with open(semantic_file, 'r') as f:
+                    semantic_info = json.load(f)
+                logger.info(f"Loaded semantic info from {semantic_file}")
+            else:
+                # Fallback to legacy load_semantic_info function
+                current_dir = os.path.dirname(os.path.abspath(__file__))
+                clam_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
+                semantic_dirs = [
+                    os.path.join(clam_root, "data", "cc18_semantic_complete"),
+                    os.path.join(clam_root, "data", "cc18_semantic")
+                ]
+                semantic_dir = None
+                for dir_path in semantic_dirs:
+                    if os.path.exists(dir_path):
+                        semantic_dir = dir_path
+                        break
+                
+                if semantic_dir:
+                    semantic_info = load_semantic_info(dataset['name'], semantic_dir)
+                else:
+                    logger.warning(f"No semantic information found for dataset {dataset['name']}")
+        except Exception as e:
+            logger.debug(f"Error loading semantic information: {e}")
+            semantic_info = None
         
         # If no pre-generated data available, try to generate on-demand
         if template_data is None or example_note is None:

@@ -25,7 +25,17 @@ except ImportError:
 # Define paths (dynamically resolve based on script location)
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..', '..'))
-SEMANTIC_DIR = os.path.join(project_root, "data", "cc18_semantic")
+# Initialize metadata loader for general semantic file search
+try:
+    import sys
+    sys.path.insert(0, project_root)
+    from clam.utils.metadata_loader import get_metadata_loader
+    METADATA_LOADER = get_metadata_loader()
+except Exception as e:
+    print(f"Warning: Could not initialize metadata loader: {e}")
+    METADATA_LOADER = None
+    # Fallback to hardcoded path
+    SEMANTIC_DIR = os.path.join(project_root, "data", "cc18_semantic")
 OUTPUT_DIR = current_dir
 NOTES_PER_DATASET = 100  # Number of example notes to generate per dataset
 
@@ -241,8 +251,23 @@ def process_dataset_to_notes(json_file: str, max_notes: int = NOTES_PER_DATASET)
 
 def create_notes_bank_files():
     """Create note bank files for all datasets."""
-    # Get all JSON files
-    json_files = glob.glob(os.path.join(SEMANTIC_DIR, "*.json"))
+    # Get all JSON files using the new general search approach
+    json_files = []
+    
+    if METADATA_LOADER:
+        # Use the metadata loader to find all semantic files recursively
+        try:
+            data_dir = Path(project_root) / "data"
+            if data_dir.exists():
+                json_files = list(data_dir.rglob("*.json"))
+                print(f"Found {len(json_files)} JSON files using recursive search")
+        except Exception as e:
+            print(f"Error with metadata loader search: {e}")
+    
+    # Fallback to old method if metadata loader failed
+    if not json_files and 'SEMANTIC_DIR' in globals():
+        json_files = glob.glob(os.path.join(SEMANTIC_DIR, "*.json"))
+        print(f"Using fallback search, found {len(json_files)} files")
     
     all_notes = []
     dataset_notes = {}  # Store notes by dataset

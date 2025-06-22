@@ -89,10 +89,10 @@ class MetadataLoader:
             metadata_base_dir: Base directory for metadata files. If None, uses default.
         """
         if metadata_base_dir is None:
-            # Default to data/cc18_semantic relative to project root
+            # Default to data directory relative to project root for recursive search
             current_file = Path(__file__)
             project_root = current_file.parent.parent.parent  # Go up from clam/utils/ to project root
-            metadata_base_dir = project_root / "data" / "cc18_semantic"
+            metadata_base_dir = project_root / "data"
         
         self.metadata_base_dir = Path(metadata_base_dir)
         self._cache = {}  # Cache loaded metadata
@@ -101,7 +101,7 @@ class MetadataLoader:
     
     def detect_metadata_file(self, dataset_id: Union[str, int]) -> Optional[Path]:
         """
-        Detect metadata file for a dataset ID.
+        Detect metadata file for a dataset ID using recursive search.
         
         Args:
             dataset_id: Dataset identifier (e.g., task ID, dataset name)
@@ -112,7 +112,7 @@ class MetadataLoader:
         # Convert to string
         dataset_str = str(dataset_id)
         
-        # Possible filename patterns
+        # First try direct patterns in base directory for backward compatibility
         patterns = [
             f"{dataset_str}.json",           # Direct match
             f"{dataset_str.lower()}.json",   # Lowercase
@@ -125,6 +125,24 @@ class MetadataLoader:
             if candidate_path.exists():
                 logger.info(f"Found metadata file for dataset '{dataset_id}': {candidate_path}")
                 return candidate_path
+        
+        # If not found in base directory, do recursive search
+        if self.metadata_base_dir.exists():
+            logger.debug(f"Performing recursive search for dataset '{dataset_id}' in {self.metadata_base_dir}")
+            
+            # Search for JSON files recursively
+            for json_file in self.metadata_base_dir.rglob("*.json"):
+                filename = json_file.name
+                stem = json_file.stem  # filename without extension
+                
+                # Check if filename contains the dataset_id
+                if (dataset_str == stem or 
+                    dataset_str.lower() == stem.lower() or
+                    dataset_str in filename or
+                    f"task_{dataset_str}" == stem or
+                    f"dataset_{dataset_str}" == stem):
+                    logger.info(f"Found metadata file for dataset '{dataset_id}': {json_file}")
+                    return json_file
         
         logger.debug(f"No metadata file found for dataset '{dataset_id}' in {self.metadata_base_dir}")
         return None
@@ -200,7 +218,7 @@ class MetadataLoader:
     
     def get_available_datasets(self) -> List[str]:
         """
-        Get list of datasets with available metadata.
+        Get list of datasets with available metadata (recursive search).
         
         Returns:
             List of dataset IDs that have metadata files
@@ -209,12 +227,19 @@ class MetadataLoader:
             return []
         
         datasets = []
-        for file_path in self.metadata_base_dir.glob("*.json"):
+        for file_path in self.metadata_base_dir.rglob("*.json"):
             # Extract dataset ID from filename (remove .json extension)
             dataset_id = file_path.stem
+            
+            # Remove common prefixes to get clean dataset ID
+            if dataset_id.startswith("task_"):
+                dataset_id = dataset_id[5:]
+            elif dataset_id.startswith("dataset_"):
+                dataset_id = dataset_id[8:]
+            
             datasets.append(dataset_id)
         
-        return sorted(datasets)
+        return sorted(list(set(datasets)))  # Remove duplicates and sort
     
     def clear_cache(self):
         """Clear the metadata cache."""

@@ -767,6 +767,14 @@ class ConfigManager:
         filename = f'{dataset_name}.json'
         return self.path_resolver.get_config_path('cc18_semantic', filename)
     
+    def find_semantic_metadata(self, dataset_id: Union[str, int]) -> Optional[Path]:
+        """Find semantic metadata for dataset ID using recursive search in data directory."""
+        from .metadata_loader import get_metadata_loader
+        
+        # Use the updated MetadataLoader which searches recursively
+        loader = get_metadata_loader()
+        return loader.detect_metadata_file(dataset_id)
+    
     def get_openml_task_mapping(self, model_type: str) -> Optional[Dict[str, int]]:
         """Get OpenML task mapping for a model type."""
         filename = 'openml_task_mapping.json'

@@ -75,16 +75,24 @@ def extract_results_from_tar(tar_path: str, temp_dir: str) -> List[Dict[str, Any
     """Extract and parse results from a tar archive."""
     logger = logging.getLogger(__name__)
     results = []
+    archive_name = os.path.basename(tar_path).replace('.tar', '')
     
     try:
         with tarfile.open(tar_path, 'r') as tar:
-            # Look for all_results_*.json files
+            # Look for all_results_*.json files first (consolidated format)
             all_results_files = [name for name in tar.getnames() 
                                if name.endswith('.json') and 'all_results_' in name]
             
+            # If no consolidated files, look for individual aggregated_results.json files
             if not all_results_files:
-                logger.warning(f"No all_results_*.json files found in {tar_path}")
-                return results
+                aggregated_files = [name for name in tar.getnames() 
+                                  if name.endswith('aggregated_results.json')]
+                if aggregated_files:
+                    logger.info(f"Found {len(aggregated_files)} individual aggregated_results.json files in {archive_name}")
+                    all_results_files = aggregated_files
+                else:
+                    logger.warning(f"No all_results_*.json or aggregated_results.json files found in {tar_path}")
+                    return results
             
             for file_name in all_results_files:
                 try:
@@ -96,9 +104,14 @@ def extract_results_from_tar(tar_path: str, temp_dir: str) -> List[Dict[str, Any
                     with open(extracted_path, 'r') as f:
                         data = json.load(f)
                     
+                    # Add archive source information to each result
                     if isinstance(data, list):
+                        for result in data:
+                            if isinstance(result, dict):
+                                result['_archive_source'] = archive_name
                         results.extend(data)
                     elif isinstance(data, dict):
+                        data['_archive_source'] = archive_name
                         results.append(data)
                     
                     logger.info(f"Loaded {len(data) if isinstance(data, list) else 1} results from {file_name}")
@@ -141,6 +154,8 @@ def normalize_model_name(model_name: str) -> str:
         'clam-t-sne-tabular': 'clam_tsne',
         'clam_t_sne_tabular': 'clam_tsne',
         'clam-tsne': 'clam_tsne',
+        'clam-t-sne': 'clam_tsne',  # Fix missing mapping
+        'clam_tsne': 'clam_tsne',   # Add direct mapping for consistency
         'jolt': 'jolt',
         'tabllm': 'tabllm',
         'tabula-8b': 'tabula_8b',
@@ -150,16 +165,102 @@ def normalize_model_name(model_name: str) -> str:
     return name_mapping.get(model_name, model_name)
 
 
+def create_unique_model_identifier(model_name: str, archive_source: str, model_used: str = None) -> str:
+    """Create a unique model identifier based on model name, archive source, and backend."""
+    normalized_name = normalize_model_name(model_name)
+    
+    # For tabllm, try to extract backend information from model_used field
+    if normalized_name == 'tabllm' and model_used:
+        if 'qwen' in model_used.lower():
+            return 'tabllm_qwen'
+        elif 'llama' in model_used.lower():
+            return 'tabllm_llama'
+        elif 'mistral' in model_used.lower():
+            return 'tabllm_mistral'
+        elif 'gemma' in model_used.lower():
+            return 'tabllm_gemma'
+        elif 'gpt' in model_used.lower():
+            return 'tabllm_gpt'
+        elif 'gemini' in model_used.lower():
+            return 'tabllm_gemini'
+    
+    # If we can't distinguish by model_used, use archive source as disambiguator
+    # Extract meaningful parts from archive name
+    archive_lower = archive_source.lower()
+    
+    # Look for LLM indicators in archive name
+    if normalized_name == 'tabllm':
+        if 'qwen' in archive_lower:
+            return 'tabllm_qwen'
+        elif 'llama' in archive_lower:
+            return 'tabllm_llama' 
+        elif 'mistral' in archive_lower:
+            return 'tabllm_mistral'
+        elif 'gemma' in archive_lower:
+            return 'tabllm_gemma'
+        elif 'gpt' in archive_lower or 'openai' in archive_lower:
+            return 'tabllm_gpt'
+        elif 'gemini' in archive_lower:
+            return 'tabllm_gemini'
+        elif '32b' in archive_lower:
+            return 'tabllm_32b'
+        elif '8b' in archive_lower:
+            return 'tabllm_8b'
+        elif '3b' in archive_lower:
+            return 'tabllm_3b'
+        else:
+            # Fall back to archive-based suffix
+            return f'tabllm_{archive_lower.replace("_", "").replace("-", "")}'
+    
+    return normalized_name
+
+
+def detect_model_conflicts(all_results: List[Dict[str, Any]]) -> Dict[str, List[str]]:
+    """Detect potential model name conflicts across archives."""
+    model_archive_mapping = defaultdict(set)
+    
+    for result in all_results:
+        model_name = normalize_model_name(result.get('model_name', 'unknown'))
+        archive_source = result.get('_archive_source', 'unknown')
+        model_archive_mapping[model_name].add(archive_source)
+    
+    # Find models that appear in multiple archives
+    conflicts = {model: list(archives) for model, archives in model_archive_mapping.items() 
+                if len(archives) > 1}
+    
+    return conflicts
+
+
 def process_results(all_results: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Process results and generate summary dataframes."""
     logger = logging.getLogger(__name__)
+    
+    # Detect and report model conflicts
+    conflicts = detect_model_conflicts(all_results)
+    if conflicts:
+        logger.info("Detected model name conflicts across archives:")
+        for model, archives in conflicts.items():
+            logger.info(f"  {model}: found in archives {', '.join(archives)}")
+        logger.info("Using unique identifiers to distinguish models...")
     
     # Organize results by model, dataset, and task
     organized_results = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
     dataset_info = {}  # Store dataset metadata
     
     for result in all_results:
-        model_name = normalize_model_name(result.get('model_name', 'unknown'))
+        original_model_name = result.get('model_name', 'unknown')
+        archive_source = result.get('_archive_source', 'unknown')
+        model_used = result.get('model_used', None)
+        
+        # Create unique model identifier
+        unique_model_name = create_unique_model_identifier(
+            original_model_name, archive_source, model_used
+        )
+        
+        # Log unique identifier creation for first occurrence
+        if unique_model_name != normalize_model_name(original_model_name):
+            logger.debug(f"Created unique identifier: {original_model_name} -> {unique_model_name} (archive: {archive_source})")
+        
         dataset_name = result.get('dataset_name', 'unknown')
         task_id = str(result.get('task_id', result.get('dataset_id', 'unknown')))
         
@@ -184,10 +285,13 @@ def process_results(all_results: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, pd
             'completion_rate': result.get('completion_rate', 1.0)
         }
         
-        organized_results[model_name][task_id]['metrics'].append(metrics)
+        organized_results[unique_model_name][task_id]['metrics'].append(metrics)
         
-        # Store result details for per-dataset analysis
-        organized_results[model_name][task_id]['raw_results'].append(result)
+        # Store result details for per-dataset analysis (include model metadata)
+        result_with_metadata = result.copy()
+        result_with_metadata['_unique_model_name'] = unique_model_name
+        result_with_metadata['_original_model_name'] = original_model_name
+        organized_results[unique_model_name][task_id]['raw_results'].append(result_with_metadata)
     
     logger.info(f"Processed {len(all_results)} results across {len(organized_results)} models and {len(dataset_info)} datasets")
     
@@ -198,6 +302,17 @@ def process_results(all_results: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, pd
     for model_name, model_results in organized_results.items():
         # Collect all metrics across datasets for this model
         all_model_metrics = defaultdict(list)
+        
+        # Extract metadata from first result to get original model name and archive source
+        first_result = None
+        for task_results in model_results.values():
+            if task_results['raw_results']:
+                first_result = task_results['raw_results'][0]
+                break
+        
+        original_model_name = first_result.get('_original_model_name', model_name) if first_result else model_name
+        archive_source = first_result.get('_archive_source', 'unknown') if first_result else 'unknown'
+        model_used = first_result.get('model_used', None) if first_result else None
         
         for task_id, task_results in model_results.items():
             dataset_name = dataset_info[task_id]['dataset_name']
@@ -238,9 +353,12 @@ def process_results(all_results: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, pd
                     dataset_stats[f'{metric_name}_std'] = np.nan
                     dataset_stats[f'{metric_name}_n_runs'] = 0
             
-            # Add to per-dataset results
+            # Add to per-dataset results with metadata
             per_dataset_data.append({
                 'model': model_name,
+                'original_model_name': original_model_name,
+                'archive_source': archive_source,
+                'model_used': model_used,
                 'task_id': task_id,
                 'dataset_name': dataset_name,
                 'n_classes': n_classes,
@@ -248,7 +366,12 @@ def process_results(all_results: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, pd
             })
         
         # Calculate aggregated statistics across all datasets for this model
-        agg_stats = {'model': model_name}
+        agg_stats = {
+            'model': model_name,
+            'original_model_name': original_model_name,
+            'archive_source': archive_source,
+            'model_used': model_used
+        }
         
         for metric_name in ['accuracy', 'balanced_accuracy', 'f1_macro', 'f1_micro', 
                           'f1_weighted', 'precision_macro', 'recall_macro', 'roc_auc']:

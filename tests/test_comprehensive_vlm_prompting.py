@@ -99,9 +99,17 @@ class VLMPromptingTestSuite:
         Returns:
             List of semantic class names if found, None otherwise
         """
-        semantic_file = Path(__file__).parent.parent / "data" / "cc18_semantic" / f"{task_id}.json"
+        # Try to find semantic file using the general search
+        try:
+            from clam.utils.metadata_loader import get_metadata_loader
+            loader = get_metadata_loader()
+            semantic_file = loader.detect_metadata_file(task_id)
+        except Exception as e:
+            logger.debug(f"Could not use metadata loader: {e}")
+            # Fallback to hardcoded path
+            semantic_file = Path(__file__).parent.parent / "data" / "cc18_semantic" / f"{task_id}.json"
         
-        if not semantic_file.exists():
+        if not semantic_file or not semantic_file.exists():
             logger.info(f"No semantic file found for task {task_id}")
             return None
         
@@ -330,6 +338,7 @@ class VLMPromptingTestSuite:
                 'enable_multi_viz': False,
                 'use_3d_tsne': False,
                 'use_knn_connections': False,
+                'nn_k': 30,
                 'tsne_perplexity': 15
             },
             # t-SNE with KNN
@@ -338,7 +347,7 @@ class VLMPromptingTestSuite:
                 'enable_multi_viz': False,
                 'use_3d_tsne': False,
                 'use_knn_connections': True,
-                'knn_k': 5,
+                'nn_k': 30,
                 'tsne_perplexity': 15
             },
             # 3D t-SNE
@@ -347,6 +356,7 @@ class VLMPromptingTestSuite:
                 'enable_multi_viz': False,
                 'use_3d_tsne': True,
                 'use_knn_connections': False,
+                'nn_k': 30,
                 'tsne_perplexity': 15
             },
             # 3D t-SNE with KNN
@@ -355,7 +365,7 @@ class VLMPromptingTestSuite:
                 'enable_multi_viz': False,
                 'use_3d_tsne': True,
                 'use_knn_connections': True,
-                'knn_k': 3,
+                'nn_k': 30,
                 'tsne_perplexity': 15
             },
             # Different perplexity
@@ -364,6 +374,7 @@ class VLMPromptingTestSuite:
                 'enable_multi_viz': False,
                 'use_3d_tsne': False,
                 'use_knn_connections': False,
+                'nn_k': 30,
                 'tsne_perplexity': 25
             }
         ]
@@ -376,6 +387,7 @@ class VLMPromptingTestSuite:
                 'enable_multi_viz': True,
                 'visualization_methods': ['pca', 'tsne'],
                 'layout_strategy': 'sequential',
+                'nn_k': 30,
                 'reasoning_focus': 'comparison'
             },
             # Three methods
@@ -384,6 +396,7 @@ class VLMPromptingTestSuite:
                 'enable_multi_viz': True,
                 'visualization_methods': ['pca', 'tsne', 'spectral'],
                 'layout_strategy': 'sequential',
+                'nn_k': 30,
                 'reasoning_focus': 'consensus'
             },
             # Linear vs nonlinear focus
@@ -392,6 +405,7 @@ class VLMPromptingTestSuite:
                 'enable_multi_viz': True,
                 'visualization_methods': ['pca', 'tsne', 'isomap'],
                 'layout_strategy': 'sequential',
+                'nn_k': 30,
                 'reasoning_focus': 'divergence'
             },
             # Local vs global methods
@@ -400,6 +414,7 @@ class VLMPromptingTestSuite:
                 'enable_multi_viz': True,
                 'visualization_methods': ['tsne', 'isomap', 'mds'],
                 'layout_strategy': 'sequential',
+                'nn_k': 30,
                 'reasoning_focus': 'comparison'
             },
             # Comprehensive multi-viz
@@ -408,6 +423,7 @@ class VLMPromptingTestSuite:
                 'enable_multi_viz': True,
                 'visualization_methods': ['pca', 'tsne', 'spectral', 'isomap'],
                 'layout_strategy': 'sequential',
+                'nn_k': 30,
                 'reasoning_focus': 'consensus'
             },
             # Different layout strategies
@@ -416,6 +432,7 @@ class VLMPromptingTestSuite:
                 'enable_multi_viz': True,
                 'visualization_methods': ['pca', 'tsne'],
                 'layout_strategy': 'grid',
+                'nn_k': 30,
                 'reasoning_focus': 'comparison'
             },
             # With UMAP if available
@@ -424,6 +441,7 @@ class VLMPromptingTestSuite:
                 'enable_multi_viz': True,
                 'visualization_methods': ['pca', 'tsne', 'umap'],
                 'layout_strategy': 'sequential',
+                'nn_k': 30,
                 'reasoning_focus': 'comparison'
             }
         ]
@@ -438,6 +456,7 @@ class VLMPromptingTestSuite:
                 'load_semantic_from_cc18': True,  # Load from CC18 semantic directory
                 'use_3d_tsne': False,
                 'use_knn_connections': False,
+                'nn_k': 30,
                 'tsne_perplexity': 15
             },
             # Multi-viz with semantic names
@@ -448,6 +467,7 @@ class VLMPromptingTestSuite:
                 'layout_strategy': 'sequential',
                 'reasoning_focus': 'comparison',
                 'use_semantic_names': True,
+                'nn_k': 30,
                 'load_semantic_from_cc18': True  # Load from CC18 semantic directory
             },
             # Semantic class names test - single visualization with semantic names only
@@ -458,6 +478,7 @@ class VLMPromptingTestSuite:
                 'load_semantic_from_cc18': True,
                 'use_3d_tsne': False,
                 'use_knn_connections': False,
+                'nn_k': 30,
                 'tsne_perplexity': 15
             },
             # Semantic axes test - single visualization with axes interpretation
@@ -469,6 +490,7 @@ class VLMPromptingTestSuite:
                 'semantic_axes': True,  # NEW: Enable semantic axes computation
                 'use_3d_tsne': False,
                 'use_knn_connections': False,
+                'nn_k': 30,
                 'tsne_perplexity': 15
             },
             # Use metadata test - incorporate metadata into prompts
@@ -481,6 +503,7 @@ class VLMPromptingTestSuite:
                 'auto_load_metadata': True,
                 'use_3d_tsne': False,
                 'use_knn_connections': False,
+                'nn_k': 30,
                 'tsne_perplexity': 15
             },
             # Combined new features test
@@ -494,6 +517,7 @@ class VLMPromptingTestSuite:
                 'auto_load_metadata': True,
                 'use_3d_tsne': False,
                 'use_knn_connections': False,
+                'nn_k': 30,
                 'tsne_perplexity': 15
             },
             # Multi-viz with semantic names only
@@ -503,6 +527,7 @@ class VLMPromptingTestSuite:
                 'visualization_methods': ['pca', 'tsne'],
                 'layout_strategy': 'sequential',
                 'reasoning_focus': 'comparison',
+                'nn_k': 30,
                 'use_semantic_names': True,
                 'load_semantic_from_cc18': True
             },
@@ -515,6 +540,7 @@ class VLMPromptingTestSuite:
                 'reasoning_focus': 'comparison',
                 'use_semantic_names': True,
                 'load_semantic_from_cc18': True,
+                'nn_k': 30,
                 'semantic_axes': True,  # NEW: Enable semantic axes
                 'use_metadata': True,   # NEW: Enable metadata
                 'auto_load_metadata': True
@@ -529,6 +555,7 @@ class VLMPromptingTestSuite:
                 'semantic_axes_method': 'perturbation',  # NEW: Use perturbation method
                 'use_3d_tsne': False,
                 'use_knn_connections': False,
+                'nn_k': 30,
                 'tsne_perplexity': 15
             },
             # Feature importance semantic axes test - alternative method
@@ -541,6 +568,7 @@ class VLMPromptingTestSuite:
                 'semantic_axes_method': 'feature_importance',  # NEW: Use feature importance method
                 'use_3d_tsne': False,
                 'use_knn_connections': False,
+                'nn_k': 30,
                 'tsne_perplexity': 15
             },
             # Perturbation + metadata test - combine perturbation method with metadata
@@ -555,6 +583,7 @@ class VLMPromptingTestSuite:
                 'auto_load_metadata': True,
                 'use_3d_tsne': False,
                 'use_knn_connections': False,
+                'nn_k': 30,
                 'tsne_perplexity': 15
             },
             # 3D perturbation test - test perturbation method with 3D visualization
@@ -567,6 +596,7 @@ class VLMPromptingTestSuite:
                 'semantic_axes_method': 'perturbation',  # NEW: Use perturbation method
                 'use_3d_tsne': True,  # NEW: 3D visualization
                 'use_knn_connections': False,
+                'nn_k': 30,
                 'tsne_perplexity': 15
             },
             # Multi-viz with perturbation method
@@ -578,6 +608,7 @@ class VLMPromptingTestSuite:
                 'reasoning_focus': 'comparison',
                 'use_semantic_names': True,
                 'load_semantic_from_cc18': True,
+                'nn_k': 30,
                 'semantic_axes': True,
                 'semantic_axes_method': 'perturbation'  # NEW: Use perturbation method
             }
@@ -591,6 +622,7 @@ class VLMPromptingTestSuite:
                 'enable_multi_viz': False,
                 'use_3d_tsne': False,
                 'use_knn_connections': False,
+                'nn_k': 30,
                 'tsne_perplexity': 15,
                 'image_dpi': 150
             },
@@ -600,6 +632,7 @@ class VLMPromptingTestSuite:
                 'enable_multi_viz': False,
                 'use_3d_tsne': False,
                 'use_knn_connections': False,
+                'nn_k': 30,
                 'tsne_perplexity': 15,
                 'tsne_zoom_factor': 3.0
             },
@@ -609,6 +642,7 @@ class VLMPromptingTestSuite:
                 'enable_multi_viz': True,
                 'visualization_methods': ['pca', 'frequent_patterns'],
                 'layout_strategy': 'sequential',
+                'nn_k': 30,
                 'reasoning_focus': 'comparison'
             },
             # MLxtend decision regions with SVM
@@ -618,6 +652,7 @@ class VLMPromptingTestSuite:
                 'visualization_methods': ['pca', 'decision_regions'],
                 'layout_strategy': 'sequential',
                 'reasoning_focus': 'comparison',
+                'nn_k': 30,
                 'decision_classifier': 'svm'
             },
             # Metadata testing with comprehensive info
@@ -628,6 +663,7 @@ class VLMPromptingTestSuite:
                 'layout_strategy': 'hierarchical',
                 'reasoning_focus': 'comparison',
                 'include_metadata': True,
+                'nn_k': 30,
                 'metadata_types': ['quality_metrics', 'timing_info', 'method_params']
             }
         ]
@@ -636,8 +672,7 @@ class VLMPromptingTestSuite:
         all_configs = (semantic_configs + single_viz_configs + multi_viz_configs + 
                       parameter_configs)
         
-        # Limit to 25 configurations to include new mlxtend and metadata tests
-        return all_configs[:25]
+        return all_configs
     
     def run_single_test(self, config: Dict[str, Any], test_idx: int) -> Dict[str, Any]:
         """Run a single test configuration."""

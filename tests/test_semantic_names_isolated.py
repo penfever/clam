@@ -29,10 +29,18 @@ logger = logging.getLogger(__name__)
 
 
 def load_semantic_class_names(task_id: int, num_classes: int):
-    """Load semantic class names from CC18 semantic data directory."""
-    semantic_file = Path(__file__).parent.parent / "data" / "cc18_semantic" / f"{task_id}.json"
+    """Load semantic class names from semantic data directory using general search."""
+    # Try to find semantic file using the general search
+    try:
+        from clam.utils.metadata_loader import get_metadata_loader
+        loader = get_metadata_loader()
+        semantic_file = loader.detect_metadata_file(task_id)
+    except Exception as e:
+        logger.debug(f"Could not use metadata loader: {e}")
+        # Fallback to hardcoded path
+        semantic_file = Path(__file__).parent.parent / "data" / "cc18_semantic" / f"{task_id}.json"
     
-    if not semantic_file.exists():
+    if not semantic_file or not semantic_file.exists():
         logger.info(f"No semantic file found for task {task_id}")
         return None
     
