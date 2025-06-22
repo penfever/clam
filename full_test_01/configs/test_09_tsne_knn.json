@@ -1,8 +1,0 @@
-{
-  "name": "tsne_knn",
-  "enable_multi_viz": false,
-  "use_3d_tsne": false,
-  "use_knn_connections": true,
-  "knn_k": 5,
-  "tsne_perplexity": 15
-}

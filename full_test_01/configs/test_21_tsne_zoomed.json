@@ -1,8 +1,0 @@
-{
-  "name": "tsne_zoomed",
-  "enable_multi_viz": false,
-  "use_3d_tsne": false,
-  "use_knn_connections": false,
-  "tsne_perplexity": 15,
-  "tsne_zoom_factor": 3.0
-}

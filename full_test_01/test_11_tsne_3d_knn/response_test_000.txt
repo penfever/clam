@@ -1,1 +1,0 @@
-Class: Class_0 | Reasoning: The query point is closer to the majority class (Class_0) in the t-SNE visualization, and it has the smallest average distance to its nearest neighbors, which are all from Class_0.
