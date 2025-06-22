@@ -84,14 +84,22 @@ def extract_column_descriptions(semantic_info: Dict[str, Any]) -> Dict[str, str]
             col_name = col['name']
             semantic_desc = col['semantic_description']
             
-            # Clean up semantic description for JOLT
-            if semantic_desc.lower().startswith('whether'):
-                clean_desc = semantic_desc.replace('Whether', '').replace('whether', '').strip()
-                if clean_desc.startswith('the '):
-                    clean_desc = clean_desc[4:]
-                clean_desc = clean_desc.capitalize()
+            # Handle case where semantic_desc might be a dict
+            if isinstance(semantic_desc, dict):
+                # Extract the description from dict if possible
+                clean_desc = str(semantic_desc.get('description', col_name))
+            elif isinstance(semantic_desc, str):
+                # Clean up semantic description for JOLT
+                if semantic_desc.lower().startswith('whether'):
+                    clean_desc = semantic_desc.replace('Whether', '').replace('whether', '').strip()
+                    if clean_desc.startswith('the '):
+                        clean_desc = clean_desc[4:]
+                    clean_desc = clean_desc.capitalize()
+                else:
+                    clean_desc = semantic_desc
             else:
-                clean_desc = semantic_desc
+                # Fallback to column name
+                clean_desc = col_name.replace('_', ' ').replace('-', ' ')
                 
             column_descriptions[col_name] = clean_desc
     
