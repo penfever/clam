@@ -830,6 +830,11 @@ class ClamTsneClassifier:
                     
                     def transform(self, X):
                         """Wrapper method to provide sklearn-style transform interface."""
+                        # Ensure X is 2D (fix for single sample case)
+                        if X.ndim == 1:
+                            X = X.reshape(1, -1)
+                            logger.debug(f"TabPFNWrapper: Reshaped 1D input to 2D: {X.shape}")
+                        
                         embeddings = self.tabpfn.get_embeddings(X)
                         # Handle ensemble embeddings by averaging if needed
                         if len(embeddings.shape) == 3 and embeddings.shape[0] > 1:

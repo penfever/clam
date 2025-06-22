@@ -205,6 +205,11 @@ class SemanticAxesComputer:
                                       axis_names: List[str]) -> Dict[str, str]:
         """Compute semantic axes using feature importance for predicting axis coordinates."""
         try:
+            # Ensure embeddings is 2D (fix for single sample case)
+            if embeddings.ndim == 1:
+                embeddings = embeddings.reshape(1, -1)
+                logger.debug(f"Reshaped 1D embeddings to 2D: {embeddings.shape}")
+            
             semantic_axes = {}
             
             for i, axis_name in enumerate(axis_names):
