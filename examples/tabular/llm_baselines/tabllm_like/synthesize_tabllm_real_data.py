@@ -207,7 +207,10 @@ def process_dataset_to_notes(json_file: str, max_notes: int = NOTES_PER_DATASET)
         
         else:
             # Generate synthetic examples if real data not available
-            print(f"  Generating synthetic examples for {dataset_name}...")
+            if dataset_id is None:
+                print(f"  Could not resolve task_id {task_id} to dataset_id - generating synthetic examples for {dataset_name}...")
+            else:
+                print(f"  Could not load OpenML dataset {dataset_id} - generating synthetic examples for {dataset_name}...")
             
             for i in range(min(10, max_notes)):  # Generate fewer synthetic examples
                 example_features = {}
