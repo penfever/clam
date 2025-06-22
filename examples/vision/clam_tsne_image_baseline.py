@@ -310,6 +310,12 @@ class ClamImageTsneClassifier:
         elapsed_time = time.time() - start_time
         logger.info(f"CLAM image t-SNE classifier fitted in {elapsed_time:.2f} seconds")
         
+        # Debug check: verify VLM wrapper is still available after fit
+        if self.vlm_wrapper is None:
+            logger.error("WARNING: VLM wrapper became None after fitting!")
+        else:
+            logger.info(f"VLM wrapper confirmed available after fit: {type(self.vlm_wrapper).__name__}")
+        
         return self
     
     def _load_vlm_model(self):
@@ -338,6 +344,8 @@ class ClamImageTsneClassifier:
                 backend = 'auto'
             
             # Load VLM using centralized model loader
+            logger.info(f"Loading VLM with parameters: model={model_to_load}, backend={backend}, device={device}")
+            
             vlm_wrapper = model_loader.load_vlm(
                 model_to_load, 
                 backend=backend,
@@ -354,7 +362,7 @@ class ClamImageTsneClassifier:
                     raise RuntimeError("Both CLAM model loader and simple VLM fallback failed to create a valid wrapper")
                 return fallback_wrapper
             
-            logger.info("VLM loaded successfully")
+            logger.info("VLM loaded successfully via CLAM model loader")
             return vlm_wrapper
             
         except ImportError as e:
@@ -478,7 +486,13 @@ class ClamImageTsneClassifier:
         
         # Ensure VLM wrapper is still available
         if self.vlm_wrapper is None:
+            logger.error("VLM wrapper is None at prediction time")
+            logger.error(f"is_fitted: {self.is_fitted}")
+            logger.error(f"vlm_model_id: {self.vlm_model_id}")
+            logger.error(f"effective_model_id: {self.effective_model_id}")
             raise RuntimeError("VLM wrapper is None. Model may have failed to load or been unloaded.")
+        
+        logger.debug(f"VLM wrapper status: {type(self.vlm_wrapper).__name__} object available")
         
         logger.info(f"Predicting labels for {len(test_image_paths)} test images using VLM")
         

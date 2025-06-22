@@ -1,0 +1,77 @@
+Class: Class_0 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_1 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_1 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_1 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_2 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_1 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_2 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_0 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_2 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_0 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_1 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_2 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_2 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_2 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_2 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_1 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_1 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_2 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_2 | Reasoning: CLAM prediction (no detailed response)
+
+=== RESPONSE ===
+
+Class: Class_0 | Reasoning: CLAM prediction (no detailed response)

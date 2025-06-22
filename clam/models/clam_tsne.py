@@ -452,16 +452,34 @@ class ClamTsneClassifier:
             vlm_kwargs['max_model_len'] = self.max_model_len
         
         # Load VLM using centralized model loader
-        self.vlm_wrapper = model_loader.load_vlm(
-            model_to_load,
-            backend=backend,
-            device=self.device if not self.is_api_model else None,
-            tensor_parallel_size=self.tensor_parallel_size if not self.is_api_model else None,
-            gpu_memory_utilization=self.gpu_memory_utilization if not self.is_api_model else None,
-            **vlm_kwargs
-        )
-        
-        return self.vlm_wrapper
+        try:
+            logger.info(f"Loading VLM with parameters: model={model_to_load}, backend={backend}, device={self.device if not self.is_api_model else None}")
+            
+            self.vlm_wrapper = model_loader.load_vlm(
+                model_to_load,
+                backend=backend,
+                device=self.device if not self.is_api_model else None,
+                tensor_parallel_size=self.tensor_parallel_size if not self.is_api_model else None,
+                gpu_memory_utilization=self.gpu_memory_utilization if not self.is_api_model else None,
+                **vlm_kwargs
+            )
+            
+            if self.vlm_wrapper is None:
+                logger.error(f"Model loader returned None for model {model_to_load}")
+                raise RuntimeError(f"Model loader returned None for model {model_to_load}")
+            
+            logger.info("VLM loaded successfully")
+            return self.vlm_wrapper
+            
+        except Exception as e:
+            logger.error(f"Failed to load VLM {model_to_load}: {e}")
+            logger.error(f"VLM loading failed with exception type: {type(e).__name__}")
+            import traceback
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            
+            # Set vlm_wrapper to None explicitly in case of error
+            self.vlm_wrapper = None
+            raise RuntimeError(f"Failed to load VLM {model_to_load}: {e}") from e
     
     def _initialize_multi_viz_composer(self, X_train, y_train, X_test=None):
         """Initialize the multi-visualization context composer."""
