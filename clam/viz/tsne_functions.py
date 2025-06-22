@@ -1131,6 +1131,80 @@ def create_knn_pie_chart(
     return description.strip()
 
 
+def create_knn_regression_analysis(
+    neighbor_targets: np.ndarray,
+    neighbor_distances: np.ndarray,
+    ax_knn: plt.Axes,
+    k: int
+) -> str:
+    """
+    Create a KNN regression analysis visualization showing target value distribution.
+    
+    Args:
+        neighbor_targets: Target values of the k nearest neighbors
+        neighbor_distances: Distances to the k nearest neighbors
+        ax_knn: Matplotlib axes for the analysis
+        k: Number of nearest neighbors
+        
+    Returns:
+        Description text for the KNN analysis
+    """
+    # Clear the axes
+    ax_knn.clear()
+    
+    # Create bar chart of neighbor target values
+    neighbor_indices = np.arange(len(neighbor_targets))
+    
+    # Create color mapping based on target values
+    normalized_targets = (neighbor_targets - np.min(neighbor_targets)) / (np.max(neighbor_targets) - np.min(neighbor_targets) + 1e-8)
+    colors = plt.cm.viridis(normalized_targets)
+    
+    bars = ax_knn.bar(neighbor_indices, neighbor_targets, color=colors, alpha=0.7, edgecolor='black', linewidth=0.5)
+    
+    # Add value labels on bars
+    for i, (bar, target) in enumerate(zip(bars, neighbor_targets)):
+        height = bar.get_height()
+        ax_knn.text(bar.get_x() + bar.get_width()/2., height + (np.max(neighbor_targets) - np.min(neighbor_targets)) * 0.01,
+                   f'{target:.3f}', ha='center', va='bottom', fontsize=8, rotation=45)
+    
+    ax_knn.set_xlabel('Neighbor Rank')
+    ax_knn.set_ylabel('Target Value')
+    ax_knn.set_title(f'KNN Target Values\n(k={k})')
+    ax_knn.grid(True, alpha=0.3)
+    
+    # Set x-ticks to show neighbor ranks
+    ax_knn.set_xticks(neighbor_indices)
+    ax_knn.set_xticklabels([f'#{i+1}' for i in neighbor_indices], rotation=45)
+    
+    # Calculate statistics
+    knn_mean = np.mean(neighbor_targets)
+    knn_std = np.std(neighbor_targets)
+    knn_min = np.min(neighbor_targets)
+    knn_max = np.max(neighbor_targets)
+    avg_distance = np.mean(neighbor_distances)
+    
+    # Add horizontal line for mean
+    ax_knn.axhline(y=knn_mean, color='red', linestyle='--', alpha=0.8, linewidth=2)
+    ax_knn.text(0.02, 0.98, f'Mean: {knn_mean:.3f}', transform=ax_knn.transAxes, 
+               bbox=dict(boxstyle='round', facecolor='red', alpha=0.3), 
+               verticalalignment='top', fontsize=9, fontweight='bold')
+    
+    plt.setp(ax_knn.get_xticklabels(), rotation=45, ha='right')
+    
+    # Create description text
+    description = f"KNN Regression Analysis (k={k}):\n"
+    description += f"• Predicted value: {knn_mean:.4f}\n"
+    description += f"• Target range: [{knn_min:.4f}, {knn_max:.4f}]\n"
+    description += f"• Standard deviation: {knn_std:.4f}\n"
+    description += f"• Average distance: {avg_distance:.4f}\n"
+    description += f"• Individual neighbor values:\n"
+    
+    for i, (target, dist) in enumerate(zip(neighbor_targets, neighbor_distances)):
+        description += f"  #{i+1}: {target:.4f} (dist: {dist:.3f})\n"
+    
+    return description.strip()
+
+
 def create_tsne_3d_plot_with_knn(
     train_tsne: np.ndarray,
     test_tsne: np.ndarray,
@@ -1824,20 +1898,205 @@ def create_regression_tsne_plot_with_knn(
     test_embeddings: np.ndarray,
     highlight_test_idx: int = 0,
     k: int = 5,
-    figsize: Tuple[int, int] = (10, 8),
-    zoom_factor: float = 1.0,
-    colormap: str = 'RdBu_r'
+    figsize: Tuple[int, int] = (14, 10),
+    zoom_factor: float = 2.0,
+    colormap: str = 'viridis'
 ) -> Tuple[plt.Figure, str, Dict]:
     """
     Create regression t-SNE plot with KNN connections showing target values.
     
-    This is a placeholder that calls the base regression plot.
-    Full KNN implementation would require adapting the KNN logic for regression.
+    Args:
+        train_tsne: 2D t-SNE coordinates for training data [n_train, 2]
+        test_tsne: 2D t-SNE coordinates for test data [n_test, 2]
+        train_targets: Training target values [n_train]
+        train_embeddings: Original training embeddings for KNN [n_train, embedding_dim]
+        test_embeddings: Original test embeddings for KNN [n_test, embedding_dim]
+        highlight_test_idx: Index of test point to highlight and show KNN analysis
+        k: Number of nearest neighbors to analyze
+        figsize: Figure size (width, height)
+        zoom_factor: Zoom level (2.0 = 200% zoom, showing 50% of the range)
+        colormap: Matplotlib colormap name for target values
+        
+    Returns:
+        fig: Matplotlib figure object
+        legend_text: Text description of the legend
+        metadata: Dictionary with plot metadata
     """
-    logger.warning("KNN regression visualization not fully implemented yet, using base regression plot")
-    return create_combined_regression_tsne_plot(
-        train_tsne, test_tsne, train_targets, highlight_test_idx, figsize, zoom_factor, colormap
-    )
+    # Create figure with subplot for main plot and KNN analysis panel
+    if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_tsne):
+        fig = plt.figure(figsize=figsize)
+        # Create a grid: main plot takes ~70% width, KNN analysis takes ~30% width
+        gs = fig.add_gridspec(1, 5, width_ratios=[2.5, 2.5, 2, 1.5, 1.5], hspace=0.1, wspace=0.15)
+        ax = fig.add_subplot(gs[0, :3])  # Main plot spans first 3 columns
+        ax_knn = fig.add_subplot(gs[0, 3:])  # KNN analysis spans last 2 columns
+    else:
+        fig, ax = plt.subplots(figsize=figsize)
+        ax_knn = None
+    
+    # Create color mapping
+    normalized_values, cmap, vmin, vmax = create_regression_color_map(train_targets, colormap)
+    
+    # Apply zoom if highlighting a test point
+    if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_tsne) and zoom_factor > 1.0:
+        # Calculate zoom boundaries around the highlighted test point
+        highlight_pos = test_tsne[highlight_test_idx]
+        
+        # Calculate the full range of the data
+        all_x = np.concatenate([train_tsne[:, 0], test_tsne[:, 0]])
+        all_y = np.concatenate([train_tsne[:, 1], test_tsne[:, 1]])
+        x_range = np.max(all_x) - np.min(all_x)
+        y_range = np.max(all_y) - np.min(all_y)
+        
+        # Calculate zoom window size (smaller window = more zoom)
+        zoom_x_radius = (x_range / zoom_factor) / 2
+        zoom_y_radius = (y_range / zoom_factor) / 2
+        
+        # Define zoom boundaries
+        x_min = highlight_pos[0] - zoom_x_radius
+        x_max = highlight_pos[0] + zoom_x_radius
+        y_min = highlight_pos[1] - zoom_y_radius
+        y_max = highlight_pos[1] + zoom_y_radius
+        
+        # Filter points within zoom region
+        train_in_zoom = ((train_tsne[:, 0] >= x_min) & (train_tsne[:, 0] <= x_max) & 
+                        (train_tsne[:, 1] >= y_min) & (train_tsne[:, 1] <= y_max))
+        test_in_zoom = ((test_tsne[:, 0] >= x_min) & (test_tsne[:, 0] <= x_max) & 
+                       (test_tsne[:, 1] >= y_min) & (test_tsne[:, 1] <= y_max))
+        
+        train_tsne_visible = train_tsne[train_in_zoom]
+        train_targets_visible = train_targets[train_in_zoom]
+        test_tsne_visible = test_tsne[test_in_zoom]
+        
+        # Set axis limits
+        ax.set_xlim(x_min, x_max)
+        ax.set_ylim(y_min, y_max)
+    else:
+        # No zoom, show all points
+        train_tsne_visible = train_tsne
+        train_targets_visible = train_targets
+        test_tsne_visible = test_tsne
+    
+    # Plot training points with color gradient (only visible ones)
+    if len(train_tsne_visible) > 0:
+        scatter = ax.scatter(
+            train_tsne_visible[:, 0], train_tsne_visible[:, 1],
+            c=train_targets_visible,
+            cmap=cmap,
+            vmin=vmin,
+            vmax=vmax,
+            alpha=0.7,
+            s=50,
+            edgecolors='black',
+            linewidth=0.5,
+            label='Training Data'
+        )
+        
+        # Add colorbar
+        cbar = plt.colorbar(scatter, ax=ax)
+        cbar.set_label('Target Value', rotation=270, labelpad=15)
+    
+    # Plot all test points in gray (only visible ones)
+    if len(test_tsne_visible) > 0:
+        ax.scatter(
+            test_tsne_visible[:, 0], test_tsne_visible[:, 1],
+            c='lightgray',
+            alpha=0.6,
+            s=60,
+            edgecolors='gray',
+            linewidth=0.8,
+            marker='s',
+            label='Test Points (Light Gray)'
+        )
+    
+    # If highlighting a specific test point, show KNN analysis
+    knn_info = {}
+    if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_tsne):
+        # Import KNN utilities
+        from clam.models.knn_utils import find_knn_in_embedding_space
+        
+        # Find KNN for this specific test point
+        query_embedding = test_embeddings[highlight_test_idx:highlight_test_idx+1]
+        distances, indices = find_knn_in_embedding_space(
+            train_embeddings, query_embedding, k=k
+        )
+        
+        neighbor_indices = indices[0]  # Get neighbors for the single query point
+        neighbor_distances = distances[0]
+        neighbor_targets = train_targets[neighbor_indices]
+        
+        # Highlight the query point with a prominent marker
+        ax.scatter(
+            test_tsne[highlight_test_idx, 0], test_tsne[highlight_test_idx, 1],
+            c='red',
+            s=150,
+            edgecolors='darkred',
+            linewidth=3,
+            marker='*',
+            label='Query Point (Red Star)',
+            zorder=10
+        )
+        
+        # Create KNN analysis in the side panel
+        if ax_knn is not None:
+            knn_description = create_knn_regression_analysis(
+                neighbor_targets, neighbor_distances, ax_knn, k
+            )
+        
+        # Store KNN information for metadata
+        knn_info = {
+            'neighbor_indices': neighbor_indices,
+            'neighbor_distances': neighbor_distances,
+            'neighbor_targets': neighbor_targets,
+            'k': k,
+            'knn_description': knn_description if ax_knn is not None else None,
+            'predicted_value': np.mean(neighbor_targets)  # Simple KNN regression prediction
+        }
+    
+    ax.set_xlabel('t-SNE Dimension 1')
+    ax.set_ylabel('t-SNE Dimension 2')
+    
+    if highlight_test_idx is not None:
+        if zoom_factor > 1.0:
+            ax.set_title(f't-SNE with KNN Regression Analysis - Query Point {highlight_test_idx} (Zoom: {zoom_factor:.1f}x)')
+        else:
+            ax.set_title(f't-SNE with KNN Regression Analysis - Query Point {highlight_test_idx}')
+    else:
+        ax.set_title('t-SNE Visualization - Training vs Test Data (Regression)')
+    
+    # Position legend differently based on whether we have a KNN panel
+    if ax_knn is not None:
+        ax.legend(bbox_to_anchor=(0, 1), loc='upper left')
+    else:
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    ax.grid(True, alpha=0.3)
+    
+    # Apply layout - use GridSpec layout if we have KNN panel, otherwise tight_layout
+    if ax_knn is not None:
+        # Manually adjust spacing for GridSpec layout
+        gs.update(left=0.06, right=0.99, bottom=0.08, top=0.92)
+    else:
+        plt.tight_layout()
+    
+    # Create legend text
+    legend_text = f"Regression data with continuous color mapping (colormap: {colormap})"
+    
+    if knn_info and 'knn_description' in knn_info and knn_info['knn_description']:
+        legend_text += f"\n\n{knn_info['knn_description']}"
+    
+    # Create metadata
+    metadata = {
+        'n_train_points': len(train_tsne),
+        'n_test_points': len(test_tsne),
+        'target_range': (float(np.min(train_targets)), float(np.max(train_targets))),
+        'highlighted_point': highlight_test_idx,
+        'knn_info': knn_info,
+        'zoom_factor': zoom_factor,
+        'colormap': colormap,
+        'query_position': test_tsne[highlight_test_idx].tolist() if highlight_test_idx is not None else None
+    }
+    
+    return fig, legend_text, metadata
 
 
 def create_combined_regression_tsne_3d_plot(
@@ -1961,18 +2220,169 @@ def create_regression_tsne_3d_plot_with_knn(
     test_embeddings: np.ndarray,
     highlight_test_idx: int = 0,
     k: int = 5,
-    figsize: Tuple[int, int] = (12, 9),
+    figsize: Tuple[int, int] = (16, 10),
     viewing_angles: Optional[List[Tuple[int, int]]] = None,
     zoom_factor: float = 1.0,
-    colormap: str = 'RdBu_r'
+    colormap: str = 'viridis'
 ) -> Tuple[plt.Figure, str, Dict]:
     """
     Create 3D regression t-SNE plot with KNN connections showing target values.
     
-    This is a placeholder that calls the base 3D regression plot.
-    Full KNN implementation would require adapting the KNN logic for regression.
+    Args:
+        train_tsne: 3D t-SNE coordinates for training data [n_train, 3]
+        test_tsne: 3D t-SNE coordinates for test data [n_test, 3]
+        train_targets: Training target values [n_train]
+        train_embeddings: Original training embeddings for KNN [n_train, embedding_dim]
+        test_embeddings: Original test embeddings for KNN [n_test, embedding_dim]
+        highlight_test_idx: Index of test point to highlight and show KNN analysis
+        k: Number of nearest neighbors to analyze
+        figsize: Figure size (width, height)
+        viewing_angles: List of (elevation, azimuth) tuples for viewing angles
+        zoom_factor: Zoom level for the plot
+        colormap: Matplotlib colormap name for target values
+        
+    Returns:
+        fig: Matplotlib figure object
+        legend_text: Text description of the legend
+        metadata: Dictionary with plot metadata
     """
-    logger.warning("3D KNN regression visualization not fully implemented yet, using base 3D regression plot")
-    return create_combined_regression_tsne_3d_plot(
-        train_tsne, test_tsne, train_targets, highlight_test_idx, figsize, viewing_angles, zoom_factor, colormap
+    # Create figure with subplot for main 3D plot and KNN analysis panel
+    if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_tsne):
+        fig = plt.figure(figsize=figsize)
+        # Create a grid: main 3D plot takes ~70% width, KNN analysis takes ~30% width
+        gs = fig.add_gridspec(1, 5, width_ratios=[2.5, 2.5, 2, 1.5, 1.5], hspace=0.1, wspace=0.15)
+        ax = fig.add_subplot(gs[0, :3], projection='3d')  # Main 3D plot spans first 3 columns
+        ax_knn = fig.add_subplot(gs[0, 3:])  # KNN analysis spans last 2 columns
+    else:
+        fig = plt.figure(figsize=figsize)
+        ax = fig.add_subplot(111, projection='3d')
+        ax_knn = None
+    
+    # Create color mapping
+    normalized_values, cmap, vmin, vmax = create_regression_color_map(train_targets, colormap)
+    
+    # Plot training points with color gradient
+    scatter = ax.scatter(
+        train_tsne[:, 0], train_tsne[:, 1], train_tsne[:, 2],
+        c=train_targets,
+        cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
+        alpha=0.7,
+        s=50,
+        edgecolors='black',
+        linewidth=0.5,
+        label='Training Data'
     )
+    
+    # Plot all test points in gray
+    ax.scatter(
+        test_tsne[:, 0], test_tsne[:, 1], test_tsne[:, 2],
+        c='lightgray',
+        alpha=0.6,
+        s=60,
+        edgecolors='gray',
+        linewidth=0.8,
+        marker='s',
+        label='Test Points (Light Gray)'
+    )
+    
+    # If highlighting a specific test point, show KNN analysis
+    knn_info = {}
+    if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_tsne):
+        # Import KNN utilities
+        from clam.models.knn_utils import find_knn_in_embedding_space
+        
+        # Find KNN for this specific test point
+        query_embedding = test_embeddings[highlight_test_idx:highlight_test_idx+1]
+        distances, indices = find_knn_in_embedding_space(
+            train_embeddings, query_embedding, k=k
+        )
+        
+        neighbor_indices = indices[0]  # Get neighbors for the single query point
+        neighbor_distances = distances[0]
+        neighbor_targets = train_targets[neighbor_indices]
+        
+        # Highlight the query point with a prominent marker
+        ax.scatter(
+            test_tsne[highlight_test_idx, 0], test_tsne[highlight_test_idx, 1], test_tsne[highlight_test_idx, 2],
+            c='red',
+            s=150,
+            edgecolors='darkred',
+            linewidth=3,
+            marker='*',
+            label='Query Point (Red Star)',
+            zorder=10
+        )
+        
+        # Create KNN analysis in the side panel
+        if ax_knn is not None:
+            knn_description = create_knn_regression_analysis(
+                neighbor_targets, neighbor_distances, ax_knn, k
+            )
+        
+        # Store KNN information for metadata
+        knn_info = {
+            'neighbor_indices': neighbor_indices,
+            'neighbor_distances': neighbor_distances,
+            'neighbor_targets': neighbor_targets,
+            'k': k,
+            'knn_description': knn_description if ax_knn is not None else None,
+            'predicted_value': np.mean(neighbor_targets)  # Simple KNN regression prediction
+        }
+    
+    # Add colorbar
+    cbar = plt.colorbar(scatter, ax=ax, shrink=0.5, aspect=20)
+    cbar.set_label('Target Value', rotation=270, labelpad=15)
+    
+    # Set labels and title
+    ax.set_xlabel('t-SNE Dimension 1')
+    ax.set_ylabel('t-SNE Dimension 2')
+    ax.set_zlabel('t-SNE Dimension 3')
+    
+    if highlight_test_idx is not None:
+        ax.set_title(f'3D t-SNE with KNN Regression Analysis - Query Point {highlight_test_idx}')
+    else:
+        ax.set_title('3D t-SNE Visualization - Training vs Test Data (Regression)')
+    
+    # Set viewing angles if provided
+    if viewing_angles and len(viewing_angles) > 0:
+        elev, azim = viewing_angles[0]  # Use the first viewing angle
+        ax.view_init(elev=elev, azim=azim)
+    else:
+        # Default viewing angle
+        ax.view_init(elev=20, azim=45)
+    
+    # Position legend differently based on whether we have a KNN panel
+    if ax_knn is not None:
+        ax.legend(bbox_to_anchor=(0, 1), loc='upper left')
+    else:
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    # Apply layout - use GridSpec layout if we have KNN panel, otherwise tight_layout
+    if ax_knn is not None:
+        # Manually adjust spacing for GridSpec layout
+        gs.update(left=0.06, right=0.99, bottom=0.08, top=0.92)
+    else:
+        plt.tight_layout()
+    
+    # Create legend text
+    legend_text = f"3D regression data with continuous color mapping (colormap: {colormap})"
+    
+    if knn_info and 'knn_description' in knn_info and knn_info['knn_description']:
+        legend_text += f"\n\n{knn_info['knn_description']}"
+    
+    # Create metadata
+    metadata = {
+        'n_train_points': len(train_tsne),
+        'n_test_points': len(test_tsne),
+        'target_range': (float(np.min(train_targets)), float(np.max(train_targets))),
+        'highlighted_point': highlight_test_idx,
+        'knn_info': knn_info,
+        'zoom_factor': zoom_factor,
+        'colormap': colormap,
+        'viewing_angles': viewing_angles,
+        'query_position': test_tsne[highlight_test_idx].tolist() if highlight_test_idx is not None else None
+    }
+    
+    return fig, legend_text, metadata
