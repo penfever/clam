@@ -357,6 +357,12 @@ def get_tabpfn_embeddings(
 
     logger.info(f"Raw embedding shapes - Train: {train_embeddings_raw.shape}, Val: {val_embeddings_raw.shape}, Test: {test_embeddings_raw.shape}")
 
+    # Fix test embeddings shape if it's inconsistent (TabPFN single sample issue)
+    if len(test_embeddings_raw.shape) == 2 and len(train_embeddings_raw.shape) == 3:
+        # Test embeddings are missing the sample dimension, add it back
+        test_embeddings_raw = test_embeddings_raw[:, np.newaxis, :]  # (8, 192) -> (8, 1, 192)
+        logger.info(f"Fixed test embeddings shape: {test_embeddings_raw.shape}")
+
     # Process embeddings - average across ensemble members if available
     if len(train_embeddings_raw.shape) == 3 and train_embeddings_raw.shape[0] > 1:
         logger.info("Averaging embeddings across ensemble members")
