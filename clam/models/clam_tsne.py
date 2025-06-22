@@ -1510,17 +1510,19 @@ class ClamTsneClassifier:
                 
                 # Save prompt and response if requested
                 if save_outputs and self.temp_dir:
-                    # Save prompt
-                    prompt_filename = f"prompt_test_{i:03d}.txt"
-                    prompt_path = os.path.join(self.temp_dir, prompt_filename)
-                    with open(prompt_path, 'w') as f:
-                        f.write(prompt)
+                    # Save prompt only for the first test sample (prompts are generally identical)
+                    if i == 0:
+                        prompt_filename = f"prompt_test_{i:03d}.txt"
+                        prompt_path = os.path.join(self.temp_dir, prompt_filename)
+                        with open(prompt_path, 'w') as f:
+                            f.write(prompt)
                     
-                    # Save response
-                    response_filename = f"response_test_{i:03d}.txt"
-                    response_path = os.path.join(self.temp_dir, response_filename)
-                    with open(response_path, 'w') as f:
-                        f.write(response)
+                    # Save response following visualization cadence pattern
+                    if i % visualization_save_cadence == 0:
+                        response_filename = f"response_test_{i:03d}.txt"
+                        response_path = os.path.join(self.temp_dir, response_filename)
+                        with open(response_path, 'w') as f:
+                            f.write(response)
                 
                 # Store details
                 if return_detailed and y_test is not None:
