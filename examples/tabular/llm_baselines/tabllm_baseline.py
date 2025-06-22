@@ -433,7 +433,7 @@ def generate_tabllm_data_on_demand(dataset_name, semantic_dir):
             
             # Generate note and template
             note = generate_note_from_semantic_info(semantic_info)
-            template_data = create_template_for_dataset(semantic_info)
+            template_data = create_template_for_dataset(semantic_info, dataset_name)
             
             return note, template_data
         

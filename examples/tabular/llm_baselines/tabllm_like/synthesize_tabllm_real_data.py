@@ -249,8 +249,32 @@ def process_dataset_to_notes(json_file: str, max_notes: int = NOTES_PER_DATASET)
     return notes_data
 
 
+def write_yaml_template(template_data: Dict[str, Any], output_path: str):
+    """Write a template to a YAML file with custom tags."""
+    # Custom YAML representers for our tags
+    def template_representer(dumper, data):
+        # Remove the __tag__ key before dumping
+        data_copy = {k: v for k, v in data.items() if k != '__tag__'}
+        return dumper.represent_mapping('!Template', data_copy)
+    
+    def template_metadata_representer(dumper, data):
+        # Remove the __tag__ key before dumping
+        data_copy = {k: v for k, v in data.items() if k != '__tag__'}
+        return dumper.represent_mapping('!TemplateMetadata', data_copy)
+    
+    # Create a custom YAML dumper
+    yaml.add_representer(dict, lambda dumper, data: (
+        template_representer(dumper, data) if data.get('__tag__') == '!Template' else
+        template_metadata_representer(dumper, data) if data.get('__tag__') == '!TemplateMetadata' else
+        dumper.represent_dict(data)
+    ))
+    
+    with open(output_path, 'w') as f:
+        yaml.dump(template_data, f, default_flow_style=False, sort_keys=False)
+
+
 def create_notes_bank_files():
-    """Create note bank files for all datasets."""
+    """Create note bank files and YAML templates for all datasets."""
     # Get all JSON files using the new general search approach
     json_files = []
     
@@ -271,8 +295,28 @@ def create_notes_bank_files():
     
     all_notes = []
     dataset_notes = {}  # Store notes by dataset
+    templates_created = 0
     
     for json_file in sorted(json_files):
+        # Load semantic info for template creation
+        try:
+            with open(json_file, 'r') as f:
+                semantic_info = json.load(f)
+            
+            dataset_name = semantic_info.get('dataset_name', semantic_info.get('dataset', Path(json_file).stem))
+            
+            # Create and save YAML template
+            template_data = create_template_for_dataset(semantic_info, dataset_name)
+            template_filename = f"templates_{dataset_name}.yaml"
+            template_path = os.path.join(OUTPUT_DIR, template_filename)
+            
+            write_yaml_template(template_data, template_path)
+            templates_created += 1
+            
+        except Exception as e:
+            print(f"Error creating template for {json_file}: {e}")
+        
+        # Process notes as before
         notes = process_dataset_to_notes(json_file)
         if notes:
             dataset_name = notes[0]['dataset']
@@ -308,6 +352,8 @@ def create_notes_bank_files():
     print(f"\nCreated note files for {len(dataset_notes)} datasets")
     print(f"Total notes generated: {len(all_notes)}")
     print(f"Notes directory: {os.path.join(OUTPUT_DIR, 'notes')}")
+    print(f"Created {templates_created} YAML template files")
+    print(f"Templates directory: {OUTPUT_DIR}")
 
 
 def generate_note_from_semantic_info(semantic_info: Dict[str, Any]) -> str:
@@ -343,37 +389,73 @@ def generate_note_from_semantic_info(semantic_info: Dict[str, Any]) -> str:
         return "This is an example tabular data instance with various features"
 
 
-def create_template_for_dataset(semantic_info: Dict[str, Any]) -> Dict[str, Any]:
-    """Create a template for a dataset from semantic information."""
+def create_template_for_dataset(semantic_info: Dict[str, Any], dataset_name: str) -> Dict[str, Any]:
+    """Create a YAML template for a dataset from semantic information."""
     try:
         # Extract class information
         classes = []
         class_descriptions = {}
         
-        if 'target_description' in semantic_info:
+        # Try to get target classes from semantic info
+        if 'target_classes' in semantic_info:
+            # Handle structure like: [{"name": "Class 0", "description": "..."}, ...]
+            classes = [tc['name'] for tc in semantic_info['target_classes']]
+            for tc in semantic_info['target_classes']:
+                class_descriptions[tc['name']] = tc.get('description', tc['name'])
+        elif 'target_values' in semantic_info:
+            # Handle structure like: {"0": "no", "1": "yes"}
+            classes = list(semantic_info['target_values'].values())
+            class_descriptions = {v: v for v in classes}
+        elif 'target_description' in semantic_info:
+            # Fallback: use generic class names with target description
             target_desc = semantic_info['target_description']
             if 'class_names' in semantic_info:
                 classes = semantic_info['class_names']
             elif 'classes' in semantic_info:
                 classes = semantic_info['classes']
             else:
-                classes = ['class_0', 'class_1']  # Default binary
+                classes = ['Class 0', 'Class 1']  # Default binary
             
             # Create class descriptions
             for cls in classes:
                 class_descriptions[str(cls)] = f"{cls} ({target_desc})"
         else:
-            # Fallback
-            classes = ['class_0', 'class_1']
-            class_descriptions = {'class_0': 'Class 0', 'class_1': 'Class 1'}
+            # Ultimate fallback
+            classes = ['Class 0', 'Class 1']
+            class_descriptions = {'Class 0': 'Class 0', 'Class 1': 'Class 1'}
         
-        # Create template structure
+        # Generate a unique ID for the template
+        template_id = str(uuid.uuid4())
+        
+        # Create answer choices string
+        answer_choices = ' ||| '.join(classes)
+        
+        # Create jinja template with appropriate question
+        if len(classes) == 2 and any(keyword in ' '.join(classes).lower() for keyword in ['yes', 'no', 'true', 'false', 'positive', 'negative']):
+            # Binary classification with clear yes/no, true/false, etc.
+            jinja_template = f"{{{{note}}}}\n\nWhat is the class of this instance?\nAnswer: \n|||\n{{{{ answer_choices[label] }}}}"
+        else:
+            # Multi-class or less clear binary
+            classes_str = ', '.join(classes)
+            jinja_template = f"{{{{note}}}}\n\nWhich of the following classes does this instance belong to: {classes_str}?\nAnswer: \n|||\n{{{{ answer_choices[label] }}}}"
+        
+        # Create template structure matching the YAML format
         template_data = {
+            'dataset': dataset_name,
             'templates': {
-                'default': {
-                    'jinja': 'Given the following information about a data instance, which of the following classes does this instance belong to: {{ answer_choices | join(", ") }}? {{ text }}',
-                    'answer_choices': ' ||| '.join(classes),
-                    'class_descriptions': class_descriptions
+                template_id: {
+                    '__tag__': '!Template',  # Will be converted to YAML tag
+                    'name': dataset_name,
+                    'id': template_id,
+                    'reference': '',
+                    'answer_choices': answer_choices,
+                    'jinja': jinja_template,
+                    'metadata': {
+                        '__tag__': '!TemplateMetadata',  # Will be converted to YAML tag
+                        'choices_in_prompt': True,
+                        'metrics': ['accuracy'],
+                        'original_task': True
+                    }
                 }
             }
         }
@@ -381,13 +463,25 @@ def create_template_for_dataset(semantic_info: Dict[str, Any]) -> Dict[str, Any]
         return template_data
         
     except Exception as e:
+        print(f"Error creating template for {dataset_name}: {e}")
         # Fallback template
+        template_id = str(uuid.uuid4())
         return {
+            'dataset': dataset_name,
             'templates': {
-                'default': {
-                    'jinja': 'Given the following information about a data instance, which of the following classes does this instance belong to: {{ answer_choices | join(", ") }}? {{ text }}',
-                    'answer_choices': 'class_0 ||| class_1',
-                    'class_descriptions': {'class_0': 'Class 0', 'class_1': 'Class 1'}
+                template_id: {
+                    '__tag__': '!Template',
+                    'name': dataset_name,
+                    'id': template_id,
+                    'reference': '',
+                    'answer_choices': 'Class 0 ||| Class 1',
+                    'jinja': "{{note}}\n\nWhat is the class of this instance?\nAnswer: \n|||\n{{ answer_choices[label] }}",
+                    'metadata': {
+                        '__tag__': '!TemplateMetadata',
+                        'choices_in_prompt': True,
+                        'metrics': ['accuracy'],
+                        'original_task': True
+                    }
                 }
             }
         }
@@ -399,7 +493,7 @@ def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     os.makedirs(os.path.join(OUTPUT_DIR, "notes"), exist_ok=True)
     
-    print("Synthesizing TabLLM notes from OpenML CC18 datasets...")
+    print("Synthesizing TabLLM notes and YAML templates from OpenML CC18 datasets...")
     create_notes_bank_files()
     print("\nDone!")
 
