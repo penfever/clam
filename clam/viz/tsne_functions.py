@@ -1447,7 +1447,8 @@ def create_regression_tsne_visualization(
     n_iter: int = 1000,
     random_state: int = 42,
     figsize: Tuple[int, int] = (12, 8),
-    colormap: str = 'viridis'
+    colormap: str = 'viridis',
+    use_3d: bool = False
 ) -> Tuple[np.ndarray, np.ndarray, plt.Figure]:
     """
     Create t-SNE visualization for regression data with continuous color mapping.
@@ -1462,10 +1463,11 @@ def create_regression_tsne_visualization(
         random_state: Random seed for reproducibility
         figsize: Figure size (width, height)
         colormap: Matplotlib colormap name for target values
+        use_3d: Whether to create 3D visualization (default: False)
         
     Returns:
-        train_tsne: 2D t-SNE coordinates for training data [n_train, 2]
-        test_tsne: 2D t-SNE coordinates for test data [n_test, 2]
+        train_tsne: 2D/3D t-SNE coordinates for training data [n_train, 2 or 3]
+        test_tsne: 2D/3D t-SNE coordinates for test data [n_test, 2 or 3]
         fig: Matplotlib figure object
     """
     logger.info(f"Creating regression t-SNE visualization with {len(train_embeddings)} train and {len(test_embeddings)} test samples")
@@ -1499,46 +1501,86 @@ def create_regression_tsne_visualization(
     test_tsne = tsne_results[n_train:]
     
     # Create visualization
-    fig, ax = plt.subplots(figsize=figsize)
-    
-    # Create color mapping for target values
-    normalized_values, cmap, vmin, vmax = create_regression_color_map(train_targets, colormap)
-    
-    # Plot training points with color gradient based on target values
-    scatter = ax.scatter(
-        train_tsne[:, 0], train_tsne[:, 1],
-        c=train_targets,
-        cmap=cmap,
-        vmin=vmin,
-        vmax=vmax,
-        alpha=0.7,
-        s=50,
-        edgecolors='black',
-        linewidth=0.5,
-        label='Training Data'
-    )
+    if use_3d:
+        fig = plt.figure(figsize=figsize)
+        ax = fig.add_subplot(111, projection='3d')
+        
+        # Create color mapping for target values
+        normalized_values, cmap, vmin, vmax = create_regression_color_map(train_targets, colormap)
+        
+        # Plot training points with color gradient based on target values
+        scatter = ax.scatter(
+            train_tsne[:, 0], train_tsne[:, 1], train_tsne[:, 2],
+            c=train_targets,
+            cmap=cmap,
+            vmin=vmin,
+            vmax=vmax,
+            alpha=0.7,
+            s=50,
+            edgecolors='black',
+            linewidth=0.5,
+            label='Training Data'
+        )
+        
+        # Plot test points in gray
+        ax.scatter(
+            test_tsne[:, 0], test_tsne[:, 1], test_tsne[:, 2],
+            c='lightgray',
+            label='Test Points (Light Gray)',
+            alpha=0.8,
+            s=60,
+            edgecolors='black',
+            linewidth=0.8,
+            marker='s'  # Square markers for test points
+        )
+        
+        ax.set_xlabel('t-SNE Dimension 1')
+        ax.set_ylabel('t-SNE Dimension 2')
+        ax.set_zlabel('t-SNE Dimension 3')
+        ax.set_title('3D t-SNE Visualization: Regression Data with Continuous Color Mapping')
+    else:
+        fig, ax = plt.subplots(figsize=figsize)
+        
+        # Create color mapping for target values
+        normalized_values, cmap, vmin, vmax = create_regression_color_map(train_targets, colormap)
+        
+        # Plot training points with color gradient based on target values
+        scatter = ax.scatter(
+            train_tsne[:, 0], train_tsne[:, 1],
+            c=train_targets,
+            cmap=cmap,
+            vmin=vmin,
+            vmax=vmax,
+            alpha=0.7,
+            s=50,
+            edgecolors='black',
+            linewidth=0.5,
+            label='Training Data'
+        )
+        
+        # Plot test points in gray
+        ax.scatter(
+            test_tsne[:, 0], test_tsne[:, 1],
+            c='lightgray',
+            label='Test Points (Light Gray)',
+            alpha=0.8,
+            s=60,
+            edgecolors='black',
+            linewidth=0.8,
+            marker='s'  # Square markers for test points
+        )
+        
+        ax.set_xlabel('t-SNE Dimension 1')
+        ax.set_ylabel('t-SNE Dimension 2')
+        ax.set_title('t-SNE Visualization: Regression Data with Continuous Color Mapping')
+        ax.grid(True, alpha=0.3)
     
     # Add colorbar
     cbar = plt.colorbar(scatter, ax=ax)
     cbar.set_label('Target Value', rotation=270, labelpad=15)
     
-    # Plot test points in gray
-    ax.scatter(
-        test_tsne[:, 0], test_tsne[:, 1],
-        c='lightgray',
-        label='Test Points (Light Gray)',
-        alpha=0.8,
-        s=60,
-        edgecolors='black',
-        linewidth=0.8,
-        marker='s'  # Square markers for test points
-    )
-    
-    ax.set_xlabel('t-SNE Dimension 1')
-    ax.set_ylabel('t-SNE Dimension 2')
-    ax.set_title('t-SNE Visualization: Regression Data with Continuous Color Mapping')
+    # Add legend
     ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-    ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
     

@@ -966,12 +966,14 @@ class ClamTsneClassifier:
                     random_state=self.seed
                 )
             else:
-                self.logger.info("Creating 2D regression t-SNE visualization...")
+                dimension_str = "3D" if self.use_3d else "2D"
+                self.logger.info(f"Creating {dimension_str} regression t-SNE visualization...")
                 self.train_tsne, self.test_tsne, base_fig = viz_methods['create_regression_tsne_visualization'](
                     self.train_embeddings, self.y_train_sample, self.test_embeddings,
                     perplexity=self.tsne_perplexity,
                     n_iter=self.tsne_n_iter,
-                    random_state=self.seed
+                    random_state=self.seed,
+                    use_3d=self.use_3d
                 )
         else:
             # Use classification visualization methods
