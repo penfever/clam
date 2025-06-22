@@ -1149,8 +1149,14 @@ class ClamTsneClassifier:
                         viz_path = os.path.join(self.temp_dir, viz_filename)
                         composed_image.save(viz_path)
                     
+                    # Initialize visible_classes_list for both task types
+                    visible_classes_list = []
+                    
                     # Create multi-visualization reasoning prompt using enhanced VLM utilities
                     if self.task_type == 'regression':
+                        # Regression - no classes to track
+                        visible_classes_list = []
+                        
                         # Import regression prompt functions
                         from clam.utils.vlm_prompting import create_regression_prompt
                         
@@ -1339,8 +1345,14 @@ class ClamTsneClassifier:
                     # Multi-viz prompt already created above
                     pass
                 else:
+                    # Initialize visible_classes_list for both task types
+                    visible_classes_list = []
+                    
                     # Create legacy single visualization prompt
                     if self.task_type == 'regression':
+                        # Regression - no classes to track
+                        visible_classes_list = []
+                        
                         # Import regression prompt functions
                         from clam.utils.vlm_prompting import create_regression_prompt, parse_vlm_response
                         
