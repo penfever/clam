@@ -1470,6 +1470,9 @@ class ClamTsneClassifier:
                     # Parse response based on task type
                     from clam.utils.vlm_prompting import parse_vlm_response
                     
+                    # Initialize visible_classes_list for both task types
+                    visible_classes_list = []
+                    
                     if self.task_type == 'classification':
                         # Get all visible classes across visualizations
                         all_visible_classes = set()
@@ -1496,7 +1499,8 @@ class ClamTsneClassifier:
                             semantic_to_numeric = {name: cls for cls, name in self.class_to_semantic.items() if cls in visible_classes_list}
                             prediction = semantic_to_numeric.get(prediction, prediction)
                     else:
-                        # Regression
+                        # Regression - no classes to track
+                        visible_classes_list = []
                         prediction = parse_vlm_response(
                             response, 
                             unique_classes=None, 
