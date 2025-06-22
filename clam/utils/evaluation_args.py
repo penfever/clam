@@ -87,10 +87,16 @@ def add_data_processing_args(parser: argparse.ArgumentParser):
 def add_embedding_args(parser: argparse.ArgumentParser):
     """Add embedding cache and computation arguments."""
     parser.add_argument(
-        "--embedding_cache_dir",
+        "--cache_dir",
         type=str,
         default="./data",
         help="Directory to store cached embeddings. Set to 'none' to disable caching."
+    )
+    parser.add_argument(
+        "--embedding_cache_dir",
+        type=str,
+        default="./data",
+        help="Directory to store cached embeddings. Set to 'none' to disable caching. (alias for --cache_dir)"
     )
     parser.add_argument(
         "--force_recompute_embeddings",
@@ -498,9 +504,14 @@ def add_vision_args(parser: argparse.ArgumentParser):
 def add_tsne_visualization_args(parser: argparse.ArgumentParser):
     """Add t-SNE and visualization arguments."""
     parser.add_argument(
-        "--use_3d_tsne",
+        "--use_3d",
         action="store_true",
         help="Use 3D t-SNE visualization with multiple viewing angles"
+    )
+    parser.add_argument(
+        "--use_3d_tsne",
+        action="store_true",
+        help="Use 3D t-SNE visualization with multiple viewing angles (deprecated, use --use_3d)"
     )
     parser.add_argument(
         "--use_knn_connections",
@@ -870,11 +881,40 @@ def create_tabular_llm_evaluation_parser(description: str = "Evaluate LLM baseli
     # Add model arguments for embedding_size and other model params
     add_model_args(parser)
     
+    # Add embedding arguments for cache management
+    add_embedding_args(parser)
+    
     # Add LLM and t-SNE specific arguments
     add_llm_baseline_args(parser)
     add_tsne_visualization_args(parser)
     
+    # Handle deprecated arguments
+    _setup_deprecated_argument_handling(parser)
+    
     return parser
+
+
+def _setup_deprecated_argument_handling(parser: argparse.ArgumentParser):
+    """Set up handling for deprecated arguments."""
+    # Store original parse_args method
+    original_parse_args = parser.parse_args
+    
+    def parse_args_with_deprecated_handling(*args, **kwargs):
+        # Parse arguments normally
+        parsed_args = original_parse_args(*args, **kwargs)
+        
+        # Handle deprecated --use_3d_tsne -> --use_3d mapping
+        if hasattr(parsed_args, 'use_3d_tsne') and parsed_args.use_3d_tsne:
+            if not hasattr(parsed_args, 'use_3d') or not parsed_args.use_3d:
+                parsed_args.use_3d = True
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning("--use_3d_tsne is deprecated, please use --use_3d instead")
+        
+        return parsed_args
+    
+    # Replace the parse_args method
+    parser.parse_args = parse_args_with_deprecated_handling
 
 
 def create_multimodal_evaluation_parser(description: str = "Evaluate CLAM models across multiple modalities") -> argparse.ArgumentParser:
