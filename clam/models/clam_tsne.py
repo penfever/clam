@@ -453,7 +453,7 @@ class ClamTsneClassifier:
         
         # Load VLM using centralized model loader
         try:
-            logger.info(f"Loading VLM with parameters: model={model_to_load}, backend={backend}, device={self.device if not self.is_api_model else None}")
+            self.logger.info(f"Loading VLM with parameters: model={model_to_load}, backend={backend}, device={self.device if not self.is_api_model else None}")
             
             self.vlm_wrapper = model_loader.load_vlm(
                 model_to_load,
@@ -465,17 +465,17 @@ class ClamTsneClassifier:
             )
             
             if self.vlm_wrapper is None:
-                logger.error(f"Model loader returned None for model {model_to_load}")
+                self.logger.error(f"Model loader returned None for model {model_to_load}")
                 raise RuntimeError(f"Model loader returned None for model {model_to_load}")
             
-            logger.info("VLM loaded successfully")
+            self.logger.info("VLM loaded successfully")
             return self.vlm_wrapper
             
         except Exception as e:
-            logger.error(f"Failed to load VLM {model_to_load}: {e}")
-            logger.error(f"VLM loading failed with exception type: {type(e).__name__}")
+            self.logger.error(f"Failed to load VLM {model_to_load}: {e}")
+            self.logger.error(f"VLM loading failed with exception type: {type(e).__name__}")
             import traceback
-            logger.error(f"Full traceback: {traceback.format_exc()}")
+            self.logger.error(f"Full traceback: {traceback.format_exc()}")
             
             # Set vlm_wrapper to None explicitly in case of error
             self.vlm_wrapper = None
@@ -843,15 +843,16 @@ class ClamTsneClassifier:
             if self.tabpfn is not None:
                 # Create a wrapper that provides a transform method for TabPFN
                 class TabPFNWrapper:
-                    def __init__(self, tabpfn_model):
+                    def __init__(self, tabpfn_model, parent_logger):
                         self.tabpfn = tabpfn_model
+                        self.logger = parent_logger
                     
                     def transform(self, X):
                         """Wrapper method to provide sklearn-style transform interface."""
                         # Ensure X is 2D (fix for single sample case)
                         if X.ndim == 1:
                             X = X.reshape(1, -1)
-                            logger.debug(f"TabPFNWrapper: Reshaped 1D input to 2D: {X.shape}")
+                            self.logger.debug(f"TabPFNWrapper: Reshaped 1D input to 2D: {X.shape}")
                         
                         embeddings = self.tabpfn.get_embeddings(X)
                         # Handle ensemble embeddings by averaging if needed
@@ -861,7 +862,7 @@ class ClamTsneClassifier:
                             embeddings = embeddings[0]
                         return embeddings
                 
-                self._embedding_model = TabPFNWrapper(self.tabpfn)
+                self._embedding_model = TabPFNWrapper(self.tabpfn, self.logger)
             else:
                 self._embedding_model = None
             
