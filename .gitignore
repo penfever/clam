@@ -9,7 +9,6 @@
 !/data/.gitkeep
 /secrets/*
 !/secrets/.gitkeep
-
 .claude
 CLAUDE.md
 catboost_info
@@ -28,6 +27,7 @@ cache
 # Include the semantic data files
 !data/cc18_semantic/
 !data/tabarena_semantic/
+!data/regression_semantic/
 
 # Python bytecode
 __pycache__/
