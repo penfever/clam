@@ -1813,7 +1813,25 @@ def evaluate_clam_tsne(dataset, args):
         )
         
         # Fit and evaluate
-        classifier.fit(X_train, y_train, X_test, dataset_name=dataset['name'])
+        # Resolve task_id using resource manager as per CLAUDE.md guidelines
+        task_id = dataset.get('task_id')
+        if task_id is None:
+            # Try to resolve task_id from dataset_id using resource manager
+            try:
+                from clam.utils.resource_manager import get_resource_manager
+                rm = get_resource_manager()
+                dataset_id = dataset.get('id')
+                if dataset_id:
+                    identifiers = rm.resolve_openml_identifiers(dataset_id=dataset_id)
+                    task_id = identifiers.get('task_id')
+            except Exception as e:
+                logger.warning(f"Could not resolve task_id from dataset_id {dataset.get('id')}: {e}")
+        
+        dataset_info = {
+            'name': dataset['name'],
+            'task_id': task_id
+        }
+        classifier.fit(X_train, y_train, X_test, dataset_name=dataset['name'], dataset_info=dataset_info)
         results = classifier.evaluate(
             X_test, y_test, 
             return_detailed=True,
