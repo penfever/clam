@@ -774,7 +774,13 @@ def parse_vlm_response(response: str, unique_classes: List = None, logger_instan
                 # Remove quotes if present
                 class_part = class_part.strip('"\'').strip()
                 
-                # If using "Class X" format, extract the number (handle both "class 6" and "class_6")
+                # First, try direct exact matching (handles cases like "Class_562")
+                for unique_class in unique_classes:
+                    if class_part.strip().lower() == str(unique_class).strip().lower():
+                        logger_instance.debug(f"Direct match found: {class_part} -> {unique_class}")
+                        return unique_class
+                
+                # If using "Class X" format, extract the number (handle both "class 6" and "class_6") 
                 if not use_semantic_names:
                     import re
                     # Try to extract number from various class formats
@@ -789,10 +795,10 @@ def parse_vlm_response(response: str, unique_classes: List = None, logger_instan
                             pass
                 
                 # Try to match with available classes using improved fuzzy matching
-                if use_semantic_names:
-                    best_match = find_best_class_match(class_part, unique_classes, logger_instance)
-                    if best_match is not None:
-                        return best_match
+                # (This now works for both semantic and non-semantic names)
+                best_match = find_best_class_match(class_part, unique_classes, logger_instance)
+                if best_match is not None:
+                    return best_match
                         
         except Exception as e:
             logger_instance.warning(f"Error parsing structured response: {e}")

@@ -135,10 +135,9 @@ class MetadataLoader:
                 filename = json_file.name
                 stem = json_file.stem  # filename without extension
                 
-                # Check if filename contains the dataset_id
+                # Check if filename matches the dataset_id (prioritize exact matches)
                 if (dataset_str == stem or 
                     dataset_str.lower() == stem.lower() or
-                    dataset_str in filename or
                     f"task_{dataset_str}" == stem or
                     f"dataset_{dataset_str}" == stem):
                     logger.info(f"Found metadata file for dataset '{dataset_id}': {json_file}")

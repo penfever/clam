@@ -596,15 +596,120 @@ def test_tabllm_integration():
         # This is expected to fail in some cases due to model loading
         logger.warning(f"⚠️ TabLLM integration test failed (may be expected): {e}")
         logger.info("   This is often due to model availability or API limits in test environment")
+
+
+def test_semantic_content_validation():
+    """Test that semantic information contains correct dataset-specific content."""
+    logger.info("\n=== Testing Semantic Content Validation ===")
+    
+    from examples.tabular.llm_baselines.tabllm_baseline import load_tabllm_config_by_openml_id, expand_semantic_features, generate_note_from_row
+    from clam.utils.metadata_loader import find_semantic_metadata_file
+    
+    # Test cases: task_id -> (expected_keywords, forbidden_keywords)
+    test_cases = {
+        3: {
+            'name': 'kr-vs-kp (chess endgame)',
+            'expected_keywords': ['king', 'rook', 'chess', 'black', 'white', 'pawn', 'square'],
+            'forbidden_keywords': ['wavelet', 'pixel', 'transformation', 'image', 'variance', 'skewness', 'dispersion']
+        },
+        6: {
+            'name': 'letter recognition',
+            'expected_keywords': ['box', 'pixel', 'horizontal', 'vertical', 'edge', 'correlation'],
+            'forbidden_keywords': ['board', 'game', 'player', 'position', 'a1', 'g6', 'connect', 'chess']
+        },
+        23: {
+            'name': 'contraceptive method choice',
+            'expected_keywords': ['wife', 'age', 'education', 'religion', 'children', 'husband'],
+            'forbidden_keywords': ['chess', 'pixel', 'board', 'game', 'wavelet', 'king', 'rook']
+        }
+    }
+    
+    for task_id, test_case in test_cases.items():
+        logger.info(f"\n--- Testing task {task_id}: {test_case['name']} ---")
         
-    finally:
-        # Clean up test directory
-        if os.path.exists(args.output_dir):
+        try:
+            # Load semantic metadata
+            config_data, feature_mapping = load_tabllm_config_by_openml_id(task_id, original_feature_count=20)
+            
+            if config_data is None or feature_mapping is None:
+                logger.warning(f"⚠️ No semantic data found for task {task_id}, skipping validation")
+                continue
+                
+            semantic_info = feature_mapping.get('semantic_info')
+            if not semantic_info or 'columns' not in semantic_info:
+                logger.warning(f"⚠️ No column information in semantic data for task {task_id}")
+                continue
+            
+            # Collect all text from semantic descriptions
+            all_text = []
+            for col in semantic_info['columns']:
+                if 'semantic_description' in col and col['semantic_description']:
+                    all_text.append(col['semantic_description'].lower())
+            
+            full_text = ' '.join(all_text)
+            
+            # Test for expected keywords
+            expected_found = []
+            for keyword in test_case['expected_keywords']:
+                if keyword.lower() in full_text:
+                    expected_found.append(keyword)
+            
+            # Test for forbidden keywords
+            forbidden_found = []
+            for keyword in test_case['forbidden_keywords']:
+                if keyword.lower() in full_text:
+                    forbidden_found.append(keyword)
+            
+            # Results
+            if expected_found:
+                logger.info(f"✅ Found expected keywords: {expected_found}")
+            else:
+                logger.error(f"❌ No expected keywords found in semantic text for task {task_id}")
+                logger.error(f"   Expected any of: {test_case['expected_keywords']}")
+                logger.error(f"   Sample text: {full_text[:200]}...")
+            
+            if not forbidden_found:
+                logger.info(f"✅ No forbidden keywords found")
+            else:
+                logger.error(f"❌ Found forbidden keywords: {forbidden_found}")
+                logger.error(f"   This suggests incorrect semantic data is being loaded")
+            
+            # Test note generation with this semantic data
+            logger.info("--- Testing note generation semantic content ---")
             try:
-                shutil.rmtree(args.output_dir)
-                logger.info(f"   Cleaned up test directory: {args.output_dir}")
-            except:
-                logger.warning(f"   Could not clean up test directory: {args.output_dir}")
+                # Create dummy test data matching the semantic structure
+                feature_names = [col['name'] for col in semantic_info['columns'][:5]]  # Limit to first 5
+                test_row = pd.Series([1] * len(feature_names), index=feature_names)
+                
+                note = generate_note_from_row(test_row, semantic_info, feature_names, exclude_target=True)
+                
+                if note and len(note.strip()) > 0:
+                    logger.info(f"✅ Note generated successfully")
+                    
+                    # Check note content
+                    note_lower = note.lower()
+                    note_expected_found = [kw for kw in test_case['expected_keywords'] if kw.lower() in note_lower]
+                    note_forbidden_found = [kw for kw in test_case['forbidden_keywords'] if kw.lower() in note_lower]
+                    
+                    if note_expected_found:
+                        logger.info(f"   ✅ Note contains expected keywords: {note_expected_found}")
+                    else:
+                        logger.warning(f"   ⚠️ Note doesn't contain expected keywords")
+                    
+                    if note_forbidden_found:
+                        logger.error(f"   ❌ Note contains forbidden keywords: {note_forbidden_found}")
+                        logger.error(f"   Sample note: {note[:200]}...")
+                    else:
+                        logger.info(f"   ✅ Note doesn't contain forbidden keywords")
+                        
+                else:
+                    logger.error(f"❌ Failed to generate note for task {task_id}")
+                    
+            except Exception as e:
+                logger.error(f"❌ Note generation failed for task {task_id}: {e}")
+                
+        except Exception as e:
+            logger.error(f"❌ Failed to test task {task_id}: {e}")
 
 def test_real_cc18_semantic_data():
     """Test TabLLM pipeline with real CC18 semantic data."""
@@ -954,6 +1059,7 @@ def main():
     test_semantic_feature_alignment()
     test_real_cc18_semantic_data()
     test_balance_scale_empty_notes_bug()  # Test the specific bug fix
+    test_semantic_content_validation()  # Test semantic content correctness
     test_online_note_generation()
     test_context_aware_truncation()
     test_note_inspection_system()

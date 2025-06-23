@@ -553,6 +553,9 @@ class VLMPromptingTestSuite:
                 'load_semantic_from_cc18': True,
                 'semantic_axes': True,
                 'semantic_axes_method': 'perturbation',  # NEW: Use perturbation method
+                'use_smart_feature_selection': True,  # NEW: Enable smart feature selection
+                'max_features_to_test': 8,  # NEW: Test 8 features instead of all
+                'feature_selection_method': 'pca_variance',  # NEW: Use PCA-based selection
                 'use_3d_tsne': False,
                 'use_knn_connections': False,
                 'nn_k': 30,
@@ -579,6 +582,9 @@ class VLMPromptingTestSuite:
                 'load_semantic_from_cc18': True,
                 'semantic_axes': True,
                 'semantic_axes_method': 'perturbation',  # NEW: Use perturbation method
+                'use_smart_feature_selection': True,  # NEW: Enable smart feature selection
+                'max_features_to_test': 12,  # NEW: Test more features for metadata combo
+                'feature_selection_method': 'mutual_info',  # NEW: Use mutual info selection
                 'use_metadata': True,  # NEW: Enable metadata
                 'auto_load_metadata': True,
                 'use_3d_tsne': False,
@@ -594,6 +600,9 @@ class VLMPromptingTestSuite:
                 'load_semantic_from_cc18': True,
                 'semantic_axes': True,
                 'semantic_axes_method': 'perturbation',  # NEW: Use perturbation method
+                'use_smart_feature_selection': True,  # NEW: Enable smart feature selection
+                'max_features_to_test': 10,  # NEW: Standard limit for 3D
+                'feature_selection_method': 'f_score',  # NEW: Use F-score selection
                 'use_3d_tsne': True,  # NEW: 3D visualization
                 'use_knn_connections': False,
                 'nn_k': 30,
@@ -610,7 +619,10 @@ class VLMPromptingTestSuite:
                 'load_semantic_from_cc18': True,
                 'nn_k': 30,
                 'semantic_axes': True,
-                'semantic_axes_method': 'perturbation'  # NEW: Use perturbation method
+                'semantic_axes_method': 'perturbation',  # NEW: Use perturbation method
+                'use_smart_feature_selection': True,  # NEW: Enable smart feature selection
+                'max_features_to_test': 15,  # NEW: More features for multi-viz
+                'feature_selection_method': 'pca_variance'  # NEW: Use PCA-based selection
             }
         ]
         
@@ -729,6 +741,9 @@ class VLMPromptingTestSuite:
                 # NEW: Add semantic axes and metadata parameters
                 'semantic_axes': config.get('semantic_axes', False),
                 'semantic_axes_method': config.get('semantic_axes_method', 'pca_loadings'),  # NEW: Support different semantic axes methods
+                'use_smart_feature_selection': config.get('use_smart_feature_selection', True),  # NEW: Enable smart feature selection by default
+                'max_features_to_test': config.get('max_features_to_test', 10),  # NEW: Limit features for perturbation testing
+                'feature_selection_method': config.get('feature_selection_method', 'pca_variance'),  # NEW: Feature selection method
                 'use_metadata': config.get('use_metadata', False),
                 # Pass feature names for semantic axes computation
                 'feature_names': self.dataset_info.get('feature_names', None),
