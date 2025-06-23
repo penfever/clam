@@ -1,1 +1,0 @@
-Class: Class_1 | Reasoning: The query point is closer to the test point and the nearest neighbors are from Class_1, with a higher average distance to neighbors from Class_0.
