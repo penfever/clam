@@ -65,27 +65,50 @@ def evaluate_jolt_official(dataset, args):
     try:
         from clam.utils.resource_manager import get_resource_manager
         rm = get_resource_manager()
-        jolt_config_path = rm.path_resolver.get_config_path('jolt', dataset['name'])
+        
+        # First try the task-based naming convention (newer format)
+        task_config_filename = f"jolt_config_task_{dataset['id']}.json"
+        jolt_config_path = rm.path_resolver.get_config_path('jolt', task_config_filename)
         
         if jolt_config_path and jolt_config_path.exists():
             import json
             with open(jolt_config_path, 'r') as f:
                 jolt_config = json.load(f)
-            logger.info(f"Using JOLT metadata for {dataset['name']} from managed config")
+            logger.info(f"Using JOLT metadata for task {dataset['id']} ({dataset['name']}) from managed config")
         else:
-            logger.info(f"No JOLT metadata found for {dataset['name']}, using default approach")
-    except Exception as e:
-        logger.debug(f"Could not load JOLT config for {dataset['name']}: {e}")
-        
-        # Fallback to legacy method
-        try:
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            jolt_config_path = os.path.join(current_dir, f"jolt_config_{dataset['name']}.json")
-            if os.path.exists(jolt_config_path):
+            # Fallback to dataset name-based naming (legacy format)
+            name_config_filename = f"jolt_config_{dataset['name']}.json"
+            jolt_config_path = rm.path_resolver.get_config_path('jolt', name_config_filename)
+            
+            if jolt_config_path and jolt_config_path.exists():
                 import json
                 with open(jolt_config_path, 'r') as f:
                     jolt_config = json.load(f)
-                logger.info(f"Using JOLT metadata for {dataset['name']} from legacy location")
+                logger.info(f"Using JOLT metadata for {dataset['name']} from managed config (legacy naming)")
+            else:
+                logger.info(f"No JOLT metadata found for task {dataset['id']} ({dataset['name']}), using default approach")
+    except Exception as e:
+        logger.debug(f"Could not load JOLT config for task {dataset['id']} ({dataset['name']}): {e}")
+        
+        # Fallback to legacy method with both naming conventions
+        try:
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            
+            # Try task-based naming first
+            task_config_path = os.path.join(current_dir, f"jolt_config_task_{dataset['id']}.json")
+            if os.path.exists(task_config_path):
+                import json
+                with open(task_config_path, 'r') as f:
+                    jolt_config = json.load(f)
+                logger.info(f"Using JOLT metadata for task {dataset['id']} from legacy location")
+            else:
+                # Try dataset name-based naming
+                name_config_path = os.path.join(current_dir, f"jolt_config_{dataset['name']}.json")
+                if os.path.exists(name_config_path):
+                    import json
+                    with open(name_config_path, 'r') as f:
+                        jolt_config = json.load(f)
+                    logger.info(f"Using JOLT metadata for {dataset['name']} from legacy location")
         except Exception as e2:
             logger.debug(f"Legacy JOLT config loading also failed: {e2}")
     
