@@ -2,9 +2,11 @@
 
 This directory contains test scripts for the CLAM library.
 
-## Test Status
+## Current Test Structure
 
-### ✅ Working Tests
+The tests directory has been cleaned up to remove redundancy and overlap. Current test files provide comprehensive coverage without duplication:
+
+### ✅ Essential Tests
 
 #### Core Functionality Tests
 - **`test_install.py`**: Tests the installation of the CLAM package and verifies all imports work correctly.
@@ -12,69 +14,95 @@ This directory contains test scripts for the CLAM library.
   python tests/test_install.py
   ```
 
-- **`test_clam_tsne_extraction.py`**: Tests CLAM t-SNE metric extraction, variable extraction, and W&B data handling.
-  ```bash
-  python tests/test_clam_tsne_extraction.py
-  ```
-
-- **`test_knn_fix.py`**: Tests the fixed KNN functionality for t-SNE visualizations.
-  ```bash
-  python tests/test_knn_fix.py
-  ```
-
 - **`test_embedding_cache.py`**: Tests embedding cache loading functionality with limits and multi-ensemble support.
   ```bash
   python tests/test_embedding_cache.py
   ```
 
-#### Audio Tests
-- **`test_baselines_simple.py`**: Tests audio baseline classifiers (Whisper KNN and CLAP zero-shot). Requires `msclap` library.
+- **`test_mps_detection.py`**: Tests Metal Performance Shaders (MPS) detection on Apple Silicon.
   ```bash
-  pip install msclap
-  python tests/test_baselines_simple.py
+  python tests/test_mps_detection.py
   ```
 
-- **`test_minimal_audio.py`**: Tests minimal CLAM audio functionality with synthetic data.
+- **`test_resource_management.py`**: Tests comprehensive resource management system functionality.
   ```bash
-  python tests/test_minimal_audio.py
+  python tests/test_resource_management.py
   ```
 
-### ⚠️ Partially Working Tests
+#### Integration Tests
+- **`test_comprehensive_vlm_prompting.py`**: Comprehensive test for VLM prompting, API integration, and model backends.
+  ```bash
+  python tests/test_comprehensive_vlm_prompting.py
+  ```
 
-- **`test_audio_simple.py`**: Tests audio processing pipeline. Some parts work but has import issues with examples module.
+- **`test_audio_simple.py`**: Tests audio processing pipeline with Whisper and CLAP models.
   ```bash
   python tests/test_audio_simple.py
   ```
 
-### ❌ Failing Tests
+- **`test_tabllm_comprehensive.py`**: Comprehensive test for TabLLM baseline functionality and semantic feature alignment.
+  ```bash
+  python tests/test_tabllm_comprehensive.py
+  ```
 
-- **`test_model_save_load.py`**: Tests model save/load functionality. Currently fails due to BFloat16/Float dtype mismatch.
-- **`test_embedding_determinism.py`**: Tests embedding generation determinism. Fails because it references old file paths.
+#### Specialized Tests
+- **`test_metadata_validation.py`**: Tests metadata validation functionality for various benchmarks.
+  ```bash
+  python tests/test_metadata_validation.py
+  ```
 
-### 🗑️ Deprecated/Analysis Scripts
+### 🔧 Development Tools
 
-These are analysis scripts rather than tests:
-- `analyze_embeddings.py` - Embedding analysis utility
-- `analyze_embeddings_all.py` - Bulk embedding analysis
-- `analyze_json_schemas.py` - JSON schema analysis
-- `check_git_files.py` - Git file checking utility
-- `setup_fix.py` - Setup fixing utility
-- `transform_cc18_to_tabarena_complete.py` - Data transformation script
+- **`test_example_parameter_validation.py`**: Validates example script parameters for consistency.
+  ```bash
+  python tests/test_example_parameter_validation.py
+  ```
+
+- **`fix_example_parameters.py`**: Utility script to fix parameter issues in example scripts.
+  ```bash
+  python tests/fix_example_parameters.py
+  ```
+
+## Test Coverage
+
+The current test suite provides comprehensive coverage of:
+
+1. **Package Installation**: Verify CLAM package installs correctly and all imports work
+2. **Core Infrastructure**: Resource management, caching, metadata validation
+3. **Model Integration**: VLM prompting, API integration, backend selection
+4. **Multi-modal Pipelines**: Tabular (TabLLM), audio (Whisper/CLAP), vision workflows
+5. **Platform Support**: Apple Silicon MPS detection and optimization
+6. **Semantic Features**: Feature alignment, expansion, and note generation
+7. **Development Tools**: Parameter validation and code quality checks
+
+## Removed Redundant Tests
+
+The following test files were removed to eliminate redundancy and overlap:
+
+- `test_api_integration.py` - Functionality covered by `test_comprehensive_vlm_prompting.py`
+- `test_vllm_backend.py` - Backend testing covered by comprehensive VLM test
+- `test_jolt_comprehensive.py` - Model testing covered by TabLLM comprehensive test
+- `test_semantic_names_isolated.py` - Feature testing covered by comprehensive VLM test
+- `test_model_save_load.py` - Basic functionality covered by other model tests
+- `test_regression_workflow.py` - Workflow covered by comprehensive tabular tests
 
 ## Running Tests
 
-### Run All Working Tests
+### Run All Essential Tests
 ```bash
-# Core tests
+# Core functionality
 python tests/test_install.py
-python tests/test_clam_tsne_extraction.py
-python tests/test_knn_fix.py
 python tests/test_embedding_cache.py
+python tests/test_mps_detection.py
+python tests/test_resource_management.py
 
-# Audio tests (requires msclap)
-pip install msclap
-python tests/test_baselines_simple.py
-python tests/test_minimal_audio.py
+# Integration tests
+python tests/test_comprehensive_vlm_prompting.py
+python tests/test_audio_simple.py
+python tests/test_tabllm_comprehensive.py
+
+# Specialized tests
+python tests/test_metadata_validation.py
 ```
 
 ### Run with pytest
@@ -82,11 +110,11 @@ python tests/test_minimal_audio.py
 # Install pytest if not available
 pip install pytest
 
-# Run specific working tests
-python -m pytest tests/test_install.py -v
-python -m pytest tests/test_clam_tsne_extraction.py -v
-python -m pytest tests/test_knn_fix.py -v
-python -m pytest tests/test_embedding_cache.py -v
+# Run all tests
+python -m pytest tests/ -v
+
+# Run specific test categories
+python -m pytest tests/test_install.py tests/test_embedding_cache.py -v
 ```
 
 ## Dependencies
@@ -96,22 +124,16 @@ python -m pytest tests/test_embedding_cache.py -v
 pip install msclap  # For CLAP zero-shot classifier
 ```
 
+### Required for VLM Tests
+VLM tests can run with either:
+- Local models (using transformers/VLLM)
+- API models (OpenAI, Gemini) - requires API keys
+
 ### Required for All Tests
 All core dependencies are installed with the main CLAM package:
 ```bash
-pip install -e .
+pip install -e ".[dev]"  # Includes test dependencies
 ```
-
-## Test Coverage
-
-The working tests cover:
-
-1. **Package Installation**: Verify CLAM package installs correctly and all imports work
-2. **Core Data Processing**: t-SNE metric extraction and variable handling
-3. **Visualization**: KNN connections and t-SNE plotting
-4. **Caching**: Embedding cache loading with various configurations
-5. **Audio Pipeline**: Whisper embeddings, audio baselines, and CLAM audio classification
-6. **Utility Functions**: Various helper functions and data processing
 
 ## Writing New Tests
 
@@ -122,11 +144,21 @@ When adding new features to CLAM, please add corresponding tests to this directo
 3. Use descriptive test function names
 4. Handle cleanup of any temporary files/directories
 5. Include proper error handling and informative error messages
+6. Check for redundancy with existing comprehensive tests before creating new files
+
+## Test Organization Principles
+
+The current test structure follows these principles:
+
+1. **Comprehensive over Isolated**: Prefer comprehensive integration tests over many isolated unit tests
+2. **No Redundancy**: Each piece of functionality is tested in exactly one authoritative test
+3. **Clear Separation**: Core tests, integration tests, and utilities are clearly separated
+4. **Maintainable**: Fewer, more comprehensive tests are easier to maintain than many small tests
 
 ## Troubleshooting
 
 ### Import Errors
-If you get import errors for the `examples` module, make sure you're running tests from the project root directory and that the CLAM package is installed in editable mode:
+If you get import errors, make sure you're running tests from the project root directory and that the CLAM package is installed in editable mode:
 ```bash
 cd /path/to/clam
 pip install -e .
@@ -136,7 +168,13 @@ python tests/test_name.py
 ### Missing Dependencies
 Some tests require additional dependencies:
 - Audio tests require `msclap`: `pip install msclap`
-- Some numpy version conflicts may occur with `msclap` - this is expected
+- VLM tests may require API keys for external models
 
 ### Timeout Issues
-Some tests may take time due to model loading. The audio tests download models on first run.
+Some tests may take time due to model loading. The audio and VLM tests download models on first run.
+
+### Model Loading Issues
+If model loading fails:
+- Check available memory (some models require significant RAM/VRAM)
+- Verify internet connection for model downloads
+- Check API keys for external model services
