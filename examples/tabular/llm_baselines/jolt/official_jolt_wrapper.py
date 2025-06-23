@@ -673,9 +673,9 @@ def evaluate_jolt_official(dataset, args):
                                 completed_samples = len(predictions)
                                 logger.info(f"Successfully extracted {completed_samples} predictions from JOLT probabilities")
                             else:
-                                logger.warning("No categories found in JOLT results")
-                                predictions = pred_indices.tolist()  # Use raw indices as fallback
-                                completed_samples = len(predictions)
+                                error_msg = "No categories found in JOLT results - cannot map prediction indices to class labels"
+                                logger.error(error_msg)
+                                raise ValueError(error_msg)
                         else:
                             logger.warning("No probabilities_from_logits found in JOLT metrics")
                             predictions = []
@@ -688,25 +688,23 @@ def evaluate_jolt_official(dataset, args):
                         completed_samples = 0
                 
                 else:
-                    # Final fallback: since JOLT computed accuracy, it must have made predictions
-                    logger.warning("Could not find predictions in JOLT results. Using fallback...")
-                    # Since JOLT computed accuracy=0.38, it must have made predictions
-                    # Use most common class as fallback prediction
-                    most_common_class = y_train.mode().iloc[0] if not y_train.empty else np.unique(y_train)[0]
-                    predictions = [most_common_class] * len(X_test)
-                    completed_samples = len(X_test)
-                    logger.info(f"Using fallback predictions based on most common class: {most_common_class}")
+                    # No valid predictions found - raise exception instead of using fallback
+                    error_msg = "Could not find valid predictions in JOLT results. JOLT may have failed to generate predictions properly."
+                    logger.error(error_msg)
+                    logger.error(f"JOLT results structure: {type(jolt_results)}")
+                    if isinstance(jolt_results, dict):
+                        logger.error(f"JOLT results keys: {list(jolt_results.keys())}")
+                    raise ValueError(error_msg)
                 
                 # Ensure predictions match the expected length
                 if len(predictions) > len(X_test):
                     predictions = predictions[:len(X_test)]
                     completed_samples = len(X_test)
                 elif len(predictions) < len(X_test) and completed_samples > 0:
-                    # Pad with most common class if we have partial predictions
-                    most_common_class = y_train.mode().iloc[0] if not y_train.empty else np.unique(y_train)[0]
-                    while len(predictions) < len(X_test):
-                        predictions.append(most_common_class)
-                    completed_samples = len(X_test)
+                    # Don't pad predictions - this indicates JOLT failed to predict all samples
+                    error_msg = f"JOLT only predicted {len(predictions)} out of {len(X_test)} samples - partial predictions not acceptable"
+                    logger.error(error_msg)
+                    raise ValueError(error_msg)
                 
                 # Calculate metrics
                 if completed_samples > 0:
@@ -740,9 +738,9 @@ def evaluate_jolt_official(dataset, args):
                                 
                                 converted_predictions.append(converted_pred)
                             except (ValueError, TypeError) as e:
-                                logger.warning(f"Could not convert prediction '{pred}' to type {target_type}: {e}")
-                                # Keep original prediction as fallback
-                                converted_predictions.append(pred)
+                                error_msg = f"Could not convert prediction '{pred}' to expected type {target_type}: {e}"
+                                logger.error(error_msg)
+                                raise ValueError(error_msg)
                         
                         predictions_partial = converted_predictions
                     
