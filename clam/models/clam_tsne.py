@@ -1649,7 +1649,7 @@ class ClamTsneClassifier:
             from clam.utils.llm_evaluation_utils import calculate_llm_metrics
             metrics = calculate_llm_metrics(
                 y_test_partial, predictions_converted, self.unique_classes,
-                all_class_log_probs=None, logger=self.logger
+                all_class_log_probs=None, logger=self.logger, task_type=self.task_type
             )
         else:
             metrics = {

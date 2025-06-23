@@ -1,0 +1,2860 @@
+[
+    {
+      "model_name": "CLAM-t-SNE-tabular",
+      "accuracy": 0.9734399112783177,
+      "balanced_accuracy": 0.9734399112783177,
+      "prediction_time": 875.1545407772064,
+      "total_time": 875.1545407772064,
+      "num_test_samples": 200,
+      "completed_samples": 200,
+      "completion_rate": 1.0,
+      "num_classes": 0,
+      "predictions": [
+        8.9367,
+        9.5888,
+        8.3071,
+        8.65,
+        8.745,
+        8.9773,
+        9.2414,
+        8.9167,
+        9.5919,
+        8.4663,
+        9.3913,
+        8.5145,
+        8.8257,
+        9.1641,
+        9.1698,
+        8.7784,
+        9.0056,
+        8.6767,
+        9.5725,
+        9.0464,
+        8.2413,
+        8.9247,
+        8.519,
+        8.513,
+        8.1895,
+        8.2195,
+        9.1523,
+        9.3848,
+        9.5575,
+        10.272,
+        8.7578,
+        9.2269,
+        9.7211,
+        8.488,
+        10.1208,
+        8.8019,
+        9.2406,
+        8.5665,
+        8.5443,
+        8.7237,
+        10.3694,
+        10.7198,
+        9.3731,
+        8.522,
+        8.4692,
+        9.3568,
+        8.619,
+        9.3044,
+        8.317,
+        9.1207,
+        9.5572,
+        8.6573,
+        9.3239,
+        9.8667,
+        8.357,
+        9.4128,
+        8.9076,
+        9.5174,
+        8.2467,
+        9.6151,
+        10.4438,
+        8.4239,
+        9.6932,
+        8.7501,
+        8.9549,
+        9.2352,
+        8.6556,
+        9.3209,
+        10.0,
+        9.5776,
+        8.6388,
+        8.2942,
+        8.9584,
+        9.1688,
+        8.7413,
+        8.2941,
+        10.3706,
+        9.0486,
+        9.2468,
+        9.4849,
+        9.55,
+        9.028,
+        8.9182,
+        9.0141,
+        8.1844,
+        9.12,
+        8.6264,
+        9.7469,
+        8.482,
+        8.607,
+        9.3323,
+        10.4316,
+        10.4146,
+        8.8034,
+        8.8121,
+        8.6507,
+        8.488,
+        8.4532,
+        8.5937,
+        9.08,
+        10.1075,
+        8.5757,
+        8.6072,
+        8.3142,
+        8.732,
+        8.2667,
+        8.6009,
+        8.2932,
+        9.8737,
+        9.584,
+        9.6424,
+        8.9984,
+        9.057,
+        8.6511,
+        9.1965,
+        9.0221,
+        9.0304,
+        8.8,
+        8.1158,
+        9.6892,
+        8.9505,
+        8.794,
+        10.3548,
+        8.3794,
+        8.6583,
+        8.2724,
+        8.9716,
+        8.3768,
+        8.7916,
+        9.8786,
+        8.554,
+        8.684,
+        9.5049,
+        9.4564,
+        8.3912,
+        8.8665,
+        8.9057,
+        8.228,
+        9.831,
+        8.8383,
+        8.4467,
+        8.3594,
+        9.4444,
+        8.3415,
+        8.5115,
+        8.363,
+        8.4354,
+        8.7486,
+        8.7,
+        8.4476,
+        8.8179,
+        8.8511,
+        9.453,
+        8.6491,
+        8.6468,
+        9.156,
+        9.1157,
+        8.9201,
+        8.6653,
+        9.9809,
+        8.6428,
+        8.339,
+        8.3215,
+        8.6511,
+        9.8868,
+        9.018,
+        8.2828,
+        9.8674,
+        8.7625,
+        8.915,
+        8.7687,
+        8.5193,
+        9.051,
+        9.2657,
+        9.1746,
+        9.1008,
+        9.2993,
+        8.6113,
+        8.8785,
+        8.9,
+        10.0604,
+        9.0858,
+        9.528,
+        8.9346,
+        9.2517,
+        8.7445,
+        9.4481,
+        8.8011,
+        8.6068,
+        10.1797,
+        8.8491,
+        10.448,
+        9.1585,
+        9.0712,
+        8.5364,
+        8.1158,
+        8.8146,
+        9.3008,
+        8.1128,
+        8.6879
+      ],
+      "ground_truth": [
+        8.952562767841787,
+        9.67765656956018,
+        8.402507277747365,
+        8.653843049842912,
+        8.70378127462843,
+        8.95861246536775,
+        9.260648763055663,
+        8.877928735667334,
+        9.57107792224307,
+        8.440778106538865,
+        9.40545691601967,
+        8.476287860090235,
+        8.782404680689513,
+        9.199039502106613,
+        9.168053891035651,
+        8.724642131152285,
+        8.955859328113293,
+        8.63707643555668,
+        9.519949719677989,
+        9.000283887084585,
+        8.391308677149832,
+        8.913651190364428,
+        8.500487762912323,
+        8.44692678210986,
+        8.164945407981689,
+        8.3654396361887,
+        9.134685130572374,
+        9.536870310919104,
+        9.506552212303713,
+        10.305114269102438,
+        8.691200795721018,
+        9.224754506405777,
+        9.769356644809763,
+        8.5111847003325,
+        10.137358810092708,
+        8.833831371710241,
+        9.233842031761274,
+        8.537705184308042,
+        8.363375789345778,
+        8.69175926185432,
+        10.360260288262456,
+        10.715814676178367,
+        9.383581611353833,
+        8.48879371689454,
+        8.453366949880644,
+        9.390693325675294,
+        8.547214207597158,
+        9.78736400884845,
+        8.329688223930129,
+        9.058555074275585,
+        9.502676979752328,
+        8.616438799074162,
+        9.5242679664837,
+        9.81175367827086,
+        8.276394704863307,
+        9.401096842982414,
+        8.854283282269066,
+        9.495044013302337,
+        8.399745099584909,
+        9.55318653759846,
+        10.420461424529432,
+        8.377400219039654,
+        9.661916320927743,
+        8.650499558724462,
+        8.937094395855052,
+        9.379782596761359,
+        8.562996963227933,
+        9.310692365902886,
+        9.935698354533104,
+        9.537761922278415,
+        8.611165355203509,
+        8.35776011577018,
+        8.930832797092858,
+        9.25409713265436,
+        8.699478289212237,
+        8.22389538017882,
+        10.351161022992413,
+        9.025605906457939,
+        9.270894708969756,
+        9.561658444666044,
+        9.483358824633957,
+        8.995460657782731,
+        8.875925351214606,
+        9.02745630408252,
+        8.084506366192329,
+        9.068632788067482,
+        8.618109250512793,
+        9.720293987453434,
+        8.490126162128318,
+        8.560353502613925,
+        9.328457574014983,
+        10.424288259324197,
+        10.364792520388548,
+        8.965768279281074,
+        8.803810854585395,
+        8.759480944998709,
+        8.427314549785626,
+        8.448485993406447,
+        8.551626823798538,
+        9.071308163280625,
+        9.946584049453554,
+        8.534274812679904,
+        8.598410395191431,
+        8.2985992748006,
+        8.760482085410647,
+        8.60021059110315,
+        8.527564225840454,
+        8.153289173142085,
+        9.944778489565655,
+        9.657313141561279,
+        9.622490775614994,
+        8.9915830205825,
+        9.027891807117046,
+        8.620832226175724,
+        9.18778796750567,
+        8.974890640030104,
+        9.156740325501655,
+        8.748806196081032,
+        8.23882518381297,
+        9.662421854712926,
+        8.957568453500846,
+        8.773210433004207,
+        10.32562066674613,
+        8.38488961614397,
+        8.771798763536957,
+        8.244978754596548,
+        8.937478600982216,
+        8.428205837432932,
+        8.771542050174947,
+        10.339612977678453,
+        8.501307682186013,
+        8.713885353655051,
+        9.550567455328933,
+        9.39799922254356,
+        8.347827345782498,
+        8.978371810305621,
+        8.893425634511663,
+        8.18320075754106,
+        9.759468017989702,
+        8.843335471564165,
+        8.501745922932285,
+        8.316710060162821,
+        9.503267248366575,
+        8.325045049977037,
+        8.529212971165332,
+        8.325521390374726,
+        8.41118077798589,
+        8.69038430343689,
+        8.71417965670213,
+        8.470990077943503,
+        8.773660294062775,
+        8.858548954615314,
+        9.4000882328867,
+        8.73417110748582,
+        8.612570354613489,
+        9.819431803372131,
+        9.137074352941976,
+        8.921968206398239,
+        8.634506783567925,
+        9.958622624661206,
+        8.641968023752138,
+        8.355946808358265,
+        8.442293297344342,
+        8.662504922576291,
+        10.024313066269753,
+        9.05498126998421,
+        8.31246952729476,
+        9.893916899596178,
+        8.7788289855367,
+        8.92331449444808,
+        8.938075680701097,
+        8.404696160189092,
+        9.045539428900216,
+        9.300604583176275,
+        9.222388140282614,
+        9.07329111055784,
+        9.268144922302763,
+        8.669189170628226,
+        8.849635340131387,
+        8.88797766458008,
+        10.049349842937328,
+        9.062990060275853,
+        9.514372528107424,
+        8.993015088914532,
+        9.26901228661797,
+        8.701071228599217,
+        9.377590591249852,
+        8.787427667285824,
+        8.570133878047734,
+        10.081930909241002,
+        8.857081355821585,
+        10.448809836455618,
+        9.135724578595394,
+        9.0666171876063,
+        8.403192280151986,
+        8.047413537086248,
+        8.930236916588246,
+        9.355081203434725,
+        8.14732272481793,
+        8.64194983458393
+      ],
+      "roc_auc": null,
+      "f1_macro": null,
+      "f1_micro": null,
+      "f1_weighted": null,
+      "precision_macro": null,
+      "recall_macro": null,
+      "config": {
+        "modality": "tabular",
+        "vlm_model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+        "embedding_size": 1000,
+        "tsne_perplexity": 30,
+        "tsne_n_iter": 1000,
+        "use_3d": false,
+        "use_knn_connections": true,
+        "nn_k": 30,
+        "max_vlm_image_size": 768,
+        "image_dpi": 72,
+        "force_rgb_mode": false,
+        "zoom_factor": 4.0,
+        "max_tabpfn_samples": 3000,
+        "use_semantic_names": false,
+        "device": "auto",
+        "backend": "transformers",
+        "enable_thinking": true,
+        "openai_model": null,
+        "gemini_model": null,
+        "api_model": null,
+        "effective_model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+        "is_api_model": false,
+        "seed": 42,
+        "enable_multi_viz": false,
+        "visualization_methods": [
+          "tsne"
+        ],
+        "layout_strategy": "adaptive_grid",
+        "reasoning_focus": "classification",
+        "multi_viz_config": {}
+      },
+      "prediction_details": [
+        {
+          "test_point_idx": 0,
+          "vlm_response": "Value: 8.9367 | Reasoning: The predicted value of 8.9367 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.8750 to 9.0877. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of target values around 8.9, which is also reflected in the neighbor analysis where the majority of the nearest neighbors have target values close to 8.9.",
+          "parsed_prediction": 8.9367,
+          "true_label": 8.952562767841787,
+          "tsne_coords": [
+            -30.336841583251953,
+            -38.601165771484375
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 1,
+          "vlm_response": "Value: 9.5888 | Reasoning: The predicted value of 9.5888 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of the target values in the dataset. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.5888, and the distances to these neighbors are relatively small, indicating high similarity.",
+          "parsed_prediction": 9.5888,
+          "true_label": 9.67765656956018,
+          "tsne_coords": [
+            -18.75602912902832,
+            54.274269104003906
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 2,
+          "vlm_response": "Value: 8.3071 | Reasoning: The predicted value of 8.3071 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.1864 to 8.5491. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.3, which is the predicted value.",
+          "parsed_prediction": 8.3071,
+          "true_label": 8.402507277747365,
+          "tsne_coords": [
+            38.699737548828125,
+            26.278966903686523
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 3,
+          "vlm_response": "Value: 8.6500 | Reasoning: The predicted value of 8.6500 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.5795 to 8.7705. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.65, which is the predicted value.",
+          "parsed_prediction": 8.65,
+          "true_label": 8.653843049842912,
+          "tsne_coords": [
+            38.632869720458984,
+            -37.760433197021484
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 4,
+          "vlm_response": "Value: 8.745 | Reasoning: The predicted value of 8.7447 is based on the weighted average of the target values of the 30 nearest neighbors, which are all within the range of 8.6604 to 9.0052. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.7, which is reflected in the neighbor analysis where the majority of the nearest neighbors have target values close to 8.7.",
+          "parsed_prediction": 8.745,
+          "true_label": 8.70378127462843,
+          "tsne_coords": [
+            19.88253402709961,
+            -50.372535705566406
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 5,
+          "vlm_response": "Value: 8.9773 | Reasoning: The predicted value of 8.9773 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.9169 to 9.0805. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.0, which is reflected in the average target value of the nearest neighbors.",
+          "parsed_prediction": 8.9773,
+          "true_label": 8.95861246536775,
+          "tsne_coords": [
+            -27.594511032104492,
+            -26.255943298339844
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 6,
+          "vlm_response": "Value: 9.2414 | Reasoning: The predicted value of 9.2414 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is close to the cluster of target values around 9.24, and the distance-weighted average of these values supports this prediction.",
+          "parsed_prediction": 9.2414,
+          "true_label": 9.260648763055663,
+          "tsne_coords": [
+            -7.824837684631348,
+            18.630451202392578
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 7,
+          "vlm_response": "Value: 8.9167 | Reasoning: The predicted value of 8.9167 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.8639 to 9.0471. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.9, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 8.9167,
+          "true_label": 8.877928735667334,
+          "tsne_coords": [
+            -29.697154998779297,
+            -40.58917236328125
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 8,
+          "vlm_response": "Value: 9.5919 | Reasoning: The predicted value of 9.5919 is based on the average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is close to the cluster of points with target values around 9.59, and the average of these values is 9.5919.",
+          "parsed_prediction": 9.5919,
+          "true_label": 9.57107792224307,
+          "tsne_coords": [
+            -21.38932991027832,
+            54.32318115234375
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 9,
+          "vlm_response": "Value: 8.4663 | Reasoning: The predicted value of 8.4663 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.3694 to 8.7952. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of target values around 8.4663, and the distances to these neighbors are relatively small, indicating high similarity.",
+          "parsed_prediction": 8.4663,
+          "true_label": 8.440778106538865,
+          "tsne_coords": [
+            14.66051197052002,
+            -0.4451149106025696
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 10,
+          "vlm_response": "Value: 9.3913 | Reasoning: The predicted value of 9.3913 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.3292 to 9.6758. The spatial clustering in the t-SNE visualization suggests that the query point is located near the center of the cluster of target values, which is consistent with the predicted value.",
+          "parsed_prediction": 9.3913,
+          "true_label": 9.40545691601967,
+          "tsne_coords": [
+            6.069647312164307,
+            49.62860870361328
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 11,
+          "vlm_response": "Value: 8.5145 | Reasoning: The predicted value of 8.5145 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.3906 to 8.7603. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.5, which is the predicted value.",
+          "parsed_prediction": 8.5145,
+          "true_label": 8.476287860090235,
+          "tsne_coords": [
+            20.07735824584961,
+            -16.429927825927734
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 12,
+          "vlm_response": "Value: 8.8257 | Reasoning: The predicted value of 8.8257 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.7091 to 9.0499. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.8, which is also reflected in the neighbor analysis where the target values of the nearest neighbors are all close to this value.",
+          "parsed_prediction": 8.8257,
+          "true_label": 8.782404680689513,
+          "tsne_coords": [
+            2.8087317943573,
+            -56.23439025878906
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 13,
+          "vlm_response": "Value: 9.1641 | Reasoning: The predicted value of 9.1641 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.1156 to 9.2410. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.16, which is the predicted value.",
+          "parsed_prediction": 9.1641,
+          "true_label": 9.199039502106613,
+          "tsne_coords": [
+            -12.924677848815918,
+            6.103702068328857
+          ],
+          "image_size": "719x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 14,
+          "vlm_response": "Value: 9.1698 | Reasoning: The predicted value of 9.1698 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.0994 to 9.3368. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.1698, which is the predicted value.",
+          "parsed_prediction": 9.1698,
+          "true_label": 9.168053891035651,
+          "tsne_coords": [
+            -15.97836971282959,
+            6.859470844268799
+          ],
+          "image_size": "719x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 15,
+          "vlm_response": "Value: 8.7784 | Reasoning: The predicted value of 8.7784 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.6676 to 9.0052. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of target values around 8.7784, which is the predicted value.",
+          "parsed_prediction": 8.7784,
+          "true_label": 8.724642131152285,
+          "tsne_coords": [
+            14.71064281463623,
+            -54.229610443115234
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 16,
+          "vlm_response": "Value: 9.0056 | Reasoning: The predicted value of 9.0056 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.9479 to 9.2671. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.00, and the average of these values is 9.0056.",
+          "parsed_prediction": 9.0056,
+          "true_label": 8.955859328113293,
+          "tsne_coords": [
+            -23.909160614013672,
+            -22.266494750976562
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 17,
+          "vlm_response": "Value: 8.6767 | Reasoning: The query point is located near the cluster of points with target values around 8.6767, which is the median of the target values of the nearest neighbors. The spatial clustering in the t-SNE visualization suggests that this value is likely the most representative of the query point's neighborhood.",
+          "parsed_prediction": 8.6767,
+          "true_label": 8.63707643555668,
+          "tsne_coords": [
+            35.20170974731445,
+            -41.22547149658203
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 18,
+          "vlm_response": "Value: 9.5725 | Reasoning: The predicted value of 9.5725 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.4907 to 9.7998. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.5, which is the predicted value.",
+          "parsed_prediction": 9.5725,
+          "true_label": 9.519949719677989,
+          "tsne_coords": [
+            -15.636351585388184,
+            58.05322265625
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 19,
+          "vlm_response": "Value: 9.0464 | Reasoning: The predicted value of 9.0464 is based on the average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is close to the cluster of points with target values around 9.0, and the average of these values is 9.0464. Additionally, the color intensity of the training points around the query point indicates a similar target value, supporting the prediction.",
+          "parsed_prediction": 9.0464,
+          "true_label": 9.000283887084585,
+          "tsne_coords": [
+            -20.792682647705078,
+            -19.93959617614746
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 20,
+          "vlm_response": "Value: 8.2413 | Reasoning: The predicted value of 8.2413 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.1638 to 8.3664. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.24, which is the predicted value.",
+          "parsed_prediction": 8.2413,
+          "true_label": 8.391308677149832,
+          "tsne_coords": [
+            36.86302185058594,
+            33.3372802734375
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 21,
+          "vlm_response": "Value: 8.9247 | Reasoning: The predicted value of 8.9247 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.8843 to 8.9950. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.92, which is the predicted value.",
+          "parsed_prediction": 8.9247,
+          "true_label": 8.913651190364428,
+          "tsne_coords": [
+            -22.962385177612305,
+            -33.21086502075195
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 22,
+          "vlm_response": "Value: 8.519 | Reasoning: The predicted value of 8.519 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of the target values in the dataset. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.5, which is the predicted value.",
+          "parsed_prediction": 8.519,
+          "true_label": 8.500487762912323,
+          "tsne_coords": [
+            13.037603378295898,
+            -6.977271556854248
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 23,
+          "vlm_response": "Value: 8.513 | Reasoning: The predicted value of 8.513 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.3906 to 8.8694. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.5, which is the predicted value.",
+          "parsed_prediction": 8.513,
+          "true_label": 8.44692678210986,
+          "tsne_coords": [
+            18.789310455322266,
+            -14.311420440673828
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 24,
+          "vlm_response": "Value: 8.1895 | Reasoning: The predicted value of 8.1895 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.0679 to 8.3951. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.1895, and the distances to these neighbors are relatively small, indicating high similarity.",
+          "parsed_prediction": 8.1895,
+          "true_label": 8.164945407981689,
+          "tsne_coords": [
+            43.61262893676758,
+            37.92237091064453
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 25,
+          "vlm_response": "Value: 8.2195 | Reasoning: The predicted value of 8.2195 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.0598 to 8.4007. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.2, which is the predicted value.",
+          "parsed_prediction": 8.2195,
+          "true_label": 8.3654396361887,
+          "tsne_coords": [
+            47.82545852661133,
+            34.394386291503906
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 26,
+          "vlm_response": "Value: 9.1523 | Reasoning: The predicted value of 9.1523 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.0994 to 9.4035. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.15, which is the predicted value.",
+          "parsed_prediction": 9.1523,
+          "true_label": 9.134685130572374,
+          "tsne_coords": [
+            -13.763448715209961,
+            4.50047492980957
+          ],
+          "image_size": "725x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 27,
+          "vlm_response": "Value: 9.3848 | Reasoning: The predicted value of 9.3848 is based on the average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is close to the cluster of points with target values around 9.38, and the average of these values is 9.3848.",
+          "parsed_prediction": 9.3848,
+          "true_label": 9.536870310919104,
+          "tsne_coords": [
+            5.965804100036621,
+            42.74126052856445
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 28,
+          "vlm_response": "Value: 9.5575 | Reasoning: The predicted value of 9.5575 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of the target values in the dataset. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.5, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 9.5575,
+          "true_label": 9.506552212303713,
+          "tsne_coords": [
+            -12.107295036315918,
+            58.77173614501953
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 29,
+          "vlm_response": "Value: 10.2720 | Reasoning: The predicted value of 10.2720 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 10.1588 to 10.4172. The spatial clustering in the t-SNE visualization suggests that the query point is located near the center of the cluster of target values, which is consistent with the average value of the nearest neighbors.",
+          "parsed_prediction": 10.272,
+          "true_label": 10.305114269102438,
+          "tsne_coords": [
+            -58.4445915222168,
+            -0.5181752443313599
+          ],
+          "image_size": "727x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 30,
+          "vlm_response": "Value: 8.7578 | Reasoning: The predicted value of 8.7578 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.6663 to 9.0052. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.75, which is the predicted value.",
+          "parsed_prediction": 8.7578,
+          "true_label": 8.691200795721018,
+          "tsne_coords": [
+            17.15898895263672,
+            -47.4766845703125
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 31,
+          "vlm_response": "Value: 9.2269 | Reasoning: The predicted value of 9.2269 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is close to the cluster of target values around 9.22, and the weighted average of these values, considering their proximity, results in the predicted value of 9.2269.",
+          "parsed_prediction": 9.2269,
+          "true_label": 9.224754506405777,
+          "tsne_coords": [
+            -8.804558753967285,
+            16.339723587036133
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 32,
+          "vlm_response": "Value: 9.7211 | Reasoning: The predicted value of 9.7211 is derived from the average of the target values of the 30 nearest neighbors, which are all within the range of 9.6650 to 9.8874. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.72, which is the predicted value.",
+          "parsed_prediction": 9.7211,
+          "true_label": 9.769356644809763,
+          "tsne_coords": [
+            -32.73345184326172,
+            35.94620895385742
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 33,
+          "vlm_response": "Value: 8.488 | Reasoning: The predicted value of 8.4877 is based on the average of the 30 nearest neighbors' target values, which are all within the range of 8.3906 to 8.6511. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.488. The color intensity of the training points near the query point also indicates a higher density of points with target values close to 8.488, supporting the prediction.",
+          "parsed_prediction": 8.488,
+          "true_label": 8.5111847003325,
+          "tsne_coords": [
+            17.015241622924805,
+            -11.55773639678955
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 34,
+          "vlm_response": "Value: 10.1208 | Reasoning: The predicted value of 10.1208 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 10.0200 to 10.3728. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 10.12, which is the predicted value.",
+          "parsed_prediction": 10.1208,
+          "true_label": 10.137358810092708,
+          "tsne_coords": [
+            -52.26411819458008,
+            7.317877292633057
+          ],
+          "image_size": "721x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 35,
+          "vlm_response": "Value: 8.8019 | Reasoning: The predicted value of 8.8019 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.7320 to 8.9537. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.8, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 8.8019,
+          "true_label": 8.833831371710241,
+          "tsne_coords": [
+            -2.6240034103393555,
+            -53.242652893066406
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 36,
+          "vlm_response": "Value: 9.2406 | Reasoning: The predicted value of 9.2406 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.1778 to 9.4240. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.24, which is the predicted value.",
+          "parsed_prediction": 9.2406,
+          "true_label": 9.233842031761274,
+          "tsne_coords": [
+            -12.26438045501709,
+            20.09084129333496
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 37,
+          "vlm_response": "Value: 8.5665 | Reasoning: The predicted value of 8.5665 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.4917 to 8.6955. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.5, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 8.5665,
+          "true_label": 8.537705184308042,
+          "tsne_coords": [
+            31.017974853515625,
+            -15.836813926696777
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 38,
+          "vlm_response": "Value: 8.5443 | Reasoning: The predicted value of 8.5443 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.3321 to 9.0321. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.5, which is the predicted value.",
+          "parsed_prediction": 8.5443,
+          "true_label": 8.363375789345778,
+          "tsne_coords": [
+            7.099905967712402,
+            7.702194690704346
+          ],
+          "image_size": "719x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 39,
+          "vlm_response": "Value: 8.7237 | Reasoning: The predicted value of 8.7237 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.6032 to 8.8837. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.7, which is the most common target value in the dataset.",
+          "parsed_prediction": 8.7237,
+          "true_label": 8.69175926185432,
+          "tsne_coords": [
+            31.07231330871582,
+            -45.88460922241211
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 40,
+          "vlm_response": "Value: 10.3694 | Reasoning: The predicted value of 10.3694 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 10.2749 to 10.6257. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 10.3, which is the predicted value.",
+          "parsed_prediction": 10.3694,
+          "true_label": 10.360260288262456,
+          "tsne_coords": [
+            -59.75971984863281,
+            -5.947734832763672
+          ],
+          "image_size": "727x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 41,
+          "vlm_response": "Value: 10.7198 | Reasoning: The query point is located near the center of the t-SNE visualization, and the nearest neighbors have target values ranging from 10.5426 to 10.9562. The predicted value of 10.6978 is close to the average of these values, which is 10.7198. Additionally, the spatial clustering pattern suggests that the query point is likely to be influenced by the central region of the target values, further supporting the prediction of 10.7198.",
+          "parsed_prediction": 10.7198,
+          "true_label": 10.715814676178367,
+          "tsne_coords": [
+            -61.92993927001953,
+            -19.370895385742188
+          ],
+          "image_size": "727x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 42,
+          "vlm_response": "Value: 9.3731 | Reasoning: The predicted value of 9.3731 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.3280 to 9.4931. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.37, which is the predicted value.",
+          "parsed_prediction": 9.3731,
+          "true_label": 9.383581611353833,
+          "tsne_coords": [
+            7.73475980758667,
+            45.5986328125
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 43,
+          "vlm_response": "Value: 8.5220 | Reasoning: The predicted value of 8.5220 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of the target values in the dataset. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.5, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 8.522,
+          "true_label": 8.48879371689454,
+          "tsne_coords": [
+            21.39230728149414,
+            -13.39116096496582
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 44,
+          "vlm_response": "Value: 8.4692 | Reasoning: The predicted value of 8.4692 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.3948 to 8.5613. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.4692, and the distances to these neighbors are relatively small, indicating a high similarity. Therefore, the predicted value is 8.4692.",
+          "parsed_prediction": 8.4692,
+          "true_label": 8.453366949880644,
+          "tsne_coords": [
+            20.784440994262695,
+            -3.9083681106567383
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 45,
+          "vlm_response": "Value: 9.3568 | Reasoning: The predicted value of 9.3568 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is close to the cluster of points with target values around 9.35, and the weighted average of these values, considering their proximity, results in the predicted value of 9.3568.",
+          "parsed_prediction": 9.3568,
+          "true_label": 9.390693325675294,
+          "tsne_coords": [
+            6.910195350646973,
+            39.782562255859375
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 46,
+          "vlm_response": "Value: 8.6190 | Reasoning: The predicted value of 8.6190 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns in the t-SNE visualization suggest that the query point is located near the center of the cluster of target values, which is consistent with the predicted value. Additionally, the target values of the nearest neighbors are closely clustered around 8.6190, further supporting this prediction.",
+          "parsed_prediction": 8.619,
+          "true_label": 8.547214207597158,
+          "tsne_coords": [
+            35.04778289794922,
+            -27.3529052734375
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 47,
+          "vlm_response": "Value: 9.3044 | Reasoning: The predicted value of 9.3044 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.2261 to 9.4898. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.3, which is the predicted value.",
+          "parsed_prediction": 9.3044,
+          "true_label": 9.78736400884845,
+          "tsne_coords": [
+            -9.807793617248535,
+            26.404747009277344
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 48,
+          "vlm_response": "Value: 8.317 | Reasoning: The predicted value of 8.3168 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.1851 to 8.6005. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.3, which is the most common target value in the dataset. The color intensity of the training points around the query point also indicates a higher density of points with target values close to 8.3, further supporting the prediction.",
+          "parsed_prediction": 8.317,
+          "true_label": 8.329688223930129,
+          "tsne_coords": [
+            31.704509735107422,
+            26.801069259643555
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 49,
+          "vlm_response": "Value: 9.1207 | Reasoning: The predicted value of 9.1207 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.0422 to 9.3574. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.1, which is the predicted value.",
+          "parsed_prediction": 9.1207,
+          "true_label": 9.058555074275585,
+          "tsne_coords": [
+            -25.19386100769043,
+            -2.1501150131225586
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 50,
+          "vlm_response": "Value: 9.5572 | Reasoning: The predicted value of 9.5572 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of the target values in the dataset. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.5, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 9.5572,
+          "true_label": 9.502676979752328,
+          "tsne_coords": [
+            -11.073704719543457,
+            61.20718002319336
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 51,
+          "vlm_response": "Value: 8.6573 | Reasoning: The predicted value of 8.6573 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.5476 to 9.2641. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.6573, and the distances to these neighbors are relatively small, indicating high similarity. Therefore, the predicted value is likely to be close to the mean of the target values of the nearest neighbors.",
+          "parsed_prediction": 8.6573,
+          "true_label": 8.616438799074162,
+          "tsne_coords": [
+            29.163654327392578,
+            -30.51895523071289
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 52,
+          "vlm_response": "Value: 9.3239 | Reasoning: The predicted value of 9.3239 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of the target values in the dataset. The spatial clustering in the t-SNE visualization suggests that the query point is located near the center of the cluster of target values, which is consistent with the predicted value.",
+          "parsed_prediction": 9.3239,
+          "true_label": 9.5242679664837,
+          "tsne_coords": [
+            1.9281262159347534,
+            32.080326080322266
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 53,
+          "vlm_response": "Value: 9.8667 | Reasoning: The predicted value of 9.8667 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.7591 to 10.1821. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.8, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 9.8667,
+          "true_label": 9.81175367827086,
+          "tsne_coords": [
+            -43.37043380737305,
+            26.448009490966797
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 54,
+          "vlm_response": "Value: 8.357 | Reasoning: The predicted value of 8.357 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.2628 to 8.7874. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.35, which is the predicted value.",
+          "parsed_prediction": 8.357,
+          "true_label": 8.276394704863307,
+          "tsne_coords": [
+            21.087581634521484,
+            22.272830963134766
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 55,
+          "vlm_response": "Value: 9.4128 | Reasoning: The predicted value of 9.4128 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is likely to be close to the cluster of points with target values around 9.4, as indicated by the color intensity of the training data points. The standard deviation of the target values is relatively small, indicating that the data is well-clustered, which supports the prediction of the mean value of the nearest neighbors.",
+          "parsed_prediction": 9.4128,
+          "true_label": 9.401096842982414,
+          "tsne_coords": [
+            6.207995414733887,
+            51.60123825073242
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 56,
+          "vlm_response": "Value: 8.9076 | Reasoning: The predicted value of 8.9076 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.8513 to 9.1483. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.90, which is the predicted value.",
+          "parsed_prediction": 8.9076,
+          "true_label": 8.854283282269066,
+          "tsne_coords": [
+            -21.265108108520508,
+            -38.47709274291992
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 57,
+          "vlm_response": "Value: 9.5174 | Reasoning: The predicted value of 9.5174 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.4606 to 9.6686. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.5, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 9.5174,
+          "true_label": 9.495044013302337,
+          "tsne_coords": [
+            -9.089035034179688,
+            59.66514587402344
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 58,
+          "vlm_response": "Value: 8.2467 | Reasoning: The predicted value of 8.2467 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.1638 to 8.4657. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.2467, which is the predicted value.",
+          "parsed_prediction": 8.2467,
+          "true_label": 8.399745099584909,
+          "tsne_coords": [
+            38.06229782104492,
+            33.15047073364258
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 59,
+          "vlm_response": "Value: 9.6151 | Reasoning: The query point is located near the cluster of points with target values around 9.59, which is the predicted value from the KNN analysis. The spatial clustering in the t-SNE visualization suggests that the query point is close to this cluster, and the target values of the nearest neighbors (connected by red lines) also support this prediction. The distance-weighted average of the nearest neighbor values (9.5919) is close to the predicted value, further supporting this prediction.",
+          "parsed_prediction": 9.6151,
+          "true_label": 9.55318653759846,
+          "tsne_coords": [
+            -20.213119506835938,
+            53.65735626220703
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 60,
+          "vlm_response": "Value: 10.4438 | Reasoning: The predicted value of 10.4438 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 10.3471 to 10.5523. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of target values around 10.4, which is consistent with the predicted value.",
+          "parsed_prediction": 10.4438,
+          "true_label": 10.420461424529432,
+          "tsne_coords": [
+            -60.71601104736328,
+            -10.870481491088867
+          ],
+          "image_size": "727x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 61,
+          "vlm_response": "Value: 8.4239 | Reasoning: The predicted value of 8.4239 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.3149 to 8.5550. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.4, which is the predicted value.",
+          "parsed_prediction": 8.4239,
+          "true_label": 8.377400219039654,
+          "tsne_coords": [
+            22.638721466064453,
+            4.620079040527344
+          ],
+          "image_size": "725x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 62,
+          "vlm_response": "Value: 9.6932 | Reasoning: The predicted value of 9.6932 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is located near the cluster of points with target values around 9.69, and the distance-weighted average of these values confirms this prediction.",
+          "parsed_prediction": 9.6932,
+          "true_label": 9.661916320927743,
+          "tsne_coords": [
+            -30.189138412475586,
+            40.10673904418945
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 63,
+          "vlm_response": "Value: 8.7501 | Reasoning: The predicted value of 8.7501 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is located near the cluster of points with target values around 8.75, and the distance-weighted average of these values supports this prediction.",
+          "parsed_prediction": 8.7501,
+          "true_label": 8.650499558724462,
+          "tsne_coords": [
+            24.143268585205078,
+            -46.15615463256836
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 64,
+          "vlm_response": "Value: 8.9549 | Reasoning: The predicted value of 8.9549 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.9141 to 9.0573. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.0, which is reflected in the average target value of the nearest neighbors.",
+          "parsed_prediction": 8.9549,
+          "true_label": 8.937094395855052,
+          "tsne_coords": [
+            -24.937664031982422,
+            -30.000913619995117
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 65,
+          "vlm_response": "Value: 9.2352 | Reasoning: The predicted value of 9.2352 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is likely to be close to the cluster of points with target values around 9.2, and the distance-weighted average of these values supports this prediction.",
+          "parsed_prediction": 9.2352,
+          "true_label": 9.379782596761359,
+          "tsne_coords": [
+            -10.15909481048584,
+            19.508960723876953
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 66,
+          "vlm_response": "Value: 8.6556 | Reasoning: The predicted value of 8.5888 is based on the weighted average of the target values of the 30 nearest neighbors, which are all within the range of 8.4916 to 8.7400. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.6556, which is the median of the nearest neighbors' values.",
+          "parsed_prediction": 8.6556,
+          "true_label": 8.562996963227933,
+          "tsne_coords": [
+            37.55534362792969,
+            -19.712385177612305
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 67,
+          "vlm_response": "Value: 9.3209 | Reasoning: The predicted value of 9.3209 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.2629 to 9.4805. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.3, which is also reflected in the neighbor analysis where the target values of the nearest neighbors are predominantly around this value.",
+          "parsed_prediction": 9.3209,
+          "true_label": 9.310692365902886,
+          "tsne_coords": [
+            -2.395965814590454,
+            31.39580535888672
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 68,
+          "vlm_response": "Value: 10.00 | Reasoning: The query point is located near the cluster of points with target values around 10.00. The target values of the nearest neighbors (9.8589, 9.8867, 9.9010, 9.9338, 10.0090, 9.9472) are all close to 10.00, indicating that this value is likely the most representative of the target values in the neighborhood.",
+          "parsed_prediction": 10.0,
+          "true_label": 9.935698354533104,
+          "tsne_coords": [
+            -49.09075164794922,
+            18.493881225585938
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 69,
+          "vlm_response": "Value: 9.5776 | Reasoning: The predicted value of 9.5776 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of the target values in the dataset. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.5, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 9.5776,
+          "true_label": 9.537761922278415,
+          "tsne_coords": [
+            -16.583446502685547,
+            55.065921783447266
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 70,
+          "vlm_response": "Value: 8.6388 | Reasoning: The predicted value of 8.6388 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.5901 to 8.7549. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.6, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 8.6388,
+          "true_label": 8.611165355203509,
+          "tsne_coords": [
+            41.60042190551758,
+            -35.08571243286133
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 71,
+          "vlm_response": "Value: 8.2942 | Reasoning: The predicted value of 8.2942 is derived from the average of the target values of the 30 nearest neighbors, which are all within the range of 8.1493 to 8.5562. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.2942, and the distances to these neighbors are relatively small, indicating a high similarity.",
+          "parsed_prediction": 8.2942,
+          "true_label": 8.35776011577018,
+          "tsne_coords": [
+            40.26038360595703,
+            29.64470672607422
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 72,
+          "vlm_response": "Value: 8.9584 | Reasoning: The predicted value of 8.9584 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.9063 to 9.0805. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.95, which is the predicted value.",
+          "parsed_prediction": 8.9584,
+          "true_label": 8.930832797092858,
+          "tsne_coords": [
+            -26.788692474365234,
+            -29.638389587402344
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 73,
+          "vlm_response": "Value: 9.1688 | Reasoning: The predicted value of 9.1688 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.0994 to 9.3368. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.1688, which is the predicted value.",
+          "parsed_prediction": 9.1688,
+          "true_label": 9.25409713265436,
+          "tsne_coords": [
+            -15.957015037536621,
+            6.657853126525879
+          ],
+          "image_size": "719x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 74,
+          "vlm_response": "Value: 8.7413 | Reasoning: The predicted value of 8.7413 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.6235 to 9.2939. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.74, which is the predicted value.",
+          "parsed_prediction": 8.7413,
+          "true_label": 8.699478289212237,
+          "tsne_coords": [
+            23.53773307800293,
+            -43.52386474609375
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 75,
+          "vlm_response": "Value: 8.2941 | Reasoning: The predicted value of 8.2941 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.1864 to 8.5491. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.2941, which is the predicted value.",
+          "parsed_prediction": 8.2941,
+          "true_label": 8.22389538017882,
+          "tsne_coords": [
+            41.58439636230469,
+            27.1433048248291
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 76,
+          "vlm_response": "Value: 10.3706 | Reasoning: The predicted value of 10.3706 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 10.2683 to 10.6257. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 10.3, which is the predicted value.",
+          "parsed_prediction": 10.3706,
+          "true_label": 10.351161022992413,
+          "tsne_coords": [
+            -57.73615646362305,
+            -5.812273979187012
+          ],
+          "image_size": "727x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 77,
+          "vlm_response": "Value: 9.0486 | Reasoning: The predicted value of 9.0486 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.9700 to 9.1166. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.0, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 9.0486,
+          "true_label": 9.025605906457939,
+          "tsne_coords": [
+            -23.7154598236084,
+            -10.817583084106445
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 78,
+          "vlm_response": "Value: 9.2468 | Reasoning: The predicted value of 9.2468 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.1905 to 9.3446. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.24, which is the predicted value.",
+          "parsed_prediction": 9.2468,
+          "true_label": 9.270894708969756,
+          "tsne_coords": [
+            -7.046568393707275,
+            19.41100311279297
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 79,
+          "vlm_response": "Value: 9.4849 | Reasoning: The predicted value of 9.4849 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.4231 to 9.6177. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.48, which is the predicted value.",
+          "parsed_prediction": 9.4849,
+          "true_label": 9.561658444666044,
+          "tsne_coords": [
+            -0.36486437916755676,
+            58.68245315551758
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 80,
+          "vlm_response": "Value: 9.5500 | Reasoning: The predicted value of 9.5500 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.4606 to 9.7998. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.5, which is the predicted value.",
+          "parsed_prediction": 9.55,
+          "true_label": 9.483358824633957,
+          "tsne_coords": [
+            -9.793157577514648,
+            60.75459289550781
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 81,
+          "vlm_response": "Value: 9.028 | Reasoning: The predicted value of 9.028 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is located near the center of the target value distribution, and the target values of the nearest neighbors are closely clustered around this value, indicating a strong influence on the prediction.",
+          "parsed_prediction": 9.028,
+          "true_label": 8.995460657782731,
+          "tsne_coords": [
+            -21.561073303222656,
+            -22.772302627563477
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 82,
+          "vlm_response": "Value: 8.9182 | Reasoning: The predicted value of 8.9182 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.8585 to 9.3205. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.9, which is the mean of the target values in the dataset.",
+          "parsed_prediction": 8.9182,
+          "true_label": 8.875925351214606,
+          "tsne_coords": [
+            -22.63336944580078,
+            -37.30928039550781
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 83,
+          "vlm_response": "Value: 9.0141 | Reasoning: The predicted value of 9.0141 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.9169 to 9.2671. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.0, and the average of these values is 9.0141.",
+          "parsed_prediction": 9.0141,
+          "true_label": 9.02745630408252,
+          "tsne_coords": [
+            -23.93305015563965,
+            -20.43360710144043
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 84,
+          "vlm_response": "Value: 8.1844 | Reasoning: The predicted value of 8.1844 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 7.9846 to 8.5160. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.1, which is the predicted value.",
+          "parsed_prediction": 8.1844,
+          "true_label": 8.084506366192329,
+          "tsne_coords": [
+            50.24052047729492,
+            38.14977264404297
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 85,
+          "vlm_response": "Value: 9.120 | Reasoning: The query point is located near the cluster of points with target values around 9.120, which is the highest frequency of target values in the nearest neighbors. The spatial clustering and the target values of the nearest neighbors suggest that the predicted value should be close to 9.120.",
+          "parsed_prediction": 9.12,
+          "true_label": 9.068632788067482,
+          "tsne_coords": [
+            -29.72939109802246,
+            -1.8911340236663818
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 86,
+          "vlm_response": "Value: 8.6264 | Reasoning: The predicted value of 8.5934 is based on the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The target values of these neighbors range from 8.5418 to 8.6890, with a standard deviation of 0.0344. The spatial clustering patterns in the t-SNE visualization suggest that the query point is close to the cluster of neighbors with target values around 8.6, which is reflected in the weighted average of the nearest neighbor values.",
+          "parsed_prediction": 8.6264,
+          "true_label": 8.618109250512793,
+          "tsne_coords": [
+            40.147804260253906,
+            -27.190876007080078
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 87,
+          "vlm_response": "Value: 9.7469 | Reasoning: The query point is located near the cluster of points with target values around 9.7469, which is the highest frequency of target values in the neighborhood. The distance-weighted average of the nearest neighbors also indicates a value close to 9.7469, suggesting it is the most likely target value for the query point.",
+          "parsed_prediction": 9.7469,
+          "true_label": 9.720293987453434,
+          "tsne_coords": [
+            -35.172889709472656,
+            35.01461410522461
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 88,
+          "vlm_response": "Value: 8.482 | Reasoning: The predicted value of 8.482 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.3854 to 8.7016. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.48, which is the predicted value.",
+          "parsed_prediction": 8.482,
+          "true_label": 8.490126162128318,
+          "tsne_coords": [
+            23.062135696411133,
+            -3.478469133377075
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 89,
+          "vlm_response": "Value: 8.6070 | Reasoning: The predicted value of 8.5991 is based on the weighted average of the target values of the 30 nearest neighbors. The neighbor with the highest value (8.7778) is relatively close (distance of 2.057), and the average of the other neighbors is around 8.6070. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.6070.",
+          "parsed_prediction": 8.607,
+          "true_label": 8.560353502613925,
+          "tsne_coords": [
+            31.384626388549805,
+            -24.78508186340332
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 90,
+          "vlm_response": "Value: 9.3323 | Reasoning: The predicted value of 9.3323 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.2658 to 9.4805. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.3, which is the predicted value.",
+          "parsed_prediction": 9.3323,
+          "true_label": 9.328457574014983,
+          "tsne_coords": [
+            1.7163476943969727,
+            35.41960525512695
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 91,
+          "vlm_response": "Value: 10.4316 | Reasoning: The predicted value of 10.4316 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 10.3471 to 10.5523. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 10.4, which is the predicted value.",
+          "parsed_prediction": 10.4316,
+          "true_label": 10.424288259324197,
+          "tsne_coords": [
+            -61.625736236572266,
+            -10.700074195861816
+          ],
+          "image_size": "727x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 92,
+          "vlm_response": "Value: 10.4146 | Reasoning: The query point is located near the cluster of points with target values around 10.4, which is the most common target value in the dataset. The predicted value of 10.3963 is close to this cluster, and the average of the nearest neighbors (10.4146) is also within this range.",
+          "parsed_prediction": 10.4146,
+          "true_label": 10.364792520388548,
+          "tsne_coords": [
+            -58.793392181396484,
+            -7.862937927246094
+          ],
+          "image_size": "727x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 93,
+          "vlm_response": "Value: 8.8034 | Reasoning: The predicted value of 8.8034 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.7091 to 9.0441. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.8, which is the predicted value.",
+          "parsed_prediction": 8.8034,
+          "true_label": 8.965768279281074,
+          "tsne_coords": [
+            5.953261375427246,
+            -54.078041076660156
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 94,
+          "vlm_response": "Value: 8.8121 | Reasoning: The predicted value of 8.8121 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.7481 to 8.8927. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of target values around 8.8, which is also reflected in the neighbor analysis where the majority of the nearest neighbors have target values close to 8.8.",
+          "parsed_prediction": 8.8121,
+          "true_label": 8.803810854585395,
+          "tsne_coords": [
+            -2.06465744972229,
+            -46.877445220947266
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 95,
+          "vlm_response": "Value: 8.6507 | Reasoning: The predicted value of 8.6507 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.5795 to 8.7705. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.65, which is the predicted value.",
+          "parsed_prediction": 8.6507,
+          "true_label": 8.759480944998709,
+          "tsne_coords": [
+            38.18425750732422,
+            -38.71635818481445
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 96,
+          "vlm_response": "Value: 8.4880 | Reasoning: The predicted value of 8.4880 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.3694 to 8.7952. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.4880, and the distance-weighted average of these values further supports this prediction.",
+          "parsed_prediction": 8.488,
+          "true_label": 8.427314549785626,
+          "tsne_coords": [
+            16.771240234375,
+            -6.65328311920166
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 97,
+          "vlm_response": "Value: 8.4532 | Reasoning: The predicted value of 8.4532 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.3694 to 8.7952. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.45, which is the predicted value.",
+          "parsed_prediction": 8.4532,
+          "true_label": 8.448485993406447,
+          "tsne_coords": [
+            12.399765968322754,
+            0.2663288414478302
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 98,
+          "vlm_response": "Value: 8.5937 | Reasoning: The predicted value of 8.5937 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.5137 to 8.9340. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.59, which is the predicted value.",
+          "parsed_prediction": 8.5937,
+          "true_label": 8.551626823798538,
+          "tsne_coords": [
+            30.101531982421875,
+            -21.98898696899414
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 99,
+          "vlm_response": "Value: 9.0800 | Reasoning: The predicted value of 9.0800 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.9743 to 9.4402. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.0800, and the distances to these neighbors are relatively small, indicating high similarity.",
+          "parsed_prediction": 9.08,
+          "true_label": 9.071308163280625,
+          "tsne_coords": [
+            -31.27775001525879,
+            -6.253532886505127
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 100,
+          "vlm_response": "Value: 10.1075 | Reasoning: The query point is located near the cluster of points with target values around 10.1075, which is the highest value among the nearest neighbors. The spatial clustering in the t-SNE visualization also suggests that this value is likely to be the most representative of the query point's target value.",
+          "parsed_prediction": 10.1075,
+          "true_label": 9.946584049453554,
+          "tsne_coords": [
+            -49.416500091552734,
+            16.226015090942383
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 101,
+          "vlm_response": "Value: 8.5757 | Reasoning: The predicted value of 8.5757 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.4750 to 8.6992. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.5, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 8.5757,
+          "true_label": 8.534274812679904,
+          "tsne_coords": [
+            36.83952713012695,
+            -16.469133377075195
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 102,
+          "vlm_response": "Value: 8.6072 | Reasoning: The predicted value of 8.6072 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.5418 to 8.7742. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.6, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 8.6072,
+          "true_label": 8.598410395191431,
+          "tsne_coords": [
+            38.28667449951172,
+            -25.739643096923828
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 103,
+          "vlm_response": "Value: 8.3142 | Reasoning: The predicted value of 8.3142 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.1956 to 8.6005. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.3, which is the predicted value.",
+          "parsed_prediction": 8.3142,
+          "true_label": 8.2985992748006,
+          "tsne_coords": [
+            30.81987190246582,
+            26.314516067504883
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 104,
+          "vlm_response": "Value: 8.7320 | Reasoning: The predicted value of 8.7320 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of the target values in the dataset. The spatial clustering in the t-SNE visualization suggests that the query point is located near the center of the cluster, which is consistent with the predicted value. Additionally, the target values of the nearest neighbors are all within a small range, indicating that the query point is likely to have a similar target value.",
+          "parsed_prediction": 8.732,
+          "true_label": 8.760482085410647,
+          "tsne_coords": [
+            24.72571563720703,
+            -40.82737350463867
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 105,
+          "vlm_response": "Value: 8.2667 | Reasoning: The predicted value of 8.2667 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.1851 to 8.3974. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.2667. Additionally, the color intensity of the training data points around this value indicates a higher density of data points, further supporting the prediction.",
+          "parsed_prediction": 8.2667,
+          "true_label": 8.60021059110315,
+          "tsne_coords": [
+            35.33073806762695,
+            23.29678726196289
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 106,
+          "vlm_response": "Value: 8.6009 | Reasoning: The predicted value of 8.6009 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.4870 to 8.9340. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.6, which is the predicted value.",
+          "parsed_prediction": 8.6009,
+          "true_label": 8.527564225840454,
+          "tsne_coords": [
+            25.87166976928711,
+            -19.27113914489746
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 107,
+          "vlm_response": "Value: 8.2932 | Reasoning: The predicted value of 8.2932 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.1851 to 8.6005. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.2932, which is the predicted value.",
+          "parsed_prediction": 8.2932,
+          "true_label": 8.153289173142085,
+          "tsne_coords": [
+            33.06683349609375,
+            26.807952880859375
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 108,
+          "vlm_response": "Value: 9.8737 | Reasoning: The predicted value of 9.8737 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.7886 to 10.1821. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.8, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 9.8737,
+          "true_label": 9.944778489565655,
+          "tsne_coords": [
+            -42.526798248291016,
+            25.42600440979004
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 109,
+          "vlm_response": "Value: 9.5840 | Reasoning: The predicted value of 9.5840 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.5287 to 9.6555. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.58, which is the predicted value.",
+          "parsed_prediction": 9.584,
+          "true_label": 9.657313141561279,
+          "tsne_coords": [
+            -21.359783172607422,
+            48.78146743774414
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 110,
+          "vlm_response": "Value: 9.6424 | Reasoning: The predicted value of 9.6424 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.5892 to 9.7829. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.64, which is the predicted value.",
+          "parsed_prediction": 9.6424,
+          "true_label": 9.622490775614994,
+          "tsne_coords": [
+            -25.58616828918457,
+            44.73183822631836
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 111,
+          "vlm_response": "Value: 8.9984 | Reasoning: The predicted value of 8.9984 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.9169 to 9.2671. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.0, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 8.9984,
+          "true_label": 8.9915830205825,
+          "tsne_coords": [
+            -22.027938842773438,
+            -24.402629852294922
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 112,
+          "vlm_response": "Value: 9.0570 | Reasoning: The predicted value of 9.0570 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.9991 to 9.1166. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.05, which is the predicted value.",
+          "parsed_prediction": 9.057,
+          "true_label": 9.027891807117046,
+          "tsne_coords": [
+            -26.45660400390625,
+            -9.62735366821289
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 113,
+          "vlm_response": "Value: 8.6511 | Reasoning: The predicted value of 8.6511 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.5562 to 8.7445. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.65, which is the predicted value.",
+          "parsed_prediction": 8.6511,
+          "true_label": 8.620832226175724,
+          "tsne_coords": [
+            32.3484001159668,
+            -34.94098663330078
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 114,
+          "vlm_response": "Value: 9.1965 | Reasoning: The predicted value of 9.1965 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is close to the cluster of target values around 9.19, and the weighted average of these values, considering their proximity, results in the predicted value of 9.1965.",
+          "parsed_prediction": 9.1965,
+          "true_label": 9.18778796750567,
+          "tsne_coords": [
+            -15.350334167480469,
+            10.072959899902344
+          ],
+          "image_size": "719x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 115,
+          "vlm_response": "Value: 9.0221 | Reasoning: The predicted value of 9.0221 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.9169 to 9.2671. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.0, and the average of these values is 9.0221.",
+          "parsed_prediction": 9.0221,
+          "true_label": 8.974890640030104,
+          "tsne_coords": [
+            -23.303314208984375,
+            -20.113740921020508
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 116,
+          "vlm_response": "Value: 9.0304 | Reasoning: The predicted value of 9.0304 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.9169 to 9.4542. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.0, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 9.0304,
+          "true_label": 9.156740325501655,
+          "tsne_coords": [
+            -22.739946365356445,
+            -21.108423233032227
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 117,
+          "vlm_response": "Value: 8.80 | Reasoning: The query point is located near the cluster of points with target values around 8.80. The target values of the nearest neighbors (8.7886, 8.7890, 8.7802, 8.7989, 8.8069, 8.8223, 8.8020) are all close to 8.80, indicating that this value is likely the most representative of the query point's target value.",
+          "parsed_prediction": 8.8,
+          "true_label": 8.748806196081032,
+          "tsne_coords": [
+            16.348934173583984,
+            -59.957786560058594
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 118,
+          "vlm_response": "Value: 8.1158 | Reasoning: The predicted value of 8.1158 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 7.9846 to 8.3951. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.1, which is the predicted value.",
+          "parsed_prediction": 8.1158,
+          "true_label": 8.23882518381297,
+          "tsne_coords": [
+            49.33242416381836,
+            41.24055862426758
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 119,
+          "vlm_response": "Value: 9.6892 | Reasoning: The predicted value of 9.6892 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.6128 to 9.8847. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.6892, and the average of these values is 9.6892.",
+          "parsed_prediction": 9.6892,
+          "true_label": 9.662421854712926,
+          "tsne_coords": [
+            -29.467517852783203,
+            39.13996124267578
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 120,
+          "vlm_response": "Value: 8.9505 | Reasoning: The predicted value of 8.9505 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.8889 to 9.0471. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.95, which is the predicted value.",
+          "parsed_prediction": 8.9505,
+          "true_label": 8.957568453500846,
+          "tsne_coords": [
+            -32.115936279296875,
+            -29.681045532226562
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 121,
+          "vlm_response": "Value: 8.7940 | Reasoning: The predicted value of 8.7940 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.7400 to 8.9013. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.7940, which is the predicted value.",
+          "parsed_prediction": 8.794,
+          "true_label": 8.773210433004207,
+          "tsne_coords": [
+            0.6988698244094849,
+            -49.13410949707031
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 122,
+          "vlm_response": "Value: 10.3548 | Reasoning: The predicted value of 10.3548 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 10.2683 to 10.6257. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 10.35, which is the predicted value.",
+          "parsed_prediction": 10.3548,
+          "true_label": 10.32562066674613,
+          "tsne_coords": [
+            -57.90081787109375,
+            -5.519847869873047
+          ],
+          "image_size": "727x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 123,
+          "vlm_response": "Value: 8.3794 | Reasoning: The predicted value of 8.3794 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.2992 to 8.5438. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.3794, which is the predicted value.",
+          "parsed_prediction": 8.3794,
+          "true_label": 8.38488961614397,
+          "tsne_coords": [
+            22.446090698242188,
+            10.447982788085938
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 124,
+          "vlm_response": "Value: 8.6583 | Reasoning: The predicted value of 8.6583 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.5627 to 8.7445. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of target values around 8.65, which is the average of the nearest neighbors.",
+          "parsed_prediction": 8.6583,
+          "true_label": 8.771798763536957,
+          "tsne_coords": [
+            35.22460174560547,
+            -41.7548713684082
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 125,
+          "vlm_response": "Value: 8.2724 | Reasoning: The predicted value of 8.2724 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.0768 to 8.8622. The spatial clustering in the t-SNE visualization suggests that the query point is located near the center of the cluster of target values, which is consistent with the predicted value.",
+          "parsed_prediction": 8.2724,
+          "true_label": 8.244978754596548,
+          "tsne_coords": [
+            47.010108947753906,
+            32.03817367553711
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 126,
+          "vlm_response": "Value: 8.9716 | Reasoning: The predicted value of 8.9716 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.9169 to 9.0805. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.0, which is reflected in the average target value of the nearest neighbors.",
+          "parsed_prediction": 8.9716,
+          "true_label": 8.937478600982216,
+          "tsne_coords": [
+            -27.530834197998047,
+            -24.550397872924805
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 127,
+          "vlm_response": "Value: 8.3768 | Reasoning: The predicted value of 8.3768 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.2992 to 8.5438. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.3768, and the distance-weighted average of these neighbors further confirms this prediction.",
+          "parsed_prediction": 8.3768,
+          "true_label": 8.428205837432932,
+          "tsne_coords": [
+            22.704790115356445,
+            10.696737289428711
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 128,
+          "vlm_response": "Value: 8.7916 | Reasoning: The predicted value of 8.7916 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.7098 to 9.0441. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.79, which is the predicted value.",
+          "parsed_prediction": 8.7916,
+          "true_label": 8.771542050174947,
+          "tsne_coords": [
+            13.545477867126465,
+            -52.07483673095703
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 129,
+          "vlm_response": "Value: 9.8786 | Reasoning: The predicted value of 9.8786 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.7886 to 10.1821. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.8786, and the distances to these neighbors are relatively small, indicating high similarity.",
+          "parsed_prediction": 9.8786,
+          "true_label": 10.339612977678453,
+          "tsne_coords": [
+            -45.16162109375,
+            24.05539894104004
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 130,
+          "vlm_response": "Value: 8.5540 | Reasoning: The predicted value of 8.5540 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.4725 to 8.6955. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.5, which is the predicted value.",
+          "parsed_prediction": 8.554,
+          "true_label": 8.501307682186013,
+          "tsne_coords": [
+            28.523344039916992,
+            -14.372901916503906
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 131,
+          "vlm_response": "Value: 8.6840 | Reasoning: The predicted value of 8.6840 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.6437 to 8.7710. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.6840, and the distance-weighted average of these values supports this prediction.",
+          "parsed_prediction": 8.684,
+          "true_label": 8.713885353655051,
+          "tsne_coords": [
+            30.848806381225586,
+            -53.816200256347656
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 132,
+          "vlm_response": "Value: 9.5049 | Reasoning: The predicted value of 9.5049 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.4587 to 9.6380. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.5, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 9.5049,
+          "true_label": 9.550567455328933,
+          "tsne_coords": [
+            -8.585271835327148,
+            57.76356506347656
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 133,
+          "vlm_response": "Value: 9.4564 | Reasoning: The predicted value of 9.4564 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is close to the cluster of points with target values around 9.45, and the weighted average of these values is 9.4564.",
+          "parsed_prediction": 9.4564,
+          "true_label": 9.39799922254356,
+          "tsne_coords": [
+            8.249152183532715,
+            58.22356414794922
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 134,
+          "vlm_response": "Value: 8.3912 | Reasoning: The predicted value of 8.3912 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of the target values in the dataset. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.39, which is the predicted value.",
+          "parsed_prediction": 8.3912,
+          "true_label": 8.347827345782498,
+          "tsne_coords": [
+            12.06776237487793,
+            14.362334251403809
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 135,
+          "vlm_response": "Value: 8.8665 | Reasoning: The predicted value of 8.8665 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.7583 to 9.1416. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.8665, which is the predicted value.",
+          "parsed_prediction": 8.8665,
+          "true_label": 8.978371810305621,
+          "tsne_coords": [
+            -14.917095184326172,
+            -50.47026824951172
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 136,
+          "vlm_response": "Value: 8.9057 | Reasoning: The predicted value of 8.9057 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.8492 to 8.9925. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of target values around 8.90, which is also reflected in the neighbor analysis where the target values are closely clustered around this value.",
+          "parsed_prediction": 8.9057,
+          "true_label": 8.893425634511663,
+          "tsne_coords": [
+            -23.40249252319336,
+            -39.56031799316406
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 137,
+          "vlm_response": "Value: 8.228 | Reasoning: The query point is located near the cluster of points with target values around 8.228, which is the predicted value from the KNN analysis. The spatial clustering and the proximity to the nearest neighbors with similar target values support this prediction.",
+          "parsed_prediction": 8.228,
+          "true_label": 8.18320075754106,
+          "tsne_coords": [
+            39.51582717895508,
+            36.80699157714844
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 138,
+          "vlm_response": "Value: 9.831 | Reasoning: The predicted value of 9.8309 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.7291 to 10.1821. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.8, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 9.831,
+          "true_label": 9.759468017989702,
+          "tsne_coords": [
+            -39.90071487426758,
+            28.56354522705078
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 139,
+          "vlm_response": "Value: 8.8383 | Reasoning: The predicted value of 8.8383 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.7425 to 8.9463. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.8, which is the most common target value in the dataset.",
+          "parsed_prediction": 8.8383,
+          "true_label": 8.843335471564165,
+          "tsne_coords": [
+            -6.808220386505127,
+            -49.71811294555664
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 140,
+          "vlm_response": "Value: 8.4467 | Reasoning: The predicted value of 8.4467 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of the target values in the dataset. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.4, which is the predicted value.",
+          "parsed_prediction": 8.4467,
+          "true_label": 8.501745922932285,
+          "tsne_coords": [
+            11.878997802734375,
+            3.1354572772979736
+          ],
+          "image_size": "725x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 141,
+          "vlm_response": "Value: 8.3594 | Reasoning: The predicted value of 8.3594 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.2419 to 8.6424. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.35, which is the predicted value.",
+          "parsed_prediction": 8.3594,
+          "true_label": 8.316710060162821,
+          "tsne_coords": [
+            23.39885711669922,
+            15.895641326904297
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 142,
+          "vlm_response": "Value: 9.4444 | Reasoning: The predicted value of 9.4444 is derived from the average of the target values of the 30 nearest neighbors, which are all within the range of 9.3913 to 9.5671. The spatial clustering in the t-SNE visualization suggests that the query point is located near the cluster of points with target values around 9.4, which is the most common target value in the dataset.",
+          "parsed_prediction": 9.4444,
+          "true_label": 9.503267248366575,
+          "tsne_coords": [
+            2.3505287170410156,
+            55.55876541137695
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 143,
+          "vlm_response": "Value: 8.3415 | Reasoning: The predicted value of 8.3415 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.2628 to 8.4869. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.34, which is the predicted value.",
+          "parsed_prediction": 8.3415,
+          "true_label": 8.325045049977037,
+          "tsne_coords": [
+            21.17130470275879,
+            22.327232360839844
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 144,
+          "vlm_response": "Value: 8.5115 | Reasoning: The predicted value of 8.5115 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.4144 to 8.8694. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.5, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 8.5115,
+          "true_label": 8.529212971165332,
+          "tsne_coords": [
+            14.551426887512207,
+            -8.021848678588867
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 145,
+          "vlm_response": "Value: 8.363 | Reasoning: The predicted value of 8.363 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.2419 to 8.6424. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.363, which is the predicted value.",
+          "parsed_prediction": 8.363,
+          "true_label": 8.325521390374726,
+          "tsne_coords": [
+            22.07014274597168,
+            15.083624839782715
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 146,
+          "vlm_response": "Value: 8.4354 | Reasoning: The predicted value of 8.4354 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.3549 to 8.5481. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.4, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 8.4354,
+          "true_label": 8.41118077798589,
+          "tsne_coords": [
+            21.454805374145508,
+            1.3515360355377197
+          ],
+          "image_size": "725x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 147,
+          "vlm_response": "Value: 8.7486 | Reasoning: The predicted value of 8.7486 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of the target values in the dataset. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.7486, and the distances to these neighbors are relatively small, indicating high similarity.",
+          "parsed_prediction": 8.7486,
+          "true_label": 8.69038430343689,
+          "tsne_coords": [
+            20.771217346191406,
+            -43.63119888305664
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 148,
+          "vlm_response": "Value: 8.7000 | Reasoning: The query point is located near the cluster of points with target values around 8.70, which is the most common target value in the dataset. The predicted value from the KNN analysis is also close to this range, indicating that the target value of 8.7000 is the most likely prediction for the query point.",
+          "parsed_prediction": 8.7,
+          "true_label": 8.71417965670213,
+          "tsne_coords": [
+            29.767168045043945,
+            -54.00209045410156
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 149,
+          "vlm_response": "Value: 8.4476 | Reasoning: The predicted value of 8.4476 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.3549 to 8.5887. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.4, which is the predicted value.",
+          "parsed_prediction": 8.4476,
+          "true_label": 8.470990077943503,
+          "tsne_coords": [
+            16.424427032470703,
+            1.2722450494766235
+          ],
+          "image_size": "725x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 150,
+          "vlm_response": "Value: 8.8179 | Reasoning: The predicted value of 8.8179 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.7091 to 9.0441. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of target values around 8.8, which is also reflected in the neighbor analysis where the target values of the nearest neighbors are all close to this value.",
+          "parsed_prediction": 8.8179,
+          "true_label": 8.773660294062775,
+          "tsne_coords": [
+            5.290848255157471,
+            -56.25128173828125
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 151,
+          "vlm_response": "Value: 8.8511 | Reasoning: The predicted value of 8.8511 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.7583 to 8.9479. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.85, which is the predicted value.",
+          "parsed_prediction": 8.8511,
+          "true_label": 8.858548954615314,
+          "tsne_coords": [
+            -8.99515438079834,
+            -49.507476806640625
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 152,
+          "vlm_response": "Value: 9.453 | Reasoning: The query point is located near the cluster of points with target values around 9.45, which is the predicted value from the KNN regression analysis. The spatial clustering in the t-SNE visualization and the proximity of the query point to the nearest neighbors with similar target values support this prediction.",
+          "parsed_prediction": 9.453,
+          "true_label": 9.4000882328867,
+          "tsne_coords": [
+            4.521935939788818,
+            56.67186737060547
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 153,
+          "vlm_response": "Value: 8.6491 | Reasoning: The predicted value of 8.6491 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.5562 to 8.8004. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.6, which is also reflected in the neighbor analysis where the majority of the nearest neighbors have target values close to 8.6.",
+          "parsed_prediction": 8.6491,
+          "true_label": 8.73417110748582,
+          "tsne_coords": [
+            31.193695068359375,
+            -34.37669372558594
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 154,
+          "vlm_response": "Value: 8.6468 | Reasoning: The predicted value of 8.6468 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is close to the cluster of points with target values around 8.6, and the weighted average of these values, considering their proximity, results in the predicted value of 8.6468.",
+          "parsed_prediction": 8.6468,
+          "true_label": 8.612570354613489,
+          "tsne_coords": [
+            32.207767486572266,
+            -35.38705825805664
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 155,
+          "vlm_response": "Value: 9.156 | Reasoning: The predicted value of 9.156 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.0647 to 9.6392. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.15, which is the predicted value.",
+          "parsed_prediction": 9.156,
+          "true_label": 9.819431803372131,
+          "tsne_coords": [
+            -27.866086959838867,
+            2.1689584255218506
+          ],
+          "image_size": "725x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 156,
+          "vlm_response": "Value: 9.1157 | Reasoning: The predicted value of 9.1157 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.0665 to 9.2552. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.1, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 9.1157,
+          "true_label": 9.137074352941976,
+          "tsne_coords": [
+            -17.638530731201172,
+            -1.909511685371399
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 157,
+          "vlm_response": "Value: 8.9201 | Reasoning: The predicted value of 8.9201 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.8590 to 9.0877. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.92, which is the predicted value.",
+          "parsed_prediction": 8.9201,
+          "true_label": 8.921968206398239,
+          "tsne_coords": [
+            -25.115222930908203,
+            -36.59736633300781
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 158,
+          "vlm_response": "Value: 8.6653 | Reasoning: The predicted value of 8.6653 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.5901 to 8.8374. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.6653, and the distances to these neighbors are relatively small, indicating a high similarity. Therefore, the predicted value is 8.6653.",
+          "parsed_prediction": 8.6653,
+          "true_label": 8.634506783567925,
+          "tsne_coords": [
+            38.6682243347168,
+            -38.416038513183594
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 159,
+          "vlm_response": "Value: 9.9809 | Reasoning: The predicted value of 9.9809 is derived from the average of the target values of the 30 nearest neighbors, which are all within the range of 9.8921 to 10.1075. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 10. The average of these values, weighted by their distances, gives a robust prediction.",
+          "parsed_prediction": 9.9809,
+          "true_label": 9.958622624661206,
+          "tsne_coords": [
+            -48.51652908325195,
+            13.142573356628418
+          ],
+          "image_size": "719x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 160,
+          "vlm_response": "Value: 8.6428 | Reasoning: The predicted value of 8.6428 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.5562 to 8.7298. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.6, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 8.6428,
+          "true_label": 8.641968023752138,
+          "tsne_coords": [
+            33.13393783569336,
+            -32.97645950317383
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 161,
+          "vlm_response": "Value: 8.339 | Reasoning: The query point is located near the cluster of points with target values around 8.339, which is the predicted value from the KNN analysis. The spatial clustering in the t-SNE visualization and the proximity of the query point to this cluster support this prediction. Additionally, the target values of the nearest neighbors, particularly those with the smallest distances, are also around 8.339, further reinforcing this prediction.",
+          "parsed_prediction": 8.339,
+          "true_label": 8.355946808358265,
+          "tsne_coords": [
+            40.871742248535156,
+            26.115293502807617
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 162,
+          "vlm_response": "Value: 8.3215 | Reasoning: The predicted value of 8.3215 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.2551 to 8.4481. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.32, which is the predicted value.",
+          "parsed_prediction": 8.3215,
+          "true_label": 8.442293297344342,
+          "tsne_coords": [
+            26.552621841430664,
+            24.445728302001953
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 163,
+          "vlm_response": "Value: 8.6511 | Reasoning: The predicted value of 8.6511 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of the target values in the dataset. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.65, which is the predicted value.",
+          "parsed_prediction": 8.6511,
+          "true_label": 8.662504922576291,
+          "tsne_coords": [
+            36.38190460205078,
+            -37.173282623291016
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 164,
+          "vlm_response": "Value: 9.8868 | Reasoning: The predicted value of 9.8868 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of the target values in the dataset. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.8868.",
+          "parsed_prediction": 9.8868,
+          "true_label": 10.024313066269753,
+          "tsne_coords": [
+            -43.611427307128906,
+            22.395004272460938
+          ],
+          "image_size": "719x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 165,
+          "vlm_response": "Value: 9.018 | Reasoning: The predicted value of 9.018 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is likely to be close to the cluster of points with target values around 9.018. Additionally, the color intensity of the training points near the query point indicates a higher probability of the target value being close to 9.018.",
+          "parsed_prediction": 9.018,
+          "true_label": 9.05498126998421,
+          "tsne_coords": [
+            -24.329978942871094,
+            -19.67681312561035
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 166,
+          "vlm_response": "Value: 8.2828 | Reasoning: The predicted value of 8.2828 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.1744 to 8.5194. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.28, which is the predicted value.",
+          "parsed_prediction": 8.2828,
+          "true_label": 8.31246952729476,
+          "tsne_coords": [
+            36.08066940307617,
+            22.531301498413086
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 167,
+          "vlm_response": "Value: 9.8674 | Reasoning: The predicted value of 9.8674 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.7591 to 10.1821. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.8, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 9.8674,
+          "true_label": 9.893916899596178,
+          "tsne_coords": [
+            -41.623924255371094,
+            24.830541610717773
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 168,
+          "vlm_response": "Value: 8.7625 | Reasoning: The predicted value of 8.7625 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.6465 to 9.0052. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.76, which is the predicted value.",
+          "parsed_prediction": 8.7625,
+          "true_label": 8.7788289855367,
+          "tsne_coords": [
+            15.053804397583008,
+            -48.72699737548828
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 169,
+          "vlm_response": "Value: 8.9150 | Reasoning: The predicted value of 8.9150 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.8492 to 9.0877. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.9, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 8.915,
+          "true_label": 8.92331449444808,
+          "tsne_coords": [
+            -25.208389282226562,
+            -38.59928512573242
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 170,
+          "vlm_response": "Value: 8.7687 | Reasoning: The predicted value of 8.7687 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.6778 to 9.0052. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.7687, and the distances to these neighbors are relatively small, indicating a high similarity.",
+          "parsed_prediction": 8.7687,
+          "true_label": 8.938075680701097,
+          "tsne_coords": [
+            15.249367713928223,
+            -52.876670837402344
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 171,
+          "vlm_response": "Value: 8.5193 | Reasoning: The predicted value of 8.5193 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.3453 to 9.0321. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.5, which is the predicted value.",
+          "parsed_prediction": 8.5193,
+          "true_label": 8.404696160189092,
+          "tsne_coords": [
+            8.04224967956543,
+            3.522063732147217
+          ],
+          "image_size": "725x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 172,
+          "vlm_response": "Value: 9.051 | Reasoning: The predicted value of 9.051 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.9574 to 9.4542. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.05, which is the predicted value.",
+          "parsed_prediction": 9.051,
+          "true_label": 9.045539428900216,
+          "tsne_coords": [
+            -20.42536163330078,
+            -19.47971534729004
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 173,
+          "vlm_response": "Value: 9.2657 | Reasoning: The predicted value of 9.2657 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.1999 to 9.3953. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.2657. Additionally, the color intensity of the training points around this value indicates a higher density of data points, further supporting the prediction.",
+          "parsed_prediction": 9.2657,
+          "true_label": 9.300604583176275,
+          "tsne_coords": [
+            -5.853503227233887,
+            22.224903106689453
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 174,
+          "vlm_response": "Value: 9.1746 | Reasoning: The predicted value of 9.1746 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is close to the cluster of target values around 9.17, and the standard deviation of the target values is relatively small, indicating that the target values are tightly clustered around this value. Therefore, the predicted value of 9.1746 is a reasonable estimate based on the spatial proximity and the target value distribution.",
+          "parsed_prediction": 9.1746,
+          "true_label": 9.222388140282614,
+          "tsne_coords": [
+            -13.693553924560547,
+            6.997627258300781
+          ],
+          "image_size": "719x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 175,
+          "vlm_response": "Value: 9.1008 | Reasoning: The predicted value of 9.1008 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of the target values in the dataset. The spatial clustering in the t-SNE visualization suggests that the query point is located near the center of the cluster, which aligns with the predicted value.",
+          "parsed_prediction": 9.1008,
+          "true_label": 9.07329111055784,
+          "tsne_coords": [
+            -28.518821716308594,
+            -4.4916672706604
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 176,
+          "vlm_response": "Value: 9.2993 | Reasoning: The predicted value of 9.2993 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.2383 to 9.4159. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.2993, and the distances to these neighbors are relatively small, indicating high similarity.",
+          "parsed_prediction": 9.2993,
+          "true_label": 9.268144922302763,
+          "tsne_coords": [
+            -4.67769718170166,
+            28.91996192932129
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 177,
+          "vlm_response": "Value: 8.6113 | Reasoning: The predicted value of 8.6113 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.5449 to 8.7742. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.6, which is the predicted value.",
+          "parsed_prediction": 8.6113,
+          "true_label": 8.669189170628226,
+          "tsne_coords": [
+            36.6776237487793,
+            -26.708927154541016
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 178,
+          "vlm_response": "Value: 8.8785 | Reasoning: The predicted value of 8.8785 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.8047 to 9.0119. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.8785, which is the predicted value.",
+          "parsed_prediction": 8.8785,
+          "true_label": 8.849635340131387,
+          "tsne_coords": [
+            -17.560989379882812,
+            -44.9012451171875
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 179,
+          "vlm_response": "Value: 8.90 | Reasoning: The query point is located near the cluster of points with target values around 8.90, and the target values of the nearest neighbors (including the query point itself) are also around 8.90. The spatial clustering and the proximity of the target values suggest that the predicted value should be close to 8.90.",
+          "parsed_prediction": 8.9,
+          "true_label": 8.88797766458008,
+          "tsne_coords": [
+            -25.010089874267578,
+            -43.642147064208984
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 180,
+          "vlm_response": "Value: 10.0604 | Reasoning: The predicted value of 10.0604 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.9338 to 10.5158. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 10.0, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 10.0604,
+          "true_label": 10.049349842937328,
+          "tsne_coords": [
+            -53.06241226196289,
+            11.600539207458496
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 181,
+          "vlm_response": "Value: 9.0858 | Reasoning: The predicted value of 9.0858 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.0434 to 9.1780. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.0858, which is the predicted value.",
+          "parsed_prediction": 9.0858,
+          "true_label": 9.062990060275853,
+          "tsne_coords": [
+            -21.594789505004883,
+            -6.797519207000732
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 182,
+          "vlm_response": "Value: 9.528 | Reasoning: The query point is located near the cluster of points with target values around 9.5, and the predicted value from the KNN analysis is 9.5276. The spatial clustering in the t-SNE visualization suggests that the query point is close to this cluster, and the target values of the nearest neighbors (9.4828, 9.5053, 9.4902, etc.) are also close to 9.5. Therefore, the predicted value of 9.528 is reasonable and consistent with the spatial and neighbor value analysis.",
+          "parsed_prediction": 9.528,
+          "true_label": 9.514372528107424,
+          "tsne_coords": [
+            -9.80072021484375,
+            56.393157958984375
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 183,
+          "vlm_response": "Value: 8.9346 | Reasoning: The predicted value of 8.9346 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.8897 to 8.9792. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.93, which is the predicted value.",
+          "parsed_prediction": 8.9346,
+          "true_label": 8.993015088914532,
+          "tsne_coords": [
+            -25.678529739379883,
+            -31.460527420043945
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 184,
+          "vlm_response": "Value: 9.2517 | Reasoning: The predicted value of 9.2517 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.1988 to 9.3593. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.25, which is the predicted value.",
+          "parsed_prediction": 9.2517,
+          "true_label": 9.26901228661797,
+          "tsne_coords": [
+            -9.474654197692871,
+            22.770030975341797
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 185,
+          "vlm_response": "Value: 8.7445 | Reasoning: The predicted value of 8.7445 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.6604 to 8.9095. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.7, which is the predicted value.",
+          "parsed_prediction": 8.7445,
+          "true_label": 8.701071228599217,
+          "tsne_coords": [
+            24.106983184814453,
+            -47.827510833740234
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 186,
+          "vlm_response": "Value: 9.4481 | Reasoning: The predicted value of 9.4481 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is located near the center of the target value distribution, and the average of the nearest neighbor values (9.4481) is close to the mean target value of 8.99, indicating a reasonable prediction.",
+          "parsed_prediction": 9.4481,
+          "true_label": 9.377590591249852,
+          "tsne_coords": [
+            8.340499877929688,
+            58.56266403198242
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 187,
+          "vlm_response": "Value: 8.8011 | Reasoning: The predicted value of 8.8011 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.7320 to 8.8927. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.8, and the average of these values is 8.8011.",
+          "parsed_prediction": 8.8011,
+          "true_label": 8.787427667285824,
+          "tsne_coords": [
+            -3.1825549602508545,
+            -52.968223571777344
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 188,
+          "vlm_response": "Value: 8.6068 | Reasoning: The query point is located near the cluster of points with target values around 8.60, which is the most common target value among the nearest neighbors. The distance-weighted average of the nearest neighbors (8.6068) is close to the mean target value of 8.99, indicating that this value is likely the best prediction for the query point.",
+          "parsed_prediction": 8.6068,
+          "true_label": 8.570133878047734,
+          "tsne_coords": [
+            40.4842529296875,
+            -22.344099044799805
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 189,
+          "vlm_response": "Value: 10.1797 | Reasoning: The predicted value of 10.1797 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 10.0201 to 10.6556. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 10.1, which is also reflected in the average distance of 4.6127.",
+          "parsed_prediction": 10.1797,
+          "true_label": 10.081930909241002,
+          "tsne_coords": [
+            -54.03493118286133,
+            6.921476364135742
+          ],
+          "image_size": "721x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 190,
+          "vlm_response": "Value: 8.8491 | Reasoning: The predicted value of 8.8491 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.7583 to 8.9479. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of target values around 8.8, which is also reflected in the neighbor values. The standard deviation of the target values is relatively small, indicating that the values are tightly clustered around the mean. Therefore, the average of the nearest neighbor values provides a reasonable prediction for the query point.",
+          "parsed_prediction": 8.8491,
+          "true_label": 8.857081355821585,
+          "tsne_coords": [
+            -11.210205078125,
+            -48.566402435302734
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 191,
+          "vlm_response": "Value: 10.448 | Reasoning: The query point is located near the center of the t-SNE visualization, surrounded by neighbors with target values close to 10.448. The spatial clustering and the weighted average of the nearest neighbor values support this prediction.",
+          "parsed_prediction": 10.448,
+          "true_label": 10.448809836455618,
+          "tsne_coords": [
+            -60.057403564453125,
+            -10.512465476989746
+          ],
+          "image_size": "727x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 192,
+          "vlm_response": "Value: 9.1585 | Reasoning: The predicted value of 9.1585 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is close to the cluster of target values around 9.15, and the weighted average of these values, considering their proximity, results in the predicted value of 9.1585.",
+          "parsed_prediction": 9.1585,
+          "true_label": 9.135724578595394,
+          "tsne_coords": [
+            -20.977567672729492,
+            4.3669352531433105
+          ],
+          "image_size": "725x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 193,
+          "vlm_response": "Value: 9.0712 | Reasoning: The predicted value of 9.0712 is derived from the weighted average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is close to the cluster of target values around 9.07, and the weighted average of these values, considering their proximity, results in the predicted value of 9.0712.",
+          "parsed_prediction": 9.0712,
+          "true_label": 9.0666171876063,
+          "tsne_coords": [
+            -22.5045166015625,
+            -8.345062255859375
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 194,
+          "vlm_response": "Value: 8.5364 | Reasoning: The predicted value of 8.5364 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.3265 to 9.0321. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.5, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 8.5364,
+          "true_label": 8.403192280151986,
+          "tsne_coords": [
+            7.655739784240723,
+            7.8928399085998535
+          ],
+          "image_size": "719x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 195,
+          "vlm_response": "Value: 8.1158 | Reasoning: The predicted value of 8.1158 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 7.9743 to 8.5160. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.1, which is the most common target value in the dataset. Additionally, the color intensity of the training points around the query point indicates that it is likely to have a target value close to the mean of the dataset, which is 8.99.",
+          "parsed_prediction": 8.1158,
+          "true_label": 8.047413537086248,
+          "tsne_coords": [
+            50.70852279663086,
+            41.286582946777344
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 196,
+          "vlm_response": "Value: 8.8146 | Reasoning: The predicted value of 8.8146 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 8.7343 to 9.0499. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.8, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 8.8146,
+          "true_label": 8.930236916588246,
+          "tsne_coords": [
+            -0.11010348051786423,
+            -54.44260787963867
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 197,
+          "vlm_response": "Value: 9.3008 | Reasoning: The predicted value of 9.3008 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 9.2464 to 9.4159. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 9.3, which is reflected in the average of the nearest neighbor values.",
+          "parsed_prediction": 9.3008,
+          "true_label": 9.355081203434725,
+          "tsne_coords": [
+            -5.334300518035889,
+            31.336929321289062
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 198,
+          "vlm_response": "Value: 8.1128 | Reasoning: The predicted value of 8.1128 is based on the average of the target values of the 30 nearest neighbors, which are all within the range of 7.9743 to 8.3595. The spatial clustering in the t-SNE visualization suggests that the query point is close to the cluster of points with target values around 8.1, which is the predicted value.",
+          "parsed_prediction": 8.1128,
+          "true_label": 8.14732272481793,
+          "tsne_coords": [
+            47.363407135009766,
+            42.312503814697266
+          ],
+          "image_size": "717x572",
+          "visible_classes": []
+        },
+        {
+          "test_point_idx": 199,
+          "vlm_response": "Value: 8.6879 | Reasoning: The predicted value of 8.6879 is based on the average of the target values of the 30 nearest neighbors, which are connected by red lines in the t-SNE visualization. The spatial clustering patterns suggest that the query point is close to the cluster of points with target values around 8.68, and the average of these values is 8.6879.",
+          "parsed_prediction": 8.6879,
+          "true_label": 8.64194983458393,
+          "tsne_coords": [
+            31.40784454345703,
+            -42.495384216308594
+          ],
+          "image_size": "726x572",
+          "visible_classes": []
+        }
+      ],
+      "dataset_name": "medical_charges",
+      "dataset_id": 44146,
+      "task_id": 44146
+    }
+  ]
