@@ -1683,8 +1683,8 @@ class ClamTsneClassifier:
         # Build results
         results = {
             'model_name': f'CLAM-t-SNE-{self.modality}',
-            'accuracy': float(metrics['accuracy']),
-            'balanced_accuracy': float(metrics['balanced_accuracy']),
+            'accuracy': float(metrics['accuracy']) if metrics['accuracy'] is not None else None,
+            'balanced_accuracy': float(metrics['balanced_accuracy']) if metrics['balanced_accuracy'] is not None else None,
             'prediction_time': float(total_time),
             'total_time': float(total_time),
             'num_test_samples': len(X_test) if hasattr(X_test, '__len__') else len(self.test_tsne),
@@ -1701,6 +1701,13 @@ class ClamTsneClassifier:
             'f1_weighted': float(metrics['f1_weighted']) if metrics['f1_weighted'] is not None else None,
             'precision_macro': float(metrics['precision_macro']) if metrics['precision_macro'] is not None else None,
             'recall_macro': float(metrics['recall_macro']) if metrics['recall_macro'] is not None else None,
+            # Regression metrics (None for classification tasks)
+            'r2_score': float(metrics['r2_score']) if metrics.get('r2_score') is not None else None,
+            'mae': float(metrics['mae']) if metrics.get('mae') is not None else None,
+            'mse': float(metrics['mse']) if metrics.get('mse') is not None else None,
+            'rmse': float(metrics['rmse']) if metrics.get('rmse') is not None else None,
+            # Task type for reference
+            'task_type': metrics.get('task_type', 'unknown'),
             # Model configuration
             'config': self.get_config()
         }
