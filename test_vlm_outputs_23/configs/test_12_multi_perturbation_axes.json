@@ -1,0 +1,20 @@
+{
+  "name": "multi_perturbation_axes",
+  "enable_multi_viz": true,
+  "visualization_methods": [
+    "pca",
+    "tsne"
+  ],
+  "layout_strategy": "sequential",
+  "reasoning_focus": "comparison",
+  "use_semantic_names": true,
+  "load_semantic_from_cc18": true,
+  "nn_k": 30,
+  "semantic_axes": true,
+  "semantic_axes_method": "perturbation",
+  "semantic_class_names": [
+    "No-use",
+    "Long-term methods",
+    "Short-term methods"
+  ]
+}
