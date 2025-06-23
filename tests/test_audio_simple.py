@@ -71,7 +71,7 @@ def test_tsne_visualization():
         train_tsne, test_tsne, fig = create_tsne_visualization(
             train_embeddings, train_labels, test_embeddings,
             perplexity=min(10, n_samples // 3),
-            n_iter=250,  # Minimum allowed by sklearn
+            max_iter=250,  # Minimum allowed by sklearn
             figsize=(8, 6)
         )
         
@@ -362,7 +362,7 @@ def test_clam_audio_minimal():
             whisper_model="tiny",  # Fastest model
             embedding_layer="encoder_last",
             tsne_perplexity=1.0,  # Very small for 2 points
-            tsne_n_iter=250,      # Minimum
+            tsne_max_iter=250,      # Minimum
             vlm_model_id="Qwen/Qwen2.5-VL-3B-Instruct",
             use_3d_tsne=False,
             use_knn_connections=True,  # Test the KNN fix

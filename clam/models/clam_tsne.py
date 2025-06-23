@@ -74,7 +74,7 @@ class ClamTsneClassifier:
         vlm_model_id: str = "Qwen/Qwen2.5-VL-32B-Instruct",
         embedding_size: int = 1000,
         tsne_perplexity: int = 30,
-        tsne_n_iter: int = 1000,
+        tsne_max_iter: int = 1000,
         use_3d: bool = False,  # Unified 3D parameter (backward compatibility: use_3d_tsne is deprecated)
         use_knn_connections: bool = False,
         nn_k: int = 5,
@@ -188,7 +188,7 @@ class ClamTsneClassifier:
         self.vlm_model_id = vlm_model_id
         self.embedding_size = embedding_size
         self.tsne_perplexity = tsne_perplexity
-        self.tsne_n_iter = tsne_n_iter
+        self.tsne_max_iter = tsne_max_iter
         # Handle backward compatibility for use_3d_tsne -> use_3d
         if 'use_3d_tsne' in kwargs:
             # Use a temporary logger for the deprecation warning
@@ -356,7 +356,7 @@ class ClamTsneClassifier:
         else:
             # Fallback to instance parameters
             perplexity = self.tsne_perplexity
-            n_iter = self.tsne_n_iter
+            max_iter = self.tsne_max_iter
             random_state = self.seed
         
         tsne = TSNE(
@@ -967,7 +967,7 @@ class ClamTsneClassifier:
         # Store t-SNE parameters for potential reuse in perturbation method
         self._tsne_params = {
             'perplexity': self.tsne_perplexity,
-            'n_iter': self.tsne_n_iter,
+            'max_iter': self.tsne_max_iter,
             'random_state': self.seed
         }
         
@@ -981,7 +981,7 @@ class ClamTsneClassifier:
                 self.train_tsne, self.test_tsne, base_fig = viz_methods['create_regression_tsne_3d_visualization'](
                     self.train_embeddings, self.y_train_sample, self.test_embeddings,
                     perplexity=self.tsne_perplexity,
-                    n_iter=self.tsne_n_iter,
+                    max_iter=self.tsne_max_iter,
                     random_state=self.seed
                 )
             else:
@@ -990,7 +990,7 @@ class ClamTsneClassifier:
                 self.train_tsne, self.test_tsne, base_fig = viz_methods['create_regression_tsne_visualization'](
                     self.train_embeddings, self.y_train_sample, self.test_embeddings,
                     perplexity=self.tsne_perplexity,
-                    n_iter=self.tsne_n_iter,
+                    max_iter=self.tsne_max_iter,
                     random_state=self.seed,
                     use_3d=self.use_3d
                 )
@@ -1001,7 +1001,7 @@ class ClamTsneClassifier:
                 self.train_tsne, self.test_tsne, base_fig = viz_methods['create_tsne_3d_visualization'](
                     self.train_embeddings, self.y_train_sample, self.test_embeddings,
                     perplexity=self.tsne_perplexity,
-                    n_iter=self.tsne_n_iter,
+                    max_iter=self.tsne_max_iter,
                     random_state=self.seed
                 )
             else:
@@ -1009,7 +1009,7 @@ class ClamTsneClassifier:
                 self.train_tsne, self.test_tsne, base_fig = viz_methods['create_tsne_visualization'](
                     self.train_embeddings, self.y_train_sample, self.test_embeddings,
                     perplexity=self.tsne_perplexity,
-                    n_iter=self.tsne_n_iter,
+                    max_iter=self.tsne_max_iter,
                     random_state=self.seed
                 )
         
@@ -1705,7 +1705,7 @@ class ClamTsneClassifier:
             'vlm_model_id': self.vlm_model_id,
             'embedding_size': self.embedding_size,
             'tsne_perplexity': self.tsne_perplexity,
-            'tsne_n_iter': self.tsne_n_iter,
+            'tsne_max_iter': self.tsne_max_iter,
             'use_3d': self.use_3d,
             'use_knn_connections': self.use_knn_connections,
             'nn_k': self.knn_k,
@@ -1767,7 +1767,7 @@ def evaluate_clam_tsne(dataset, args):
             vlm_model_id=getattr(args, 'vlm_model_id', "Qwen/Qwen2.5-VL-32B-Instruct"),
             embedding_size=getattr(args, 'embedding_size', 1000),
             tsne_perplexity=getattr(args, 'tsne_perplexity', 30),
-            tsne_n_iter=getattr(args, 'tsne_n_iter', 1000),
+            tsne_max_iter=getattr(args, 'tsne_max_iter', getattr(args, 'tsne_n_iter', 1000)),
             use_3d=getattr(args, 'use_3d', False),
             use_knn_connections=getattr(args, 'use_knn_connections', False),
             nn_k=getattr(args, 'nn_k', 5),

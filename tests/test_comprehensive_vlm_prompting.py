@@ -720,7 +720,7 @@ class VLMPromptingTestSuite:
                 'modality': 'tabular',
                 'vlm_model_id': self.vlm_model,
                 'tsne_perplexity': config.get('tsne_perplexity', 15),
-                'tsne_n_iter': 500,  # Reduced for speed
+                'tsne_max_iter': 500,  # Reduced for speed
                 'seed': 42,
                 'max_vlm_image_size': 1024,  # Reduced for speed
                 'image_dpi': config.get('image_dpi', 100),

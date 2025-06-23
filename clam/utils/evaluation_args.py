@@ -531,10 +531,11 @@ def add_tsne_visualization_args(parser: argparse.ArgumentParser):
         help="Perplexity parameter for t-SNE"
     )
     parser.add_argument(
-        "--tsne_n_iter",
+        "--tsne_max_iter",
+        "--tsne_n_iter",  # Backward compatibility
         type=int,
         default=1000,
-        help="Number of iterations for t-SNE"
+        help="Maximum number of iterations for t-SNE (formerly n_iter, renamed for sklearn 1.5+ compatibility)"
     )
     parser.add_argument(
         "--zoom_factor",

@@ -99,7 +99,7 @@ def create_tsne_visualization(
     test_embeddings: np.ndarray,
     test_labels: Optional[np.ndarray] = None,
     perplexity: int = 30,
-    n_iter: int = 1000,
+    max_iter: int = 1000,
     random_state: int = 42,
     figsize: Tuple[int, int] = (12, 8),
     class_names: Optional[List[str]] = None,
@@ -139,11 +139,11 @@ def create_tsne_visualization(
         logger.warning(f"Adjusting perplexity from {perplexity} to {effective_perplexity} due to small dataset size")
     
     # Apply t-SNE
-    logger.info(f"Running t-SNE with perplexity={effective_perplexity}, n_iter={n_iter}")
+    logger.info(f"Running t-SNE with perplexity={effective_perplexity}, max_iter={max_iter}")
     tsne = TSNE(
         n_components=3 if use_3d else 2,
         perplexity=effective_perplexity,
-        max_iter=n_iter,
+        max_iter=max_iter,
         random_state=random_state,
         verbose=1
     )
@@ -258,7 +258,7 @@ def create_tsne_3d_visualization(
     test_embeddings: np.ndarray,
     test_labels: Optional[np.ndarray] = None,
     perplexity: int = 30,
-    n_iter: int = 1000,
+    max_iter: int = 1000,
     random_state: int = 42,
     figsize: Tuple[int, int] = (15, 12),
     class_names: Optional[List[str]] = None,
@@ -294,11 +294,11 @@ def create_tsne_3d_visualization(
         logger.warning(f"Adjusting perplexity from {perplexity} to {effective_perplexity} due to small dataset size")
     
     # Apply 3D t-SNE
-    logger.info(f"Running 3D t-SNE with perplexity={effective_perplexity}, n_iter={n_iter}")
+    logger.info(f"Running 3D t-SNE with perplexity={effective_perplexity}, max_iter={max_iter}")
     tsne = TSNE(
         n_components=3,  # 3D instead of 2D
         perplexity=effective_perplexity,
-        max_iter=n_iter,
+        max_iter=max_iter,
         random_state=random_state,
         verbose=1
     )
@@ -1518,7 +1518,7 @@ def create_regression_tsne_visualization(
     test_embeddings: np.ndarray,
     test_targets: Optional[np.ndarray] = None,
     perplexity: int = 30,
-    n_iter: int = 1000,
+    max_iter: int = 1000,
     random_state: int = 42,
     figsize: Tuple[int, int] = (12, 8),
     colormap: str = 'viridis',
@@ -1556,11 +1556,11 @@ def create_regression_tsne_visualization(
         logger.warning(f"Adjusting perplexity from {perplexity} to {effective_perplexity} due to small dataset size")
     
     # Apply t-SNE
-    logger.info(f"Running t-SNE with perplexity={effective_perplexity}, n_iter={n_iter}")
+    logger.info(f"Running t-SNE with perplexity={effective_perplexity}, max_iter={max_iter}")
     tsne = TSNE(
         n_components=3 if use_3d else 2,
         perplexity=effective_perplexity,
-        max_iter=n_iter,
+        max_iter=max_iter,
         random_state=random_state,
         verbose=1
     )
@@ -1668,7 +1668,7 @@ def create_regression_tsne_3d_visualization(
     test_embeddings: np.ndarray,
     test_targets: Optional[np.ndarray] = None,
     perplexity: int = 30,
-    n_iter: int = 1000,
+    max_iter: int = 1000,
     random_state: int = 42,
     figsize: Tuple[int, int] = (15, 12),
     colormap: str = 'viridis'
@@ -1704,11 +1704,11 @@ def create_regression_tsne_3d_visualization(
         logger.warning(f"Adjusting perplexity from {perplexity} to {effective_perplexity} due to small dataset size")
     
     # Apply 3D t-SNE
-    logger.info(f"Running 3D t-SNE with perplexity={effective_perplexity}, n_iter={n_iter}")
+    logger.info(f"Running 3D t-SNE with perplexity={effective_perplexity}, max_iter={max_iter}")
     tsne = TSNE(
         n_components=3,  # 3D instead of 2D
         perplexity=effective_perplexity,
-        max_iter=n_iter,
+        max_iter=max_iter,
         random_state=random_state,
         verbose=1
     )
