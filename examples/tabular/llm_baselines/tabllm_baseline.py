@@ -1518,10 +1518,24 @@ def evaluate_tabllm(dataset, args):
                 # Import shared metric calculation function
                 from clam.utils.llm_evaluation_utils import calculate_llm_metrics
                 
+                # Resolve task_id using resource manager as per CLAUDE.md guidelines
+                task_id = dataset.get('task_id')
+                if task_id is None:
+                    # Try to resolve task_id from dataset_id using resource manager
+                    try:
+                        from clam.utils.resource_manager import get_resource_manager
+                        rm = get_resource_manager()
+                        dataset_id = dataset.get('id')
+                        if dataset_id:
+                            identifiers = rm.resolve_openml_identifiers(dataset_id=dataset_id)
+                            task_id = identifiers.get('task_id')
+                    except Exception as e:
+                        logger.warning(f"Could not resolve task_id from dataset_id {dataset.get('id')}: {e}")
+                
                 # Calculate all metrics using shared function
                 calculated_metrics = calculate_llm_metrics(
                     y_test_partial, predictions, unique_classes, 
-                    all_class_log_probs, logger
+                    all_class_log_probs, logger, task_id=task_id, dataset=dataset
                 )
                 
                 # Extract individual metrics for backward compatibility
