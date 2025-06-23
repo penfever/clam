@@ -297,10 +297,19 @@ def compute_classification_probabilities(args, tokenizer, model, results):
         y_logprobs_given_x = y_logprobs[itr * num_categories : (itr + 1) * num_categories]
 
         idx_gt_column = None
+        # Convert ground truth to string for comparison with categories
+        gt_value_str = str(y_test_true[0])
         for j, category in enumerate(results['categories'][0]):
-            if category == str(y_test_true[0]):
+            # Try both direct string match and numeric match
+            if str(category) == gt_value_str or category == y_test_true[0]:
                 idx_gt_column = j
-        assert idx_gt_column is not None
+                break
+        
+        if idx_gt_column is None:
+            # More robust error handling with detailed information
+            available_categories = [str(cat) for cat in results['categories'][0]]
+            raise RuntimeError(f"Ground truth value '{gt_value_str}' (type: {type(y_test_true[0])}) not found in categories: {available_categories}. "
+                             f"This suggests a mismatch between training and test data categories or data preprocessing issues.")
 
         logprobs = [y_logprob[0].sum().item() for y_logprob in y_logprobs_given_x]
                 

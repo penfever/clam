@@ -294,8 +294,27 @@ def map_text_labels_to_integer_labels(text_labels, categories):
 
 
 def compute_classification_metrics(results, column_index):
-    results['metrics'][column_index]['y_test_mode'] =\
-        np.array(results['categories'][column_index])[np.argmax(results['metrics'][column_index]['probabilities_from_logits'], axis=1)]
+    # Handle both 1D and 2D probability arrays
+    probs = np.array(results['metrics'][column_index]['probabilities_from_logits'])
+    
+    if probs.ndim == 1:
+        # If 1D, we have a single sample - expand to 2D
+        probs = probs.reshape(1, -1)
+    elif probs.ndim == 2:
+        # If already 2D, check if we need to transpose
+        if probs.shape[1] == 1 and probs.shape[0] > 1:
+            # If shape is [n_classes, 1], transpose to [1, n_classes]
+            probs = probs.T
+    
+    # Get predicted classes
+    if probs.shape[0] == 1:
+        # Single prediction case
+        pred_indices = [np.argmax(probs[0])]
+    else:
+        # Multiple predictions case
+        pred_indices = np.argmax(probs, axis=1)
+    
+    results['metrics'][column_index]['y_test_mode'] = np.array(results['categories'][column_index])[pred_indices]
     
     # accuracy
     accuracy_logits = accuracy_score(

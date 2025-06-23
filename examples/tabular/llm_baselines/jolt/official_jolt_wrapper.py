@@ -881,6 +881,33 @@ def evaluate_jolt_official(dataset, args):
                 'regression_results': None
             })
         
+        # Validate JOLT completion before returning results
+        min_completion_rate = 0.5  # Require at least 50% completion
+        if results['completion_rate'] < min_completion_rate:
+            error_msg = (f"JOLT failed to complete successfully: only {results['completed_samples']}/{results['num_test_samples']} "
+                        f"samples completed ({results['completion_rate']:.1%}). "
+                        f"Minimum required completion rate: {min_completion_rate:.0%}. "
+                        f"This indicates JOLT encountered critical errors during evaluation.")
+            logger.error(error_msg)
+            raise RuntimeError(error_msg)
+        
+        # Additional validation for metrics
+        if not is_regression:
+            if results['accuracy'] is None or results['accuracy'] == 0:
+                error_msg = (f"JOLT failed to produce valid classification results: "
+                           f"accuracy={results['accuracy']}, completed_samples={results['completed_samples']}. "
+                           f"This indicates the classification pipeline failed.")
+                logger.error(error_msg)
+                raise RuntimeError(error_msg)
+        else:
+            if results['mae'] is None:
+                error_msg = (f"JOLT failed to produce valid regression results: "
+                           f"MAE={results['mae']}, completed_samples={results['completed_samples']}. "
+                           f"This indicates the regression pipeline failed.")
+                logger.error(error_msg)
+                raise RuntimeError(error_msg)
+        
+        logger.info(f"JOLT evaluation completed successfully with {results['completion_rate']:.1%} completion rate")
         return results
         
     except Exception as e:
