@@ -394,9 +394,18 @@ def expand_semantic_features(semantic_info: Dict[str, Any], target_feature_count
         original_columns = semantic_info['columns']
         current_count = len(original_columns)
         
-        if current_count < target_feature_count:
+        # Check if we need to expand or realign features
+        needs_expansion = current_count < target_feature_count
+        needs_realignment = (actual_feature_names and 
+                           len(actual_feature_names) == target_feature_count and 
+                           current_count <= target_feature_count)
+        
+        if needs_expansion or needs_realignment:
             logger = logging.getLogger(__name__)
-            logger.info(f"Expanding {current_count} semantic features to {target_feature_count} by duplicating with actual feature names...")
+            if needs_expansion:
+                logger.info(f"Expanding {current_count} semantic features to {target_feature_count} by duplicating with actual feature names...")
+            else:
+                logger.info(f"Realigning {current_count} semantic features to match actual feature names...")
             expanded_columns = []
             
             # If we have actual feature names, use them; otherwise create suffixed names
@@ -436,9 +445,18 @@ def expand_semantic_features(semantic_info: Dict[str, Any], target_feature_count
         original_features = semantic_info['feature_descriptions']
         current_count = len(original_features)
         
-        if current_count < target_feature_count:
+        # Check if we need to expand or realign features
+        needs_expansion = current_count < target_feature_count
+        needs_realignment = (actual_feature_names and 
+                           len(actual_feature_names) == target_feature_count and 
+                           current_count <= target_feature_count)
+        
+        if needs_expansion or needs_realignment:
             logger = logging.getLogger(__name__)
-            logger.info(f"Expanding {current_count} semantic features to {target_feature_count} by duplicating with actual feature names...")
+            if needs_expansion:
+                logger.info(f"Expanding {current_count} semantic features to {target_feature_count} by duplicating with actual feature names...")
+            else:
+                logger.info(f"Realigning {current_count} semantic features to match actual feature names...")
             expanded_features = {}
             
             # If we have actual feature names, use them; otherwise create suffixed names
@@ -470,9 +488,18 @@ def expand_semantic_features(semantic_info: Dict[str, Any], target_feature_count
         original_features = semantic_info['feature_description']
         current_count = len(original_features)
         
-        if current_count < target_feature_count:
+        # Check if we need to expand or realign features
+        needs_expansion = current_count < target_feature_count
+        needs_realignment = (actual_feature_names and 
+                           len(actual_feature_names) == target_feature_count and 
+                           current_count <= target_feature_count)
+        
+        if needs_expansion or needs_realignment:
             logger = logging.getLogger(__name__)
-            logger.info(f"Expanding {current_count} semantic features to {target_feature_count} by duplicating with actual feature names...")
+            if needs_expansion:
+                logger.info(f"Expanding {current_count} semantic features to {target_feature_count} by duplicating with actual feature names...")
+            else:
+                logger.info(f"Realigning {current_count} semantic features to match actual feature names...")
             expanded_features = {}
             
             # If we have actual feature names, use them; otherwise create suffixed names

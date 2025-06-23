@@ -1,0 +1,441 @@
+{
+  "test_config": {
+    "name": "tsne_3d_perturbation",
+    "enable_multi_viz": false,
+    "use_semantic_names": true,
+    "load_semantic_from_cc18": true,
+    "semantic_axes": true,
+    "semantic_axes_method": "perturbation",
+    "use_3d_tsne": true,
+    "use_knn_connections": false,
+    "nn_k": 30,
+    "tsne_perplexity": 15,
+    "semantic_class_names": [
+      "No-use",
+      "Long-term methods",
+      "Short-term methods"
+    ]
+  },
+  "ground_truth": [
+    0,
+    1,
+    0,
+    0,
+    0,
+    2,
+    0,
+    1,
+    2,
+    0,
+    1,
+    2,
+    0,
+    1,
+    2,
+    2,
+    0,
+    1,
+    2,
+    0
+  ],
+  "prediction_details": [
+    {
+      "test_point_idx": 0,
+      "vlm_response": "Class: Long-term methods | Reasoning: The red star (query point) is positioned closer to the orange-colored \"Long-term methods\" cluster across all four viewing angles. This spatial proximity indicates that the query point is more aligned with the characteristics of the \"Long-term methods\" class, as opposed to the \"No-use\" or \"Short-term methods\" clusters.",
+      "parsed_prediction": "1",
+      "true_label": "0",
+      "tsne_coords": [
+        2.0908217430114746,
+        -4.623635768890381,
+        -5.8320722579956055
+      ],
+      "image_size": "1024x844",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 1,
+      "vlm_response": "Class: No-use | Reasoning: The red star (query point) is closest to the blue-colored \"No-use\" class across all viewing angles. In the isometric view, the red star is near the blue points, indicating a strong spatial clustering with the \"No-use\" class. Similarly, in the front, side, and top views, the red star is positioned near the blue points, reinforcing the classification.",
+      "parsed_prediction": "0",
+      "true_label": "1",
+      "tsne_coords": [
+        -5.841493129730225,
+        12.139589309692383,
+        0.7215628623962402
+      ],
+      "image_size": "1024x849",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 2,
+      "vlm_response": "Class: Long-term methods | Reasoning: The red star (query point) is closest to the orange-colored points, which represent the \"Long-term methods\" class. Across all viewing angles, the red star is more aligned with the \"Long-term methods\" cluster, indicating that it is more similar to this class in terms of the features embedded in the 3D space.",
+      "parsed_prediction": "1",
+      "true_label": "0",
+      "tsne_coords": [
+        0.6862661242485046,
+        9.062536239624023,
+        -3.5367610454559326
+      ],
+      "image_size": "1024x844",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 3,
+      "vlm_response": "Class: Long-term methods | Reasoning: The red star (query point) is positioned closer to the orange-colored \"Long-term methods\" cluster across all viewing angles. This spatial clustering indicates that the query point is more aligned with the characteristics of the \"Long-term methods\" class, as opposed to the \"No-use\" or \"Short-term methods\" clusters.",
+      "parsed_prediction": "1",
+      "true_label": "0",
+      "tsne_coords": [
+        2.4194681644439697,
+        -3.844001054763794,
+        -6.6678361892700195
+      ],
+      "image_size": "1024x844",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 4,
+      "vlm_response": "Class: No-use | Reasoning: The red star (query point) is positioned in the lower left region of the 3D space, which is closest to the \"No-use\" class cluster across all viewing angles. This spatial clustering indicates that the query point is more aligned with the \"No-use\" class than the \"Long-term methods\" or \"Short-term methods\" classes.",
+      "parsed_prediction": "0",
+      "true_label": "0",
+      "tsne_coords": [
+        -8.574289321899414,
+        -3.365567207336426,
+        -1.0842671394348145
+      ],
+      "image_size": "1024x844",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 5,
+      "vlm_response": "Class: Long-term methods | Reasoning: The red star (query point) is positioned closer to the orange-colored points, which represent the \"Long-term methods\" class. Across all viewing angles, the red star appears to be more aligned with the \"Long-term methods\" cluster, indicating that it is most likely to belong to this class.",
+      "parsed_prediction": "1",
+      "true_label": "2",
+      "tsne_coords": [
+        5.15709114074707,
+        -8.842610359191895,
+        -2.7054662704467773
+      ],
+      "image_size": "1024x843",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 6,
+      "vlm_response": "Class: No-use | Reasoning: The red star (query point) is closest to the blue-colored \"No-use\" class across all four viewing angles. In the isometric view, the red star is near the blue points, indicating a strong spatial clustering with the \"No-use\" class. In the front, side, and top views, the red star also aligns with the blue points, further confirming its classification as \"No-use.\"",
+      "parsed_prediction": "0",
+      "true_label": "0",
+      "tsne_coords": [
+        -12.680590629577637,
+        0.5837756991386414,
+        2.128145456314087
+      ],
+      "image_size": "1024x849",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 7,
+      "vlm_response": "Class: Short-term methods | Reasoning: The red star (query point) is closest to the green-colored points, which represent short-term methods. Across all viewing angles, the red star is more aligned with the short-term methods cluster, indicating that it is more similar to these points in the 3D space.",
+      "parsed_prediction": "2",
+      "true_label": "1",
+      "tsne_coords": [
+        6.577204704284668,
+        -4.810616970062256,
+        -3.5448930263519287
+      ],
+      "image_size": "1024x844",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 8,
+      "vlm_response": "Class: Long-term methods | Reasoning: The red star (query point) is positioned closer to the orange-colored points representing \"Long-term methods\" across all four viewing angles. This spatial clustering indicates that the query point is more aligned with the \"Long-term methods\" class in the 3D t-SNE space.",
+      "parsed_prediction": "1",
+      "true_label": "2",
+      "tsne_coords": [
+        -5.841518402099609,
+        12.139448165893555,
+        0.7215843200683594
+      ],
+      "image_size": "1024x849",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 9,
+      "vlm_response": "Class: No-use | Reasoning: The red star (query point) is closest to the blue-colored \"No-use\" points across all four viewing angles. This indicates that the query point is spatially clustered with the \"No-use\" class, suggesting that it belongs to this class.",
+      "parsed_prediction": "0",
+      "true_label": "0",
+      "tsne_coords": [
+        -14.149124145507812,
+        -0.418969064950943,
+        -0.4446770250797272
+      ],
+      "image_size": "1024x846",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 10,
+      "vlm_response": "Class: Short-term methods | Reasoning: The red star (query point) is closest to the green-colored short-term methods cluster across all four viewing angles. This spatial proximity indicates that the query point is more aligned with the short-term methods class in the 3D t-SNE space.",
+      "parsed_prediction": "2",
+      "true_label": "1",
+      "tsne_coords": [
+        6.5757222175598145,
+        -4.56112813949585,
+        -3.8375966548919678
+      ],
+      "image_size": "1024x844",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 11,
+      "vlm_response": "Class: Short-term methods | Reasoning: The red star (query point) is closest to the green-colored points, which represent the \"Short-term methods\" class across all four viewing angles. This spatial clustering indicates that the query point is more aligned with the \"Short-term methods\" class than the \"No-use\" or \"Long-term methods\" classes.",
+      "parsed_prediction": "2",
+      "true_label": "2",
+      "tsne_coords": [
+        -6.438791275024414,
+        8.603578567504883,
+        0.5814202427864075
+      ],
+      "image_size": "1024x848",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 12,
+      "vlm_response": "Class: No-use | Reasoning: The red star (query point) is closest to the blue-colored \"No-use\" points across all four viewing angles. This indicates that the query point is more similar to the \"No-use\" class in terms of the features embedded in the 3D space, suggesting that it should be classified as \"No-use.\"",
+      "parsed_prediction": "0",
+      "true_label": "0",
+      "tsne_coords": [
+        -15.427938461303711,
+        -3.1940529346466064,
+        -3.2480721473693848
+      ],
+      "image_size": "1024x844",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 13,
+      "vlm_response": "Class: Short-term methods | Reasoning: The red star (query point) is closest to the green-colored points, which represent the \"Short-term methods\" class. Across all viewing angles, the red star is more aligned with the \"Short-term methods\" cluster than with the \"No-use\" or \"Long-term methods\" clusters. This spatial clustering pattern suggests that the query point is more representative of the \"Short-term methods\" class.",
+      "parsed_prediction": "2",
+      "true_label": "1",
+      "tsne_coords": [
+        9.67858600616455,
+        0.6563253998756409,
+        4.636991500854492
+      ],
+      "image_size": "1024x849",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 14,
+      "vlm_response": "Class: Short-term methods | Reasoning: The red star (query point) is positioned closer to the green-colored short-term methods cluster across all four viewing angles. This spatial clustering indicates that the query point is more aligned with the short-term methods class in the 3D t-SNE space.",
+      "parsed_prediction": "2",
+      "true_label": "2",
+      "tsne_coords": [
+        -7.92113733291626,
+        5.085351943969727,
+        0.5638822317123413
+      ],
+      "image_size": "1024x848",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 15,
+      "vlm_response": "Class: Short-term methods | Reasoning: The red star (query point) is closest to the green-colored points, which represent the \"Short-term methods\" class across all viewing angles. This spatial clustering indicates that the query point is more aligned with the \"Short-term methods\" class than the other classes.",
+      "parsed_prediction": "2",
+      "true_label": "2",
+      "tsne_coords": [
+        6.229418754577637,
+        -0.05895492434501648,
+        -1.1828407049179077
+      ],
+      "image_size": "1024x844",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 16,
+      "vlm_response": "Class: Long-term methods | Reasoning: The red star (query point) is closest to the orange-colored points, which represent the \"Long-term methods\" class. Across all viewing angles, the red star is more aligned with the \"Long-term methods\" cluster than with the \"Short-term methods\" or \"No-use\" clusters. This spatial proximity suggests that the query point is more representative of the \"Long-term methods\" class.",
+      "parsed_prediction": "1",
+      "true_label": "0",
+      "tsne_coords": [
+        -3.091524839401245,
+        11.541199684143066,
+        -1.7981038093566895
+      ],
+      "image_size": "1024x844",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 17,
+      "vlm_response": "Class: Short-term methods | Reasoning: The red star (query point) is closest to the green-colored points, which represent the \"Short-term methods\" class. Across all viewing angles, the red star is more aligned with the \"Short-term methods\" cluster than with the \"No-use\" or \"Long-term methods\" clusters. This spatial clustering pattern suggests that the query point is more representative of the \"Short-term methods\" class.",
+      "parsed_prediction": "2",
+      "true_label": "1",
+      "tsne_coords": [
+        -2.055896043777466,
+        1.662066102027893,
+        -1.452282428741455
+      ],
+      "image_size": "1024x843",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 18,
+      "vlm_response": "Class: Long-term methods | Reasoning: The red star (query point) is closest to the orange-colored points, which represent the \"Long-term methods\" class. Across all viewing angles, the red star is more aligned with the \"Long-term methods\" cluster, indicating that it is more similar to these points in the 3D space.",
+      "parsed_prediction": "1",
+      "true_label": "2",
+      "tsne_coords": [
+        5.423096179962158,
+        -5.519639492034912,
+        3.094160795211792
+      ],
+      "image_size": "1024x848",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "test_point_idx": 19,
+      "vlm_response": "Class: No-use | Reasoning: The red star (query point) is closest to the blue-colored \"No-use\" points across all four viewing angles. This suggests that the query point is more aligned with the \"No-use\" class in the 3D space, indicating that it is more likely to belong to this class.",
+      "parsed_prediction": "0",
+      "true_label": "0",
+      "tsne_coords": [
+        -13.269777297973633,
+        -1.0447574853897095,
+        -0.9771005511283875
+      ],
+      "image_size": "1024x844",
+      "visible_classes": [
+        0,
+        1,
+        2
+      ]
+    }
+  ],
+  "completion_rate": 1.0,
+  "test_indices": [
+    0,
+    7,
+    15,
+    20,
+    25,
+    34,
+    43,
+    45,
+    48,
+    82,
+    95,
+    99,
+    107,
+    111,
+    113,
+    118,
+    132,
+    138,
+    142,
+    148
+  ],
+  "metrics": {
+    "config_name": "tsne_3d_perturbation",
+    "accuracy": 0.4,
+    "balanced_accuracy": 0.35185185185185186,
+    "precision_macro": 0.42063492063492064,
+    "recall_macro": 0.35185185185185186,
+    "f1_macro": 0.37606837606837606,
+    "precision_micro": 0.4,
+    "recall_micro": 0.4,
+    "f1_micro": 0.4,
+    "precision_weighted": 0.5035714285714286,
+    "recall_weighted": 0.4,
+    "f1_weighted": 0.4384615384615385,
+    "confusion_matrix": [
+      [
+        5,
+        4,
+        0
+      ],
+      [
+        1,
+        0,
+        4
+      ],
+      [
+        0,
+        3,
+        3
+      ]
+    ],
+    "completion_rate": 1.0,
+    "num_test_samples": 20,
+    "num_classes": 3,
+    "support": []
+  }
+}

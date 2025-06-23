@@ -739,6 +739,129 @@ def test_real_cc18_semantic_data():
         logger.error(f"❌ Error testing real CC18 data: {e}")
 
 
+def test_balance_scale_empty_notes_bug():
+    """Test the specific bug fix for balance-scale empty notes (task 11)."""
+    logger.info("\n=== Testing Balance-Scale Empty Notes Bug Fix ===")
+    
+    from examples.tabular.llm_baselines.tabllm_baseline import (
+        load_tabllm_config_by_openml_id, expand_semantic_features, generate_note_from_row
+    )
+    import pandas as pd
+    
+    # Test the exact scenario that was failing before the fix
+    try:
+        # Load task 11 (balance-scale) configuration
+        config_data, feature_mapping = load_tabllm_config_by_openml_id(11, original_feature_count=4)
+        
+        if not config_data or not feature_mapping:
+            logger.warning("⚠️ Could not load task 11 config - skipping test")
+            return
+        
+        semantic_info = feature_mapping.get('semantic_info')
+        if not semantic_info:
+            logger.warning("⚠️ No semantic info for task 11 - skipping test")
+            return
+        
+        logger.info("✅ Loaded task 11 (balance-scale) configuration")
+        
+        # Test with the exact feature names that were causing the issue
+        actual_feature_names = ['left-weight', 'left-distance', 'right-weight', 'right-distance']
+        logger.info(f"Using actual feature names: {actual_feature_names}")
+        
+        # Before fix: semantic features would be ['Left weight', 'Left distance', 'Right weight', 'Right distance']
+        # After fix: semantic features should be ['left-weight', 'left-distance', 'right-weight', 'right-distance']
+        
+        # Expand semantic features (this should trigger realignment)
+        expanded_semantic = expand_semantic_features(semantic_info, 4, actual_feature_names)
+        
+        # Validate that the fix worked
+        tests_passed = 0
+        total_tests = 3
+        
+        if 'columns' in expanded_semantic:
+            expanded_names = [col['name'] for col in expanded_semantic['columns']]
+            
+            # Test 1: Names should match exactly
+            if set(expanded_names) == set(actual_feature_names):
+                logger.info("✅ Bug fix working: Semantic names match actual feature names")
+                tests_passed += 1
+            else:
+                logger.error(f"❌ Bug fix failed: Names don't match")
+                logger.error(f"   Expected: {actual_feature_names}")
+                logger.error(f"   Got: {expanded_names}")
+            
+            # Test 2: Create test data and generate note (this should NOT be empty)
+            test_data = pd.Series([1, 1, 1, 1], index=actual_feature_names)
+            
+            try:
+                note = generate_note_from_row(test_data, expanded_semantic, actual_feature_names, exclude_target=True)
+                if note and len(note.strip()) > 0:
+                    logger.info("✅ Bug fix working: Note generation successful")
+                    logger.info(f"   Generated note: {note[:100]}...")
+                    tests_passed += 1
+                else:
+                    logger.error("❌ Bug fix failed: Empty note still generated")
+            except Exception as e:
+                logger.error(f"❌ Bug fix failed: Note generation error: {e}")
+            
+            # Test 3: All features should have descriptions
+            missing_desc = [col['name'] for col in expanded_semantic['columns'] if not col.get('semantic_description')]
+            if not missing_desc:
+                logger.info("✅ Bug fix working: All features have semantic descriptions")
+                tests_passed += 1
+            else:
+                logger.error(f"❌ Bug fix issue: Missing descriptions for: {missing_desc}")
+        
+        elif 'feature_description' in expanded_semantic:
+            expanded_names = list(expanded_semantic['feature_description'].keys())
+            
+            # Test 1: Names should match exactly
+            if set(expanded_names) == set(actual_feature_names):
+                logger.info("✅ Bug fix working: Semantic names match actual feature names")
+                tests_passed += 1
+            else:
+                logger.error(f"❌ Bug fix failed: Names don't match")
+                logger.error(f"   Expected: {actual_feature_names}")
+                logger.error(f"   Got: {expanded_names}")
+            
+            # Test 2: Create test data and generate note (this should NOT be empty)
+            test_data = pd.Series([1, 1, 1, 1], index=actual_feature_names)
+            
+            try:
+                note = generate_note_from_row(test_data, expanded_semantic, actual_feature_names, exclude_target=True)
+                if note and len(note.strip()) > 0:
+                    logger.info("✅ Bug fix working: Note generation successful")
+                    logger.info(f"   Generated note: {note[:100]}...")
+                    tests_passed += 1
+                else:
+                    logger.error("❌ Bug fix failed: Empty note still generated")
+            except Exception as e:
+                logger.error(f"❌ Bug fix failed: Note generation error: {e}")
+            
+            # Test 3: All features should have descriptions
+            missing_desc = [feat for feat, desc in expanded_semantic['feature_description'].items() if not desc]
+            if not missing_desc:
+                logger.info("✅ Bug fix working: All features have semantic descriptions")
+                tests_passed += 1
+            else:
+                logger.error(f"❌ Bug fix issue: Missing descriptions for: {missing_desc}")
+        
+        # Summary
+        logger.info(f"\n--- Balance-Scale Bug Fix Test Summary ---")
+        logger.info(f"Tests passed: {tests_passed}/{total_tests}")
+        
+        if tests_passed == total_tests:
+            logger.info("✅ Balance-scale empty notes bug has been FIXED!")
+        else:
+            logger.error("❌ Balance-scale empty notes bug still exists")
+        
+        return tests_passed == total_tests
+        
+    except Exception as e:
+        logger.error(f"❌ Error testing balance-scale bug fix: {e}")
+        return False
+
+
 def test_note_inspection_system():
     """Test the note inspection file saving system."""
     logger.info("\n=== Testing Note Inspection System ===")
@@ -830,6 +953,7 @@ def main():
     test_semantic_feature_expansion()
     test_semantic_feature_alignment()
     test_real_cc18_semantic_data()
+    test_balance_scale_empty_notes_bug()  # Test the specific bug fix
     test_online_note_generation()
     test_context_aware_truncation()
     test_note_inspection_system()
