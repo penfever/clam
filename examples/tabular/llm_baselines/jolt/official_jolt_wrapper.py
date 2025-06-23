@@ -60,7 +60,7 @@ def evaluate_jolt_official(dataset, args):
             logger.info(f"Current CUDA device: {torch.cuda.current_device()}")
             logger.info(f"Device name: {torch.cuda.get_device_name(0)}")  # Should be GPU 2's name
     
-    # Load JOLT configuration using the new resource manager
+    # Load JOLT configuration using the new resource manager (MOVED OUTSIDE try block)
     jolt_config = None
     try:
         from clam.utils.resource_manager import get_resource_manager
@@ -88,7 +88,9 @@ def evaluate_jolt_official(dataset, args):
             else:
                 logger.info(f"No JOLT metadata found for task {dataset['id']} ({dataset['name']}), using default approach")
     except Exception as e:
-        logger.debug(f"Could not load JOLT config for task {dataset['id']} ({dataset['name']}): {e}")
+        logger.error(f"Could not load JOLT config for task {dataset['id']} ({dataset['name']}): {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         
         # Fallback to legacy method with both naming conventions
         try:
@@ -110,7 +112,12 @@ def evaluate_jolt_official(dataset, args):
                         jolt_config = json.load(f)
                     logger.info(f"Using JOLT metadata for {dataset['name']} from legacy location")
         except Exception as e2:
-            logger.debug(f"Legacy JOLT config loading also failed: {e2}")
+            logger.error(f"Legacy JOLT config loading also failed: {e2}")
+            import traceback
+            logger.error(traceback.format_exc())
+    
+    # Debug: Log config status before main evaluation
+    logger.info(f"Starting JOLT evaluation with jolt_config={'loaded' if jolt_config else 'None'}")
     
     start_time = time.time()
     
@@ -177,9 +184,10 @@ def evaluate_jolt_official(dataset, args):
         unique_classes = np.unique(y_train)
         
         # Limit test samples if specified
-        if args.max_test_samples and args.max_test_samples < len(X_test):
-            X_test = X_test[:args.max_test_samples]
-            y_test = y_test[:args.max_test_samples]
+        max_test_samples = getattr(args, 'max_test_samples', None)
+        if max_test_samples and max_test_samples < len(X_test):
+            X_test = X_test[:max_test_samples]
+            y_test = y_test[:max_test_samples]
         
         # Apply feature selection for large feature spaces
         X_train, X_test, dataset, _ = apply_feature_reduction(
@@ -627,7 +635,9 @@ def evaluate_jolt_official(dataset, args):
                             predictions = []
                             completed_samples = 0
                     except Exception as e:
-                        logger.warning(f"Error extracting regression predictions from JOLT metrics: {e}")
+                        logger.error(f"Error extracting regression predictions from JOLT metrics: {e}")
+                        import traceback
+                        logger.error(traceback.format_exc())
                         predictions = []
                         completed_samples = 0
                 
@@ -671,7 +681,9 @@ def evaluate_jolt_official(dataset, args):
                             predictions = []
                             completed_samples = 0
                     except Exception as e:
-                        logger.warning(f"Error extracting predictions from JOLT metrics: {e}")
+                        logger.error(f"Error extracting predictions from JOLT metrics: {e}")
+                        import traceback
+                        logger.error(traceback.format_exc())
                         predictions = []
                         completed_samples = 0
                 
@@ -930,7 +942,9 @@ def evaluate_jolt_official(dataset, args):
                 logger.error(error_msg)
                 raise RuntimeError(error_msg)
         
+        # Debug: Log config status at successful completion
         logger.info(f"JOLT evaluation completed successfully with {results['completion_rate']:.1%} completion rate")
+        logger.info(f"Final jolt_config status: {'loaded' if jolt_config else 'None'}")
         return results
         
     except Exception as e:
@@ -945,7 +959,8 @@ def evaluate_jolt_official(dataset, args):
             'error': str(e),
             'timeout': False,
             'completed_samples': 0,
-            'completion_rate': 0.0
+            'completion_rate': 0.0,
+            'used_jolt_config': jolt_config is not None  # Include config status even in error case
         }
     finally:
         # Restore original environment variables
