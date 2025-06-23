@@ -301,14 +301,29 @@ class ClamImageTsneClassifier:
         # Limit training samples for plotting if needed
         if len(self.train_embeddings) > self.max_train_plot_samples:
             logger.info(f"Limiting training samples for plotting: {len(self.train_embeddings)} -> {self.max_train_plot_samples}")
-            # Use stratified sampling to maintain class balance
+            
+            # Check if stratified sampling is possible (each class needs at least 2 samples)
+            from collections import Counter
+            class_counts = Counter(self.y_train)
+            min_class_count = min(class_counts.values())
+            can_stratify = min_class_count >= 2
+            
             from sklearn.model_selection import train_test_split
-            _, plot_indices = train_test_split(
-                np.arange(len(self.train_embeddings)),
-                train_size=self.max_train_plot_samples,
-                random_state=self.seed,
-                stratify=self.y_train
-            )
+            if can_stratify:
+                logger.info("Using stratified sampling to maintain class balance")
+                _, plot_indices = train_test_split(
+                    np.arange(len(self.train_embeddings)),
+                    train_size=self.max_train_plot_samples,
+                    random_state=self.seed,
+                    stratify=self.y_train
+                )
+            else:
+                logger.warning(f"Cannot use stratified sampling: minimum class has only {min_class_count} samples. Using random sampling instead.")
+                _, plot_indices = train_test_split(
+                    np.arange(len(self.train_embeddings)),
+                    train_size=self.max_train_plot_samples,
+                    random_state=self.seed
+                )
             
             self.train_embeddings_plot = self.train_embeddings[plot_indices]
             self.y_train_plot = self.y_train[plot_indices]
