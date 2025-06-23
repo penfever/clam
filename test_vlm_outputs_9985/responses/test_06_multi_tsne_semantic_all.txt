@@ -1,0 +1,77 @@
+Class: "Theorem too difficult - decline to prove" | Reasoning: The red star is consistently closest to the class labeled "Theorem too difficult - decline to prove" across both PCA and t-SNE visualizations. This class appears to be more isolated and distinct in both plots, suggesting it is the most different from the other classes.
+
+=== RESPONSE ===
+
+Class: "Heuristic 2 fastest" | Reasoning: The red star is consistently closest to the class labeled "Heuristic 2 fastest" across both PCA and t-SNE visualizations. This class appears to be the most central and well-separated in both plots, indicating it is the most representative of the query point's classification.
+
+=== RESPONSE ===
+
+Class: "Theorem too difficult - decline to prove" | Reasoning: The red star is consistently closest to the class labeled "Theorem too difficult - decline to prove" across both PCA and t-SNE visualizations. This class appears to be more isolated and distinct in both plots, suggesting it is the most different from the other classes.
+
+=== RESPONSE ===
+
+Class: "Heuristic 1 fastest" | Reasoning: The red star is consistently closest to the cluster of points representing "Heuristic 1 fastest" across both PCA and t-SNE visualizations. This suggests that the query point is most similar to the data points associated with this class, indicating that it should be classified as "Heuristic 1 fastest."
+
+=== RESPONSE ===
+
+Class: "Theorem too difficult - decline to prove" | Reasoning: The red star is consistently closest to the class labeled "Theorem too difficult - decline to prove" across both PCA and t-SNE visualizations. This class appears to be more isolated and distinct in both representations, suggesting it is the most likely classification for the query point.
+
+=== RESPONSE ===
+
+Class: "Heuristic 1 fastest" | Reasoning: The red star is consistently closest to the cluster of points representing "Heuristic 1 fastest" across both PCA and t-SNE visualizations. This suggests that the query point is most similar to the data points associated with "Heuristic 1 fastest" in both methods, indicating that it should be classified as "Heuristic 1 fastest."
+
+=== RESPONSE ===
+
+Class: "Heuristic 1 fastest" | Reasoning: The red star is consistently closest to the cluster of points representing "Heuristic 1 fastest" across both PCA and t-SNE visualizations. This suggests that the query point is most similar to the data points associated with "Heuristic 1 fastest" in both linear and non-linear representations of the data.
+
+=== RESPONSE ===
+
+Class: "Theorem too difficult - decline to prove" | Reasoning: The red star is consistently closest to the class labeled "Theorem too difficult - decline to prove" across both PCA and t-SNE visualizations. This class appears to be more isolated and distinct in both plots, suggesting it is the most different from the other classes.
+
+=== RESPONSE ===
+
+Class: "Heuristic 1 fastest" | Reasoning: The red star is consistently closest to the cluster of points representing "Heuristic 1 fastest" across both PCA and t-SNE visualizations. This suggests that the query point is most similar to the data points associated with this class, indicating that it should be classified as "Heuristic 1 fastest."
+
+=== RESPONSE ===
+
+Class: "Heuristic 2 fastest" | Reasoning: The red star is consistently closest to the class labeled "Heuristic 2 fastest" across both PCA and t-SNE visualizations. This class appears to be the most central and well-separated in both plots, indicating it is the most representative of the query point's classification.
+
+=== RESPONSE ===
+
+Class: "Heuristic 1 fastest" | Reasoning: The red star is consistently closest to the class labeled "Heuristic 1 fastest" across both PCA and t-SNE visualizations. This suggests that the query point is most similar to the data points associated with this class in both representations, indicating that it is most likely to belong to this class.
+
+=== RESPONSE ===
+
+Class: "Heuristic 1 fastest" | Reasoning: The red star is consistently closest to the cluster of points representing "Heuristic 1 fastest" across both PCA and t-SNE visualizations. This suggests that the query point is most similar to the data points associated with this class, indicating that it belongs to "Heuristic 1 fastest".
+
+=== RESPONSE ===
+
+Class: "Heuristic 1 fastest" | Reasoning: The red star is consistently closest to the cluster of points representing "Heuristic 1 fastest" across both PCA and t-SNE visualizations. This suggests that the query point is most similar to the data points associated with this class, indicating that it should be classified as "Heuristic 1 fastest."
+
+=== RESPONSE ===
+
+Class: "Heuristic 3 fastest" | Reasoning: The red star is consistently closest to the class labeled "Heuristic 3 fastest" across both PCA and t-SNE visualizations. This class appears to be the most central and well-separated in both plots, indicating that it is the most representative of the query point's classification.
+
+=== RESPONSE ===
+
+Class: "Heuristic 3 fastest" | Reasoning: The red star is consistently closest to the cluster of points representing "Heuristic 3 fastest" across both PCA and t-SNE visualizations. This suggests that the query point is most similar to the data points associated with this class, indicating that it should be classified as "Heuristic 3 fastest."
+
+=== RESPONSE ===
+
+Class: "Theorem too difficult - decline to prove" | Reasoning: The red star is consistently closest to the class labeled "Theorem too difficult - decline to prove" across both PCA and t-SNE visualizations. This class appears to be more isolated and distinct in both plots, suggesting it is the most different from the other classes.
+
+=== RESPONSE ===
+
+Class: "Theorem too difficult - decline to prove" | Reasoning: The red star is consistently closest to the class labeled "Theorem too difficult - decline to prove" across both PCA and t-SNE visualizations. This class appears to be more isolated and distinct in both plots, suggesting it is the most different from the other classes.
+
+=== RESPONSE ===
+
+Class: "Heuristic 2 fastest" | Reasoning: The red star is consistently closest to the class labeled "Heuristic 2 fastest" across both PCA and t-SNE visualizations. This suggests that the query point is most similar to the data points associated with this class, indicating that it is most likely to belong to "Heuristic 2 fastest".
+
+=== RESPONSE ===
+
+Class: "Heuristic 1 fastest" | Reasoning: The red star is consistently closest to the cluster of points representing "Heuristic 1 fastest" across both PCA and t-SNE visualizations. This suggests that the query point is most similar to the data points associated with this class, indicating that it should be classified as "Heuristic 1 fastest."
+
+=== RESPONSE ===
+
+Class: "Heuristic 1 fastest" | Reasoning: The red star is consistently closest to the cluster of points representing "Heuristic 1 fastest" across both PCA and t-SNE visualizations. This suggests that the query point is most similar to the data points associated with "Heuristic 1 fastest" in both linear and non-linear representations of the data.

@@ -3,6 +3,7 @@ import os
 import pickle
 import time
 import logging
+import numpy as np
 from tqdm import tqdm
 from helpers import construct_prompts, process_generated_results
 from hf_api import hf_generate
@@ -39,19 +40,57 @@ def sample(args, tokenizer, model, results):
                 elapsed_time = time.time() - start_time
                 if elapsed_time > max_timeout_per_sample:
                     logging.warning(f"JOLT sampling timeout ({max_timeout_per_sample}s) reached for sample {idx}. "
-                                  f"Filling remaining {num_samples} samples with fallback value '0.0'")
-                    # Fill remaining samples with fallback value
+                                  f"Filling remaining {num_samples} samples with fallback value 0.0")
+                    # Fill remaining samples with fallback value - match expected data types
                     for _ in range(num_samples):
-                        samples.append(['0.0'] * results['dim_y'])
+                        fallback_sample = []
+                        for col_idx in range(results['dim_y']):
+                            if hasattr(args, 'y_column_types') and col_idx < len(args.y_column_types):
+                                if args.y_column_types[col_idx] == 'categorical':
+                                    # For categorical, use first available category as fallback
+                                    if 'categories' in results and col_idx < len(results['categories']) and len(results['categories'][col_idx]) > 0:
+                                        fallback_sample.append(results['categories'][col_idx][0])
+                                    else:
+                                        fallback_sample.append('unknown')
+                                elif args.y_column_types[col_idx] == 'numerical':
+                                    # For numerical, use appropriate numeric type
+                                    if hasattr(args, 'num_decimal_places_y') and args.num_decimal_places_y == 0:
+                                        fallback_sample.append(0)  # int
+                                    else:
+                                        fallback_sample.append(0.0)  # float
+                                else:
+                                    fallback_sample.append(0.0)
+                            else:
+                                fallback_sample.append(0.0)
+                        samples.append(np.array(fallback_sample, dtype=object))
                     break
                 
                 # Check failed attempts limit
                 if failed_attempts >= max_failed_attempts:
                     logging.warning(f"JOLT sampling max failed attempts ({max_failed_attempts}) reached for sample {idx}. "
-                                  f"Filling remaining {num_samples} samples with fallback value '0.0'")
-                    # Fill remaining samples with fallback value
+                                  f"Filling remaining {num_samples} samples with fallback value 0.0")
+                    # Fill remaining samples with fallback value - match expected data types
                     for _ in range(num_samples):
-                        samples.append(['0.0'] * results['dim_y'])
+                        fallback_sample = []
+                        for col_idx in range(results['dim_y']):
+                            if hasattr(args, 'y_column_types') and col_idx < len(args.y_column_types):
+                                if args.y_column_types[col_idx] == 'categorical':
+                                    # For categorical, use first available category as fallback
+                                    if 'categories' in results and col_idx < len(results['categories']) and len(results['categories'][col_idx]) > 0:
+                                        fallback_sample.append(results['categories'][col_idx][0])
+                                    else:
+                                        fallback_sample.append('unknown')
+                                elif args.y_column_types[col_idx] == 'numerical':
+                                    # For numerical, use appropriate numeric type
+                                    if hasattr(args, 'num_decimal_places_y') and args.num_decimal_places_y == 0:
+                                        fallback_sample.append(0)  # int
+                                    else:
+                                        fallback_sample.append(0.0)  # float
+                                else:
+                                    fallback_sample.append(0.0)
+                            else:
+                                fallback_sample.append(0.0)
+                        samples.append(np.array(fallback_sample, dtype=object))
                     break
                 
                 bs = min(args.batch_size, num_samples)
