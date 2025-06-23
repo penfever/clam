@@ -517,7 +517,7 @@ class ClamTsneClassifier:
             if viz_method == 'tsne':
                 method_config.update({
                     'perplexity': min(self.tsne_perplexity, len(X_train) // 4),
-                    'max_iter': self.tsne_n_iter
+                    'max_iter': self.tsne_max_iter
                 })
             elif viz_method == 'umap':
                 method_config.setdefault('n_neighbors', 15)

@@ -273,7 +273,7 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
         "--vlm_model_id", args.vlm_model_id,
         "--embedding_size", str(args.embedding_size),
         "--tsne_perplexity", str(args.tsne_perplexity),
-        "--tsne_n_iter", str(args.tsne_n_iter),
+        "--tsne_max_iter", str(getattr(args, 'tsne_max_iter', getattr(args, 'tsne_n_iter', 1000))),
         "--max_tabpfn_samples", str(args.max_tabpfn_samples),
         "--nn_k", str(args.nn_k),
         "--max_vlm_image_size", str(args.max_vlm_image_size),
