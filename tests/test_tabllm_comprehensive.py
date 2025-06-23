@@ -122,31 +122,125 @@ def test_semantic_feature_expansion():
         logger.info(f"\n--- Testing {description}: {target_count} target features ---")
         
         try:
-            expanded_info = expand_semantic_features(test_semantic_info, target_count)
+            # Test both with and without actual feature names
+            test_feature_names = [f"feature_{i}" for i in range(target_count)] if target_count > 0 else None
+            expanded_info = expand_semantic_features(test_semantic_info, target_count, test_feature_names)
             
             if 'columns' in expanded_info:
                 expanded_count = len(expanded_info['columns'])
+                feature_names = [col['name'] for col in expanded_info['columns']]
+                
                 logger.info(f"✅ Expanded from 3 to {expanded_count} features")
                 
-                if target_count > 3:
-                    # Check that we have expanded features with suffixes
-                    feature_names = [col['name'] for col in expanded_info['columns']]
-                    has_suffixes = any('_' in name and name.split('_')[-1].isdigit() for name in feature_names[3:])
-                    if has_suffixes:
-                        logger.info("   ✅ Expanded features have numeric suffixes")
-                        logger.info(f"   Feature names: {feature_names}")
+                # CRITICAL TESTS: Uniqueness and Completeness
+                if target_count > 0:
+                    # Test 1: All feature names are unique
+                    unique_names = set(feature_names)
+                    if len(unique_names) == len(feature_names):
+                        logger.info("   ✅ All semantic feature names are unique")
                     else:
-                        logger.warning("   ⚠️ Expanded features missing expected suffixes")
+                        logger.error(f"   ❌ Duplicate semantic feature names found: {len(feature_names)} total, {len(unique_names)} unique")
+                        duplicates = [name for name in feature_names if feature_names.count(name) > 1]
+                        logger.error(f"      Duplicates: {set(duplicates)}")
+                    
+                    # Test 2: Semantic features match actual feature names when provided
+                    if test_feature_names:
+                        if set(feature_names) == set(test_feature_names):
+                            logger.info("   ✅ Semantic feature names exactly match actual feature names")
+                        else:
+                            logger.error(f"   ❌ Semantic feature names don't match actual names")
+                            logger.error(f"      Expected: {test_feature_names}")
+                            logger.error(f"      Got: {feature_names}")
+                            missing = set(test_feature_names) - set(feature_names)
+                            extra = set(feature_names) - set(test_feature_names)
+                            if missing:
+                                logger.error(f"      Missing: {missing}")
+                            if extra:
+                                logger.error(f"      Extra: {extra}")
+                    
+                    # Test 3: Count matches exactly
+                    if expanded_count == target_count:
+                        logger.info("   ✅ Exact target count achieved")
+                    else:
+                        logger.error(f"   ❌ Count mismatch: got {expanded_count}, expected {target_count}")
                         
-                if expanded_count == target_count:
-                    logger.info("   ✅ Exact target count achieved")
+                # Test 4: All semantic features have descriptions
+                missing_descriptions = [col['name'] for col in expanded_info['columns'] if not col.get('semantic_description')]
+                if not missing_descriptions:
+                    logger.info("   ✅ All semantic features have descriptions")
                 else:
-                    logger.info(f"   ℹ️ Got {expanded_count}, expected {target_count}")
+                    logger.error(f"   ❌ Features missing descriptions: {missing_descriptions}")
+                    
             else:
                 logger.error("❌ Expanded info missing 'columns' structure")
                 
         except Exception as e:
             logger.error(f"❌ ERROR: {e}")
+
+
+def test_semantic_feature_alignment():
+    """Test that semantic features properly align with actual data after subselection."""
+    logger.info("\n=== Testing Semantic Feature Alignment ===")
+    
+    from examples.tabular.llm_baselines.tabllm_baseline import expand_semantic_features, generate_note_from_row
+    import pandas as pd
+    
+    # Simulate feature subselection scenario
+    original_features = [f"original_feature_{i}" for i in range(10)]
+    retained_features = [f"retained_feature_{i}" for i in range(7)]  # Simulated after feature reduction
+    
+    # Create original semantic info (fewer than retained features)
+    original_semantic = {
+        'columns': [
+            {'name': 'base_feature_1', 'semantic_description': 'First base feature'},
+            {'name': 'base_feature_2', 'semantic_description': 'Second base feature'},
+        ]
+    }
+    
+    logger.info(f"Original semantic features: 2")
+    logger.info(f"Retained features after subselection: {len(retained_features)}")
+    
+    # Test expansion with retained feature names
+    expanded_semantic = expand_semantic_features(original_semantic, len(retained_features), retained_features)
+    
+    # Validate the expansion
+    if 'columns' in expanded_semantic:
+        semantic_names = [col['name'] for col in expanded_semantic['columns']]
+        
+        # Test 1: Count matches retained features
+        if len(semantic_names) == len(retained_features):
+            logger.info("✅ Semantic feature count matches retained feature count")
+        else:
+            logger.error(f"❌ Count mismatch: {len(semantic_names)} semantic vs {len(retained_features)} retained")
+        
+        # Test 2: Names match exactly
+        if set(semantic_names) == set(retained_features):
+            logger.info("✅ Semantic feature names exactly match retained feature names")
+        else:
+            logger.error("❌ Semantic and retained feature names don't match")
+            logger.error(f"   Semantic: {semantic_names}")
+            logger.error(f"   Retained: {retained_features}")
+        
+        # Test 3: All names are unique
+        if len(set(semantic_names)) == len(semantic_names):
+            logger.info("✅ All semantic feature names are unique")
+        else:
+            logger.error("❌ Duplicate semantic feature names found")
+        
+        # Test 4: Test note generation with aligned data
+        test_data = pd.Series([i * 10 + 5 for i in range(len(retained_features))], index=retained_features)
+        
+        try:
+            note = generate_note_from_row(test_data, expanded_semantic, retained_features, exclude_target=True)
+            if note and len(note.strip()) > 0:
+                logger.info("✅ Note generation successful with aligned features")
+                logger.info(f"   Sample note: {note[:100]}...")
+            else:
+                logger.error("❌ Note generation failed - empty note")
+        except Exception as e:
+            logger.error(f"❌ Note generation failed with error: {e}")
+    else:
+        logger.error("❌ Expanded semantic info missing 'columns' structure")
 
 def test_online_note_generation():
     """Test online note generation with expanded semantics."""
@@ -185,13 +279,13 @@ def test_online_note_generation():
     
     logger.info("\n--- Testing note generation with expanded features ---")
     try:
-        # Expand semantic features to 5
-        expanded_semantic = expand_semantic_features(semantic_info, 5)
+        # Expand semantic features to 5 with actual feature names
+        expanded_attributes = ['age', 'workclass', 'education', 'age_1', 'workclass_1']
+        expanded_semantic = expand_semantic_features(semantic_info, 5, expanded_attributes)
         
         # Create expanded test row
         expanded_row = pd.Series([39, 'State-gov', 'Bachelors', 50000, 'Married'], 
-                                index=['age', 'workclass', 'education', 'age_1', 'workclass_1'])
-        expanded_attributes = ['age', 'workclass', 'education', 'age_1', 'workclass_1']
+                                index=expanded_attributes)
         
         expanded_note = generate_note_from_row(expanded_row, expanded_semantic, expanded_attributes)
         logger.info(f"✅ Generated expanded note: {expanded_note}")
@@ -271,6 +365,168 @@ def test_context_aware_truncation():
         except Exception as e:
             logger.error(f"❌ ERROR with context limit {limit}: {e}")
 
+def test_tabllm_pipeline_with_mocked_llm():
+    """Test TabLLM pipeline with mocked LLM to focus on feature alignment."""
+    logger.info("\n=== Testing TabLLM Pipeline with Mocked LLM ===")
+    
+    from examples.tabular.llm_baselines.tabllm_baseline import (
+        load_tabllm_config_by_openml_id, expand_semantic_features, generate_note_from_row
+    )
+    import pandas as pd
+    from unittest.mock import Mock, patch
+    
+    # Create test dataset with feature subselection scenario
+    test_dataset = {
+        'name': 'test_pipeline',
+        'task_id': 23,
+        'X': pd.DataFrame({
+            'age': [25, 30, 35, 40, 45],
+            'workclass': ['Private', 'Self-emp', 'Private', 'Local-gov', 'Private'],
+            'education': ['Bachelors', 'Masters', 'HS-grad', 'PhD', 'Bachelors'],
+            'capital_gain': [0, 5178, 0, 0, 15024],
+            'hours_per_week': [40, 50, 40, 45, 40]
+        }),
+        'y': pd.Series(['<=50K', '>50K', '<=50K', '>50K', '>50K']),
+        'attribute_names': ['age', 'workclass', 'education', 'capital_gain', 'hours_per_week']
+    }
+    
+    # Simulate feature reduction (keep only 3 out of 5 features)
+    retained_features = ['age', 'workclass', 'education']
+    reduced_dataset = test_dataset.copy()
+    reduced_dataset['X'] = test_dataset['X'][retained_features]
+    reduced_dataset['attribute_names'] = retained_features
+    
+    # Create semantic info with fewer features than final dataset
+    semantic_info = {
+        'columns': [
+            {'name': 'age', 'semantic_description': 'age in years'},
+            {'name': 'workclass', 'semantic_description': 'type of employment'}
+        ]
+    }
+    
+    logger.info(f"Original dataset features: {len(test_dataset['attribute_names'])}")
+    logger.info(f"Retained features: {len(retained_features)}")
+    logger.info(f"Original semantic features: {len(semantic_info['columns'])}")
+    
+    # Test semantic expansion
+    logger.info("\n--- Testing Semantic Expansion ---")
+    expanded_semantic = expand_semantic_features(semantic_info, len(retained_features), retained_features)
+    
+    semantic_names = [col['name'] for col in expanded_semantic['columns']]
+    
+    # Validate semantic expansion
+    tests_passed = 0
+    total_tests = 4
+    
+    # Test 1: Count matches
+    if len(semantic_names) == len(retained_features):
+        logger.info("✅ Semantic feature count matches retained feature count")
+        tests_passed += 1
+    else:
+        logger.error(f"❌ Count mismatch: {len(semantic_names)} vs {len(retained_features)}")
+    
+    # Test 2: Names match exactly
+    if set(semantic_names) == set(retained_features):
+        logger.info("✅ Semantic feature names exactly match retained feature names")
+        tests_passed += 1
+    else:
+        logger.error(f"❌ Name mismatch")
+        logger.error(f"   Expected: {retained_features}")
+        logger.error(f"   Got: {semantic_names}")
+    
+    # Test 3: All names unique
+    if len(set(semantic_names)) == len(semantic_names):
+        logger.info("✅ All semantic feature names are unique")
+        tests_passed += 1
+    else:
+        logger.error(f"❌ Duplicate semantic names found")
+    
+    # Test 4: All features have descriptions
+    missing_desc = [col['name'] for col in expanded_semantic['columns'] if not col.get('semantic_description')]
+    if not missing_desc:
+        logger.info("✅ All semantic features have descriptions")
+        tests_passed += 1
+    else:
+        logger.error(f"❌ Missing descriptions for: {missing_desc}")
+    
+    # Test note generation
+    logger.info("\n--- Testing Note Generation ---")
+    X_test = reduced_dataset['X']
+    
+    notes_generated = 0
+    empty_notes = 0
+    
+    for idx in range(len(X_test)):
+        row = X_test.iloc[idx]
+        try:
+            note = generate_note_from_row(row, expanded_semantic, retained_features, exclude_target=True)
+            if note and len(note.strip()) > 0:
+                notes_generated += 1
+                if idx == 0:  # Log first note as example
+                    logger.info(f"✅ Sample note generated: {note}")
+            else:
+                empty_notes += 1
+                logger.warning(f"⚠️ Empty note for row {idx}")
+        except Exception as e:
+            empty_notes += 1
+            logger.error(f"❌ Note generation failed for row {idx}: {e}")
+    
+    if empty_notes == 0:
+        logger.info(f"✅ All {notes_generated} notes generated successfully")
+        tests_passed += 1
+        total_tests += 1
+    else:
+        logger.error(f"❌ {empty_notes} empty notes out of {len(X_test)} total")
+    
+    # Mock LLM prediction test
+    logger.info("\n--- Testing Mocked LLM Pipeline ---")
+    
+    class MockLLM:
+        def predict(self, prompts):
+            # Return mock predictions based on prompt count
+            return ['>50K' if i % 2 == 1 else '<=50K' for i in range(len(prompts))]
+    
+    mock_llm = MockLLM()
+    
+    # Create prompts (would normally be done by TabLLM)
+    prompts = []
+    for idx in range(len(X_test)):
+        row = X_test.iloc[idx]
+        note = generate_note_from_row(row, expanded_semantic, retained_features, exclude_target=True)
+        prompt = f"Based on this information: {note}\nQuestion: What is the income class?"
+        prompts.append(prompt)
+    
+    # Test mock predictions
+    predictions = mock_llm.predict(prompts)
+    
+    if len(predictions) == len(X_test):
+        logger.info(f"✅ Mock LLM generated {len(predictions)} predictions")
+        tests_passed += 1
+        total_tests += 1
+        
+        # Validate predictions are in expected format
+        valid_predictions = all(pred in ['<=50K', '>50K'] for pred in predictions)
+        if valid_predictions:
+            logger.info("✅ All predictions are in valid format")
+            tests_passed += 1
+            total_tests += 1
+        else:
+            logger.error("❌ Invalid prediction format found")
+    else:
+        logger.error(f"❌ Prediction count mismatch: {len(predictions)} vs {len(X_test)}")
+    
+    # Final summary
+    logger.info(f"\n--- Pipeline Test Summary ---")
+    logger.info(f"Tests passed: {tests_passed}/{total_tests}")
+    
+    if tests_passed == total_tests:
+        logger.info("✅ TabLLM pipeline tests PASSED - feature alignment is correct")
+    else:
+        logger.error("❌ TabLLM pipeline tests FAILED - feature alignment issues detected")
+    
+    return tests_passed == total_tests
+
+
 def test_tabllm_integration():
     """Test full TabLLM integration with a minimal dataset."""
     logger.info("\n=== Testing TabLLM Integration ===")
@@ -349,6 +605,139 @@ def test_tabllm_integration():
                 logger.info(f"   Cleaned up test directory: {args.output_dir}")
             except:
                 logger.warning(f"   Could not clean up test directory: {args.output_dir}")
+
+def test_real_cc18_semantic_data():
+    """Test TabLLM pipeline with real CC18 semantic data."""
+    logger.info("\n=== Testing Real CC18 Semantic Data ===")
+    
+    from examples.tabular.llm_baselines.tabllm_baseline import (
+        load_tabllm_config_by_openml_id, expand_semantic_features, generate_note_from_row
+    )
+    import pandas as pd
+    
+    # Load real CC18 semantic data for task 23 (cmc dataset)
+    try:
+        config_data, feature_mapping = load_tabllm_config_by_openml_id(23, original_feature_count=9)
+        
+        if config_data is None or feature_mapping is None:
+            logger.warning("⚠️ Could not load real CC18 data for task 23 - skipping test")
+            return
+        
+        real_semantic_info = feature_mapping.get('semantic_info')
+        if not real_semantic_info:
+            logger.warning("⚠️ No semantic info in loaded CC18 data - skipping test")
+            return
+            
+        logger.info(f"✅ Loaded real CC18 semantic data for task 23")
+        logger.info(f"   Structure: {list(real_semantic_info.keys())}")
+        
+        # Check the structure type
+        if 'feature_description' in real_semantic_info:
+            original_feature_count = len(real_semantic_info['feature_description'])
+            logger.info(f"   Original features in semantic data: {original_feature_count}")
+            
+            # Simulate feature subselection (reduce from 9 to 6 features)
+            simulated_retained_features = [
+                "Wife's age", "Wife's education", "Husband's education", 
+                "Number of children ever born", "Wife's religion", "Media exposure"
+            ]
+            logger.info(f"   Simulated retained features: {len(simulated_retained_features)}")
+            
+            # Test semantic expansion with real data
+            expanded_semantic = expand_semantic_features(
+                real_semantic_info, 
+                len(simulated_retained_features), 
+                simulated_retained_features
+            )
+            
+            # Validate expansion
+            tests_passed = 0
+            total_tests = 4
+            
+            if 'feature_description' in expanded_semantic:
+                expanded_features = list(expanded_semantic['feature_description'].keys())
+                
+                # Test 1: Count matches
+                if len(expanded_features) == len(simulated_retained_features):
+                    logger.info("✅ Real data: Semantic feature count matches retained count")
+                    tests_passed += 1
+                else:
+                    logger.error(f"❌ Real data: Count mismatch {len(expanded_features)} vs {len(simulated_retained_features)}")
+                
+                # Test 2: Names match exactly
+                if set(expanded_features) == set(simulated_retained_features):
+                    logger.info("✅ Real data: Semantic feature names match retained names")
+                    tests_passed += 1
+                else:
+                    logger.error("❌ Real data: Feature names don't match")
+                    missing = set(simulated_retained_features) - set(expanded_features)
+                    extra = set(expanded_features) - set(simulated_retained_features)
+                    if missing: logger.error(f"   Missing: {missing}")
+                    if extra: logger.error(f"   Extra: {extra}")
+                
+                # Test 3: All names unique
+                if len(set(expanded_features)) == len(expanded_features):
+                    logger.info("✅ Real data: All feature names are unique")
+                    tests_passed += 1
+                else:
+                    logger.error("❌ Real data: Duplicate feature names found")
+                
+                # Test 4: All features have descriptions
+                missing_desc = [feat for feat, desc in expanded_semantic['feature_description'].items() if not desc]
+                if not missing_desc:
+                    logger.info("✅ Real data: All features have descriptions")
+                    tests_passed += 1
+                else:
+                    logger.error(f"❌ Real data: Missing descriptions for: {missing_desc}")
+                
+                # Test note generation with real data
+                logger.info("\n--- Testing Note Generation with Real CC18 Data ---")
+                
+                # Create realistic test data
+                test_row_data = {
+                    "Wife's age": 29,
+                    "Wife's education": 3,
+                    "Husband's education": 4,
+                    "Number of children ever born": 2,
+                    "Wife's religion": 1,
+                    "Media exposure": 0
+                }
+                test_row = pd.Series(test_row_data)
+                
+                try:
+                    note = generate_note_from_row(test_row, expanded_semantic, simulated_retained_features, exclude_target=True)
+                    if note and len(note.strip()) > 0:
+                        logger.info("✅ Real data: Note generation successful")
+                        logger.info(f"   Sample note: {note}")
+                        tests_passed += 1
+                        total_tests += 1
+                        
+                        # Validate note contains expected semantic descriptions
+                        if "Age of wife in years" in note and "29" in note:
+                            logger.info("   ✅ Note contains semantic descriptions from real data")
+                        else:
+                            logger.warning("   ⚠️ Note may not contain expected semantic content")
+                    else:
+                        logger.error("❌ Real data: Empty note generated")
+                except Exception as e:
+                    logger.error(f"❌ Real data: Note generation failed: {e}")
+                
+                # Summary
+                logger.info(f"\n--- Real CC18 Data Test Summary ---")
+                logger.info(f"Tests passed: {tests_passed}/{total_tests}")
+                
+                if tests_passed >= 4:  # Core tests must pass
+                    logger.info("✅ Real CC18 semantic data pipeline working correctly")
+                else:
+                    logger.error("❌ Real CC18 semantic data pipeline has issues")
+            else:
+                logger.error("❌ Expanded semantic data missing feature_description structure")
+        else:
+            logger.warning("⚠️ Real semantic data doesn't use feature_description structure")
+            
+    except Exception as e:
+        logger.error(f"❌ Error testing real CC18 data: {e}")
+
 
 def test_note_inspection_system():
     """Test the note inspection file saving system."""
@@ -439,9 +828,12 @@ def main():
     # Run all tests
     test_task_id_resolution()
     test_semantic_feature_expansion()
+    test_semantic_feature_alignment()
+    test_real_cc18_semantic_data()
     test_online_note_generation()
     test_context_aware_truncation()
     test_note_inspection_system()
+    test_tabllm_pipeline_with_mocked_llm()
     
     if not args.skip_integration:
         test_tabllm_integration()

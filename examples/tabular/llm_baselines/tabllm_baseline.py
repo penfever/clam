@@ -194,28 +194,9 @@ def load_tabllm_config_by_openml_id(openml_task_id, original_feature_count=None)
                     with open(semantic_file, 'r') as f:
                         semantic_info = json.load(f)
                     
-                    # Count features from semantic info NOT including target column
-                    config_feature_count = None
-                    if 'columns' in semantic_info:
-                        # The 'columns' array contains only feature columns, target is stored separately
-                        config_feature_count = len(semantic_info['columns'])
-                    elif 'feature_descriptions' in semantic_info:
-                        # These typically don't include target
-                        config_feature_count = len(semantic_info['feature_descriptions'])
-                    elif 'feature_description' in semantic_info:
-                        # These typically don't include target
-                        config_feature_count = len(semantic_info['feature_description'])
-                    
-                    if config_feature_count is not None and config_feature_count != original_feature_count:
-                        error_msg = (
-                            f"Feature count mismatch for OpenML task {openml_task_id}: "
-                            f"dataset has {original_feature_count} features but TabLLM config expects {config_feature_count} features. "
-                            f"This indicates a version mismatch or preprocessing differences."
-                        )
-                        logger.error(error_msg)
-                        raise ValueError(error_msg)
-                    
-                    logger.info(f"Feature count validation passed: {original_feature_count} features")
+                    # Skip early feature count validation since we'll expand semantics online
+                    # to match the actual processed feature count after reduction
+                    logger.info(f"Semantic info loaded for online note generation (will expand to match processed features)")
                     
                     # Create feature mapping to preserve semantic descriptions
                     feature_mapping = {
@@ -392,14 +373,15 @@ def create_feature_mapping_after_preprocessing(original_feature_names, processed
 # NOTE: Old note loading functions removed - TabLLM now generates notes online during evaluation
 
 
-def expand_semantic_features(semantic_info: Dict[str, Any], target_feature_count: int) -> Dict[str, Any]:
+def expand_semantic_features(semantic_info: Dict[str, Any], target_feature_count: int, 
+                           actual_feature_names: List[str] = None) -> Dict[str, Any]:
     """
-    Expand semantic features by duplicating them with suffixes when there are fewer 
-    semantic features than actual dataset features.
+    Expand semantic features by duplicating them to match actual dataset features.
     
     Args:
         semantic_info: Original semantic information dictionary
         target_feature_count: Number of features the dataset actually has
+        actual_feature_names: List of actual feature names from the processed dataset
         
     Returns:
         Updated semantic_info with expanded features
@@ -414,24 +396,39 @@ def expand_semantic_features(semantic_info: Dict[str, Any], target_feature_count
         
         if current_count < target_feature_count:
             logger = logging.getLogger(__name__)
-            logger.info(f"Expanding {current_count} semantic features to {target_feature_count} by duplicating with suffixes...")
-            expanded_columns = original_columns.copy()
+            logger.info(f"Expanding {current_count} semantic features to {target_feature_count} by duplicating with actual feature names...")
+            expanded_columns = []
             
-            # Calculate how many times we need to cycle through features
-            features_needed = target_feature_count - current_count
-            
-            for i in range(features_needed):
-                # Get the base feature to duplicate (cycle through original features)
-                base_feature = original_columns[i % current_count]
-                suffix_num = (i // current_count) + 1
-                
-                # Create new feature with suffix
-                new_feature = base_feature.copy()
-                new_feature['name'] = f"{base_feature['name']}_{suffix_num}"
-                if 'semantic_description' in new_feature:
-                    new_feature['semantic_description'] = f"{base_feature['semantic_description']} (variant {suffix_num})"
-                
-                expanded_columns.append(new_feature)
+            # If we have actual feature names, use them; otherwise create suffixed names
+            if actual_feature_names and len(actual_feature_names) == target_feature_count:
+                for i, actual_name in enumerate(actual_feature_names):
+                    # Get the base feature to duplicate (cycle through original features)
+                    base_feature = original_columns[i % current_count]
+                    
+                    # Create new feature with actual name
+                    new_feature = base_feature.copy()
+                    new_feature['name'] = actual_name
+                    if 'semantic_description' in new_feature:
+                        variant_num = (i // current_count) + 1 if i >= current_count else ""
+                        variant_suffix = f" (variant {variant_num})" if variant_num else ""
+                        new_feature['semantic_description'] = f"{base_feature['semantic_description']}{variant_suffix}"
+                    
+                    expanded_columns.append(new_feature)
+            else:
+                # Fallback to suffixed names
+                for i in range(target_feature_count):
+                    # Get the base feature to duplicate (cycle through original features)
+                    base_feature = original_columns[i % current_count]
+                    suffix_num = (i // current_count) + 1
+                    
+                    # Create new feature with suffix
+                    new_feature = base_feature.copy()
+                    new_feature['name'] = f"{base_feature['name']}_{suffix_num}" if i >= current_count else base_feature['name']
+                    if 'semantic_description' in new_feature:
+                        variant_suffix = f" (variant {suffix_num})" if i >= current_count else ""
+                        new_feature['semantic_description'] = f"{base_feature['semantic_description']}{variant_suffix}"
+                    
+                    expanded_columns.append(new_feature)
             
             expanded_info['columns'] = expanded_columns
     
@@ -441,21 +438,31 @@ def expand_semantic_features(semantic_info: Dict[str, Any], target_feature_count
         
         if current_count < target_feature_count:
             logger = logging.getLogger(__name__)
-            logger.info(f"Expanding {current_count} semantic features to {target_feature_count} by duplicating with suffixes...")
-            expanded_features = original_features.copy()
+            logger.info(f"Expanding {current_count} semantic features to {target_feature_count} by duplicating with actual feature names...")
+            expanded_features = {}
             
-            # Get list of original feature names for cycling
-            original_names = list(original_features.keys())
-            features_needed = target_feature_count - current_count
-            
-            for i in range(features_needed):
-                base_name = original_names[i % current_count]
-                base_desc = original_features[base_name]
-                suffix_num = (i // current_count) + 1
-                
-                new_name = f"{base_name}_{suffix_num}"
-                new_desc = f"{base_desc} (variant {suffix_num})"
-                expanded_features[new_name] = new_desc
+            # If we have actual feature names, use them; otherwise create suffixed names
+            if actual_feature_names and len(actual_feature_names) == target_feature_count:
+                original_names = list(original_features.keys())
+                for i, actual_name in enumerate(actual_feature_names):
+                    # Get the base feature to duplicate (cycle through original features)
+                    base_name = original_names[i % current_count]
+                    base_desc = original_features[base_name]
+                    
+                    variant_num = (i // current_count) + 1 if i >= current_count else ""
+                    variant_suffix = f" (variant {variant_num})" if variant_num else ""
+                    expanded_features[actual_name] = f"{base_desc}{variant_suffix}"
+            else:
+                # Fallback to suffixed names
+                original_names = list(original_features.keys())
+                for i in range(target_feature_count):
+                    base_name = original_names[i % current_count]
+                    base_desc = original_features[base_name]
+                    suffix_num = (i // current_count) + 1
+                    
+                    new_name = f"{base_name}_{suffix_num}" if i >= current_count else base_name
+                    variant_suffix = f" (variant {suffix_num})" if i >= current_count else ""
+                    expanded_features[new_name] = f"{base_desc}{variant_suffix}"
             
             expanded_info['feature_descriptions'] = expanded_features
     
@@ -465,21 +472,31 @@ def expand_semantic_features(semantic_info: Dict[str, Any], target_feature_count
         
         if current_count < target_feature_count:
             logger = logging.getLogger(__name__)
-            logger.info(f"Expanding {current_count} semantic features to {target_feature_count} by duplicating with suffixes...")
-            expanded_features = original_features.copy()
+            logger.info(f"Expanding {current_count} semantic features to {target_feature_count} by duplicating with actual feature names...")
+            expanded_features = {}
             
-            # Get list of original feature names for cycling
-            original_names = list(original_features.keys())
-            features_needed = target_feature_count - current_count
-            
-            for i in range(features_needed):
-                base_name = original_names[i % current_count]
-                base_desc = original_features[base_name]
-                suffix_num = (i // current_count) + 1
-                
-                new_name = f"{base_name}_{suffix_num}"
-                new_desc = f"{base_desc} (variant {suffix_num})"
-                expanded_features[new_name] = new_desc
+            # If we have actual feature names, use them; otherwise create suffixed names
+            if actual_feature_names and len(actual_feature_names) == target_feature_count:
+                original_names = list(original_features.keys())
+                for i, actual_name in enumerate(actual_feature_names):
+                    # Get the base feature to duplicate (cycle through original features)
+                    base_name = original_names[i % current_count]
+                    base_desc = original_features[base_name]
+                    
+                    variant_num = (i // current_count) + 1 if i >= current_count else ""
+                    variant_suffix = f" (variant {variant_num})" if variant_num else ""
+                    expanded_features[actual_name] = f"{base_desc}{variant_suffix}"
+            else:
+                # Fallback to suffixed names
+                original_names = list(original_features.keys())
+                for i in range(target_feature_count):
+                    base_name = original_names[i % current_count]
+                    base_desc = original_features[base_name]
+                    suffix_num = (i // current_count) + 1
+                    
+                    new_name = f"{base_name}_{suffix_num}" if i >= current_count else base_name
+                    variant_suffix = f" (variant {suffix_num})" if i >= current_count else ""
+                    expanded_features[new_name] = f"{base_desc}{variant_suffix}"
             
             expanded_info['feature_description'] = expanded_features
     
@@ -877,7 +894,7 @@ def evaluate_tabllm(dataset, args):
     if semantic_info is not None:
         current_feature_count = len(processed_feature_names)
         logger.info(f"Expanding semantic features for online note generation: {current_feature_count} features after reduction")
-        semantic_info = expand_semantic_features(semantic_info, current_feature_count)
+        semantic_info = expand_semantic_features(semantic_info, current_feature_count, processed_feature_names)
         
         # Update the feature mapping with expanded semantic info
         if feature_mapping:
@@ -1113,7 +1130,28 @@ def evaluate_tabllm(dataset, args):
             # Generate TabLLM-style note online with expanded semantic information
             semantic_for_note = semantic_info  # Use the expanded semantic info
             if semantic_for_note is not None:
-                note = generate_note_from_row(x_example, semantic_for_note, dataset["attribute_names"], exclude_target=True)
+                # Debug: check alignment between row and semantic info
+                current_feature_names = dataset["attribute_names"]
+                if hasattr(x_example, 'index'):
+                    row_feature_names = list(x_example.index)
+                else:
+                    row_feature_names = current_feature_names
+                
+                # Generate note with proper feature alignment
+                note = generate_note_from_row(x_example, semantic_for_note, current_feature_names, exclude_target=True)
+                
+                # Debug empty notes
+                if not note.strip():
+                    logger.warning(f"Empty note generated - debugging:")
+                    logger.warning(f"  Row type: {type(x_example)}")
+                    logger.warning(f"  Row shape/len: {len(x_example) if hasattr(x_example, '__len__') else 'N/A'}")
+                    logger.warning(f"  Current feature names ({len(current_feature_names)}): {current_feature_names[:5]}...")
+                    logger.warning(f"  Row feature names ({len(row_feature_names)}): {row_feature_names[:5]}...")
+                    if 'columns' in semantic_for_note:
+                        semantic_names = [col['name'] for col in semantic_for_note['columns']]
+                        logger.warning(f"  Semantic feature names ({len(semantic_names)}): {semantic_names[:5]}...")
+                    # Use fallback for debugging
+                    note = " ".join([f"Feature {i} is {val}" for i, val in enumerate(x_example)])
             else:
                 # Fallback to basic note if no semantic info available
                 note = " ".join([f"Feature {i} is {val}" for i, val in enumerate(x_example)])

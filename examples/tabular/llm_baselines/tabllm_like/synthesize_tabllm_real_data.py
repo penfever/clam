@@ -9,10 +9,15 @@ import os
 import glob
 import yaml
 import uuid
+import sys
 import numpy as np
 import pandas as pd
 from pathlib import Path
 from typing import Dict, List, Any, Optional
+
+# Add parent directory to path to import from tabllm_baseline
+sys.path.append(str(Path(__file__).parent.parent))
+from tabllm_baseline import expand_semantic_features
 
 # Optional: Import OpenML if available
 try:
@@ -70,98 +75,7 @@ def load_openml_dataset(dataset_id: int) -> Optional[pd.DataFrame]:
         return None
 
 
-def expand_semantic_features(semantic_info: Dict[str, Any], target_feature_count: int) -> Dict[str, Any]:
-    """
-    Expand semantic features by duplicating them with suffixes when there are fewer 
-    semantic features than actual dataset features.
-    
-    Args:
-        semantic_info: Original semantic information dictionary
-        target_feature_count: Number of features the dataset actually has
-        
-    Returns:
-        Updated semantic_info with expanded features
-    """
-    # Make a copy to avoid modifying the original
-    expanded_info = semantic_info.copy()
-    
-    # Handle different semantic info structures
-    if 'columns' in semantic_info:
-        original_columns = semantic_info['columns']
-        current_count = len(original_columns)
-        
-        if current_count < target_feature_count:
-            print(f"  Expanding {current_count} semantic features to {target_feature_count} by duplicating with suffixes...")
-            expanded_columns = original_columns.copy()
-            
-            # Calculate how many times we need to cycle through features
-            features_needed = target_feature_count - current_count
-            
-            for i in range(features_needed):
-                # Get the base feature to duplicate (cycle through original features)
-                base_feature = original_columns[i % current_count]
-                suffix_num = (i // current_count) + 1
-                
-                # Create new feature with suffix
-                new_feature = base_feature.copy()
-                new_feature['name'] = f"{base_feature['name']}_{suffix_num}"
-                if 'semantic_description' in new_feature:
-                    new_feature['semantic_description'] = f"{base_feature['semantic_description']} (variant {suffix_num})"
-                
-                expanded_columns.append(new_feature)
-            
-            expanded_info['columns'] = expanded_columns
-            print(f"  Successfully expanded to {len(expanded_columns)} features")
-    
-    elif 'feature_descriptions' in semantic_info:
-        original_features = semantic_info['feature_descriptions']
-        current_count = len(original_features)
-        
-        if current_count < target_feature_count:
-            print(f"  Expanding {current_count} semantic features to {target_feature_count} by duplicating with suffixes...")
-            expanded_features = original_features.copy()
-            
-            # Get list of original feature names for cycling
-            original_names = list(original_features.keys())
-            features_needed = target_feature_count - current_count
-            
-            for i in range(features_needed):
-                base_name = original_names[i % current_count]
-                base_desc = original_features[base_name]
-                suffix_num = (i // current_count) + 1
-                
-                new_name = f"{base_name}_{suffix_num}"
-                new_desc = f"{base_desc} (variant {suffix_num})"
-                expanded_features[new_name] = new_desc
-            
-            expanded_info['feature_descriptions'] = expanded_features
-            print(f"  Successfully expanded to {len(expanded_features)} features")
-    
-    elif 'feature_description' in semantic_info:
-        original_features = semantic_info['feature_description']
-        current_count = len(original_features)
-        
-        if current_count < target_feature_count:
-            print(f"  Expanding {current_count} semantic features to {target_feature_count} by duplicating with suffixes...")
-            expanded_features = original_features.copy()
-            
-            # Get list of original feature names for cycling
-            original_names = list(original_features.keys())
-            features_needed = target_feature_count - current_count
-            
-            for i in range(features_needed):
-                base_name = original_names[i % current_count]
-                base_desc = original_features[base_name]
-                suffix_num = (i // current_count) + 1
-                
-                new_name = f"{base_name}_{suffix_num}"
-                new_desc = f"{base_desc} (variant {suffix_num})"
-                expanded_features[new_name] = new_desc
-            
-            expanded_info['feature_description'] = expanded_features
-            print(f"  Successfully expanded to {len(expanded_features)} features")
-    
-    return expanded_info
+# expand_semantic_features is now imported from tabllm_baseline
 
 
 def generate_note_from_row(row: pd.Series, semantic_info: Dict[str, Any], exclude_target: bool = True) -> str:
@@ -293,7 +207,7 @@ def process_dataset_to_notes(json_file: str, max_notes: int = NOTES_PER_DATASET)
             actual_feature_count = len(feature_columns)
             
             # Expand semantic features if needed to match actual dataset features
-            semantic_info = expand_semantic_features(semantic_info, actual_feature_count)
+            semantic_info = expand_semantic_features(semantic_info, actual_feature_count, feature_columns)
             
             # Sample rows for notes
             n_samples = min(max_notes, len(df))
@@ -476,7 +390,7 @@ def create_notes_bank_files():
                     feature_columns = [col for col in df.columns if col not in ['target', 'class']]
                     actual_feature_count = len(feature_columns)
                     # Expand semantic features for template creation too
-                    template_semantic_info = expand_semantic_features(semantic_info, actual_feature_count)
+                    template_semantic_info = expand_semantic_features(semantic_info, actual_feature_count, feature_columns)
             
             # Create and save YAML template using task_id for consistent lookup
             template_data = create_template_for_dataset(template_semantic_info, dataset_name)
