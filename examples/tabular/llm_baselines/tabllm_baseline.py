@@ -389,85 +389,376 @@ def create_feature_mapping_after_preprocessing(original_feature_names, processed
     
     return processed_mapping
 
-def load_tabllm_note_examples(dataset_name):
-    """Load TabLLM note examples if available for the dataset."""
-    # Use relative path from current script location
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    note_path = os.path.join(current_dir, "tabllm_like", f"note_{dataset_name}_example.txt")
-    
-    try:
-        if os.path.exists(note_path):
-            with open(note_path, 'r') as f:
-                content = f.read().strip()
-            # Parse the example format: ['The age is 72. The workclass is Self-emp-inc...']
-            if content.startswith("['") and content.endswith("']"):
-                example_note = content[2:-2]  # Remove [' and ']
-                return example_note
-        return None
-    except Exception as e:
-        logging.getLogger(__name__).debug(f"Could not load note example for {dataset_name}: {e}")
-        return None
+# NOTE: Old note loading functions removed - TabLLM now generates notes online during evaluation
 
-def load_semantic_info(dataset_name, semantic_dir):
-    """Load semantic information for a dataset."""
+
+def expand_semantic_features(semantic_info: Dict[str, Any], target_feature_count: int) -> Dict[str, Any]:
+    """
+    Expand semantic features by duplicating them with suffixes when there are fewer 
+    semantic features than actual dataset features.
+    
+    Args:
+        semantic_info: Original semantic information dictionary
+        target_feature_count: Number of features the dataset actually has
+        
+    Returns:
+        Updated semantic_info with expanded features
+    """
+    # Make a copy to avoid modifying the original
+    expanded_info = semantic_info.copy()
+    
+    # Handle different semantic info structures
+    if 'columns' in semantic_info:
+        original_columns = semantic_info['columns']
+        current_count = len(original_columns)
+        
+        if current_count < target_feature_count:
+            logger = logging.getLogger(__name__)
+            logger.info(f"Expanding {current_count} semantic features to {target_feature_count} by duplicating with suffixes...")
+            expanded_columns = original_columns.copy()
+            
+            # Calculate how many times we need to cycle through features
+            features_needed = target_feature_count - current_count
+            
+            for i in range(features_needed):
+                # Get the base feature to duplicate (cycle through original features)
+                base_feature = original_columns[i % current_count]
+                suffix_num = (i // current_count) + 1
+                
+                # Create new feature with suffix
+                new_feature = base_feature.copy()
+                new_feature['name'] = f"{base_feature['name']}_{suffix_num}"
+                if 'semantic_description' in new_feature:
+                    new_feature['semantic_description'] = f"{base_feature['semantic_description']} (variant {suffix_num})"
+                
+                expanded_columns.append(new_feature)
+            
+            expanded_info['columns'] = expanded_columns
+    
+    elif 'feature_descriptions' in semantic_info:
+        original_features = semantic_info['feature_descriptions']
+        current_count = len(original_features)
+        
+        if current_count < target_feature_count:
+            logger = logging.getLogger(__name__)
+            logger.info(f"Expanding {current_count} semantic features to {target_feature_count} by duplicating with suffixes...")
+            expanded_features = original_features.copy()
+            
+            # Get list of original feature names for cycling
+            original_names = list(original_features.keys())
+            features_needed = target_feature_count - current_count
+            
+            for i in range(features_needed):
+                base_name = original_names[i % current_count]
+                base_desc = original_features[base_name]
+                suffix_num = (i // current_count) + 1
+                
+                new_name = f"{base_name}_{suffix_num}"
+                new_desc = f"{base_desc} (variant {suffix_num})"
+                expanded_features[new_name] = new_desc
+            
+            expanded_info['feature_descriptions'] = expanded_features
+    
+    elif 'feature_description' in semantic_info:
+        original_features = semantic_info['feature_description']
+        current_count = len(original_features)
+        
+        if current_count < target_feature_count:
+            logger = logging.getLogger(__name__)
+            logger.info(f"Expanding {current_count} semantic features to {target_feature_count} by duplicating with suffixes...")
+            expanded_features = original_features.copy()
+            
+            # Get list of original feature names for cycling
+            original_names = list(original_features.keys())
+            features_needed = target_feature_count - current_count
+            
+            for i in range(features_needed):
+                base_name = original_names[i % current_count]
+                base_desc = original_features[base_name]
+                suffix_num = (i // current_count) + 1
+                
+                new_name = f"{base_name}_{suffix_num}"
+                new_desc = f"{base_desc} (variant {suffix_num})"
+                expanded_features[new_name] = new_desc
+            
+            expanded_info['feature_description'] = expanded_features
+    
+    return expanded_info
+
+
+def generate_note_from_row(row, semantic_info: Dict[str, Any], attribute_names: List[str], exclude_target: bool = True) -> str:
+    """Generate a TabLLM-style note from a data row using semantic info."""
+    import pandas as pd
+    
+    note_parts = []
+    
+    # Convert row to pandas Series if it isn't already
+    if not isinstance(row, pd.Series):
+        if hasattr(row, '__len__') and len(attribute_names) == len(row):
+            row = pd.Series(row, index=attribute_names)
+        else:
+            # Fallback: create basic series
+            row = pd.Series(row) if hasattr(row, '__iter__') else pd.Series([row])
+    
+    # Get feature descriptions based on the structure of semantic JSON
+    if 'columns' in semantic_info:
+        # Structure like kr-vs-kp dataset
+        for col in semantic_info['columns']:
+            col_name = col['name']
+            if col_name in row.index and (not exclude_target or col_name != 'target'):
+                semantic_desc = col['semantic_description']
+                value = row[col_name]
+                
+                # Handle different data types
+                if pd.isna(value):
+                    note_parts.append(f"The {semantic_desc} is missing.")
+                elif isinstance(value, (int, float)):
+                    if value == int(value):
+                        note_parts.append(f"The {semantic_desc} is {int(value)}.")
+                    else:
+                        note_parts.append(f"The {semantic_desc} is {value:.2f}.")
+                else:
+                    note_parts.append(f"The {semantic_desc} is {value}.")
+    
+    elif 'feature_descriptions' in semantic_info:
+        # Structure like letter dataset
+        for feat_name, feat_desc in semantic_info['feature_descriptions'].items():
+            if feat_name in row.index and (not exclude_target or feat_name != 'target'):
+                value = row[feat_name]
+                # Clean up description for better readability
+                clean_desc = feat_desc.replace(' (integer)', '').replace(' (float)', '')
+                
+                if pd.isna(value):
+                    note_parts.append(f"The {clean_desc} is missing.")
+                elif isinstance(value, (int, float)):
+                    if value == int(value):
+                        note_parts.append(f"The {clean_desc} is {int(value)}.")
+                    else:
+                        note_parts.append(f"The {clean_desc} is {value:.2f}.")
+                else:
+                    note_parts.append(f"The {clean_desc} is {value}.")
+    
+    elif 'feature_description' in semantic_info:
+        # Handle adult dataset format (singular feature_description)
+        for feat_name, feat_desc in semantic_info['feature_description'].items():
+            if feat_name in row.index and (not exclude_target or feat_name != 'target'):
+                value = row[feat_name]
+                # Create more natural descriptions
+                feature_label = feat_name.replace('-', ' ').replace('_', ' ')
+                
+                if pd.isna(value):
+                    note_parts.append(f"The {feature_label} is missing.")
+                elif isinstance(value, (int, float)):
+                    if value == int(value):
+                        note_parts.append(f"The {feature_label} is {int(value)}.")
+                    else:
+                        note_parts.append(f"The {feature_label} is {value:.2f}.")
+                else:
+                    note_parts.append(f"The {feature_label} is {value}.")
+    
+    elif 'feature_names' in semantic_info:
+        # Fallback to feature_names if descriptions not available
+        for feat_name, feat_meaning in semantic_info['feature_names'].items():
+            if feat_name in row.index and (not exclude_target or feat_name != 'target'):
+                value = row[feat_name]
+                
+                if pd.isna(value):
+                    note_parts.append(f"The {feat_meaning} is missing.")
+                elif isinstance(value, (int, float)):
+                    if value == int(value):
+                        note_parts.append(f"The {feat_meaning} is {int(value)}.")
+                    else:
+                        note_parts.append(f"The {feat_meaning} is {value:.2f}.")
+                else:
+                    note_parts.append(f"The {feat_meaning} is {value}.")
+    
+    return " ".join(note_parts)
+
+
+def estimate_note_tokens(note: str, tokenizer) -> int:
+    """Estimate the number of tokens in a note using existing CLAM utilities."""
+    try:
+        if tokenizer is not None:
+            return len(tokenizer.encode(note))
+        else:
+            # Fallback: rough estimation when tokenizer unavailable (API models)
+            return len(note.split()) * 1.3  # ~1.3 tokens per word on average
+    except Exception:
+        # Fallback: rough estimation
+        return len(note.split()) * 1.3  # ~1.3 tokens per word on average
+
+
+def estimate_prompt_tokens(few_shot_examples: List[Tuple[str, str]], test_note: str, 
+                          question: str, task_description: str, tokenizer) -> int:
+    """Estimate total tokens for the complete prompt."""
+    total_tokens = 0
+    
+    # Task description
+    total_tokens += estimate_note_tokens(task_description, tokenizer)
+    
+    # Few-shot examples
+    for note, label in few_shot_examples:
+        example_text = f"{note}\n\n{question}\nAnswer: {label}"
+        total_tokens += estimate_note_tokens(example_text, tokenizer)
+    
+    # Test query
+    test_query = f"{test_note}\n\n{question}\nAnswer:"
+    total_tokens += estimate_note_tokens(test_query, tokenizer)
+    
+    return total_tokens
+
+
+def truncate_few_shot_examples_for_context(few_shot_examples: List[Tuple[str, str]], 
+                                         test_note: str, question: str, task_description: str,
+                                         tokenizer, max_context_length: int) -> List[Tuple[str, str]]:
+    """
+    Truncate few-shot examples to fit within context length limits.
+    Uses existing CLAM utilities for token estimation and context management.
+    """
+    logger = logging.getLogger(__name__)
+    
+    if not few_shot_examples:
+        return few_shot_examples
+    
+    # Reserve tokens for test query and task description
+    test_query = f"{test_note}\n\n{question}\nAnswer:"
+    reserved_tokens = (estimate_note_tokens(test_query, tokenizer) + 
+                      estimate_note_tokens(task_description, tokenizer) + 
+                      100)  # Safety buffer
+    
+    available_tokens = max_context_length - reserved_tokens
+    
+    if available_tokens <= 0:
+        logger.warning(f"No tokens available for few-shot examples after reserving {reserved_tokens} tokens")
+        return []
+    
+    # Estimate tokens per example and select as many as fit
+    selected_examples = []
+    used_tokens = 0
+    
+    for note, label in few_shot_examples:
+        example_text = f"{note}\n\n{question}\nAnswer: {label}"
+        example_tokens = estimate_note_tokens(example_text, tokenizer)
+        
+        if used_tokens + example_tokens <= available_tokens:
+            selected_examples.append((note, label))
+            used_tokens += example_tokens
+        else:
+            # Can't fit this example
+            break
+    
+    if len(selected_examples) < len(few_shot_examples):
+        logger.info(f"Truncated few-shot examples from {len(few_shot_examples)} to {len(selected_examples)} "
+                   f"to fit context limit ({max_context_length} tokens, {used_tokens} used for examples)")
+    
+    return selected_examples
+
+
+def save_sample_notes_for_inspection(few_shot_examples: List[Tuple[str, str]], 
+                                   dataset: Dict[str, Any], args, semantic_info: Optional[Dict[str, Any]]):
+    """
+    Save sample generated notes to the default TabLLM output directory for inspection.
+    Saves up to 5 notes with metadata for debugging and quality assessment.
+    """
     logger = logging.getLogger(__name__)
     
     try:
-        # Look for semantic information for this dataset
-        semantic_file = os.path.join(semantic_dir, f"{dataset_name}.json")
-        if not os.path.exists(semantic_file):
-            # Try alternative names (OpenML ID might be used)
-            semantic_files = glob.glob(os.path.join(semantic_dir, "*.json"))
-            for sf in semantic_files:
-                with open(sf, 'r') as f:
-                    semantic_info = json.load(f)
-                    if semantic_info.get('dataset_name') == dataset_name or semantic_info.get('dataset') == dataset_name:
-                        semantic_file = sf
-                        break
+        # Determine output directory (follow existing CLAM patterns)
+        if hasattr(args, 'output_dir') and args.output_dir:
+            base_output_dir = args.output_dir
+        else:
+            # Fallback to current directory
+            base_output_dir = "."
         
-        if os.path.exists(semantic_file):
-            logger.info(f"Loading semantic information for {dataset_name}")
-            with open(semantic_file, 'r') as f:
-                semantic_info = json.load(f)
-            return semantic_info
+        # Create TabLLM-specific subdirectory
+        tabllm_output_dir = os.path.join(base_output_dir, "tabllm_notes_inspection")
+        os.makedirs(tabllm_output_dir, exist_ok=True)
         
-        return None
-    
-    except Exception as e:
-        print(f"Could not load semantic information for {dataset_name}: {e}")
-        return None
-
-def generate_tabllm_data_on_demand(dataset_name, semantic_dir):
-    """Generate TabLLM data on-demand using the synthesize_tabllm_real_data.py script logic."""
-    logger = logging.getLogger(__name__)
-    
-    try:
-        # Import the synthesis functions
-        import sys
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        tabllm_like_path = os.path.join(current_dir, "tabllm_like")
-        if tabllm_like_path not in sys.path:
-            sys.path.append(tabllm_like_path)
+        # Create filename with dataset and timestamp
+        import datetime
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        dataset_name = dataset.get('name', 'unknown_dataset')
+        task_id = dataset.get('task_id', dataset.get('id', 'unknown_task'))
         
-        from synthesize_tabllm_real_data import generate_note_from_semantic_info, create_template_for_dataset
+        notes_filename = f"notes_{dataset_name}_task_{task_id}_{timestamp}.json"
+        notes_filepath = os.path.join(tabllm_output_dir, notes_filename)
         
-        # Load semantic information
-        semantic_info = load_semantic_info(dataset_name, semantic_dir)
+        # Prepare metadata
+        num_features = len(dataset.get("attribute_names", []))
+        max_context_length = getattr(args, 'max_context_length', None)
         
+        inspection_data = {
+            "metadata": {
+                "dataset_name": dataset_name,
+                "task_id": task_id,
+                "timestamp": timestamp,
+                "num_features_after_reduction": num_features,
+                "total_few_shot_examples": len(few_shot_examples),
+                "max_context_length": max_context_length,
+                "semantic_info_available": semantic_info is not None,
+                "generation_method": "online_with_expanded_semantics" if semantic_info else "online_basic_fallback"
+            },
+            "semantic_expansion_info": {
+                "original_semantic_features": None,
+                "expanded_to_features": num_features,
+                "expansion_applied": False
+            },
+            "sample_notes": []
+        }
+        
+        # Add semantic expansion details if available
         if semantic_info:
-            logger.info(f"Generating TabLLM data on-demand for {dataset_name}")
-            
-            # Generate note and template
-            note = generate_note_from_semantic_info(semantic_info)
-            template_data = create_template_for_dataset(semantic_info, dataset_name)
-            
-            return note, template_data
+            if 'columns' in semantic_info:
+                original_count = len([col for col in semantic_info['columns']])
+                inspection_data["semantic_expansion_info"]["original_semantic_features"] = original_count
+                inspection_data["semantic_expansion_info"]["expansion_applied"] = original_count < num_features
+            elif 'feature_descriptions' in semantic_info:
+                original_count = len(semantic_info['feature_descriptions'])
+                inspection_data["semantic_expansion_info"]["original_semantic_features"] = original_count
+                inspection_data["semantic_expansion_info"]["expansion_applied"] = original_count < num_features
+            elif 'feature_description' in semantic_info:
+                original_count = len(semantic_info['feature_description'])
+                inspection_data["semantic_expansion_info"]["original_semantic_features"] = original_count
+                inspection_data["semantic_expansion_info"]["expansion_applied"] = original_count < num_features
         
-        return None, None
-    
+        # Save up to 5 sample notes
+        num_samples = min(5, len(few_shot_examples))
+        for i in range(num_samples):
+            note, label = few_shot_examples[i]
+            
+            # Calculate note statistics
+            word_count = len(note.split())
+            char_count = len(note)
+            
+            # Count feature mentions in the note
+            feature_mentions = 0
+            for attr_name in dataset.get("attribute_names", []):
+                if attr_name.lower() in note.lower():
+                    feature_mentions += 1
+            
+            sample_data = {
+                "index": i,
+                "note": note,
+                "label": label,
+                "statistics": {
+                    "word_count": word_count,
+                    "character_count": char_count,
+                    "feature_mentions_found": feature_mentions,
+                    "total_features_available": num_features
+                }
+            }
+            
+            inspection_data["sample_notes"].append(sample_data)
+        
+        # Write to file
+        with open(notes_filepath, 'w', encoding='utf-8') as f:
+            json.dump(inspection_data, f, indent=2, ensure_ascii=False)
+        
+        logger.info(f"Saved {num_samples} sample notes for inspection to: {notes_filepath}")
+        
     except Exception as e:
-        print(f"Could not generate TabLLM data on-demand for {dataset_name}: {e}")
-        return None, None
+        logger.warning(f"Failed to save sample notes for inspection: {e}")
+
 
 def evaluate_tabllm(dataset, args):
     """Evaluate TabLLM baseline using proper ICL methodology with log probability computation."""
@@ -481,8 +772,30 @@ def evaluate_tabllm(dataset, args):
     original_feature_count = X.shape[1] if hasattr(X, 'shape') else len(X[0])
     original_feature_names = dataset.get("attribute_names", [])
     
-    # Load TabLLM configuration by OpenML ID if available
-    openml_task_id = dataset.get('id')
+    # Load TabLLM configuration by OpenML task ID if available
+    # Try multiple ways to get task_id (following CLAUDE.md guidelines)
+    openml_task_id = None
+    if 'task_id' in dataset:
+        openml_task_id = dataset['task_id']
+    elif hasattr(dataset, 'task_id'):
+        openml_task_id = getattr(dataset, 'task_id', None)
+    elif 'openml_task_id' in dataset:
+        openml_task_id = dataset['openml_task_id']
+    elif hasattr(dataset, 'openml_task_id'):
+        openml_task_id = getattr(dataset, 'openml_task_id', None)
+    elif 'id' in dataset and isinstance(dataset['id'], (int, str)):
+        # We have dataset_id, need to resolve to task_id using resource manager
+        try:
+            dataset_id = int(dataset['id'])
+            from clam.utils.resource_manager import get_resource_manager
+            rm = get_resource_manager()
+            identifiers = rm.resolve_openml_identifiers(dataset_id=dataset_id)
+            openml_task_id = identifiers.get('task_id')
+            if openml_task_id:
+                logger.debug(f"Resolved dataset_id {dataset_id} to task_id {openml_task_id}")
+        except (ValueError, TypeError, Exception) as e:
+            logger.debug(f"Could not resolve dataset_id to task_id: {e}")
+    
     template_data, feature_mapping = None, None
     
     if openml_task_id:
@@ -497,76 +810,43 @@ def evaluate_tabllm(dataset, args):
     else:
         logger.warning(f"No OpenML task ID found for dataset {dataset['name']}, cannot load TabLLM config")
     
-    # Fallback to legacy loading if no OpenML ID config found
-    if template_data is None:
-        template_data = load_tabllm_template(dataset['name'])
-        example_note = load_tabllm_note_examples(dataset['name'])
-        
-        # Try to load semantic information for better feature descriptions
-        semantic_info = None
-        semantic_dir = None  # Initialize semantic_dir outside try block to ensure it's always defined
+    # If no config loaded from task_id, try loading semantic info for online note generation
+    semantic_info = None
+    if feature_mapping and 'semantic_info' in feature_mapping:
+        # Already have semantic info from task_id lookup
+        semantic_info = feature_mapping['semantic_info']
+        logger.info(f"Using semantic info from task_id {openml_task_id}")
+    else:
+        # Try to load semantic information for online note generation
         try:
             # Try using the general metadata loader first
             from clam.utils.metadata_loader import get_metadata_loader
             loader = get_metadata_loader()
             
-            # Try with dataset name and also task_id if available
-            semantic_file = loader.detect_metadata_file(dataset['name'])
-            if semantic_file is None and 'task_id' in dataset:
-                semantic_file = loader.detect_metadata_file(dataset['task_id'])
+            # Try with task_id first, then dataset name
+            semantic_file = None
+            if openml_task_id:
+                semantic_file = loader.detect_metadata_file(openml_task_id)
+            if semantic_file is None:
+                semantic_file = loader.detect_metadata_file(dataset['name'])
             
             if semantic_file and semantic_file.exists():
                 with open(semantic_file, 'r') as f:
                     semantic_info = json.load(f)
-                logger.info(f"Loaded semantic info from {semantic_file}")
+                logger.info(f"Loaded semantic info from {semantic_file} for online note generation")
             else:
-                # Fallback to legacy load_semantic_info function
-                current_dir = os.path.dirname(os.path.abspath(__file__))
-                clam_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
-                semantic_dirs = [
-                    os.path.join(clam_root, "data", "cc18_semantic_complete"),
-                    os.path.join(clam_root, "data", "cc18_semantic")
-                ]
-                for dir_path in semantic_dirs:
-                    if os.path.exists(dir_path):
-                        semantic_dir = dir_path
-                        break
-                
-                if semantic_dir:
-                    semantic_info = load_semantic_info(dataset['name'], semantic_dir)
-                else:
-                    logger.warning(f"No semantic information found for dataset {dataset['name']}")
+                logger.warning(f"No semantic information found for dataset {dataset['name']} or task {openml_task_id}")
         except Exception as e:
             logger.debug(f"Error loading semantic information: {e}")
             semantic_info = None
-        
-        # If no pre-generated data available, try to generate on-demand
-        if template_data is None or example_note is None:
-            generated_note, generated_template = generate_tabllm_data_on_demand(dataset['name'], semantic_dir)
-            
-            if template_data is None and generated_template is not None:
-                template_data = generated_template
-                logger.info(f"Generated template on-demand for {dataset['name']}")
-            
-            if example_note is None and generated_note is not None:
-                example_note = generated_note
-                logger.info(f"Generated note example on-demand for {dataset['name']}")
-        
-        if template_data is not None:
-            logger.info(f"Using TabLLM semantic templates for {dataset['name']}")
-        else:
-            logger.info(f"No TabLLM templates available for {dataset['name']}, using default approach")
-        
-        if semantic_info is not None:
-            logger.info(f"Using semantic information for enhanced feature descriptions in {dataset['name']}")
-        else:
-            logger.info(f"No semantic information available for {dataset['name']}, using raw feature names")
+    
+    # Notes will be generated online during evaluation, no need to load pre-generated ones
+    logger.info(f"Will generate TabLLM notes online during evaluation to match current feature set")
     
     # Import required utilities
     from clam.utils import (
         drop_feature_for_oom,
         is_oom_error,
-        create_tabllm_note,
         apply_feature_reduction,
         unified_llm_predict
     )
@@ -592,6 +872,18 @@ def evaluate_tabllm(dataset, args):
     
     # Update feature mapping after preprocessing
     processed_feature_names = dataset.get("attribute_names", [])
+    
+    # ONLINE NOTE GENERATION: Expand semantic features to match current feature count
+    if semantic_info is not None:
+        current_feature_count = len(processed_feature_names)
+        logger.info(f"Expanding semantic features for online note generation: {current_feature_count} features after reduction")
+        semantic_info = expand_semantic_features(semantic_info, current_feature_count)
+        
+        # Update the feature mapping with expanded semantic info
+        if feature_mapping:
+            feature_mapping = feature_mapping.copy()
+            feature_mapping['semantic_info'] = semantic_info
+    
     processed_feature_mapping = create_feature_mapping_after_preprocessing(
         original_feature_names, processed_feature_names, feature_mapping
     )
@@ -818,16 +1110,64 @@ def evaluate_tabllm(dataset, args):
             x_example = X_train.iloc[idx] if hasattr(X_train, 'iloc') else X_train[idx]
             y_example = y_train.iloc[idx] if hasattr(y_train, 'iloc') else y_train[idx]
             
-            # Create TabLLM-style note with semantic information (use processed mapping if available)
-            semantic_for_note = processed_feature_mapping.get('semantic_info') if processed_feature_mapping else None
-            if semantic_for_note is None and feature_mapping:
-                semantic_for_note = feature_mapping.get('semantic_info')
-            note = create_tabllm_note(x_example, dataset["attribute_names"], dataset['name'], semantic_for_note)
+            # Generate TabLLM-style note online with expanded semantic information
+            semantic_for_note = semantic_info  # Use the expanded semantic info
+            if semantic_for_note is not None:
+                note = generate_note_from_row(x_example, semantic_for_note, dataset["attribute_names"], exclude_target=True)
+            else:
+                # Fallback to basic note if no semantic info available
+                note = " ".join([f"Feature {i} is {val}" for i, val in enumerate(x_example)])
+                logger.warning(f"No semantic info available, using basic note format")
             # Use meaningful class name if available, otherwise use the original label
             class_label = class_to_name.get(y_example, str(y_example))
             few_shot_examples.append((note, class_label))
         
         logger.info(f"Created {len(few_shot_examples)} few-shot examples (requested: {args.num_few_shot_examples})")
+        
+        # Apply context-aware truncation to few-shot examples
+        max_context_length = getattr(args, 'max_context_length', None)
+        if max_context_length and tokenizer is not None and len(X_test) > 0:
+            logger.info(f"Applying context-aware truncation with max_context_length={max_context_length}")
+            
+            # Use a sample test note to estimate truncation (use first test sample)
+            sample_test = X_test.iloc[0] if hasattr(X_test, 'iloc') else X_test[0]
+            if semantic_info is not None:
+                sample_test_note = generate_note_from_row(sample_test, semantic_info, dataset["attribute_names"], exclude_target=True)
+            else:
+                sample_test_note = " ".join([f"Feature {i} is {val}" for i, val in enumerate(sample_test)])
+            
+            # Create task description
+            task_description = f"Task: Given tabular data examples, classify each instance into one of the following categories: {', '.join(answer_choices)}.\n\nExamples:\n\n"
+            
+            # Estimate tokens before truncation
+            original_tokens = estimate_prompt_tokens(few_shot_examples, sample_test_note, question, task_description, tokenizer)
+            logger.info(f"Estimated {original_tokens} tokens for full prompt with {len(few_shot_examples)} examples")
+            
+            # Apply context-aware truncation using the existing utility functions
+            few_shot_examples = truncate_few_shot_examples_for_context(
+                few_shot_examples, 
+                sample_test_note, 
+                question, 
+                task_description,
+                tokenizer, 
+                max_context_length
+            )
+            
+            # Log results
+            if len(few_shot_examples) == 0:
+                logger.warning("All few-shot examples were truncated due to context length limits. Using zero-shot approach.")
+            else:
+                final_tokens = estimate_prompt_tokens(few_shot_examples, sample_test_note, question, task_description, tokenizer)
+                logger.info(f"After truncation: {len(few_shot_examples)} examples, ~{final_tokens} tokens")
+        elif max_context_length is None:
+            logger.info("No max_context_length specified, using all few-shot examples")
+        elif tokenizer is None:
+            logger.info("No tokenizer available (API model), skipping context-aware truncation")
+        else:
+            logger.info("No test samples available for context estimation")
+        
+        # Save sample notes for inspection
+        save_sample_notes_for_inspection(few_shot_examples, dataset, args, semantic_info)
         
         # Make predictions using unified LLM prediction function with memory optimization
         predictions = []
@@ -853,11 +1193,14 @@ def evaluate_tabllm(dataset, args):
                         # Continue execution anyway
             test_sample = X_test.iloc[i] if hasattr(X_test, 'iloc') else X_test[i]
             
-            # Create TabLLM-style note for test sample with semantic information (use processed mapping)
-            semantic_for_note = processed_feature_mapping.get('semantic_info') if processed_feature_mapping else None
-            if semantic_for_note is None and feature_mapping:
-                semantic_for_note = feature_mapping.get('semantic_info')
-            test_note = create_tabllm_note(test_sample, dataset["attribute_names"], dataset['name'], semantic_for_note, dropped_features)
+            # Generate TabLLM-style note for test sample online with expanded semantic information
+            semantic_for_note = semantic_info  # Use the expanded semantic info
+            if semantic_for_note is not None:
+                test_note = generate_note_from_row(test_sample, semantic_for_note, dataset["attribute_names"], exclude_target=True)
+            else:
+                # Fallback to basic note if no semantic info available
+                test_note = " ".join([f"Feature {i} is {val}" for i, val in enumerate(test_sample)])
+                logger.warning(f"No semantic info available for test sample, using basic note format")
             
             # Create TabLLM-style prompt following the template format with task description
             # Add task description for better ICL
@@ -1175,6 +1518,12 @@ def evaluate_tabllm(dataset, args):
             logger.info(f"TabLLM R² on {dataset['name']}: {regression_results.get('r2_score', 'N/A'):.4f}")
         else:
             logger.info(f"TabLLM accuracy on {dataset['name']}: {accuracy:.4f}")
+        
+        # Log where inspection files can be found
+        if hasattr(args, 'output_dir') and args.output_dir:
+            inspection_dir = os.path.join(args.output_dir, "tabllm_notes_inspection")
+            logger.info(f"Sample generated notes saved for inspection in: {inspection_dir}")
+        
         return results
         
     except Exception as e:
