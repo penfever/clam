@@ -28,33 +28,34 @@ def get_openml_cc18_mapping() -> Dict[int, Dict[str, Any]]:
     """
     Get comprehensive mapping of OpenML CC18 tasks with task_id, dataset_id, and dataset_name.
     
+    TEMPORARY: Disabled cache and fallback mechanisms to force OpenML API usage.
     The centralized cache invalidation system automatically handles cache invalidation
     when the data directory changes, so this function focuses on cache loading/saving.
     
     Returns:
         Dictionary mapping task_id to {'dataset_id': int, 'dataset_name': str, 'num_classes': int, etc.}
     """
-    # Try to load from cache first
-    if MAPPING_CACHE_FILE.exists():
-        try:
-            with open(MAPPING_CACHE_FILE, 'rb') as f:
-                cached_mapping = pickle.load(f)
-                logger.debug(f"Loaded OpenML mapping from cache: {len(cached_mapping)} tasks")
-                return cached_mapping
-        except Exception as e:
-            logger.warning(f"Failed to load cached mapping: {e}")
+    # DISABLED: Try to load from cache first - forcing fresh OpenML API calls
+    # if MAPPING_CACHE_FILE.exists():
+    #     try:
+    #         with open(MAPPING_CACHE_FILE, 'rb') as f:
+    #             cached_mapping = pickle.load(f)
+    #             logger.debug(f"Loaded OpenML mapping from cache: {len(cached_mapping)} tasks")
+    #             return cached_mapping
+    #     except Exception as e:
+    #         logger.warning(f"Failed to load cached mapping: {e}")
     
     # If cache doesn't exist or failed to load, create new mapping
-    logger.info("Creating OpenML mapping from scratch (cache miss or invalidated)")
+    logger.info("Creating OpenML mapping from scratch (cache and fallbacks disabled)")
     mapping = _create_openml_mapping()
     
-    # Save to cache
-    try:
-        with open(MAPPING_CACHE_FILE, 'wb') as f:
-            pickle.dump(mapping, f)
-        logger.info(f"Saved OpenML mapping to cache: {len(mapping)} tasks")
-    except Exception as e:
-        logger.warning(f"Failed to save mapping to cache: {e}")
+    # DISABLED: Save to cache - preventing incorrect cached mappings
+    # try:
+    #     with open(MAPPING_CACHE_FILE, 'wb') as f:
+    #         pickle.dump(mapping, f)
+    #     logger.info(f"Saved OpenML mapping to cache: {len(mapping)} tasks")
+    # except Exception as e:
+    #     logger.warning(f"Failed to save mapping to cache: {e}")
     
     return mapping
 
@@ -136,67 +137,98 @@ def _discover_tasks_from_data_directory() -> Dict[int, Dict[str, Any]]:
 def _create_openml_mapping() -> Dict[int, Dict[str, Any]]:
     """
     Create OpenML mapping by:
-    1. Starting with fallback mapping (includes hardcoded tasks)
-    2. Discovering task IDs from data directory JSON files
-    3. Optionally querying OpenML API for additional details
+    1. DISABLED: Starting with fallback mapping (includes hardcoded tasks)
+    2. DISABLED: Discovering task IDs from data directory JSON files
+    3. Only querying OpenML API for accurate task resolution
     
     Returns:
         Dictionary mapping task_id to task information
     """
-    # Start with fallback mapping which includes our manually added tasks
-    mapping = _get_fallback_mapping()
-    logger.info(f"Starting with {len(mapping)} tasks from fallback mapping")
+    # DISABLED: Start with fallback mapping which includes our manually added tasks
+    # mapping = _get_fallback_mapping()
+    # logger.info(f"Starting with {len(mapping)} tasks from fallback mapping")
     
-    # Discover tasks from data directory
-    discovered_tasks = _discover_tasks_from_data_directory()
-    logger.info(f"Discovered {len(discovered_tasks)} unique task IDs from data directory")
+    # DISABLED: Discover tasks from data directory
+    # discovered_tasks = _discover_tasks_from_data_directory()
+    # logger.info(f"Discovered {len(discovered_tasks)} unique task IDs from data directory")
     
-    # Add discovered tasks to mapping if not already present
-    for task_id, metadata in discovered_tasks.items():
-        if task_id not in mapping:
-            mapping[task_id] = metadata
-            logger.debug(f"Added discovered task {task_id}: {metadata.get('dataset_name', 'unknown')}")
-        else:
-            # Update existing entry with discovered metadata if it has more info
-            if metadata.get('dataset_id') and not mapping[task_id].get('dataset_id'):
-                mapping[task_id]['dataset_id'] = metadata['dataset_id']
-            if metadata.get('source_file'):
-                mapping[task_id]['source_file'] = metadata['source_file']
+    # Start with empty mapping - only use OpenML API
+    mapping = {}
+    logger.info("Starting with empty mapping - only using OpenML API for task resolution")
     
-    # Optionally try to enrich with OpenML API data
+    # DISABLED: Add discovered tasks to mapping if not already present
+    # for task_id, metadata in discovered_tasks.items():
+    #     if task_id not in mapping:
+    #         mapping[task_id] = metadata
+    #         logger.debug(f"Added discovered task {task_id}: {metadata.get('dataset_name', 'unknown')}")
+    #     else:
+    #         # Update existing entry with discovered metadata if it has more info
+    #         if metadata.get('dataset_id') and not mapping[task_id].get('dataset_id'):
+    #             mapping[task_id]['dataset_id'] = metadata['dataset_id']
+    #         if metadata.get('source_file'):
+    #             mapping[task_id]['source_file'] = metadata['source_file']
+    
+    # Only use OpenML API data - no fallback enrichment
     try:
         import openml
-        logger.info("Attempting to enrich mapping with OpenML API data")
+        logger.info("Using only OpenML API data for task resolution")
         
-        # Try to get CC18 study for additional tasks
+        # Get CC18 study for classification tasks
         try:
             suite = openml.study.get_suite(99)  # 99 is the ID for CC18
             cc18_task_ids = suite.tasks
             logger.info(f"Found {len(cc18_task_ids)} CC18 tasks from OpenML")
             
-            # Add CC18 tasks if not already in mapping
+            # Add CC18 tasks to mapping
             for task_id in cc18_task_ids:
-                if task_id not in mapping:
-                    try:
-                        task = openml.tasks.get_task(task_id)
-                        dataset = task.get_dataset()
-                        
-                        mapping[task_id] = {
-                            'dataset_id': task.dataset_id,
-                            'dataset_name': dataset.name,
-                            'num_classes': len(task.class_labels) if hasattr(task, 'class_labels') else None,
-                            'num_features': len(dataset.features) if hasattr(dataset, 'features') and isinstance(dataset.features, dict) else None,
-                            'target_attribute': task.target_name if hasattr(task, 'target_name') else None
-                        }
-                        logger.debug(f"Added CC18 task {task_id}: {dataset.name}")
-                    except Exception as e:
-                        logger.warning(f"Failed to get details for CC18 task {task_id}: {e}")
-                        
+                try:
+                    task = openml.tasks.get_task(task_id)
+                    dataset = task.get_dataset()
+                    
+                    mapping[task_id] = {
+                        'dataset_id': task.dataset_id,
+                        'dataset_name': dataset.name,
+                        'num_classes': len(task.class_labels) if hasattr(task, 'class_labels') else None,
+                        'num_features': len(dataset.features) if hasattr(dataset, 'features') and isinstance(dataset.features, dict) else None,
+                        'target_attribute': task.target_name if hasattr(task, 'target_name') else None,
+                        'source': 'openml_api'
+                    }
+                    logger.debug(f"Added CC18 task {task_id}: {dataset.name} (dataset_id: {task.dataset_id})")
+                except Exception as e:
+                    logger.warning(f"Failed to get details for CC18 task {task_id}: {e}")
         except Exception as e:
             logger.warning(f"Could not fetch CC18 tasks from OpenML: {e}")
+        
+        # Get regression study tasks
+        try:
+            suite = openml.study.get_suite(455)  # 455 is the ID for regression suite
+            regression_task_ids = suite.tasks
+            logger.info(f"Found {len(regression_task_ids)} regression tasks from OpenML")
+            
+            # Add regression tasks to mapping
+            for task_id in regression_task_ids:
+                try:
+                    task = openml.tasks.get_task(task_id)
+                    dataset = task.get_dataset()
+                    
+                    mapping[task_id] = {
+                        'dataset_id': task.dataset_id,
+                        'dataset_name': dataset.name,
+                        'task_type': 'regression',
+                        'num_features': len(dataset.features) if hasattr(dataset, 'features') and isinstance(dataset.features, dict) else None,
+                        'target_attribute': task.target_name if hasattr(task, 'target_name') else None,
+                        'source': 'openml_api'
+                    }
+                    logger.debug(f"Added regression task {task_id}: {dataset.name} (dataset_id: {task.dataset_id})")
+                except Exception as e:
+                    logger.warning(f"Failed to get details for regression task {task_id}: {e}")
+                    
+        except Exception as e:
+            logger.warning(f"Could not fetch regression tasks from OpenML: {e}")
             
     except ImportError:
-        logger.info("OpenML not available, skipping API enrichment")
+        logger.warning("OpenML not available - cannot create mapping without fallbacks")
+        return {}
     
     logger.info(f"Final mapping contains {len(mapping)} tasks")
     return mapping

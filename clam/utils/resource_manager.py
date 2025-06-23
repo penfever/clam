@@ -933,50 +933,48 @@ class ClamResourceManager:
         # Get the complete mapping
         mapping = get_openml_cc18_mapping()
         
-        # If we have task_id, get the rest from mapping
+        # If we have task_id, prioritize OpenML API resolution
         if task_id:
+            # Try OpenML API first for accurate resolution
+            from clam.utils.openml_mapping import resolve_task_id_from_openml_api
+            api_result = resolve_task_id_from_openml_api(task_id)
+            if api_result:
+                result['dataset_id'] = api_result.get('dataset_id')
+                result['dataset_name'] = api_result.get('dataset_name')
+                logger.info(f"Task ID {task_id} resolves to dataset ID {result['dataset_id']}")
+                return result
+            
+            # Fallback to mapping only if API fails
             if task_id in mapping:
                 info = mapping[task_id]
                 result['dataset_id'] = info.get('dataset_id')
                 result['dataset_name'] = info.get('dataset_name')
-                
-                # If dataset_id is missing, try to resolve from OpenML API
-                if not result['dataset_id']:
-                    from clam.utils.openml_mapping import resolve_task_id_from_openml_api
-                    api_result = resolve_task_id_from_openml_api(task_id)
-                    if api_result:
-                        result['dataset_id'] = api_result.get('dataset_id')
-                        result['dataset_name'] = api_result.get('dataset_name')
-                
+                logger.warning(f"Using fallback mapping for task {task_id} -> dataset {result['dataset_id']}")
                 return result
-            else:
-                # Try to resolve from OpenML API if not in hardcoded mapping
-                from clam.utils.openml_mapping import resolve_task_id_from_openml_api
-                api_result = resolve_task_id_from_openml_api(task_id)
-                if api_result:
-                    result['dataset_id'] = api_result.get('dataset_id')
-                    result['dataset_name'] = api_result.get('dataset_name')
-                    return result
+            
+            logger.error(f"Could not resolve task_id {task_id} from either OpenML API or fallback mapping")
         
-        # If we have dataset_id, find task_id first
-        if dataset_id and not task_id:
-            imputed_task_id = impute_task_id_from_dataset_id(dataset_id)
-            if imputed_task_id:
-                result['task_id'] = imputed_task_id
-                if imputed_task_id in mapping:
-                    info = mapping[imputed_task_id]
-                    result['dataset_name'] = info.get('dataset_name')
-            return result
+        # DISABLED: If we have dataset_id, find task_id first - requires working fallback mappings
+        # if dataset_id and not task_id:
+        #     imputed_task_id = impute_task_id_from_dataset_id(dataset_id)
+        #     if imputed_task_id:
+        #         result['task_id'] = imputed_task_id
+        #         if imputed_task_id in mapping:
+        #             info = mapping[imputed_task_id]
+        #             result['dataset_name'] = info.get('dataset_name')
+        #     return result
         
-        # If we have dataset_name, find task_id first
-        if dataset_name and not task_id:
-            imputed_task_id = impute_task_id_from_dataset_name(dataset_name)
-            if imputed_task_id:
-                result['task_id'] = imputed_task_id
-                if imputed_task_id in mapping:
-                    info = mapping[imputed_task_id]
-                    result['dataset_id'] = info.get('dataset_id')
-            return result
+        # DISABLED: If we have dataset_name, find task_id first - requires working fallback mappings  
+        # if dataset_name and not task_id:
+        #     imputed_task_id = impute_task_id_from_dataset_name(dataset_name)
+        #     if imputed_task_id:
+        #         result['task_id'] = imputed_task_id
+        #         if imputed_task_id in mapping:
+        #             info = mapping[imputed_task_id]
+        #             result['dataset_id'] = info.get('dataset_id')
+        #     return result
+        
+        logger.warning("Resolution by dataset_id or dataset_name is temporarily disabled to force task_id-based OpenML API usage")
         
         return result
     
