@@ -277,8 +277,10 @@ class ContextComposer:
         
         strategy = layout_strategy or self.config.layout_strategy
         
-        # Generate individual visualization results
+        # Generate individual visualization results with explicit figure cleanup
         results = []
+        initial_figures = set(plt.get_fignums())
+        
         for i, viz in enumerate(self.visualizations):
             train_data = self.cached_results.get(f"viz_{i}_train")
             test_data = self.cached_results.get(f"viz_{i}_test")
@@ -288,6 +290,9 @@ class ContextComposer:
                 continue
             
             try:
+                # Track figures before visualization
+                pre_viz_figures = set(plt.get_fignums())
+                
                 result = viz.generate_plot(
                     transformed_data=train_data,
                     y=self._y_train,
@@ -297,8 +302,19 @@ class ContextComposer:
                 )
                 results.append(result)
                 
+                # Ensure any new figures created are properly closed
+                post_viz_figures = set(plt.get_fignums())
+                new_figures = post_viz_figures - pre_viz_figures
+                for fignum in new_figures:
+                    plt.close(fignum)
+                
             except Exception as e:
                 self.logger.error(f"Failed to generate plot for {viz.method_name}: {e}")
+                # Clean up any figures that might have been created during the failed attempt
+                current_figures = set(plt.get_fignums())
+                error_figures = current_figures - initial_figures
+                for fignum in error_figures:
+                    plt.close(fignum)
                 continue
         
         if not results:
@@ -306,6 +322,14 @@ class ContextComposer:
         
         # Use layout manager to compose the results
         composed_image = self.layout_manager.compose_layout(results, strategy)
+        
+        # Final cleanup: close any remaining figures that might have been missed
+        final_figures = set(plt.get_fignums())
+        remaining_figures = final_figures - initial_figures
+        if remaining_figures:
+            self.logger.debug(f"Closing {len(remaining_figures)} remaining figures to prevent memory leaks")
+            for fignum in remaining_figures:
+                plt.close(fignum)
         
         return composed_image
     

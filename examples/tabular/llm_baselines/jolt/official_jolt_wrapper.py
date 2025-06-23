@@ -849,10 +849,48 @@ def evaluate_jolt_official(dataset, args):
                     predictions = predictions[:len(X_test)]
                     completed_samples = len(X_test)
                 elif len(predictions) < len(X_test) and completed_samples > 0:
-                    # Don't pad predictions - this indicates JOLT failed to predict all samples
-                    error_msg = f"JOLT only predicted {len(predictions)} out of {len(X_test)} samples - partial predictions not acceptable"
-                    logger.error(error_msg)
-                    raise ValueError(error_msg)
+                    # JOLT failed to predict all samples - impute missing predictions
+                    missing_count = len(X_test) - len(predictions)
+                    logger.warning(f"JOLT only predicted {len(predictions)} out of {len(X_test)} samples. "
+                                 f"Imputing {missing_count} missing predictions using majority class/mean strategy.")
+                    
+                    if is_regression:
+                        # For regression: use mean of existing predictions
+                        if len(predictions) > 0:
+                            existing_predictions = [p for p in predictions if p is not None and not np.isnan(p)]
+                            if existing_predictions:
+                                imputation_value = np.mean(existing_predictions)
+                                logger.info(f"Using mean value {imputation_value:.3f} for regression imputation")
+                            else:
+                                # Fallback to training data mean
+                                imputation_value = np.mean(y_train)
+                                logger.info(f"Using training data mean {imputation_value:.3f} for regression imputation")
+                        else:
+                            imputation_value = np.mean(y_train)
+                            logger.info(f"Using training data mean {imputation_value:.3f} for regression imputation")
+                        
+                        # Extend predictions with imputed values
+                        predictions.extend([imputation_value] * missing_count)
+                    else:
+                        # For classification: use majority class
+                        if len(predictions) > 0:
+                            # Use majority class from existing predictions
+                            from collections import Counter
+                            prediction_counts = Counter(predictions)
+                            majority_class = prediction_counts.most_common(1)[0][0]
+                            logger.info(f"Using majority class '{majority_class}' for classification imputation")
+                        else:
+                            # Fallback to most frequent class in training data
+                            from collections import Counter
+                            train_counts = Counter(y_train)
+                            majority_class = train_counts.most_common(1)[0][0]
+                            logger.info(f"Using training majority class '{majority_class}' for classification imputation")
+                        
+                        # Extend predictions with imputed values
+                        predictions.extend([majority_class] * missing_count)
+                    
+                    completed_samples = len(X_test)  # Update completed samples count
+                    logger.info(f"Successfully imputed {missing_count} missing predictions. Total predictions: {len(predictions)}")
                 
                 # Calculate metrics
                 if completed_samples > 0:

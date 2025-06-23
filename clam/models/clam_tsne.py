@@ -1153,6 +1153,9 @@ class ClamTsneClassifier:
         self.logger.info(f"Starting VLM predictions for {len(self.test_tsne)} test points...")
         
         for i in range(len(self.test_tsne)):
+            # Track figures at start of iteration to ensure cleanup
+            iteration_start_figures = set(plt.get_fignums())
+            
             try:
                 # Choose visualization approach based on multi-viz setting
                 if self.enable_multi_viz and self.context_composer is not None:
@@ -1600,6 +1603,14 @@ class ClamTsneClassifier:
                     prediction = 0 if self.task_type == 'regression' else 0
                 predictions.append(prediction)
                 completed_samples = i + 1
+            
+            finally:
+                # Ensure figures created during this iteration are cleaned up
+                iteration_end_figures = set(plt.get_fignums())
+                new_iteration_figures = iteration_end_figures - iteration_start_figures
+                if new_iteration_figures:
+                    for fignum in new_iteration_figures:
+                        plt.close(fignum)
         
         if return_detailed:
             return {
