@@ -1,0 +1,11 @@
+{
+  "name": "frequent_patterns",
+  "enable_multi_viz": true,
+  "visualization_methods": [
+    "pca",
+    "frequent_patterns"
+  ],
+  "layout_strategy": "sequential",
+  "nn_k": 30,
+  "reasoning_focus": "comparison"
+}

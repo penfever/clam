@@ -641,7 +641,9 @@ def main():
                 elif 'X' in dataset and 'y' in dataset:
                     y_data = dataset['y']
             
-            task_type, detection_method = detect_task_type(y=y_data, dataset=dataset)
+            # Get task_id for proper task type detection
+            task_id = dataset.get('task_id') or dataset.get('id')
+            task_type, detection_method = detect_task_type(y=y_data, dataset=dataset, task_id=task_id)
             logger.info(f"Detected task type: {task_type}")
             
             # Apply task type filtering

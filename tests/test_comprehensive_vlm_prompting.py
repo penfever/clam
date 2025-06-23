@@ -239,8 +239,25 @@ class VLMPromptingTestSuite:
     def _load_dataset(self):
         """Load OpenML dataset with robust error handling."""
         try:
-            # Load dataset from OpenML
-            dataset = fetch_openml(data_id=self.task_id, as_frame=True, parser='auto')
+            # Create data directory if it doesn't exist
+            data_dir = Path.home() / ".clam" / "data"
+            data_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Load dataset from OpenML using task_id
+            # First resolve task_id to dataset_id using the resource manager
+            from clam.utils.resource_manager import get_resource_manager
+            rm = get_resource_manager()
+            identifiers = rm.resolve_openml_identifiers(task_id=self.task_id)
+            
+            dataset_id = identifiers.get('dataset_id')
+            if not dataset_id:
+                # Fallback: try to get task and dataset_id directly from OpenML
+                import openml
+                task = openml.tasks.get_task(self.task_id)
+                dataset_id = task.dataset_id
+            
+            # Load dataset using dataset_id (not task_id)
+            dataset = fetch_openml(data_id=dataset_id, as_frame=True, parser='auto')
             X = dataset.data
             y = dataset.target
             

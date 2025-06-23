@@ -37,6 +37,12 @@ def evaluate_jolt_official(dataset, args):
     original_cuda_device = os.environ.get('CUDA_VISIBLE_DEVICES', None)
     original_pytorch_cuda_alloc_conf = os.environ.get('PYTORCH_CUDA_ALLOC_CONF', None)
     
+    # Force CPU usage for JOLT on Mac/CPU environments by masking CUDA completely
+    # We need to check this before importing torch to avoid issues
+    force_cpu = args.device == "cpu"
+    if force_cpu:
+        os.environ['CUDA_VISIBLE_DEVICES'] = ''  # Hide all CUDA devices
+    
     # Set CUDA device environment variable for JOLT BEFORE importing torch
     if hasattr(args, 'gpu_index') and args.gpu_index != 0 and args.device != "cpu":
         os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_index)
@@ -53,8 +59,11 @@ def evaluate_jolt_official(dataset, args):
     logger = logging.getLogger(__name__)
     logger.info(f"Evaluating JOLT (official) on dataset {dataset['name']}")
     
-    # Verify the masking worked after torch import
-    if torch.cuda.is_available() and args.device != "cpu":
+    # Log device configuration
+    if force_cpu:
+        logger.info("Forcing CPU-only mode for JOLT by hiding CUDA devices")
+        logger.info(f"CUDA available after masking: {torch.cuda.is_available()}")
+    elif torch.cuda.is_available() and args.device != "cpu":
         logger.info(f"Available CUDA devices after masking: {torch.cuda.device_count()}")
         if torch.cuda.device_count() > 0:
             logger.info(f"Current CUDA device: {torch.cuda.current_device()}")
@@ -194,8 +203,10 @@ def evaluate_jolt_official(dataset, args):
             X_train, y_train, X_test, dataset, args, logger
         )
         
-        # Detect task type (classification vs regression)
-        task_type, _ = detect_task_type(dataset=dataset, y=y_train)
+        # Detect task type (classification vs regression) using task_id
+        task_id = dataset.get('task_id') or dataset.get('id')
+        task_type, detection_method = detect_task_type(dataset=dataset, y=y_train, task_id=task_id)
+        logger.info(f"Task type detection method: {detection_method}")
         is_regression = (task_type == 'regression')
         logger.info(f"JOLT detected task type: {task_type}")
         
@@ -286,6 +297,12 @@ def evaluate_jolt_official(dataset, args):
         
         logger.info(f"JOLT using model: {jolt_model_name}, shots: {effective_shots}, train limit: {effective_train_limit}")
         
+        # Log task-specific configuration
+        if is_regression:
+            logger.info(f"REGRESSION CONFIG: mode=sample, y_column_types=['numerical'], num_decimal_places_y=3")
+        else:
+            logger.info(f"CLASSIFICATION CONFIG: mode=logpy_only, y_column_types=['categorical'], num_decimal_places_y=0")
+        
         # Combine features and target for JOLT format with size limits
         train_data = pd.concat([X_train, y_train], axis=1)
         test_data = pd.concat([X_test, y_test], axis=1)
@@ -370,7 +387,7 @@ def evaluate_jolt_official(dataset, args):
                 # Create JOLT arguments with memory optimizations
                 # Set mode and column types based on task type
                 if is_regression:
-                    mode = "sampling"  # Use sampling mode for regression
+                    mode = "sample"  # Use sample mode for regression - must contain "sample" string
                     y_column_types = ['numerical']
                     num_decimal_places_y = 3  # Use 3 decimal places for regression targets
                 else:
@@ -525,6 +542,17 @@ def evaluate_jolt_official(dataset, args):
                 
                 for retry in range(max_retries + 1):
                     try:
+                        # Log critical JOLT arguments before call
+                        logger.info(f"CALLING JOLT with key arguments:")
+                        logger.info(f"  - mode: {jolt_args.mode}")
+                        logger.info(f"  - y_column_types: {jolt_args.y_column_types}")
+                        logger.info(f"  - num_samples: {jolt_args.num_samples}")
+                        logger.info(f"  - shots: {jolt_args.shots}")
+                        logger.info(f"  - temperature: {jolt_args.temperature}")
+                        logger.info(f"  - max_generated_length: {jolt_args.max_generated_length}")
+                        logger.info(f"  - data_path: {jolt_args.data_path}")
+                        logger.info(f"  - y_column_names: {jolt_args.y_column_names}")
+                        
                         # Disable gradients globally to save memory during inference
                         with torch.no_grad():
                             
@@ -532,7 +560,65 @@ def evaluate_jolt_official(dataset, args):
                             if hasattr(model, 'eval'):
                                 model.eval()
                             
+                            logger.info("Starting JOLT run_jolt() call...")
                             jolt_results = run_jolt(jolt_args, model, tokenizer)
+                            logger.info("JOLT run_jolt() call completed")
+                            
+                            # Validate JOLT results immediately after call
+                            if jolt_results is None:
+                                raise ValueError("JOLT run_jolt() returned None")
+                            
+                            if not isinstance(jolt_results, dict):
+                                raise ValueError(f"JOLT run_jolt() returned {type(jolt_results)}, expected dict")
+                            
+                            # For regression tasks, validate that sample mode worked
+                            if is_regression:
+                                if 'gen' not in jolt_results:
+                                    raise ValueError("JOLT sample mode did not return 'gen' key - sample() function may have failed")
+                                
+                                gen_data = jolt_results['gen']
+                                if not isinstance(gen_data, list):
+                                    raise ValueError(f"JOLT 'gen' data is {type(gen_data)}, expected list")
+                                
+                                if len(gen_data) == 0:
+                                    raise ValueError("JOLT 'gen' data is empty - no samples were generated")
+                                
+                                # Check if any generation results exist
+                                total_samples = sum(len(gen_item) if isinstance(gen_item, list) else 0 for gen_item in gen_data)
+                                if total_samples == 0:
+                                    raise ValueError("JOLT generated 0 valid samples - all generation attempts failed or were filtered out")
+                                
+                                logger.info(f"JOLT generated {total_samples} total samples across {len(gen_data)} test instances")
+                                
+                                # Check if process_generated_results was called (should add 'metrics' key)
+                                if 'metrics' not in jolt_results:
+                                    raise ValueError("JOLT sample mode completed but 'metrics' key missing - process_generated_results() was not called or failed")
+                                
+                                # Validate metrics structure for regression
+                                metrics = jolt_results['metrics']
+                                if not isinstance(metrics, list) or len(metrics) == 0:
+                                    raise ValueError(f"JOLT metrics is {type(metrics)} with length {len(metrics) if hasattr(metrics, '__len__') else 'N/A'}, expected non-empty list")
+                                
+                                first_metric = metrics[0]
+                                if not isinstance(first_metric, dict):
+                                    raise ValueError(f"JOLT first metric is {type(first_metric)}, expected dict")
+                                
+                                required_keys = ['y_test_median', 'y_test_mean', 'mae']
+                                missing_keys = [key for key in required_keys if key not in first_metric]
+                                if missing_keys:
+                                    raise ValueError(f"JOLT regression metrics missing required keys: {missing_keys}")
+                                
+                                # Check for NaN values in predictions
+                                y_test_median = first_metric['y_test_median']
+                                import numpy as np
+                                if isinstance(y_test_median, list) and len(y_test_median) > 0:
+                                    nan_count = sum(1 for val in y_test_median if np.isnan(val))
+                                    if nan_count == len(y_test_median):
+                                        raise ValueError("All JOLT regression predictions are NaN - generation or parsing failed")
+                                    elif nan_count > 0:
+                                        logger.warning(f"JOLT has {nan_count}/{len(y_test_median)} NaN predictions")
+                                
+                                logger.info("JOLT regression validation passed")
                         
                         # If successful, break out of retry loop
                         break
@@ -602,44 +688,106 @@ def evaluate_jolt_official(dataset, args):
                 if isinstance(jolt_results, dict) and 'data' in jolt_results:
                     logger.info(f"JOLT data keys: {list(jolt_results['data'].keys()) if isinstance(jolt_results['data'], dict) else 'Data not a dict'}")
                 
-                # Handle regression predictions differently from classification
-                if is_regression and isinstance(jolt_results, dict) and 'metrics' in jolt_results and len(jolt_results['metrics']) > 0:
-                    # Extract regression predictions and metrics from JOLT
-                    logger.info("Extracting regression predictions from JOLT metrics...")
-                    try:
-                        metrics = jolt_results['metrics'][0]  # Get first column metrics for regression
+                # Add detailed logging for regression tasks
+                if is_regression:
+                    logger.info(f"REGRESSION TASK DEBUGGING:")
+                    logger.info(f"  - Task type: {task_type}")
+                    logger.info(f"  - JOLT mode used: sample")
+                    logger.info(f"  - y_column_types: ['numerical']")
+                    if isinstance(jolt_results, dict):
+                        logger.info(f"  - JOLT results type: dict with {len(jolt_results)} keys")
+                        for key, value in jolt_results.items():
+                            if key == 'data' and isinstance(value, dict):
+                                logger.info(f"    - {key}: dict with keys {list(value.keys())}")
+                                for subkey, subvalue in value.items():
+                                    if hasattr(subvalue, 'shape'):
+                                        logger.info(f"      - {subkey}: array shape {subvalue.shape}")
+                                    elif isinstance(subvalue, (list, tuple)):
+                                        logger.info(f"      - {subkey}: {type(subvalue).__name__} length {len(subvalue)}")
+                                    else:
+                                        logger.info(f"      - {subkey}: {type(subvalue).__name__}")
+                            elif key == 'metrics':
+                                logger.info(f"    - {key}: {type(value).__name__} with {len(value) if hasattr(value, '__len__') else 'no'} items")
+                                if isinstance(value, list) and len(value) > 0:
+                                    first_metric = value[0]
+                                    if isinstance(first_metric, dict):
+                                        logger.info(f"      - First metric keys: {list(first_metric.keys())}")
+                                        for metric_key in ['y_test_median', 'y_test_mean', 'mae']:
+                                            if metric_key in first_metric:
+                                                metric_val = first_metric[metric_key]
+                                                if hasattr(metric_val, '__len__'):
+                                                    logger.info(f"        - {metric_key}: length {len(metric_val)}")
+                                                else:
+                                                    logger.info(f"        - {metric_key}: {metric_val}")
+                                            else:
+                                                logger.info(f"        - {metric_key}: MISSING")
+                            elif hasattr(value, 'shape'):
+                                logger.info(f"    - {key}: array shape {value.shape}")
+                            elif isinstance(value, (list, tuple)):
+                                logger.info(f"    - {key}: {type(value).__name__} length {len(value)}")
+                            else:
+                                logger.info(f"    - {key}: {type(value).__name__}")
+                    else:
+                        logger.info(f"  - JOLT results type: {type(jolt_results)}")
                         
-                        # Extract regression predictions (use median as point prediction)
-                        if 'y_test_median' in metrics and len(metrics['y_test_median']) > 0:
-                            predictions = metrics['y_test_median']
-                            completed_samples = len([p for p in predictions if not np.isnan(p)])
-                            logger.info(f"Successfully extracted {completed_samples} regression predictions from JOLT")
+                    # Check if JOLT's sample function was supposed to call process_generated_results
+                    if isinstance(jolt_results, dict):
+                        has_gen = 'gen' in jolt_results
+                        has_prompts = 'prompts' in jolt_results
+                        has_metrics = 'metrics' in jolt_results
+                        logger.info(f"  - Expected sample mode results: gen={has_gen}, prompts={has_prompts}, metrics={has_metrics}")
+                        
+                        if has_gen:
+                            gen_data = jolt_results['gen']
+                            logger.info(f"    - gen data type: {type(gen_data)}, length: {len(gen_data) if hasattr(gen_data, '__len__') else 'N/A'}")
+                            if isinstance(gen_data, list) and len(gen_data) > 0:
+                                first_gen = gen_data[0]
+                                logger.info(f"    - first gen item type: {type(first_gen)}, length: {len(first_gen) if hasattr(first_gen, '__len__') else 'N/A'}")
+                        
+                        if not has_metrics:
+                            logger.error("REGRESSION ISSUE: JOLT sample mode did not produce 'metrics' - process_generated_results may have failed!")
+                            logger.error("This suggests the sample() function completed but process_generated_results() was not called or failed")
+                
+                # Handle regression predictions differently from classification
+                if is_regression:
+                    logger.info("Processing regression task results...")
+                    if isinstance(jolt_results, dict) and 'metrics' in jolt_results and len(jolt_results['metrics']) > 0:
+                        # Extract regression predictions and metrics from JOLT
+                        logger.info("Extracting regression predictions from JOLT metrics...")
+                        try:
+                            metrics = jolt_results['metrics'][0]  # Get first column metrics for regression
                             
-                            # Extract JOLT's built-in regression metrics
-                            if 'mae' in metrics:
-                                jolt_regression_metrics['mae'] = float(metrics['mae'])
-                                logger.info(f"JOLT built-in MAE: {jolt_regression_metrics['mae']:.4f}")
-                            
-                            # Store additional regression statistics if available
-                            if 'y_test_mean' in metrics:
-                                jolt_regression_metrics['predictions_mean'] = metrics['y_test_mean']
-                            if 'y_test_std' in metrics:
-                                jolt_regression_metrics['predictions_std'] = metrics['y_test_std']
-                            if 'y_test_lower' in metrics and 'y_test_upper' in metrics:
-                                jolt_regression_metrics['confidence_intervals'] = {
-                                    'lower': metrics['y_test_lower'],
-                                    'upper': metrics['y_test_upper']
-                                }
-                        else:
-                            logger.warning("No y_test_median found in JOLT regression metrics")
+                            # Extract regression predictions (use median as point prediction)
+                            if 'y_test_median' in metrics and len(metrics['y_test_median']) > 0:
+                                predictions = metrics['y_test_median']
+                                completed_samples = len([p for p in predictions if not np.isnan(p)])
+                                logger.info(f"Successfully extracted {completed_samples} regression predictions from JOLT")
+                                
+                                # Extract JOLT's built-in regression metrics
+                                if 'mae' in metrics:
+                                    jolt_regression_metrics['mae'] = float(metrics['mae'])
+                                    logger.info(f"JOLT built-in MAE: {jolt_regression_metrics['mae']:.4f}")
+                                
+                                # Store additional regression statistics if available
+                                if 'y_test_mean' in metrics:
+                                    jolt_regression_metrics['predictions_mean'] = metrics['y_test_mean']
+                                if 'y_test_std' in metrics:
+                                    jolt_regression_metrics['predictions_std'] = metrics['y_test_std']
+                                if 'y_test_lower' in metrics and 'y_test_upper' in metrics:
+                                    jolt_regression_metrics['confidence_intervals'] = {
+                                        'lower': metrics['y_test_lower'],
+                                        'upper': metrics['y_test_upper']
+                                    }
+                            else:
+                                logger.warning("No y_test_median found in JOLT regression metrics")
+                                predictions = []
+                                completed_samples = 0
+                        except Exception as e:
+                            logger.error(f"Error extracting regression predictions from JOLT metrics: {e}")
+                            import traceback
+                            logger.error(traceback.format_exc())
                             predictions = []
                             completed_samples = 0
-                    except Exception as e:
-                        logger.error(f"Error extracting regression predictions from JOLT metrics: {e}")
-                        import traceback
-                        logger.error(traceback.format_exc())
-                        predictions = []
-                        completed_samples = 0
                 
                 elif 'data' in jolt_results and 'y_pred' in jolt_results['data']:
                     raw_predictions = jolt_results['data']['y_pred']
@@ -789,7 +937,7 @@ def evaluate_jolt_official(dataset, args):
                         # Calculate all classification metrics using shared function
                         calculated_metrics = calculate_llm_metrics(
                             y_test_partial, predictions_partial, unique_classes, 
-                            all_class_log_probs=None, logger=logger
+                            all_class_log_probs=None, logger=logger, task_type=task_type
                         )
                         
                         # Extract individual metrics for backward compatibility

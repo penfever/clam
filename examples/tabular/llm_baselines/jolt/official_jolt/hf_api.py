@@ -91,43 +91,52 @@ def get_model_and_tokenizer(args):
     else:
         llm_path = args.llm_path
     tokenizer = get_tokenizer(llm_path, args.llm_type)
+    
+    # Determine device and dtype based on availability
+    use_cuda = torch.cuda.is_available() and getattr(args, 'device', 'auto') != 'cpu'
+    device_map = "auto" if use_cuda else "cpu"
+    torch_dtype = torch.bfloat16 if use_cuda else torch.float32
+    
+    # Override dtype for specific models if needed
     if "llama-2" in args.llm_type:
+        torch_dtype = torch.float16 if use_cuda else torch.float32
         model = LlamaForCausalLM.from_pretrained(
             llm_path,
-            device_map="auto",
-            torch_dtype=torch.float16,
+            device_map=device_map,
+            torch_dtype=torch_dtype,
         )
     elif "llama-3" in args.llm_type:
         model = AutoModelForCausalLM.from_pretrained(
             llm_path,
-            device_map="auto",
-            torch_dtype=torch.bfloat16,
+            device_map=device_map,
+            torch_dtype=torch_dtype,
         )
     elif "phi-3" in args.llm_type:
         model = AutoModelForCausalLM.from_pretrained(
             llm_path,
-            device_map="auto",
-            torch_dtype="auto",
+            device_map=device_map,
+            torch_dtype="auto" if use_cuda else torch.float32,
             trust_remote_code=True,
         )
     elif "mixtral" in args.llm_type:
+        torch_dtype = torch.float16 if use_cuda else torch.float32
         model = AutoModelForCausalLM.from_pretrained(
             llm_path,
             trust_remote_code=True,
-            torch_dtype=torch.float16,
-            device_map='auto',
+            torch_dtype=torch_dtype,
+            device_map=device_map,
         )
     elif "gemma" in args.llm_type:
         model = AutoModelForCausalLM.from_pretrained(
             llm_path,
-            torch_dtype=torch.bfloat16,
-            device_map='auto',
-            )
+            torch_dtype=torch_dtype,
+            device_map=device_map,
+        )
     elif "qwen" in args.llm_type:
         model = AutoModelForCausalLM.from_pretrained(
             llm_path,
-            torch_dtype=torch.bfloat16,
-            device_map='auto',
+            torch_dtype=torch_dtype,
+            device_map=device_map,
         )
     else:
         assert False
@@ -187,7 +196,9 @@ def hf_generate(
     ):
     batch = tokenizer([input_str], return_tensors="pt")
     batch = {k: v.repeat(batch_size, 1) for k, v in batch.items()}
-    batch = {k: v.cuda() for k, v in batch.items()}
+    # Use the device of the model instead of hardcoding CUDA
+    device = next(model.parameters()).device
+    batch = {k: v.to(device) for k, v in batch.items()}
     num_input_ids = batch['input_ids'].shape[1]
 
     return _generate_core(model, tokenizer, batch, temp, top_p, top_k, max_new_tokens, num_input_ids)

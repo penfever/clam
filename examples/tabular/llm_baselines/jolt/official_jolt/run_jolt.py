@@ -12,6 +12,20 @@ from helpers import compute_classification_metrics
 def run_jolt(args, model, tokenizer):
     np.random.seed(args.seed)
 
+    # Validate mode argument
+    valid_modes = ['sample', 'logpy_only', 'sample_and_logpy']
+    if args.mode not in valid_modes:
+        # Check if mode contains valid substrings for backward compatibility
+        has_sample = 'sample' in args.mode
+        has_logpy = 'logpy' in args.mode
+        
+        if not has_sample and not has_logpy:
+            raise ValueError(f"Invalid mode '{args.mode}'. Valid modes are: {valid_modes}. "
+                           f"Mode must contain 'sample' for sampling mode or 'logpy' for log probability mode.")
+        
+        # Log warning for non-standard mode format
+        print(f"WARNING: Mode '{args.mode}' uses non-standard format. Consider using: {valid_modes}")
+
     # create the output directory
     os.makedirs(args.output_dir, exist_ok=True)
 

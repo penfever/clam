@@ -977,7 +977,7 @@ def parse_regression_prediction(prediction_text: str, target_stats: Optional[Dic
     return 0.0
 
 
-def calculate_llm_metrics(y_test_partial, predictions, unique_classes, all_class_log_probs=None, logger=None, task_type=None):
+def calculate_llm_metrics(y_test_partial, predictions, unique_classes, all_class_log_probs=None, logger=None, task_type=None, task_id=None, dataset=None):
     """
     Calculate comprehensive metrics for LLM baselines for both classification and regression tasks.
     
@@ -988,6 +988,8 @@ def calculate_llm_metrics(y_test_partial, predictions, unique_classes, all_class
         all_class_log_probs: List of class log probability dictionaries (optional, classification only)
         logger: Logger instance
         task_type: 'classification' or 'regression' (auto-detected if None)
+        task_id: OpenML task ID for task type detection (if task_type is None)
+        dataset: Dataset dictionary containing task_id (if task_type is None)
         
     Returns:
         Dictionary containing all calculated metrics
@@ -1011,15 +1013,15 @@ def calculate_llm_metrics(y_test_partial, predictions, unique_classes, all_class
     if task_type is None:
         try:
             from .task_detection import detect_task_type
-            task_type, detection_method = detect_task_type(y=y_test_partial)
+            task_type, detection_method = detect_task_type(
+                y=y_test_partial,
+                task_id=task_id,
+                dataset=dataset
+            )
             logger.debug(f"Auto-detected task type: {task_type} (method: {detection_method})")
-        except ImportError:
-            # Fallback: use unique_classes to determine task type
-            if unique_classes is not None and len(unique_classes) <= 50:
-                task_type = 'classification'
-            else:
-                task_type = 'regression'
-            logger.debug(f"Fallback task type detection: {task_type}")
+        except Exception as e:
+            logger.error(f"Task type detection failed: {e}")
+            raise ValueError(f"Cannot determine task type. Please provide task_type, task_id, or dataset with task_id. Error: {e}")
     
     # Convert predictions and targets to numpy arrays for consistent handling
     y_true = np.array(y_test_partial)

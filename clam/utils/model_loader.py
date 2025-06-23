@@ -214,7 +214,7 @@ class VLLMModelWrapper(BaseModelWrapper):
         # Filter out wrapper-specific kwargs that shouldn't be passed to VLLM
         wrapper_specific_kwargs = {
             'backend', 'tensor_parallel_size', 'gpu_memory_utilization', 
-            'max_model_len', 'torch_dtype', 'low_cpu_mem_usage', 'device_map'
+            'max_model_len', 'torch_dtype', 'low_cpu_mem_usage', 'device_map', 'use_cache'
         }
         
         # Add any additional kwargs (excluding wrapper-specific ones)
@@ -303,7 +303,7 @@ class VLLMVisionModelWrapper(BaseModelWrapper):
         # Filter out wrapper-specific kwargs that shouldn't be passed to VLLM
         wrapper_specific_kwargs = {
             'backend', 'tensor_parallel_size', 'gpu_memory_utilization', 
-            'max_model_len', 'torch_dtype', 'low_cpu_mem_usage', 'device_map'
+            'max_model_len', 'torch_dtype', 'low_cpu_mem_usage', 'device_map', 'use_cache'
         }
         
         # Add any additional kwargs (excluding wrapper-specific ones)

@@ -764,10 +764,13 @@ class ClamTsneClassifier:
         # Detect task type
         try:
             from clam.utils.task_detection import detect_task_type, get_target_statistics
+            dataset_info = kwargs.get('dataset_info')
+            task_id = dataset_info.get('task_id') if dataset_info else None
             self.task_type, detection_method = detect_task_type(
                 y=y_train_array, 
                 manual_override=task_type,
-                dataset_info=kwargs.get('dataset_info')
+                task_id=task_id,
+                dataset_info=dataset_info
             )
             self.logger.info(f"Task type: {self.task_type} (detected via: {detection_method})")
             

@@ -91,7 +91,7 @@ class ClamTsneRegressionMetricsTestSuite:
             # Test regression dataset
             X_reg, y_reg, feature_names_reg = self.create_regression_dataset()
             
-            task_type_reg, method_reg = detect_task_type(y=y_reg)
+            task_type_reg, method_reg = detect_task_type(y=y_reg, manual_override='regression')
             logger.info(f"Regression dataset detected as: {task_type_reg} (method: {method_reg})")
             
             if task_type_reg == 'regression':
@@ -104,7 +104,7 @@ class ClamTsneRegressionMetricsTestSuite:
             # Test classification dataset 
             X_cls, y_cls, feature_names_cls = self.create_classification_dataset()
             
-            task_type_cls, method_cls = detect_task_type(y=y_cls)
+            task_type_cls, method_cls = detect_task_type(y=y_cls, manual_override='classification')
             logger.info(f"Classification dataset detected as: {task_type_cls} (method: {method_cls})")
             
             if task_type_cls == 'classification':

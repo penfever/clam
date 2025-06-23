@@ -197,6 +197,7 @@ def detect_task_type(dataset: Optional[Dict[str, Any]] = None,
                     task: Optional[Any] = None,
                     dataset_info: Optional[Dict[str, Any]] = None,
                     manual_override: Optional[str] = None,
+                    task_id: Optional[int] = None,
                     classification_threshold: int = 50) -> Tuple[str, str]:
     """
     Comprehensive task type detection using multiple methods.
@@ -207,6 +208,7 @@ def detect_task_type(dataset: Optional[Dict[str, Any]] = None,
         task: OpenML task object
         dataset_info: Dataset metadata dictionary
         manual_override: Manual specification ('classification' or 'regression')
+        task_id: OpenML task ID (primary method - will fetch task metadata)
         classification_threshold: Maximum unique values for classification
         
     Returns:
@@ -224,44 +226,62 @@ def detect_task_type(dataset: Optional[Dict[str, Any]] = None,
         else:
             logger.warning(f"Invalid manual override '{manual_override}', ignoring")
     
-    # 2. Try OpenML task metadata
+    # 2. Try task_id - fetch OpenML task metadata (PRIMARY METHOD)
+    if task_id is not None:
+        try:
+            import openml
+            logger.debug(f"Fetching OpenML task {task_id} for task type detection")
+            openml_task = openml.tasks.get_task(task_id)
+            detected_type = detect_task_type_from_openml_task(openml_task)
+            if detected_type:
+                logger.info(f"Detected task type from OpenML task {task_id}: {detected_type}")
+                return detected_type, f"openml_task_id_{task_id}"
+            else:
+                raise ValueError(f"OpenML task {task_id} does not have recognizable task type metadata")
+        except Exception as e:
+            raise ValueError(f"Failed to fetch or parse OpenML task {task_id}: {e}")
+    
+    # 3. Extract task_id from dataset if not provided
+    if task_id is None and dataset is not None:
+        # Try to get task_id from dataset dictionary
+        dataset_task_id = dataset.get('task_id') or dataset.get('id')
+        if dataset_task_id:
+            try:
+                task_id_int = int(dataset_task_id)
+                logger.debug(f"Found task_id {task_id_int} in dataset, attempting OpenML lookup")
+                import openml
+                openml_task = openml.tasks.get_task(task_id_int)
+                detected_type = detect_task_type_from_openml_task(openml_task)
+                if detected_type:
+                    logger.info(f"Detected task type from dataset task_id {task_id_int}: {detected_type}")
+                    return detected_type, f"openml_task_id_{task_id_int}_from_dataset"
+                else:
+                    raise ValueError(f"OpenML task {task_id_int} does not have recognizable task type metadata")
+            except (ValueError, TypeError) as e:
+                raise ValueError(f"Could not parse dataset task_id '{dataset_task_id}' as integer: {e}")
+            except Exception as e:
+                raise ValueError(f"Failed to fetch OpenML task {dataset_task_id}: {e}")
+    
+    # 4. Try OpenML task metadata (if task object provided directly)
     if task is not None:
         detected_type = detect_task_type_from_openml_task(task)
         if detected_type:
             logger.info(f"Detected task type from OpenML task: {detected_type}")
             return detected_type, "openml_task"
+        else:
+            raise ValueError("Provided OpenML task object does not have recognizable task type metadata")
     
-    # 3. Try dataset info metadata
-    if dataset_info is not None:
-        detected_type = detect_task_type_from_dataset_info(dataset_info)
-        if detected_type:
-            logger.info(f"Detected task type from dataset info: {detected_type}")
-            return detected_type, "dataset_info"
-    
-    # 4. Extract target variable from dataset if not provided
-    if y is None and dataset is not None:
-        if 'y' in dataset:
-            y = dataset['y']
-        elif 'target' in dataset:
-            y = dataset['target']
-    
-    # 5. Analyze target variable
-    if y is not None:
-        target_name = None
-        if dataset and 'target_name' in dataset:
-            target_name = dataset['target_name']
-        elif dataset_info and 'target_attribute' in dataset_info:
-            target_name = dataset_info['target_attribute']
-        
-        detected_type = detect_task_type_from_target(
-            y, target_name, classification_threshold
-        )
-        logger.info(f"Detected task type from target analysis: {detected_type}")
-        return detected_type, "target_analysis"
-    
-    # 6. Default fallback
-    logger.warning("Could not determine task type, defaulting to classification")
-    return 'classification', "default_fallback"
+    # 5. ERROR - no valid OpenML task source provided
+    error_msg = (
+        "Task type detection requires OpenML task metadata. Please provide one of:\n"
+        "- task_id: OpenML task ID\n"
+        "- task: OpenML task object\n"
+        "- dataset with 'task_id' or 'id' field containing OpenML task ID\n"
+        f"Received: task_id={task_id}, task={task is not None}, "
+        f"dataset_keys={list(dataset.keys()) if dataset else None}"
+    )
+    logger.error(error_msg)
+    raise ValueError(error_msg)
 
 def is_regression_task(dataset: Optional[Dict[str, Any]] = None,
                       y: Optional[Union[np.ndarray, pd.Series, list]] = None,

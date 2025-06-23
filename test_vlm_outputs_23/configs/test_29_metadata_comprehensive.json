@@ -1,0 +1,18 @@
+{
+  "name": "metadata_comprehensive",
+  "enable_multi_viz": true,
+  "visualization_methods": [
+    "pca",
+    "tsne",
+    "isomap"
+  ],
+  "layout_strategy": "hierarchical",
+  "reasoning_focus": "comparison",
+  "include_metadata": true,
+  "nn_k": 30,
+  "metadata_types": [
+    "quality_metrics",
+    "timing_info",
+    "method_params"
+  ]
+}

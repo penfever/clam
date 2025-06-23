@@ -1022,8 +1022,11 @@ def evaluate_tabllm(dataset, args):
         
         # Detect task type (classification vs regression)
         from clam.utils.task_detection import detect_task_type, get_target_statistics
+        task_id = dataset.get('task_id') or dataset.get('id')
         task_type, detection_method = detect_task_type(
             y=y_train,
+            task_id=task_id,
+            dataset=dataset,
             classification_threshold=getattr(args, 'regression_bins', 10) * 2  # Use 2x bins as threshold
         )
         logger.info(f"Detected task type: {task_type} (method: {detection_method})")
