@@ -1815,7 +1815,13 @@ def evaluate_clam_tsne(dataset, args):
             'task_id': dataset['id']
         })
         
-        logger.info(f"CLAM t-SNE accuracy on {dataset['name']}: {results['accuracy']:.4f}")
+        # Log appropriate metric based on task type
+        if results.get('accuracy') is not None:
+            logger.info(f"CLAM t-SNE accuracy on {dataset['name']}: {results['accuracy']:.4f}")
+        elif results.get('r2_score') is not None:
+            logger.info(f"CLAM t-SNE R² score on {dataset['name']}: {results['r2_score']:.4f}")
+        else:
+            logger.info(f"CLAM t-SNE evaluation completed on {dataset['name']}")
         return results
         
     except Exception as e:

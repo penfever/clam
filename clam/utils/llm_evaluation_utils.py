@@ -1035,17 +1035,16 @@ def calculate_llm_metrics(y_test_partial, predictions, unique_classes, all_class
             metrics['accuracy'] = 0.0
             metrics['balanced_accuracy'] = 0.0
     else:
-        # Regression: accuracy doesn't apply, use R² as primary metric
+        # Regression: accuracy and balanced_accuracy don't apply
+        metrics['accuracy'] = None
+        metrics['balanced_accuracy'] = None
+        
+        # Calculate R² as the primary regression metric
         try:
-            # For regression, we set accuracy to R² score for consistency with baseline expectations
             r2 = r2_score(y_true, y_pred)
-            metrics['accuracy'] = float(max(0.0, r2))  # Ensure non-negative for compatibility
-            metrics['balanced_accuracy'] = float(max(0.0, r2))  # Same as accuracy for regression
             metrics['r2_score'] = float(r2)
         except Exception as e:
             logger.warning(f"Could not calculate R² score: {e}")
-            metrics['accuracy'] = 0.0
-            metrics['balanced_accuracy'] = 0.0
             metrics['r2_score'] = None
     
     # ROC AUC - only for classification
