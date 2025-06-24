@@ -301,14 +301,11 @@ def evaluate_jolt_official(dataset, args):
         else:
             logger.info(f"CLASSIFICATION CONFIG: mode=logpy_only, y_column_types=['categorical'], num_decimal_places_y=0")
         
-        # Combine features and target for JOLT format with size limits
+        # Combine features and target for JOLT format using all available data
         train_data = pd.concat([X_train, y_train], axis=1)
         test_data = pd.concat([X_test, y_test], axis=1)
         
-        # Apply size limits to prevent massive prompt generation
-        if len(train_data) > max_train_samples:
-            logger.info(f"Limiting JOLT training data from {len(train_data)} to {max_train_samples} samples (user requested {user_few_shot})")
-            train_data = train_data.head(max_train_samples)
+        logger.info(f"Using full training dataset: {len(train_data)} samples for JOLT training")
         
         combined_data = pd.concat([train_data, test_data], axis=0, ignore_index=True)
         
@@ -368,7 +365,7 @@ def evaluate_jolt_official(dataset, args):
                 
                 
                 logger.info(f"Using JOLT config - llm_path: {llm_path}, llm_type: {llm_type}")
-                logger.info(f"JOLT few-shot: user requested {user_few_shot}, using {effective_shots} shots, {effective_train_limit} train samples")
+                logger.info(f"JOLT few-shot: user requested {user_few_shot}, using {effective_shots} shots, {len(train_data)} train samples")
                 
                 # Determine max token length based on model capabilities
                 if "qwen" in jolt_model_name.lower():

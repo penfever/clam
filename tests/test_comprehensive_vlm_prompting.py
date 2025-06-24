@@ -821,6 +821,10 @@ class VLMPromptingTestSuite:
                     visualization_save_cadence=3
                 )
                 
+                # Close any remaining matplotlib figures to prevent memory leaks
+                import matplotlib.pyplot as plt
+                plt.close('all')
+                
                 # Extract ground truth labels
                 ground_truth_labels = [int(label) for label in y_test]
                 
@@ -991,6 +995,9 @@ class VLMPromptingTestSuite:
                 
             except Exception as e:
                 logger.error(f"✗ CLAM pipeline failed for test {test_idx + 1}: {e}")
+                # Close any figures that might have been created before the error
+                import matplotlib.pyplot as plt
+                plt.close('all')
                 # Create fallback data for summary
                 ground_truth_labels = [int(label) for label in y_test]
                 all_responses = [f"Class: FAILED | Reasoning: Pipeline error: {str(e)}"] * len(X_test)
@@ -1058,6 +1065,11 @@ class VLMPromptingTestSuite:
             }
             
             logger.info(f"✓ Test {test_idx + 1} completed successfully")
+            
+            # Final cleanup: ensure all figures are closed after this test
+            import matplotlib.pyplot as plt
+            plt.close('all')
+            
             return result
             
         except Exception as e:
