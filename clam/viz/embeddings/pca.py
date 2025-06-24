@@ -7,7 +7,7 @@ structure and comparing with nonlinear methods.
 """
 
 import numpy as np
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 import logging
 
 from sklearn.decomposition import PCA
@@ -66,6 +66,49 @@ class PCAVisualization(BaseVisualization):
         self.logger.info(f"Creating PCA with parameters: {pca_params}")
         
         return PCA(**pca_params)
+    
+    def fit_transform(
+        self,
+        X: np.ndarray,
+        y: Optional[np.ndarray] = None,
+        **kwargs
+    ) -> np.ndarray:
+        """
+        Fit the PCA method and transform the data with data cleaning.
+        
+        Args:
+            X: Input data [n_samples, n_features]
+            y: Optional target values [n_samples]
+            **kwargs: Additional parameters for the method
+            
+        Returns:
+            Transformed coordinates [n_samples, n_components]
+        """
+        # Clean data before PCA to prevent numerical issues
+        X_clean = np.nan_to_num(X, nan=0.0, posinf=1e4, neginf=-1e4)
+        X_clean = np.clip(X_clean, -1e4, 1e4)
+        
+        # Call parent's fit_transform with cleaned data
+        return super().fit_transform(X_clean, y, **kwargs)
+    
+    def transform(self, X: np.ndarray) -> np.ndarray:
+        """
+        Transform new data using fitted PCA with data cleaning.
+        
+        Args:
+            X: New data to transform [n_samples, n_features]
+            
+        Returns:
+            Transformed coordinates [n_samples, n_components]
+        """
+        if not self._fitted:
+            raise ValueError("Must fit the model before transforming new data")
+        
+        # Clean data before transformation
+        X_clean = np.nan_to_num(X, nan=0.0, posinf=1e4, neginf=-1e4)
+        X_clean = np.clip(X_clean, -1e4, 1e4)
+        
+        return self._transformer.transform(X_clean)
     
     def _get_default_description(self, n_samples: int, n_features: int) -> str:
         """Get default description for PCA."""

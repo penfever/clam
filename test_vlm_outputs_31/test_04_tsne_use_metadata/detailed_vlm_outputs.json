@@ -1,0 +1,393 @@
+{
+  "test_config": {
+    "name": "tsne_use_metadata",
+    "enable_multi_viz": false,
+    "use_semantic_names": true,
+    "load_semantic_from_cc18": true,
+    "use_metadata": true,
+    "auto_load_metadata": true,
+    "use_3d_tsne": false,
+    "use_knn_connections": false,
+    "nn_k": 30,
+    "tsne_perplexity": 15,
+    "semantic_class_names": [
+      "Good credit risk (creditworthy)",
+      "Bad credit risk (not creditworthy)"
+    ]
+  },
+  "ground_truth": [
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    0
+  ],
+  "prediction_details": [
+    {
+      "test_point_idx": 0,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is positioned closer to the orange-colored points, which represent bad credit risk (not creditworthy) in the t-SNE visualization. This suggests that the query point is more aligned with the characteristics of bad credit risk individuals.",
+      "parsed_prediction": "1",
+      "true_label": "0",
+      "tsne_coords": [
+        -28.193893432617188,
+        11.815711975097656
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 1,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is positioned closer to the orange-colored points, which represent the \"Bad credit risk (not creditworthy)\" class. The spatial clustering suggests that the query point is more aligned with the characteristics of the bad credit risk class.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        -10.742498397827148,
+        -20.948772430419922
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 2,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is positioned closer to the orange-colored points, which represent the \"Bad credit risk (not creditworthy)\" class. This suggests that the query point is more aligned with the characteristics of the bad credit risk class.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        18.50513458251953,
+        10.72203540802002
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 3,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is positioned closer to the orange-colored points, which represent bad credit risk (not creditworthy) in the t-SNE visualization. This suggests that the query point is more aligned with the characteristics of bad credit risk individuals.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        22.770410537719727,
+        15.82004165649414
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 4,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is positioned closer to the orange-colored points, which represent the \"Bad credit risk (not creditworthy)\" class. This suggests that the query point is more aligned with the characteristics of the bad credit risk class.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        -28.179790496826172,
+        9.926382064819336
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 5,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is positioned closer to the orange-colored points, which represent the \"Bad credit risk (not creditworthy)\" class. This suggests that the query point is more aligned with the characteristics of the bad credit risk class.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        -28.565340042114258,
+        9.443000793457031
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 6,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is positioned closer to the blue-colored points, which represent the \"Good credit risk (creditworthy)\" class. The spatial clustering pattern indicates that the query point is more aligned with the \"Good credit risk (creditworthy)\" class.",
+      "parsed_prediction": "0",
+      "true_label": "0",
+      "tsne_coords": [
+        -7.500426769256592,
+        3.8883047103881836
+      ],
+      "image_size": "780x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 7,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is positioned closer to the orange-colored points, which represent bad credit risk (not creditworthy) in the t-SNE visualization. This suggests that the query point is more aligned with the characteristics of bad credit risk individuals.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        -9.845818519592285,
+        -19.39618682861328
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 8,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is positioned closer to the blue-colored points, which represent the \"Good credit risk (creditworthy)\" class. The spatial clustering pattern indicates that the query point is more aligned with the \"Good credit risk\" class.",
+      "parsed_prediction": "0",
+      "true_label": "0",
+      "tsne_coords": [
+        -5.919297218322754,
+        0.6966621279716492
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 9,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is positioned closer to the orange-colored points, which represent bad credit risk (not creditworthy) in the t-SNE visualization. This suggests that the query point is more aligned with the characteristics of bad credit risk individuals.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        17.806095123291016,
+        -13.55648136138916
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 10,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is positioned closer to the orange-colored points, which represent the \"Bad credit risk (not creditworthy)\" class. This suggests that the query point is more aligned with the characteristics of the bad credit risk class.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        15.162978172302246,
+        19.243459701538086
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 11,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is positioned closer to the orange-colored points, which represent the \"Bad credit risk (not creditworthy)\" class. This suggests that the query point is more aligned with the characteristics of the bad credit risk class.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        16.833242416381836,
+        19.219942092895508
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 12,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is positioned closer to the blue-colored points, which represent the \"Good credit risk (creditworthy)\" class. The spatial clustering pattern shows that the query point is embedded within the cluster of points associated with the \"Good credit risk (creditworthy)\" class.",
+      "parsed_prediction": "0",
+      "true_label": "1",
+      "tsne_coords": [
+        -9.978975296020508,
+        -17.235029220581055
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 13,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is positioned closer to the orange-colored points, which represent bad credit risk (not creditworthy) in the t-SNE visualization. This suggests that the query point is more aligned with the characteristics of bad credit risk individuals.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        18.201772689819336,
+        -11.870487213134766
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 14,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is positioned closer to the orange-colored points, which represent the \"Bad credit risk (not creditworthy)\" class. This suggests that the query point is more aligned with the characteristics of the bad credit risk class.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        15.96219539642334,
+        18.52933120727539
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 15,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is positioned closer to the blue-colored points, which represent the \"Good credit risk (creditworthy)\" class. The spatial clustering suggests that the query point is more aligned with the characteristics of the \"Good credit risk (creditworthy)\" class.",
+      "parsed_prediction": "0",
+      "true_label": "0",
+      "tsne_coords": [
+        -4.5700273513793945,
+        -17.334970474243164
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 16,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is positioned closer to the blue-colored points, which represent the \"Good credit risk (creditworthy)\" class. The spatial clustering suggests that the query point is more aligned with the characteristics of the \"Good credit risk (creditworthy)\" class.",
+      "parsed_prediction": "0",
+      "true_label": "1",
+      "tsne_coords": [
+        -2.513629198074341,
+        -33.245235443115234
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 17,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is positioned closer to the blue-colored points, which represent the \"Good credit risk (creditworthy)\" class. The spatial clustering pattern shows that the query point is embedded within the cluster of points associated with the \"Good credit risk (creditworthy)\" class.",
+      "parsed_prediction": "0",
+      "true_label": "1",
+      "tsne_coords": [
+        -20.654024124145508,
+        13.177635192871094
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 18,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is positioned closer to the blue-colored points, which represent the \"Good credit risk (creditworthy)\" class. This spatial clustering indicates that the query point is more aligned with the characteristics of the \"Good credit risk (creditworthy)\" class.",
+      "parsed_prediction": "0",
+      "true_label": "1",
+      "tsne_coords": [
+        -18.357099533081055,
+        9.483086585998535
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    },
+    {
+      "test_point_idx": 19,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is positioned closer to the blue-colored points, which represent the \"Good credit risk (creditworthy)\" class. The spatial clustering pattern indicates that the query point is more aligned with the \"Good credit risk\" class.",
+      "parsed_prediction": "0",
+      "true_label": "0",
+      "tsne_coords": [
+        -7.521914482116699,
+        -11.249882698059082
+      ],
+      "image_size": "779x590",
+      "visible_classes": [
+        0,
+        1
+      ]
+    }
+  ],
+  "completion_rate": 1.0,
+  "test_indices": [
+    2,
+    15,
+    18,
+    20,
+    27,
+    33,
+    43,
+    45,
+    55,
+    60,
+    80,
+    87,
+    90,
+    91,
+    101,
+    103,
+    112,
+    125,
+    138,
+    140
+  ],
+  "metrics": {
+    "config_name": "tsne_use_metadata",
+    "accuracy": 0.75,
+    "balanced_accuracy": 0.7666666666666666,
+    "precision_macro": 0.7083333333333333,
+    "recall_macro": 0.7666666666666666,
+    "f1_macro": 0.7150997150997151,
+    "precision_micro": 0.75,
+    "recall_micro": 0.75,
+    "f1_micro": 0.75,
+    "precision_weighted": 0.8125,
+    "recall_weighted": 0.75,
+    "f1_weighted": 0.7649572649572649,
+    "confusion_matrix": [
+      [
+        4,
+        1
+      ],
+      [
+        4,
+        11
+      ]
+    ],
+    "completion_rate": 1.0,
+    "num_test_samples": 20,
+    "num_classes": 2,
+    "support": []
+  }
+}

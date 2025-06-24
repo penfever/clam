@@ -1,1 +1,0 @@
-Class: Class_5 | Reasoning: The red star (query point) is consistently closest to the class labeled "Class_5" across all three visualization methods (PCA, t-SNE, SPECTRAL). This consistency suggests that "Class_5" is the most likely class for the query point.

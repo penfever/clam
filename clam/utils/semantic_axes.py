@@ -15,6 +15,8 @@ from sklearn.feature_selection import f_regression, mutual_info_regression
 import pandas as pd
 
 from .metadata_loader import DatasetMetadata, ColumnMetadata
+from ..viz.embeddings.pca import PCAVisualization
+from ..viz.base import VisualizationConfig
 
 logger = logging.getLogger(__name__)
 
@@ -141,14 +143,26 @@ class SemanticAxesComputer:
                 embeddings = embeddings.reshape(1, -1)
                 logger.debug(f"Reshaped 1D embeddings to 2D: {embeddings.shape}")
             
-            # Standardize embeddings
-            scaler = StandardScaler()
-            embeddings_scaled = scaler.fit_transform(embeddings)
-            
-            # Apply PCA to match the dimensionality of reduced coordinates
+            # Use PCAVisualization for consistent data preprocessing
             n_components = len(axis_names)
-            pca = PCA(n_components=n_components)
-            pca.fit(embeddings_scaled)
+            pca_config = VisualizationConfig(
+                use_3d=(n_components == 3),
+                random_state=42
+            )
+            pca_viz = PCAVisualization(pca_config)
+            
+            # Fit PCA using the visualization class (includes data cleaning)
+            pca_viz.fit_transform(embeddings)
+            
+            # Get the underlying PCA transformer
+            pca = pca_viz._transformer
+            
+            # Standardize embeddings for loadings calculation
+            # (PCAVisualization already handles cleaning, we just need scaling)
+            embeddings_clean = np.nan_to_num(embeddings, nan=0.0, posinf=1e4, neginf=-1e4)
+            embeddings_clean = np.clip(embeddings_clean, -1e4, 1e4)
+            scaler = StandardScaler()
+            embeddings_scaled = scaler.fit_transform(embeddings_clean)
             
             semantic_axes = {}
             

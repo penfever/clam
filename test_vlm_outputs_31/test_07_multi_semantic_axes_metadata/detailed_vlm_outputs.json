@@ -1,0 +1,397 @@
+{
+  "test_config": {
+    "name": "multi_semantic_axes_metadata",
+    "enable_multi_viz": true,
+    "visualization_methods": [
+      "pca",
+      "tsne"
+    ],
+    "layout_strategy": "sequential",
+    "reasoning_focus": "comparison",
+    "use_semantic_names": true,
+    "load_semantic_from_cc18": true,
+    "nn_k": 30,
+    "semantic_axes": true,
+    "use_metadata": true,
+    "auto_load_metadata": true,
+    "semantic_class_names": [
+      "Good credit risk (creditworthy)",
+      "Bad credit risk (not creditworthy)"
+    ]
+  },
+  "ground_truth": [
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    0
+  ],
+  "prediction_details": [
+    {
+      "test_point_idx": 0,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is consistently closest to the blue class cluster across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Good credit risk\" class, as indicated by the blue-colored points. The spatial proximity in both PCA and t-SNE suggests that the query point is more similar to the \"Good credit risk\" class in terms of the features represented by the data points.",
+      "parsed_prediction": "0",
+      "true_label": "0",
+      "tsne_coords": [
+        -28.193893432617188,
+        11.815711975097656
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 1,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is consistently closest to the blue class cluster across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Good credit risk\" class, as indicated by the blue-colored points. The spatial proximity in both PCA and t-SNE suggests that the query point is more similar to the \"Good credit risk\" class in terms of the features represented by the data points.",
+      "parsed_prediction": "0",
+      "true_label": "1",
+      "tsne_coords": [
+        -10.742498397827148,
+        -20.948772430419922
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 2,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is consistently closest to the class labeled \"2\" (Bad credit risk) across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Bad credit risk\" class, as indicated by the spatial relationships and patterns observed in both methods.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        18.50513458251953,
+        10.72203540802002
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 3,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is consistently closest to the blue class cluster across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Good credit risk\" class, as indicated by the blue-colored points. The spatial proximity in both PCA and t-SNE suggests that the query point is more similar to the \"Good credit risk\" class in terms of the features represented by the data points.",
+      "parsed_prediction": "0",
+      "true_label": "1",
+      "tsne_coords": [
+        22.770410537719727,
+        15.82004165649414
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 4,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is consistently closest to the class labeled \"2\" (Bad credit risk) across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Bad credit risk\" class, as it is more centrally located within the cluster of points representing this class in both PCA and t-SNE.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        -28.179790496826172,
+        9.926382064819336
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 5,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is consistently closest to the blue-colored class cluster in both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Good credit risk\" class, as indicated by the blue-colored points. The spatial proximity in both PCA and t-SNE suggests that the query point is more similar to the \"Good credit risk\" class in terms of the features represented by the data points.",
+      "parsed_prediction": "0",
+      "true_label": "1",
+      "tsne_coords": [
+        -28.565340042114258,
+        9.443000793457031
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 6,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is consistently closest to the class labeled \"2\" (Bad credit risk) across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Bad credit risk\" class, as indicated by the spatial relationships and patterns observed in both methods.",
+      "parsed_prediction": "1",
+      "true_label": "0",
+      "tsne_coords": [
+        -7.500426769256592,
+        3.8883047103881836
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 7,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is consistently closest to the blue-colored class clusters across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Good credit risk\" class, as indicated by the blue-colored points. The spatial proximity in both PCA and t-SNE visualizations reinforces this classification.",
+      "parsed_prediction": "0",
+      "true_label": "1",
+      "tsne_coords": [
+        -9.845818519592285,
+        -19.39618682861328
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 8,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is consistently closest to the class labeled \"2\" (Bad credit risk) across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Bad credit risk\" class, as it is more centrally located within the cluster of points representing that class in both PCA and t-SNE space.",
+      "parsed_prediction": "1",
+      "true_label": "0",
+      "tsne_coords": [
+        -5.919297218322754,
+        0.6966621279716492
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 9,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is consistently closest to the class labeled \"2\" (Bad credit risk) across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Bad credit risk\" class, as indicated by the spatial relationships and patterns observed in both methods.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        17.806095123291016,
+        -13.55648136138916
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 10,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is consistently closest to the blue class cluster across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Good credit risk\" class, as indicated by the blue-colored points. The spatial proximity in both PCA and t-SNE suggests that the query point is more similar to the \"Good credit risk\" class in terms of the features represented by the data points.",
+      "parsed_prediction": "0",
+      "true_label": "1",
+      "tsne_coords": [
+        15.162978172302246,
+        19.243459701538086
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 11,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is consistently closest to the blue class cluster across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Good credit risk\" class, as indicated by the blue-colored points. The spatial proximity in both PCA and t-SNE suggests that the query point is more similar to the \"Good credit risk\" class in terms of the features represented by the data points.",
+      "parsed_prediction": "0",
+      "true_label": "1",
+      "tsne_coords": [
+        16.833242416381836,
+        19.219942092895508
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 12,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is consistently closest to the class labeled \"2\" (Bad credit risk) across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Bad credit risk\" class, as indicated by the spatial relationships and patterns observed in both methods.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        -9.978975296020508,
+        -17.235029220581055
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 13,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is consistently closest to the blue class cluster across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Good credit risk\" class, as indicated by the blue-colored points. The spatial proximity in both PCA and t-SNE suggests that the query point is more representative of the \"Good credit risk\" class, which is consistent with the dataset's classification of \"Good credit risk\" as likely to repay the loan.",
+      "parsed_prediction": "0",
+      "true_label": "1",
+      "tsne_coords": [
+        18.201772689819336,
+        -11.870487213134766
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 14,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is consistently closest to the class labeled \"2\" (Bad credit risk) across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Bad credit risk\" class, as indicated by the position of the red star in both PCA and t-SNE plots.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        15.96219539642334,
+        18.52933120727539
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 15,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is consistently closest to the blue class cluster across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Good credit risk\" class, as indicated by the blue-colored points. The spatial proximity in both PCA and t-SNE suggests that the query point is more representative of the \"Good credit risk\" class, which is consistent with the dataset's classification of \"Good credit risk\" as likely to repay the loan.",
+      "parsed_prediction": "0",
+      "true_label": "0",
+      "tsne_coords": [
+        -4.5700273513793945,
+        -17.334970474243164
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 16,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is consistently closest to the class labeled \"2\" (Bad credit risk) across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Bad credit risk\" class, as it is more centrally located in the space where the \"Bad credit risk\" class is represented.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        -2.513629198074341,
+        -33.245235443115234
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 17,
+      "vlm_response": "Class: Good credit risk (creditworthy) | Reasoning: The red star is consistently closest to the blue class cluster across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Good credit risk\" class, as indicated by the blue-colored points. The spatial proximity in both PCA and t-SNE suggests that the query point's features are more similar to those of the \"Good credit risk\" class, making it more likely to belong to this class.",
+      "parsed_prediction": "0",
+      "true_label": "1",
+      "tsne_coords": [
+        -20.654024124145508,
+        13.177635192871094
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 18,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is consistently closest to the class labeled \"2\" (Bad credit risk) across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Bad credit risk\" class, as indicated by the spatial relationships and patterns observed in both methods.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        -18.357099533081055,
+        9.483086585998535
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    },
+    {
+      "test_point_idx": 19,
+      "vlm_response": "Class: Bad credit risk (not creditworthy) | Reasoning: The red star is consistently closest to the class labeled \"2\" (Bad credit risk) across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the \"Bad credit risk\" class, as indicated by the spatial relationships and patterns observed in both methods.",
+      "parsed_prediction": "1",
+      "true_label": "0",
+      "tsne_coords": [
+        -7.521914482116699,
+        -11.249882698059082
+      ],
+      "image_size": "1024x580",
+      "visible_classes": [
+        "0",
+        "1"
+      ]
+    }
+  ],
+  "completion_rate": 1.0,
+  "test_indices": [
+    2,
+    15,
+    18,
+    20,
+    27,
+    33,
+    43,
+    45,
+    55,
+    60,
+    80,
+    87,
+    90,
+    91,
+    101,
+    103,
+    112,
+    125,
+    138,
+    140
+  ],
+  "metrics": {
+    "config_name": "multi_semantic_axes_metadata",
+    "accuracy": 0.45,
+    "balanced_accuracy": 0.43333333333333335,
+    "precision_macro": 0.44999999999999996,
+    "recall_macro": 0.43333333333333335,
+    "f1_macro": 0.41333333333333333,
+    "precision_micro": 0.45,
+    "recall_micro": 0.45,
+    "f1_micro": 0.45,
+    "precision_weighted": 0.575,
+    "recall_weighted": 0.45,
+    "f1_weighted": 0.4866666666666667,
+    "confusion_matrix": [
+      [
+        2,
+        3
+      ],
+      [
+        8,
+        7
+      ]
+    ],
+    "completion_rate": 1.0,
+    "num_test_samples": 20,
+    "num_classes": 2,
+    "support": []
+  }
+}

@@ -1,1 +1,0 @@
-Class: Class_2 | Reasoning: The red star (query point) is consistently closest to the cluster of points labeled as "Class_2" across all four visualization methods (PCA, T-SNE, SPECTRAL, ISOMAP). This consistency suggests that "Class_2" is the most likely class for the query point.
