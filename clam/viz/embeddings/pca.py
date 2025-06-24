@@ -84,9 +84,8 @@ class PCAVisualization(BaseVisualization):
         Returns:
             Transformed coordinates [n_samples, n_components]
         """
-        # Clean data before PCA to prevent numerical issues
-        X_clean = np.nan_to_num(X, nan=0.0, posinf=1e4, neginf=-1e4)
-        X_clean = np.clip(X_clean, -1e4, 1e4)
+        # Enhanced data cleaning for PCA numerical stability
+        X_clean = self._robust_data_cleaning(X)
         
         # Call parent's fit_transform with cleaned data
         return super().fit_transform(X_clean, y, **kwargs)
@@ -104,11 +103,50 @@ class PCAVisualization(BaseVisualization):
         if not self._fitted:
             raise ValueError("Must fit the model before transforming new data")
         
-        # Clean data before transformation
-        X_clean = np.nan_to_num(X, nan=0.0, posinf=1e4, neginf=-1e4)
-        X_clean = np.clip(X_clean, -1e4, 1e4)
+        # Enhanced data cleaning for numerical stability
+        X_clean = self._robust_data_cleaning(X)
         
         return self._transformer.transform(X_clean)
+    
+    def _robust_data_cleaning(self, X: np.ndarray) -> np.ndarray:
+        """
+        Robust data cleaning to prevent PCA numerical issues.
+        
+        Args:
+            X: Input data array
+            
+        Returns:
+            Cleaned data array safe for PCA
+        """
+        # Step 1: Handle NaN, inf values with conservative bounds
+        X_clean = np.nan_to_num(X, nan=0.0, posinf=1e3, neginf=-1e3)
+        
+        # Step 2: Clip to conservative range for float16/32 safety
+        X_clean = np.clip(X_clean, -1e3, 1e3)
+        
+        # Step 3: Check for constant or near-constant features that cause issues
+        feature_vars = np.var(X_clean, axis=0)
+        constant_threshold = 1e-12
+        
+        # Add small noise to constant features to prevent singular matrices
+        constant_mask = feature_vars < constant_threshold
+        if np.any(constant_mask):
+            self.logger.debug(f"Found {np.sum(constant_mask)} constant/near-constant features, adding noise")
+            noise = np.random.normal(0, 1e-6, X_clean[:, constant_mask].shape)
+            X_clean[:, constant_mask] += noise
+        
+        # Step 4: Check for extreme variance ratios that can cause overflow
+        feature_vars_updated = np.var(X_clean, axis=0)
+        if len(feature_vars_updated) > 1:
+            var_ratio = np.max(feature_vars_updated) / np.min(feature_vars_updated[feature_vars_updated > 0])
+            if var_ratio > 1e12:
+                self.logger.debug(f"Extreme variance ratio {var_ratio:.2e}, applying standardization")
+                # Apply StandardScaler to reduce variance differences
+                from sklearn.preprocessing import StandardScaler
+                scaler = StandardScaler()
+                X_clean = scaler.fit_transform(X_clean)
+        
+        return X_clean
     
     def _get_default_description(self, n_samples: int, n_features: int) -> str:
         """Get default description for PCA."""

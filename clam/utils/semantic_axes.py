@@ -159,8 +159,8 @@ class SemanticAxesComputer:
             
             # Standardize embeddings for loadings calculation
             # (PCAVisualization already handles cleaning, we just need scaling)
-            embeddings_clean = np.nan_to_num(embeddings, nan=0.0, posinf=1e4, neginf=-1e4)
-            embeddings_clean = np.clip(embeddings_clean, -1e4, 1e4)
+            embeddings_clean = np.nan_to_num(embeddings, nan=0.0, posinf=1e3, neginf=-1e3)
+            embeddings_clean = np.clip(embeddings_clean, -1e3, 1e3)
             scaler = StandardScaler()
             embeddings_scaled = scaler.fit_transform(embeddings_clean)
             
