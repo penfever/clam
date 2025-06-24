@@ -305,8 +305,20 @@ def evaluate_jolt_official(dataset, args):
         train_data = pd.concat([X_train, y_train], axis=1)
         test_data = pd.concat([X_test, y_test], axis=1)
         
-        # Let JOLT handle training data internally - no artificial limits
-        logger.info(f"Using full training dataset: {len(train_data)} samples for JOLT training")
+        # Limit training data based on JOLT authors' approach (max 50 shots for regression)
+        if is_regression:
+            # JOLT authors use 10-50 shots for regression
+            max_train_for_jolt = min(effective_shots, 50, len(train_data))
+            logger.info(f"Limiting regression training data to {max_train_for_jolt} samples (JOLT authors use 10-50)")
+        else:
+            # JOLT authors use up to 32 shots for classification  
+            max_train_for_jolt = min(effective_shots * 2, 32, len(train_data))
+            logger.info(f"Limiting classification training data to {max_train_for_jolt} samples (JOLT authors use up to 32)")
+            
+        original_train_size = len(train_data)
+        if original_train_size > max_train_for_jolt:
+            train_data = train_data.head(max_train_for_jolt)
+            logger.info(f"Reduced training data from {original_train_size} to {max_train_for_jolt} samples to match JOLT authors' approach")
         
         combined_data = pd.concat([train_data, test_data], axis=0, ignore_index=True)
         
@@ -410,7 +422,7 @@ def evaluate_jolt_official(dataset, args):
                     seed=args.seed,
                     num_decimal_places_x=2,
                     num_decimal_places_y=num_decimal_places_y,
-                    batch_size=1,  # Use batch size of 1 to minimize memory usage
+                    batch_size=1 if is_regression else 5,  # Smaller batch for regression, JOLT authors use 5 for classification
                     
                     # Memory optimization parameters
                     gradient_checkpointing=True,  # Enable gradient checkpointing to save memory
@@ -426,12 +438,12 @@ def evaluate_jolt_official(dataset, args):
                     test_fraction=0.2,
                     shots=effective_shots,  # Few-shot examples per prompt (user controlled)
                     header_option='headers_as_item_prefix',  # Use headers in prompts
-                    train_size_limit=effective_shots,  # Limit training data to match few-shot examples
+                    train_size_limit=None,  # We manually limited data above
                     test_size_limit=None,
                     train_start_index=0,
-                    train_end_index=len(X_train),  # Pass all training data but JOLT will limit internally
-                    test_start_index=len(X_train),  # Test data starts after training data
-                    test_end_index=len(X_train) + len(X_test),  # Test data ends after all test samples
+                    train_end_index=len(train_data),  # Use actual limited training data size
+                    test_start_index=len(train_data),  # Test data starts after limited training data
+                    test_end_index=len(train_data) + len(X_test),  # Test data ends after all test samples
                     missing_fraction=0.0,
                     impute_features=False,
                     shuffle=False,  # Don't shuffle since we already split
