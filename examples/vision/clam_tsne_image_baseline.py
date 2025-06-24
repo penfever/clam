@@ -138,7 +138,7 @@ class ClamImageTsneClassifier:
         bioclip2_model: str = "hf-hub:imageomics/bioclip-2",
         embedding_size: int = 1000,
         tsne_perplexity: float = 30.0,
-        tsne_n_iter: int = 1000,
+        tsne_max_iter: int = 1000,
         vlm_model_id: str = "Qwen/Qwen2.5-VL-3B-Instruct",
         use_3d: bool = False,
         use_knn_connections: bool = False,
@@ -167,7 +167,7 @@ class ClamImageTsneClassifier:
             bioclip2_model: BioClip2 model variant to use (if embedding_backend="bioclip2")
             embedding_size: Target embedding size (only used for DINOV2)
             tsne_perplexity: t-SNE perplexity parameter
-            tsne_n_iter: Number of t-SNE iterations
+            tsne_max_iter: Number of t-SNE iterations
             vlm_model_id: Vision Language Model ID
             use_3d: Whether to use 3D t-SNE
             use_knn_connections: Whether to show KNN connections
@@ -187,7 +187,7 @@ class ClamImageTsneClassifier:
         self.bioclip2_model = bioclip2_model
         self.embedding_size = embedding_size
         self.tsne_perplexity = tsne_perplexity
-        self.tsne_n_iter = tsne_n_iter
+        self.tsne_max_iter = tsne_max_iter
         self.vlm_model_id = vlm_model_id
         self.use_3d = use_3d
         self.use_knn_connections = use_knn_connections
@@ -395,7 +395,7 @@ class ClamImageTsneClassifier:
                 self.train_tsne, self.test_tsne, base_fig = create_tsne_3d_visualization(
                     train_embeddings_scaled, self.y_train_plot, test_embeddings_scaled,
                     perplexity=self.tsne_perplexity,
-                    n_iter=self.tsne_n_iter,
+                    max_iter=self.tsne_max_iter,
                     random_state=self.seed,
                     class_names=None,  # Will be handled in combined plots
                     use_semantic_names=self.use_semantic_names
@@ -405,7 +405,7 @@ class ClamImageTsneClassifier:
                 self.train_tsne, self.test_tsne, base_fig = create_tsne_visualization(
                     train_embeddings_scaled, self.y_train_plot, test_embeddings_scaled,
                     perplexity=self.tsne_perplexity,
-                    n_iter=self.tsne_n_iter,
+                    max_iter=self.tsne_max_iter,
                     random_state=self.seed,
                     class_names=None,  # Will be handled in combined plots
                     use_semantic_names=self.use_semantic_names
@@ -913,7 +913,7 @@ class ClamImageTsneClassifier:
             'bioclip2_model': self.bioclip2_model,
             'embedding_size': self.embedding_size,
             'tsne_perplexity': self.tsne_perplexity,
-            'tsne_n_iter': self.tsne_n_iter,
+            'tsne_max_iter': self.tsne_max_iter,
             'vlm_model_id': self.vlm_model_id,
             'use_3d': self.use_3d,
             'use_knn_connections': self.use_knn_connections,
