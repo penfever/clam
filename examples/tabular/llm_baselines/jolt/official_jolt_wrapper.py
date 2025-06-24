@@ -682,6 +682,7 @@ def evaluate_jolt_official(dataset, args):
                 predictions = []
                 example_inputs_outputs = []  # Store example inputs and outputs for debugging
                 jolt_regression_metrics = {}  # Store JOLT's built-in regression metrics
+                jolt_probabilities = None  # Store JOLT probabilities for classification
                 
                 # JOLT stores results in a specific format - extract predictions
                 logger.info(f"JOLT results keys: {list(jolt_results.keys()) if isinstance(jolt_results, dict) else 'Not a dict'}")
@@ -819,7 +820,11 @@ def evaluate_jolt_official(dataset, args):
                                 categories = jolt_results['categories'][0]  # First column categories
                                 predictions = [categories[idx] for idx in pred_indices]
                                 completed_samples = len(predictions)
-                                logger.info(f"Successfully extracted {completed_samples} predictions from JOLT probabilities")
+                                
+                                # Store probabilities for proper AUC calculation
+                                jolt_probabilities = probs
+                                logger.info(f"Successfully extracted {completed_samples} predictions and probabilities from JOLT")
+                                logger.info(f"JOLT probabilities shape: {probs.shape}")
                             else:
                                 error_msg = "No categories found in JOLT results - cannot map prediction indices to class labels"
                                 logger.error(error_msg)
@@ -972,10 +977,32 @@ def evaluate_jolt_official(dataset, args):
                         # Import shared metric calculation function for classification
                         from clam.utils.llm_evaluation_utils import calculate_llm_metrics
                         
+                        # Convert JOLT probabilities to log probs format if available
+                        all_class_log_probs = None
+                        if jolt_probabilities is not None and completed_samples > 0:
+                            # JOLT probabilities are in shape [n_samples, n_classes]
+                            # We need to convert to list of dicts with log probabilities
+                            all_class_log_probs = []
+                            categories = jolt_results['categories'][0] if 'categories' in jolt_results else unique_classes
+                            
+                            for i in range(min(completed_samples, len(jolt_probabilities))):
+                                # Create dict mapping class labels to log probabilities
+                                class_log_probs = {}
+                                for j, class_label in enumerate(categories):
+                                    # Convert probability to log probability
+                                    prob = jolt_probabilities[i][j] if j < len(jolt_probabilities[i]) else 1e-10
+                                    # Ensure prob is positive and non-zero to avoid log(0)
+                                    prob = max(prob, 1e-10)
+                                    log_prob = np.log(prob)
+                                    class_log_probs[str(class_label)] = log_prob
+                                all_class_log_probs.append(class_log_probs)
+                            
+                            logger.info(f"Converted JOLT probabilities to log probs for {len(all_class_log_probs)} samples")
+                        
                         # Calculate all classification metrics using shared function
                         calculated_metrics = calculate_llm_metrics(
                             y_test_partial, predictions_partial, unique_classes, 
-                            all_class_log_probs=None, logger=logger, task_type=task_type
+                            all_class_log_probs=all_class_log_probs, logger=logger, task_type=task_type
                         )
                         
                         # Extract individual metrics for backward compatibility

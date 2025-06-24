@@ -1,0 +1,557 @@
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at these 3 different visualizations (T-SNE, ISOMAP, MDS) of the same tabular classification data:
+
+Each visualization shows:
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+The multiple visualizations provide different perspectives on the same underlying data structure:
+- **T-SNE**: t-SNE visualization
+- **ISOMAP**: Preserves geodesic distances along the data manifold
+- **MDS**: Preserves pairwise distances between data points
+
+Dataset Context: Test dataset with 6 classes
+
+Based on the position of the red star (query point) across ALL 3 visualization methods (T-SNE, ISOMAP, MDS), which class should this query point belong to? The available classes are: "Class_0", "Class_1", "Class_2", "Class_3", "Class_4", "Class_5"
+
+Consider:
+- The spatial relationships across all 3 visualization methods
+- Which colored class clusters the red star is consistently closest to across multiple methods
+- Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
+- How different visualization methods agree or disagree about the query point's classification
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the multi-visualization analysis across 3 methods (T-SNE, ISOMAP, MDS).
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 

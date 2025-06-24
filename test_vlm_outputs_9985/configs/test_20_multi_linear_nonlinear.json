@@ -1,0 +1,12 @@
+{
+  "name": "multi_linear_nonlinear",
+  "enable_multi_viz": true,
+  "visualization_methods": [
+    "pca",
+    "tsne",
+    "isomap"
+  ],
+  "layout_strategy": "sequential",
+  "nn_k": 30,
+  "reasoning_focus": "divergence"
+}

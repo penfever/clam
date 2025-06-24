@@ -1,0 +1,540 @@
+{
+  "test_config": {
+    "name": "tsne_3d_perturbation",
+    "enable_multi_viz": false,
+    "use_semantic_names": true,
+    "load_semantic_from_cc18": true,
+    "semantic_axes": true,
+    "semantic_axes_method": "perturbation",
+    "use_smart_feature_selection": true,
+    "max_features_to_test": 10,
+    "feature_selection_method": "f_score",
+    "use_3d_tsne": true,
+    "use_knn_connections": false,
+    "nn_k": 30,
+    "tsne_perplexity": 15,
+    "semantic_class_names": [
+      "Heuristic 1 fastest",
+      "Heuristic 2 fastest",
+      "Heuristic 3 fastest",
+      "Heuristic 4 fastest",
+      "Heuristic 5 fastest",
+      "Theorem too difficult - decline to prove"
+    ]
+  },
+  "ground_truth": [
+    1,
+    1,
+    4,
+    0,
+    2,
+    5,
+    3,
+    0,
+    0,
+    1,
+    5,
+    2,
+    5,
+    0,
+    5,
+    2,
+    5,
+    3,
+    2,
+    0
+  ],
+  "prediction_details": [
+    {
+      "test_point_idx": 0,
+      "vlm_response": "Class: Heuristic 2 fastest | Reasoning: The red star (query point) is closest to the orange-colored points, which represent \"Heuristic 2 fastest\". Across all viewing angles, the red star is positioned near the orange points, indicating that it is more likely to belong to the \"Heuristic 2 fastest\" class.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        -2.195464849472046,
+        -4.031989574432373,
+        5.173041343688965
+      ],
+      "image_size": "1024x810",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 1,
+      "vlm_response": "Class: Heuristic 1 fastest | Reasoning: The red star (query point) is closest to the blue-colored training points, which represent the \"Heuristic 1 fastest\" class. This is evident across all four viewing angles, indicating that the query point is spatially aligned with the \"Heuristic 1 fastest\" class.",
+      "parsed_prediction": "0",
+      "true_label": "1",
+      "tsne_coords": [
+        3.8950631618499756,
+        5.228765487670898,
+        1.047970175743103
+      ],
+      "image_size": "1024x853",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 2,
+      "vlm_response": "Class: Heuristic 4 fastest | Reasoning: The red star (query point) is closest to the red-colored training points, which are associated with \"Heuristic 4 fastest\". This clustering is consistent across all four viewing angles, indicating that the query point is most similar to the \"Heuristic 4 fastest\" class in terms of the features embedded in the 3D space.",
+      "parsed_prediction": "3",
+      "true_label": "4",
+      "tsne_coords": [
+        7.563549041748047,
+        -4.438709259033203,
+        -5.4539408683776855
+      ],
+      "image_size": "1024x848",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 3,
+      "vlm_response": "Class: Heuristic 3 fastest | Reasoning: The red star (query point) is closest to the green-colored points, which represent Heuristic 3 fastest. Across all viewing angles, the red star is positioned near the green points, indicating that it is more likely to belong to the same class as the green points.",
+      "parsed_prediction": "2",
+      "true_label": "0",
+      "tsne_coords": [
+        11.983790397644043,
+        -5.437110900878906,
+        5.0763421058654785
+      ],
+      "image_size": "1024x853",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 4,
+      "vlm_response": "Class: Heuristic 2 fastest | Reasoning: The red star (query point) is closest to the cluster of points representing \"Heuristic 2 fastest\" in the Front View (XZ) and Side View (YZ). In the Isometric View (20\u00b0 elevation, 45\u00b0 azimuth), the red star is also near the \"Heuristic 2 fastest\" cluster. The Top View (XY) shows the red star in a position that aligns with the \"Heuristic 2 fastest\" cluster, indicating that the query point is most closely associated with this class across all viewing angles.",
+      "parsed_prediction": "1",
+      "true_label": "2",
+      "tsne_coords": [
+        3.2778244018554688,
+        2.147138833999634,
+        6.089504241943359
+      ],
+      "image_size": "1024x853",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 5,
+      "vlm_response": "Class: Heuristic 2 fastest | Reasoning: The red star (query point) is closest to the cluster of blue points in the Isometric View, which corresponds to the \"Heuristic 1 fastest\" class. This spatial relationship is consistent across all four views, indicating that the query point is most similar to the \"Heuristic 1 fastest\" class in terms of the features embedded in the dataset.",
+      "parsed_prediction": "1",
+      "true_label": "5",
+      "tsne_coords": [
+        4.710516452789307,
+        2.0945894718170166,
+        5.405770778656006
+      ],
+      "image_size": "1024x852",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 6,
+      "vlm_response": "Class: Heuristic 4 fastest | Reasoning: The red star (query point) is closest to the cluster of points labeled \"Heuristic 4 fastest\" in all four views. This indicates that the query point is more similar to the \"Heuristic 4 fastest\" class in terms of the features embedded in the 3D space.",
+      "parsed_prediction": "3",
+      "true_label": "3",
+      "tsne_coords": [
+        -1.5762237310409546,
+        1.9554859399795532,
+        -7.9398298263549805
+      ],
+      "image_size": "1024x807",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 7,
+      "vlm_response": "Class: Heuristic 2 fastest | Reasoning: The red star (query point) is positioned closer to the cluster of points representing \"Heuristic 2 fastest\" in the Front View (XZ) and Side View (YZ) compared to other classes. In the Isometric View (20\u00b0 elevation, 45\u00b0 azimuth), the red star is also relatively close to the \"Heuristic 2 fastest\" cluster. The Top View (XY) shows the red star slightly above the \"Heuristic 2 fastest\" cluster, but still within the same general area. This consistent spatial clustering across all views suggests that the red star is most likely associated with the \"Heuristic 2 fastest\" class.",
+      "parsed_prediction": "1",
+      "true_label": "0",
+      "tsne_coords": [
+        -5.602108955383301,
+        -1.7879334688186646,
+        1.2423702478408813
+      ],
+      "image_size": "1024x810",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 8,
+      "vlm_response": "Class: Heuristic 2 fastest | Reasoning: The red star (query point) is positioned closer to the cluster of points representing \"Heuristic 2 fastest\" in the Front View (XZ) and Side View (YZ) compared to the other views. This suggests that the query point is more aligned with the characteristics of the \"Heuristic 2 fastest\" class in the 3D space.",
+      "parsed_prediction": "1",
+      "true_label": "0",
+      "tsne_coords": [
+        5.57602596282959,
+        1.5613985061645508,
+        5.065627098083496
+      ],
+      "image_size": "1024x853",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 9,
+      "vlm_response": "Class: Heuristic 2 fastest | Reasoning: The red star (query point) is closest to the cluster of points representing the \"Heuristic 2 fastest\" class in the Front View (XZ) and Side View (YZ). In the Isometric View (20\u00b0 elevation, 45\u00b0 azimuth), the red star is also relatively close to the \"Heuristic 2 fastest\" class. The Top View (XY) shows the red star in a position that aligns with the \"Heuristic 2 fastest\" class cluster. Therefore, based on the spatial relationships across all viewing angles, the query point is most likely to belong to the \"Heuristic 2 fastest\" class.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        4.349615097045898,
+        3.1835520267486572,
+        4.835440635681152
+      ],
+      "image_size": "1024x852",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 10,
+      "vlm_response": "Class: Heuristic 3 fastest | Reasoning: The red star (query point) is positioned closer to the cluster of points representing \"Heuristic 3 fastest\" in the isometric view, which shows a clear separation from the other classes. This spatial clustering is consistent across all four views, indicating that the query point is most closely associated with the \"Heuristic 3 fastest\" class.",
+      "parsed_prediction": "2",
+      "true_label": "5",
+      "tsne_coords": [
+        5.886957168579102,
+        1.297448754310608,
+        5.142440319061279
+      ],
+      "image_size": "1024x853",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 11,
+      "vlm_response": "Class: Heuristic 2 fastest | Reasoning: The red star (query point) is closest to the cluster of points representing the \"Heuristic 2 fastest\" class in the Front View (XZ) and Side View (YZ). In the Isometric View (20\u00b0 elevation, 45\u00b0 azimuth), the red star is also near the \"Heuristic 2 fastest\" class. The Top View (XY) shows the red star in a position that aligns with the \"Heuristic 2 fastest\" class cluster. Therefore, based on the spatial relationships across all viewing angles, the query point should be classified as \"Heuristic 2 fastest.\"",
+      "parsed_prediction": "1",
+      "true_label": "2",
+      "tsne_coords": [
+        3.2510344982147217,
+        2.185814619064331,
+        6.133527755737305
+      ],
+      "image_size": "1024x853",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 12,
+      "vlm_response": "Class: Heuristic 2 fastest | Reasoning: The red star (query point) is closest to the cluster of points representing the \"Heuristic 2 fastest\" class in the Front View (XZ) and Side View (YZ). In the Isometric View (Elevation=20\u00b0, Azimuth=45\u00b0), the red star is also relatively close to the \"Heuristic 2 fastest\" class. The Top View (XY) shows a similar pattern, with the red star being near the \"Heuristic 2 fastest\" class. Therefore, based on the spatial relationships across all viewing angles, the query point is most likely to belong to the \"Heuristic 2 fastest\" class.",
+      "parsed_prediction": "1",
+      "true_label": "5",
+      "tsne_coords": [
+        3.1417551040649414,
+        2.968785285949707,
+        6.374683856964111
+      ],
+      "image_size": "1024x852",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 13,
+      "vlm_response": "Class: Heuristic 3 fastest | Reasoning: The red star (query point) is positioned closer to the cluster of points representing the \"Heuristic 3 fastest\" class across all four viewing angles. This indicates that the query point is most similar to the \"Heuristic 3 fastest\" class in terms of the features embedded in the 3D space.",
+      "parsed_prediction": "2",
+      "true_label": "0",
+      "tsne_coords": [
+        3.6505320072174072,
+        2.6654601097106934,
+        6.06504487991333
+      ],
+      "image_size": "1024x853",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 14,
+      "vlm_response": "Class: Heuristic 2 fastest | Reasoning: The red star (query point) is positioned closer to the cluster of points representing \"Heuristic 2 fastest\" in the Front View (XZ) and Side View (YZ) compared to other classes. This suggests that the query point is more aligned with the characteristics of \"Heuristic 2 fastest\" in the 3D space.",
+      "parsed_prediction": "1",
+      "true_label": "5",
+      "tsne_coords": [
+        -15.106225967407227,
+        -2.609272003173828,
+        -1.2737644910812378
+      ],
+      "image_size": "1024x807",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 15,
+      "vlm_response": "Class: Heuristic 3 fastest | Reasoning: The red star (query point) is positioned closer to the cluster of points representing the \"Heuristic 3 fastest\" class in the Front View (XZ) and Top View (XY). In the Isometric View (Elevation=20\u00b0, Azimuth=45\u00b0) and Side View (YZ), the red star is also relatively close to the \"Heuristic 3 fastest\" class, indicating that it is most likely to belong to this class based on its spatial clustering across all viewing angles.",
+      "parsed_prediction": "2",
+      "true_label": "2",
+      "tsne_coords": [
+        4.230983734130859,
+        3.2998924255371094,
+        5.512126445770264
+      ],
+      "image_size": "1024x852",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 16,
+      "vlm_response": "Class: Heuristic 5 fastest | Reasoning: The red star (query point) is closest to the purple-colored training points in all four views, indicating that it is embedded within the cluster of Heuristic 5 fastest data.",
+      "parsed_prediction": "4",
+      "true_label": "5",
+      "tsne_coords": [
+        7.530298233032227,
+        0.004028307739645243,
+        0.19385629892349243
+      ],
+      "image_size": "1024x851",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 17,
+      "vlm_response": "Class: Heuristic 3 fastest | Reasoning: The red star (query point) is closest to the green-colored points, which represent the \"Heuristic 3 fastest\" class. Across all viewing angles, the red star is positioned near the green points, indicating that it is more likely to belong to the \"Heuristic 3 fastest\" class.",
+      "parsed_prediction": "2",
+      "true_label": "3",
+      "tsne_coords": [
+        11.771016120910645,
+        -5.048941612243652,
+        5.41208028793335
+      ],
+      "image_size": "1024x852",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 18,
+      "vlm_response": "Class: Heuristic 2 fastest | Reasoning: The red star (query point) is positioned closer to the cluster of points representing the \"Heuristic 2 fastest\" class in the Front View (XZ) and Side View (YZ) compared to the other views. This suggests that the query point is more aligned with the characteristics of the \"Heuristic 2 fastest\" class in these specific orientations.",
+      "parsed_prediction": "1",
+      "true_label": "2",
+      "tsne_coords": [
+        4.084540367126465,
+        3.072599411010742,
+        5.431375026702881
+      ],
+      "image_size": "1024x852",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "test_point_idx": 19,
+      "vlm_response": "Class: Heuristic 1 fastest | Reasoning: The red star (query point) is closest to the blue RGB(30, 119, 181) colored points in the Isometric View, indicating that it is most similar to the \"Heuristic 1 fastest\" class. This similarity is consistent across all four viewing angles, suggesting that the red star is embedded within the cluster of \"Heuristic 1 fastest\" points.",
+      "parsed_prediction": "0",
+      "true_label": "0",
+      "tsne_coords": [
+        -6.023991107940674,
+        -3.4154279232025146,
+        4.488471508026123
+      ],
+      "image_size": "1024x810",
+      "visible_classes": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "completion_rate": 1.0,
+  "test_indices": [
+    6,
+    11,
+    21,
+    26,
+    32,
+    36,
+    43,
+    52,
+    58,
+    66,
+    69,
+    75,
+    77,
+    81,
+    109,
+    121,
+    135,
+    138,
+    139,
+    149
+  ],
+  "metrics": {
+    "config_name": "tsne_3d_perturbation",
+    "accuracy": 0.25,
+    "balanced_accuracy": 0.26944444444444443,
+    "precision_macro": 0.2333333333333333,
+    "recall_macro": 0.26944444444444443,
+    "f1_macro": 0.21927146927146926,
+    "precision_micro": 0.25,
+    "recall_micro": 0.25,
+    "f1_micro": 0.25,
+    "precision_weighted": 0.24500000000000002,
+    "recall_weighted": 0.25,
+    "f1_weighted": 0.212026862026862,
+    "confusion_matrix": [
+      [
+        1,
+        2,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        1,
+        0,
+        1,
+        0
+      ]
+    ],
+    "completion_rate": 1.0,
+    "num_test_samples": 20,
+    "num_classes": 6,
+    "support": []
+  }
+}

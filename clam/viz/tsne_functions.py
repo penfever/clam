@@ -1165,7 +1165,7 @@ def create_knn_regression_analysis(
     for i, (bar, target) in enumerate(zip(bars, neighbor_targets)):
         height = bar.get_height()
         ax_knn.text(bar.get_x() + bar.get_width()/2., height + (np.max(neighbor_targets) - np.min(neighbor_targets)) * 0.01,
-                   f'{target:.3f}', ha='center', va='bottom', fontsize=8, rotation=45)
+                   f'{target:.3f}', ha='center', va='bottom', fontsize=8, rotation=90)
     
     ax_knn.set_xlabel('Neighbor Rank')
     ax_knn.set_ylabel('Target Value')
@@ -1174,7 +1174,7 @@ def create_knn_regression_analysis(
     
     # Set x-ticks to show neighbor ranks
     ax_knn.set_xticks(neighbor_indices)
-    ax_knn.set_xticklabels([f'#{i+1}' for i in neighbor_indices], rotation=45)
+    ax_knn.set_xticklabels([f'#{i+1}' for i in neighbor_indices], rotation=90)
     
     # Calculate statistics
     knn_mean = np.mean(neighbor_targets)
@@ -1189,7 +1189,7 @@ def create_knn_regression_analysis(
                bbox=dict(boxstyle='round', facecolor='red', alpha=0.3), 
                verticalalignment='top', fontsize=9, fontweight='bold')
     
-    plt.setp(ax_knn.get_xticklabels(), rotation=45, ha='right')
+    plt.setp(ax_knn.get_xticklabels(), rotation=90, ha='center')
     
     # Create description text
     description = f"KNN Regression Analysis (k={k}):\n"
@@ -1925,10 +1925,10 @@ def create_regression_tsne_plot_with_knn(
     # Create figure with subplot for main plot and KNN analysis panel
     if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_tsne):
         fig = plt.figure(figsize=figsize)
-        # Create a grid: main plot takes ~70% width, KNN analysis takes ~30% width
-        gs = fig.add_gridspec(1, 5, width_ratios=[2.5, 2.5, 2, 1.5, 1.5], hspace=0.1, wspace=0.15)
+        # Create a grid: main plot takes ~60% width, KNN analysis takes ~40% width (doubled width)
+        gs = fig.add_gridspec(1, 5, width_ratios=[2, 2, 1.5, 2, 2], hspace=0.1, wspace=0.15)
         ax = fig.add_subplot(gs[0, :3])  # Main plot spans first 3 columns
-        ax_knn = fig.add_subplot(gs[0, 3:])  # KNN analysis spans last 2 columns
+        ax_knn = fig.add_subplot(gs[0, 3:])  # KNN analysis spans last 2 columns (now wider)
     else:
         fig, ax = plt.subplots(figsize=figsize)
         ax_knn = None
@@ -2249,10 +2249,10 @@ def create_regression_tsne_3d_plot_with_knn(
     # Create figure with subplot for main 3D plot and KNN analysis panel
     if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_tsne):
         fig = plt.figure(figsize=figsize)
-        # Create a grid: main 3D plot takes ~70% width, KNN analysis takes ~30% width
-        gs = fig.add_gridspec(1, 5, width_ratios=[2.5, 2.5, 2, 1.5, 1.5], hspace=0.1, wspace=0.15)
+        # Create a grid: main 3D plot takes ~60% width, KNN analysis takes ~40% width (doubled width)
+        gs = fig.add_gridspec(1, 5, width_ratios=[2, 2, 1.5, 2, 2], hspace=0.1, wspace=0.15)
         ax = fig.add_subplot(gs[0, :3], projection='3d')  # Main 3D plot spans first 3 columns
-        ax_knn = fig.add_subplot(gs[0, 3:])  # KNN analysis spans last 2 columns
+        ax_knn = fig.add_subplot(gs[0, 3:])  # KNN analysis spans last 2 columns (now wider)
     else:
         fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111, projection='3d')
