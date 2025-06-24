@@ -1428,8 +1428,18 @@ def evaluate_tabllm(dataset, args):
                     })
                     
             except Exception as e:
+                # Check for critical errors that should be raised immediately
+                error_message = str(e).lower()
+                if any(critical_error in error_message for critical_error in [
+                    'invalid api key', 'incorrect api key', 'api key', 'authentication', 
+                    'unauthorized', '401', '403', 'quota', 'rate limit', 'billing'
+                ]):
+                    logger.error(f"Critical API error on sample {i}: {e}")
+                    logger.error("This error indicates a configuration problem that needs to be fixed")
+                    raise e  # Re-raise API configuration errors
+                
                 # Check if this is an OOM error
-                if is_oom_error(e):
+                elif is_oom_error(e):
                     logger.warning(f"Unified prediction failed for sample {i} due to OOM: {e}")
                     
                     # Try dropping a feature and retry this sample
@@ -1451,10 +1461,17 @@ def evaluate_tabllm(dataset, args):
                         # Return partial results
                         break
                 else:
+                    # For other non-critical errors, log and continue with fallback
                     logger.warning(f"Unified prediction failed for sample {i}: {e}")
-                    # Use default prediction
+                    logger.info("Using fallback prediction and continuing evaluation")
+                    # Use default prediction and initialize missing variables
                     predicted_class = unique_classes[0]
+                    predicted_class_name = str(predicted_class)
+                    class_log_probs = {}
+                    generated_text = None
+                    prediction_method = "default_fallback"
                     predictions.append(predicted_class)
+                    all_class_log_probs.append(class_log_probs)
                     completed_samples = i + 1
             
             # Log first few predictions for debugging
