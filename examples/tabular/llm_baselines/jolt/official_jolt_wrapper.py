@@ -301,11 +301,17 @@ def evaluate_jolt_official(dataset, args):
         else:
             logger.info(f"CLASSIFICATION CONFIG: mode=logpy_only, y_column_types=['categorical'], num_decimal_places_y=0")
         
-        # Combine features and target for JOLT format using all available data
+        # Combine features and target for JOLT format with memory-safe limits
         train_data = pd.concat([X_train, y_train], axis=1)
         test_data = pd.concat([X_test, y_test], axis=1)
         
-        logger.info(f"Using full training dataset: {len(train_data)} samples for JOLT training")
+        # Cap training data to prevent VRAM OOM while still using more data than just few-shot examples
+        max_train_samples = min(user_few_shot * 2, len(train_data))
+        if len(train_data) > max_train_samples:
+            logger.info(f"Limiting JOLT training data from {len(train_data)} to {max_train_samples} samples to prevent VRAM OOM (2x few-shot: {user_few_shot})")
+            train_data = train_data.head(max_train_samples)
+        else:
+            logger.info(f"Using full training dataset: {len(train_data)} samples for JOLT training")
         
         combined_data = pd.concat([train_data, test_data], axis=0, ignore_index=True)
         
@@ -419,9 +425,9 @@ def evaluate_jolt_official(dataset, args):
                     train_size_limit=None,  # No limit on training data size
                     test_size_limit=None,
                     train_start_index=0,
-                    train_end_index=len(X_train),  # Use ALL our training data
-                    test_start_index=len(X_train),  # Test data starts after training data
-                    test_end_index=len(X_train) + len(X_test),  # Test data ends after all test samples
+                    train_end_index=len(train_data),  # Use the actual amount of training data we're providing
+                    test_start_index=len(train_data),  # Test data starts after training data
+                    test_end_index=len(train_data) + len(X_test),  # Test data ends after all test samples
                     missing_fraction=0.0,
                     impute_features=False,
                     shuffle=False,  # Don't shuffle since we already split
