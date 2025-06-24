@@ -305,13 +305,8 @@ def evaluate_jolt_official(dataset, args):
         train_data = pd.concat([X_train, y_train], axis=1)
         test_data = pd.concat([X_test, y_test], axis=1)
         
-        # Cap training data to prevent VRAM OOM while still using more data than just few-shot examples
-        max_train_samples = min(user_few_shot * 2, len(train_data))
-        if len(train_data) > max_train_samples:
-            logger.info(f"Limiting JOLT training data from {len(train_data)} to {max_train_samples} samples to prevent VRAM OOM (2x few-shot: {user_few_shot})")
-            train_data = train_data.head(max_train_samples)
-        else:
-            logger.info(f"Using full training dataset: {len(train_data)} samples for JOLT training")
+        # Let JOLT handle training data internally - no artificial limits
+        logger.info(f"Using full training dataset: {len(train_data)} samples for JOLT training")
         
         combined_data = pd.concat([train_data, test_data], axis=0, ignore_index=True)
         
@@ -371,19 +366,28 @@ def evaluate_jolt_official(dataset, args):
                 
                 
                 logger.info(f"Using JOLT config - llm_path: {llm_path}, llm_type: {llm_type}")
-                logger.info(f"JOLT few-shot: user requested {user_few_shot}, using {effective_shots} shots, {len(train_data)} train samples")
+                logger.info(f"JOLT few-shot: user requested {user_few_shot}, using {effective_shots} shots, {len(train_data)} train samples available")
+                logger.info(f"JOLT train_size_limit={effective_shots} to prevent massive prompts while preserving test indices")
                 
-                # Determine max token length based on model capabilities
-                if "qwen" in jolt_model_name.lower():
-                    max_tokens = getattr(args, 'max_context_length', 4096)  # Qwen supports larger contexts
-                elif "llama" in jolt_model_name.lower():
-                    max_tokens = getattr(args, 'max_context_length', 4096)  # Llama-2/3 supports 4k+
-                elif "gemma" in jolt_model_name.lower():
-                    max_tokens = getattr(args, 'max_context_length', 8192)  # Gemma supports larger contexts
+                # Determine max token length with aggressive limits for regression to prevent OOM
+                if is_regression:
+                    # For regression, use much smaller context to prevent OOM issues
+                    # Regression only needs to predict a number, not generate long text
+                    max_tokens = 1024  # Much smaller for regression
+                    max_generated_length = 256  # Minimum safe generation length
+                    logger.info(f"Using aggressive memory limits for regression: max_tokens={max_tokens}, max_generated_length={max_generated_length}")
                 else:
-                    max_tokens = getattr(args, 'max_context_length', 2048)  # Conservative default
-                
-                logger.info(f"Using max_tokens: {max_tokens} for generative model: {jolt_model_name}")
+                    # Classification can use larger contexts since it uses logpy_only mode
+                    if "qwen" in jolt_model_name.lower():
+                        max_tokens = getattr(args, 'max_context_length', 4096)
+                    elif "llama" in jolt_model_name.lower():
+                        max_tokens = getattr(args, 'max_context_length', 4096)
+                    elif "gemma" in jolt_model_name.lower():
+                        max_tokens = getattr(args, 'max_context_length', 8192)
+                    else:
+                        max_tokens = getattr(args, 'max_context_length', 2048)
+                    max_generated_length = 256  # Minimum safe generation length
+                    logger.info(f"Using standard limits for classification: max_tokens={max_tokens}, max_generated_length={max_generated_length}")
                 
                 # Create JOLT arguments with memory optimizations
                 # Set mode and column types based on task type
@@ -422,12 +426,12 @@ def evaluate_jolt_official(dataset, args):
                     test_fraction=0.2,
                     shots=effective_shots,  # Few-shot examples per prompt (user controlled)
                     header_option='headers_as_item_prefix',  # Use headers in prompts
-                    train_size_limit=None,  # No limit on training data size
+                    train_size_limit=effective_shots,  # Limit training data to match few-shot examples
                     test_size_limit=None,
                     train_start_index=0,
-                    train_end_index=len(train_data),  # Use the actual amount of training data we're providing
-                    test_start_index=len(train_data),  # Test data starts after training data
-                    test_end_index=len(train_data) + len(X_test),  # Test data ends after all test samples
+                    train_end_index=len(X_train),  # Pass all training data but JOLT will limit internally
+                    test_start_index=len(X_train),  # Test data starts after training data
+                    test_end_index=len(X_train) + len(X_test),  # Test data ends after all test samples
                     missing_fraction=0.0,
                     impute_features=False,
                     shuffle=False,  # Don't shuffle since we already split
@@ -437,7 +441,7 @@ def evaluate_jolt_official(dataset, args):
                     num_samples=1,
                     temperature=1.0,
                     top_p=0.9,
-                    max_generated_length=7,
+                    max_generated_length=max_generated_length,  # Use the calculated value
                     top_k=None,
                     
                     # Debug options
