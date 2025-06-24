@@ -534,6 +534,7 @@ def generate_note_from_row(row, semantic_info: Dict[str, Any], attribute_names: 
     """Generate a TabLLM-style note from a data row using semantic info."""
     import pandas as pd
     
+    logger = logging.getLogger(__name__)
     note_parts = []
     
     # Convert row to pandas Series if it isn't already
@@ -544,77 +545,89 @@ def generate_note_from_row(row, semantic_info: Dict[str, Any], attribute_names: 
             # Fallback: create basic series
             row = pd.Series(row) if hasattr(row, '__iter__') else pd.Series([row])
     
-    # Get feature descriptions based on the structure of semantic JSON
+    # Determine the number of features we need to describe
+    feature_count = len(row)
+    
+    # Extract semantic feature names and descriptions based on structure
+    semantic_features = []
     if 'columns' in semantic_info:
-        # Structure like kr-vs-kp dataset
-        for col in semantic_info['columns']:
-            col_name = col['name']
-            if col_name in row.index and (not exclude_target or col_name != 'target'):
-                semantic_desc = col['semantic_description']
-                value = row[col_name]
-                
-                # Handle different data types
-                if pd.isna(value):
-                    note_parts.append(f"The {semantic_desc} is missing.")
-                elif isinstance(value, (int, float)):
-                    if value == int(value):
-                        note_parts.append(f"The {semantic_desc} is {int(value)}.")
-                    else:
-                        note_parts.append(f"The {semantic_desc} is {value:.2f}.")
-                else:
-                    note_parts.append(f"The {semantic_desc} is {value}.")
-    
+        semantic_features = [(col['name'], col.get('semantic_description', col['name'])) 
+                           for col in semantic_info['columns'] 
+                           if col.get('name') != 'target']
     elif 'feature_descriptions' in semantic_info:
-        # Structure like letter dataset
-        for feat_name, feat_desc in semantic_info['feature_descriptions'].items():
-            if feat_name in row.index and (not exclude_target or feat_name != 'target'):
-                value = row[feat_name]
-                # Clean up description for better readability
-                clean_desc = feat_desc.replace(' (integer)', '').replace(' (float)', '')
-                
-                if pd.isna(value):
-                    note_parts.append(f"The {clean_desc} is missing.")
-                elif isinstance(value, (int, float)):
-                    if value == int(value):
-                        note_parts.append(f"The {clean_desc} is {int(value)}.")
-                    else:
-                        note_parts.append(f"The {clean_desc} is {value:.2f}.")
-                else:
-                    note_parts.append(f"The {clean_desc} is {value}.")
-    
+        semantic_features = [(name, desc) for name, desc in semantic_info['feature_descriptions'].items()]
     elif 'feature_description' in semantic_info:
-        # Handle adult dataset format (singular feature_description)
-        for feat_name, feat_desc in semantic_info['feature_description'].items():
-            if feat_name in row.index and (not exclude_target or feat_name != 'target'):
-                value = row[feat_name]
-                # Create more natural descriptions
-                feature_label = feat_name.replace('-', ' ').replace('_', ' ')
-                
-                if pd.isna(value):
-                    note_parts.append(f"The {feature_label} is missing.")
-                elif isinstance(value, (int, float)):
-                    if value == int(value):
-                        note_parts.append(f"The {feature_label} is {int(value)}.")
-                    else:
-                        note_parts.append(f"The {feature_label} is {value:.2f}.")
-                else:
-                    note_parts.append(f"The {feature_label} is {value}.")
-    
+        semantic_features = [(name, desc) for name, desc in semantic_info['feature_description'].items()]
     elif 'feature_names' in semantic_info:
-        # Fallback to feature_names if descriptions not available
-        for feat_name, feat_meaning in semantic_info['feature_names'].items():
-            if feat_name in row.index and (not exclude_target or feat_name != 'target'):
-                value = row[feat_name]
-                
+        semantic_features = [(name, meaning) for name, meaning in semantic_info['feature_names'].items()]
+    
+    # Check if semantic features match the feature count
+    if len(semantic_features) == feature_count:
+        # Use semantic features by position
+        logger.debug(f"Using {len(semantic_features)} semantic features by position")
+        for i, (value, (sem_name, sem_desc)) in enumerate(zip(row, semantic_features)):
+            if pd.isna(value):
+                note_parts.append(f"The {sem_desc} is missing.")
+            elif isinstance(value, (int, float)):
+                if value == int(value):
+                    note_parts.append(f"The {sem_desc} is {int(value)}.")
+                else:
+                    note_parts.append(f"The {sem_desc} is {value:.2f}.")
+            else:
+                note_parts.append(f"The {sem_desc} is {value}.")
+    
+    elif len(attribute_names) == feature_count:
+        # Try to match by feature names
+        logger.debug(f"Attempting to match {feature_count} features by name")
+        matched_count = 0
+        for i, (feat_name, value) in enumerate(row.items()):
+            # Look for matching semantic description
+            matched = False
+            for sem_name, sem_desc in semantic_features:
+                if sem_name == feat_name:
+                    matched = True
+                    matched_count += 1
+                    if pd.isna(value):
+                        note_parts.append(f"The {sem_desc} is missing.")
+                    elif isinstance(value, (int, float)):
+                        if value == int(value):
+                            note_parts.append(f"The {sem_desc} is {int(value)}.")
+                        else:
+                            note_parts.append(f"The {sem_desc} is {value:.2f}.")
+                    else:
+                        note_parts.append(f"The {sem_desc} is {value}.")
+                    break
+            
+            if not matched:
+                # Use feature name as description
                 if pd.isna(value):
-                    note_parts.append(f"The {feat_meaning} is missing.")
+                    note_parts.append(f"The {feat_name} is missing.")
                 elif isinstance(value, (int, float)):
                     if value == int(value):
-                        note_parts.append(f"The {feat_meaning} is {int(value)}.")
+                        note_parts.append(f"The {feat_name} is {int(value)}.")
                     else:
-                        note_parts.append(f"The {feat_meaning} is {value:.2f}.")
+                        note_parts.append(f"The {feat_name} is {value:.2f}.")
                 else:
-                    note_parts.append(f"The {feat_meaning} is {value}.")
+                    note_parts.append(f"The {feat_name} is {value}.")
+        
+        if matched_count == 0:
+            logger.warning(f"No semantic features matched by name, fell back to feature names")
+    
+    else:
+        # Fallback to Feature_i format
+        logger.warning(f"Feature count mismatch - Row: {feature_count}, Semantic: {len(semantic_features)}, Names: {len(attribute_names)}")
+        logger.debug(f"Using Feature_i fallback for {feature_count} features")
+        for i, value in enumerate(row):
+            feat_desc = f"Feature {i}"
+            if pd.isna(value):
+                note_parts.append(f"The {feat_desc} is missing.")
+            elif isinstance(value, (int, float)):
+                if value == int(value):
+                    note_parts.append(f"The {feat_desc} is {int(value)}.")
+                else:
+                    note_parts.append(f"The {feat_desc} is {value:.2f}.")
+            else:
+                note_parts.append(f"The {feat_desc} is {value}.")
     
     return " ".join(note_parts)
 
