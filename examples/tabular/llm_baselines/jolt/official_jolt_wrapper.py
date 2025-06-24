@@ -320,6 +320,8 @@ def evaluate_jolt_official(dataset, args):
             train_data = train_data.head(max_train_for_jolt)
             logger.info(f"Reduced training data from {original_train_size} to {max_train_for_jolt} samples to match JOLT authors' approach")
         
+        # Store the actual test data size before combining
+        actual_test_size = len(test_data)
         combined_data = pd.concat([train_data, test_data], axis=0, ignore_index=True)
         
         # Create temporary CSV file for JOLT
@@ -443,7 +445,7 @@ def evaluate_jolt_official(dataset, args):
                     train_start_index=0,
                     train_end_index=len(train_data),  # Use actual limited training data size
                     test_start_index=len(train_data),  # Test data starts after limited training data
-                    test_end_index=len(train_data) + len(X_test),  # Test data ends after all test samples
+                    test_end_index=len(train_data) + actual_test_size,  # Test data ends after all test samples
                     missing_fraction=0.0,
                     impute_features=False,
                     shuffle=False,  # Don't shuffle since we already split
