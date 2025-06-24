@@ -290,12 +290,10 @@ def evaluate_jolt_official(dataset, args):
         user_few_shot = getattr(args, 'num_few_shot_examples', 16)
         jolt_model_name = getattr(args, 'jolt_model', 'Qwen/Qwen2.5-7B-Instruct')
         
-        # JOLT should use reasonable limits for any generative LLM
+        # JOLT should use reasonable limits for few-shot prompting, but use all training data
         effective_shots = min(user_few_shot, 16)
-        effective_train_limit = min(user_few_shot, 32)
-        max_train_samples = effective_train_limit
         
-        logger.info(f"JOLT using model: {jolt_model_name}, shots: {effective_shots}, train limit: {effective_train_limit}")
+        logger.info(f"JOLT using model: {jolt_model_name}, shots: {effective_shots}, full training data: {len(X_train)} samples")
         
         # Log task-specific configuration
         if is_regression:
@@ -416,17 +414,17 @@ def evaluate_jolt_official(dataset, args):
                     column_separator=';',
                     name_value_separator=':',
                     
-                    # CSV parsing options with memory safety limits
+                    # CSV parsing options - use our exact train/test split
                     csv_split_option="fixed_indices",
                     test_fraction=0.2,
-                    shots=effective_shots,  # Respect user setting but cap at 16 for memory
+                    shots=effective_shots,  # Few-shot examples per prompt (user controlled)
                     header_option='headers_as_item_prefix',  # Use headers in prompts
-                    train_size_limit=effective_train_limit,  # Respect user setting but cap for memory
+                    train_size_limit=None,  # No limit on training data size
                     test_size_limit=None,
                     train_start_index=0,
-                    train_end_index=min(max_train_samples, len(X_train)),  # Use our limited training data
-                    test_start_index=min(max_train_samples, len(X_train)),
-                    test_end_index=min(max_train_samples, len(X_train)) + len(X_test),
+                    train_end_index=len(X_train),  # Use ALL our training data
+                    test_start_index=len(X_train),  # Test data starts after training data
+                    test_end_index=len(X_train) + len(X_test),  # Test data ends after all test samples
                     missing_fraction=0.0,
                     impute_features=False,
                     shuffle=False,  # Don't shuffle since we already split
