@@ -115,7 +115,7 @@ def create_tsne_visualization(
         test_embeddings: Test embeddings [n_test, embedding_dim]
         test_labels: Optional test labels for validation [n_test]
         perplexity: t-SNE perplexity parameter
-        n_iter: Number of t-SNE iterations
+        max_iter: Number of t-SNE iterations
         random_state: Random seed for reproducibility
         figsize: Figure size (width, height)
         class_names: Optional class names for labeling
@@ -273,7 +273,7 @@ def create_tsne_3d_visualization(
         test_embeddings: Test embeddings [n_test, embedding_dim]
         test_labels: Optional test labels for validation [n_test]
         perplexity: t-SNE perplexity parameter
-        n_iter: Number of t-SNE iterations
+        max_iter: Number of t-SNE iterations
         random_state: Random seed for reproducibility
         figsize: Figure size (width, height)
         
@@ -1533,7 +1533,7 @@ def create_regression_tsne_visualization(
         test_embeddings: Test embeddings [n_test, embedding_dim]
         test_targets: Optional test target values [n_test]
         perplexity: t-SNE perplexity parameter
-        n_iter: Number of t-SNE iterations
+        max_iter: Number of t-SNE iterations
         random_state: Random seed for reproducibility
         figsize: Figure size (width, height)
         colormap: Matplotlib colormap name for target values
@@ -1682,7 +1682,7 @@ def create_regression_tsne_3d_visualization(
         test_embeddings: Test embeddings [n_test, embedding_dim]
         test_targets: Optional test target values [n_test]
         perplexity: t-SNE perplexity parameter
-        n_iter: Number of t-SNE iterations
+        max_iter: Number of t-SNE iterations
         random_state: Random seed for reproducibility
         figsize: Figure size (width, height)
         colormap: Matplotlib colormap name for target values

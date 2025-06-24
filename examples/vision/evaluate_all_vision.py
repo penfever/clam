@@ -463,7 +463,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
                 dinov2_model=args.dinov2_model,
                 embedding_size=512,
                 tsne_perplexity=min(30.0, len(train_paths) / 4),
-                tsne_n_iter=1000,
+                tsne_max_iter=1000,
                 vlm_model_id="Qwen/Qwen2.5-VL-3B-Instruct",
                 use_3d=args.use_3d,
                 use_knn_connections=args.use_knn_connections,

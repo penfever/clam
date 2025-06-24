@@ -831,7 +831,7 @@ def test_single_dataset(dataset_name: str, args):
                 bioclip2_model=getattr(args, 'bioclip2_model', 'hf-hub:imageomics/bioclip-2'),
                 embedding_size=512,  # Not used for BioClip2 but kept for compatibility
                 tsne_perplexity=min(30.0, len(train_paths) / 4),
-                tsne_n_iter=1000,
+                tsne_max_iter=1000,
                 vlm_model_id=args.vlm_model_id,
                 use_3d=args.use_3d,
                 use_knn_connections=args.use_knn_connections,

@@ -351,7 +351,7 @@ class ClamTsneClassifier:
         # Use same parameters as the main t-SNE computation, with fallbacks
         if hasattr(self, '_tsne_params'):
             perplexity = self._tsne_params['perplexity']
-            n_iter = self._tsne_params['n_iter']
+            max_iter = self._tsne_params.get('max_iter', self._tsne_params.get('n_iter', 1000))  # Support both old and new parameter names
             random_state = self._tsne_params['random_state']
         else:
             # Fallback to instance parameters
@@ -362,7 +362,7 @@ class ClamTsneClassifier:
         tsne = TSNE(
             n_components=n_components,
             perplexity=min(perplexity, len(embeddings) // 4),
-            n_iter=n_iter,
+            max_iter=max_iter,
             random_state=random_state
         )
         
