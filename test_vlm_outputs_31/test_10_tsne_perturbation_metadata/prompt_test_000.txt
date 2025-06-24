@@ -1,0 +1,27 @@
+Looking at this t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+
+Class Legend:
+- Good credit risk (creditworthy): Blue RGB(30, 119, 181)
+- Bad credit risk (not creditworthy): Orange RGB(255, 127, 12)
+- Test points: Light Gray RGB(211, 211, 211)
+
+Semantic Axis Interpretation:
+• X-axis (42.9% var): Mixed factors
+• Y-axis (17.3% var): Mixed factors
+
+Dataset Context: Tabular data embedded using appropriate features 
+Dataset: German Credit dataset for credit risk assessment. This dataset classifies people described by a set of attributes as good or bad credit risks. Based on demographic and financial profiles of loan applicants, the dataset enables banks to predict creditworthiness and make informed lending decisions. | Key features: checking_status; duration; credit_history; purpose; credit_amount: Credit amount requested by the applicant in Deutsche Mark. | Classes: "1": Good credit risk - likely to repay loan; "2": Bad credit risk - unlikely to repay loan
+
+Based on the position of the red star (query point) relative to the colored training points, which class should this query point belong to? The available classes are: "Good credit risk (creditworthy)", "Bad credit risk (not creditworthy)"
+
+Consider:
+- The spatial relationships in the t-SNE visualization
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Good credit risk (creditworthy)", "Bad credit risk (not creditworthy)", etc.) followed by a brief explanation of your reasoning based on the spatial clustering patterns you observe.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 

@@ -577,41 +577,33 @@ def generate_note_from_row(row, semantic_info: Dict[str, Any], attribute_names: 
                 note_parts.append(f"The {sem_desc} is {value}.")
     
     elif len(attribute_names) == feature_count:
-        # Try to match by feature names
-        logger.debug(f"Attempting to match {feature_count} features by name")
-        matched_count = 0
-        for i, (feat_name, value) in enumerate(row.items()):
-            # Look for matching semantic description
-            matched = False
-            for sem_name, sem_desc in semantic_features:
-                if sem_name == feat_name:
-                    matched = True
-                    matched_count += 1
-                    if pd.isna(value):
-                        note_parts.append(f"The {sem_desc} is missing.")
-                    elif isinstance(value, (int, float)):
-                        if value == int(value):
-                            note_parts.append(f"The {sem_desc} is {int(value)}.")
-                        else:
-                            note_parts.append(f"The {sem_desc} is {value:.2f}.")
-                    else:
-                        note_parts.append(f"The {sem_desc} is {value}.")
-                    break
-            
-            if not matched:
-                # Use feature name as description
-                if pd.isna(value):
-                    note_parts.append(f"The {feat_name} is missing.")
-                elif isinstance(value, (int, float)):
-                    if value == int(value):
-                        note_parts.append(f"The {feat_name} is {int(value)}.")
-                    else:
-                        note_parts.append(f"The {feat_name} is {value:.2f}.")
-                else:
-                    note_parts.append(f"The {feat_name} is {value}.")
+        # Use attribute names by position, ensuring they're strings and unique
+        logger.debug(f"Using {len(attribute_names)} attribute names by position")
         
-        if matched_count == 0:
-            logger.warning(f"No semantic features matched by name, fell back to feature names")
+        # Convert to strings and ensure uniqueness
+        clean_names = []
+        seen_names = set()
+        for i, name in enumerate(attribute_names):
+            str_name = str(name)
+            # Make unique if duplicate
+            if str_name in seen_names:
+                counter = 1
+                while f"{str_name}_{counter}" in seen_names:
+                    counter += 1
+                str_name = f"{str_name}_{counter}"
+            clean_names.append(str_name)
+            seen_names.add(str_name)
+        
+        for i, (value, feat_name) in enumerate(zip(row, clean_names)):
+            if pd.isna(value):
+                note_parts.append(f"The {feat_name} is missing.")
+            elif isinstance(value, (int, float)):
+                if value == int(value):
+                    note_parts.append(f"The {feat_name} is {int(value)}.")
+                else:
+                    note_parts.append(f"The {feat_name} is {value:.2f}.")
+            else:
+                note_parts.append(f"The {feat_name} is {value}.")
     
     else:
         # Fallback to Feature_i format
