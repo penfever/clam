@@ -72,15 +72,13 @@ def parse_args():
     parser = create_dataset_evaluation_parser()
     parser.description = "Evaluate baseline models on OpenML CC18 collection"
     
-    # Make task_ids optional by removing the required constraint for dataset source args
-    # Find the dataset source argument group and make it not required
-    for action_group in parser._action_groups:
-        if hasattr(action_group, '_group_actions'):
-            for action in action_group._group_actions:
-                if hasattr(action, 'dest') and action.dest == 'task_ids':
-                    # Found the mutually exclusive group containing task_ids
-                    action_group.required = False
-                    break
+    # Make the dataset source arguments optional by finding and modifying the mutually exclusive group
+    for action in parser._actions:
+        if hasattr(action, 'container') and hasattr(action.container, 'required'):
+            # This is a mutually exclusive group - make it not required
+            if any(hasattr(choice_action, 'dest') and choice_action.dest in ['task_ids', 'dataset_ids', 'dataset_name', 'data_dir', 'num_datasets'] 
+                   for choice_action in getattr(action.container, '_group_actions', [])):
+                action.container.required = False
     
     # Add OpenML CC18 orchestration-specific arguments
     parser.add_argument(
@@ -313,11 +311,13 @@ def main():
     # Get OpenML CC18 tasks
     tasks = get_openml_cc18_tasks()
     
-    # Filter tasks if task_ids is provided
+    # Filter tasks if task_ids is provided, otherwise use all CC18 tasks
     if args.task_ids:
         task_ids = [int(id.strip()) for id in args.task_ids.split(",")]
         tasks = [task for task in tasks if task.task_id in task_ids]
         logger.info(f"Filtered to {len(tasks)} specified tasks")
+    else:
+        logger.info(f"No specific tasks provided, using all {len(tasks)} CC18 tasks")
     
     # Apply start and end indices
     start_idx = args.start_idx
