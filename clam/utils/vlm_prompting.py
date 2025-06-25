@@ -284,7 +284,7 @@ The multiple visualizations provide different perspectives on the same underlyin
     if multi_viz_info:
         # Multi-visualization analysis
         viz_list = ', '.join([viz['method'].upper() for viz in multi_viz_info])
-        analysis_prompt = f"Based on the position of the red star (query {'audio sample' if modality == 'audio' else 'point'}) across ALL {len(multi_viz_info)} visualization methods ({viz_list}), which class should this query {'audio sample' if modality == 'audio' else 'point'} belong to? The available classes are: {class_list_str}"
+        analysis_prompt = f"Based on the position of the red star (query {'audio sample' if modality == 'audio' else 'point'}) across ALL {len(multi_viz_info)} visualization methods ({viz_list}), which class should this query {'audio sample' if modality == 'audio' else 'point'} belong to?"
         
         considerations = [
             f"The spatial relationships across all {len(multi_viz_info)} visualization methods",
@@ -310,7 +310,7 @@ The multiple visualizations provide different perspectives on the same underlyin
             considerations.append("The audio spectrogram patterns that might provide additional context")
             
     elif use_knn:
-        analysis_prompt = f"Based on BOTH the spatial position in the t-SNE visualization AND the explicit nearest neighbor connections, which class should this query {'audio sample' if modality == 'audio' else 'point'} belong to? The available classes are: {class_list_str}"
+        analysis_prompt = f"Based on BOTH the spatial position in the t-SNE visualization AND the explicit nearest neighbor connections, which class should this query {'audio sample' if modality == 'audio' else 'point'} belong to?"
         
         considerations = ["The spatial clustering patterns" + (" across all four 3D views" if use_3d else " in the t-SNE visualization")]
         considerations.append("Which classes the nearest neighbors (connected by red lines) belong to")
@@ -319,7 +319,7 @@ The multiple visualizations provide different perspectives on the same underlyin
         if include_spectrogram and modality == "audio":
             considerations.append("The audio spectrogram patterns that might provide additional context")
     else:
-        analysis_prompt = f"Based on the position of the red star (query {'audio sample' if modality == 'audio' else 'point'}) relative to the colored training points{' across ALL viewing angles' if use_3d else ''}, which class should this query {'audio sample' if modality == 'audio' else 'point'} belong to? The available classes are: {class_list_str}"
+        analysis_prompt = f"Based on the position of the red star (query {'audio sample' if modality == 'audio' else 'point'}) relative to the colored training points{' across ALL viewing angles' if use_3d else ''}, which class should this query {'audio sample' if modality == 'audio' else 'point'} belong to?"
         
         considerations = [f"The spatial relationships in {'3D space by examining all four views' if use_3d else 'the t-SNE visualization'}"]
         considerations.append("Which colored class clusters the red star is closest to or embedded within")
