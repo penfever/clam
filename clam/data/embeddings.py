@@ -782,7 +782,8 @@ def get_dinov2_embeddings(
     
     for i in range(0, len(image_paths), batch_size):
         batch_paths = image_paths[i:i+batch_size]
-        logger.info(f"Processing batch {i//batch_size + 1}/{(len(image_paths) + batch_size - 1)//batch_size}")
+        if i % 20 == 0:
+            logger.info(f"Processing batch {i//batch_size + 1}/{(len(image_paths) + batch_size - 1)//batch_size}")
         
         # Prepare batch
         batch_tensors = []
