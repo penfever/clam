@@ -72,6 +72,16 @@ def parse_args():
     parser = create_dataset_evaluation_parser()
     parser.description = "Evaluate baseline models on OpenML CC18 collection"
     
+    # Make task_ids optional by removing the required constraint for dataset source args
+    # Find the dataset source argument group and make it not required
+    for action_group in parser._action_groups:
+        if hasattr(action_group, '_group_actions'):
+            for action in action_group._group_actions:
+                if hasattr(action, 'dest') and action.dest == 'task_ids':
+                    # Found the mutually exclusive group containing task_ids
+                    action_group.required = False
+                    break
+    
     # Add OpenML CC18 orchestration-specific arguments
     parser.add_argument(
         "--clam_repo_path",
