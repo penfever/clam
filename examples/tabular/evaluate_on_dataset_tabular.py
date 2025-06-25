@@ -1709,10 +1709,10 @@ def main():
         baseline_models = ['catboost', 'tabpfn_v2', 'random_forest', 'gradient_boosting', 'logistic_regression']
         logger.info("All datasets are classification tasks - using full baseline model set")
     elif all_regression:
-        baseline_models = ['catboost', 'random_forest', 'gradient_boosting', 'logistic_regression']  # Exclude TabPFN for now
+        baseline_models = ['catboost', 'tabpfn_v2', 'random_forest', 'gradient_boosting', 'logistic_regression']
         logger.info("All datasets are regression tasks - using regression-compatible baseline models")
     else:
-        baseline_models = ['catboost', 'random_forest', 'gradient_boosting', 'logistic_regression']  # Safe set for mixed tasks
+        baseline_models = ['catboost', 'tabpfn_v2', 'random_forest', 'gradient_boosting', 'logistic_regression']  # Safe set for mixed tasks
         logger.info("Mixed classification/regression tasks - using universally compatible baseline models")
     
     # 2.6. Determine which models to evaluate
@@ -1918,11 +1918,24 @@ def main():
                     'error': str(e)
                 })
         
-        # Calculate average accuracy for this model
-        valid_results = [r for r in model_results if 'accuracy' in r]
+        # Calculate average metrics for this model
+        # For classification: check for 'accuracy', for regression: check for 'mse'
+        valid_results = [r for r in model_results if 'accuracy' in r or 'mse' in r]
         if valid_results:
-            avg_accuracy = sum(r['accuracy'] for r in valid_results) / len(valid_results)
-            logger.info(f"Average accuracy for {model_identifier}: {avg_accuracy:.4f} over {len(valid_results)} datasets")
+            # Calculate appropriate average metric based on task type
+            classification_results = [r for r in valid_results if 'accuracy' in r]
+            regression_results = [r for r in valid_results if 'mse' in r]
+            
+            if classification_results:
+                avg_accuracy = sum(r['accuracy'] for r in classification_results) / len(classification_results)
+                logger.info(f"Average accuracy for {model_identifier}: {avg_accuracy:.4f} over {len(classification_results)} datasets")
+            
+            if regression_results:
+                avg_mse = sum(r['mse'] for r in regression_results) / len(regression_results)
+                avg_r2 = sum(r['r2'] for r in regression_results if not np.isnan(r['r2'])) / len([r for r in regression_results if not np.isnan(r['r2'])]) if any(not np.isnan(r['r2']) for r in regression_results) else None
+                logger.info(f"Average MSE for {model_identifier}: {avg_mse:.4f} over {len(regression_results)} datasets")
+                if avg_r2 is not None:
+                    logger.info(f"Average R² for {model_identifier}: {avg_r2:.4f} over {len(regression_results)} datasets")
             
             # Add to all results
             all_results.extend(model_results)
@@ -1942,9 +1955,18 @@ def main():
                 
                 # Calculate aggregated metrics
                 aggregated_metrics = {
-                    'accuracy': avg_accuracy,
                     'num_valid_datasets': len(valid_results)
                 }
+                
+                # Add classification metrics if available
+                if classification_results:
+                    aggregated_metrics['accuracy'] = avg_accuracy
+                
+                # Add regression metrics if available  
+                if regression_results:
+                    aggregated_metrics['mse'] = avg_mse
+                    if avg_r2 is not None:
+                        aggregated_metrics['r2'] = avg_r2
                 
                 # Calculate average balanced accuracy if available
                 balanced_accs = [r.get('balanced_accuracy') for r in valid_results if r.get('balanced_accuracy') is not None]
