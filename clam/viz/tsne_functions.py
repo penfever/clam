@@ -783,12 +783,15 @@ def create_combined_tsne_3d_plot(
         view_name = view_names[i] if i < len(view_names) else f'View {i+1}'
         legend_text += f"\n- {view_name}: Elevation={elev}°, Azimuth={azim}°"
     
-    # Create metadata
+    # Create metadata with visible classes from legend
+    from .utils.styling import extract_visible_classes_from_legend
+    
     metadata = {
         'n_train_points': len(train_tsne),
         'n_test_points': len(test_tsne),
         'n_classes': len(unique_classes),
         'classes': unique_classes.tolist(),
+        'visible_classes': extract_visible_classes_from_legend(unique_classes, class_names, use_semantic_names),
         'highlighted_point': highlight_test_idx,
         'viewing_angles': viewing_angles,
         'n_views': n_views,
@@ -993,12 +996,15 @@ def create_tsne_plot_with_knn(
     if knn_info and 'knn_description' in knn_info and knn_info['knn_description']:
         legend_text += f"\n\n{knn_info['knn_description']}"
     
-    # Create metadata
+    # Create metadata with visible classes from legend
+    from .utils.styling import extract_visible_classes_from_legend
+    
     metadata = {
         'n_train_points': len(train_tsne),
         'n_test_points': len(test_tsne),
         'n_classes': len(unique_classes),
         'classes': unique_classes.tolist(),
+        'visible_classes': extract_visible_classes_from_legend(unique_classes, class_names, use_semantic_names),
         'highlighted_point': highlight_test_idx,
         'knn_info': knn_info,
         'has_knn_pie_chart': bool(knn_info and ax_pie is not None),
@@ -1458,12 +1464,15 @@ def create_tsne_3d_plot_with_knn(
     if knn_info and 'knn_description' in knn_info and knn_info['knn_description']:
         legend_text += f"\n\n{knn_info['knn_description']}"
     
-    # Create metadata
+    # Create metadata with visible classes from legend
+    from .utils.styling import extract_visible_classes_from_legend
+    
     metadata = {
         'n_train_points': len(train_tsne),
         'n_test_points': len(test_tsne),
         'n_classes': len(unique_classes),
         'classes': unique_classes.tolist(),
+        'visible_classes': extract_visible_classes_from_legend(unique_classes, class_names, use_semantic_names),
         'highlighted_point': highlight_test_idx,
         'viewing_angles': viewing_angles,
         'n_views': n_views,
@@ -2095,6 +2104,7 @@ def create_regression_tsne_plot_with_knn(
         'n_train_points': len(train_tsne),
         'n_test_points': len(test_tsne),
         'target_range': (float(np.min(train_targets)), float(np.max(train_targets))),
+        'visible_classes': [],  # No classes in regression
         'highlighted_point': highlight_test_idx,
         'knn_info': knn_info,
         'zoom_factor': zoom_factor,
@@ -2209,6 +2219,7 @@ def create_combined_regression_tsne_3d_plot(
     # Create metadata
     metadata = {
         'target_range': (vmin, vmax),
+        'visible_classes': [],  # No classes in regression
         'colormap': colormap,
         'query_position': test_tsne[highlight_test_idx].tolist(),
         'viewing_angles': viewing_angles,
@@ -2383,6 +2394,7 @@ def create_regression_tsne_3d_plot_with_knn(
         'n_train_points': len(train_tsne),
         'n_test_points': len(test_tsne),
         'target_range': (float(np.min(train_targets)), float(np.max(train_targets))),
+        'visible_classes': [],  # No classes in regression
         'highlighted_point': highlight_test_idx,
         'knn_info': knn_info,
         'zoom_factor': zoom_factor,
@@ -2392,3 +2404,392 @@ def create_regression_tsne_3d_plot_with_knn(
     }
     
     return fig, legend_text, metadata
+# ================================================================================
+# NEW CLASS-BASED WRAPPER FUNCTIONS FOR BACKWARD COMPATIBILITY
+# ================================================================================
+
+def _create_tsne_visualization_from_class(
+    train_tsne,
+    test_tsne,
+    train_labels,
+    highlight_test_idx=None,
+    figsize=(10, 8),
+    zoom_factor=2.0,
+    class_names=None,
+    use_semantic_names=False,
+    use_3d=False,
+    viewing_angles=None,
+    use_knn_connections=False,
+    train_embeddings=None,
+    test_embeddings=None,
+    k=5,
+    semantic_axes_labels=None,
+    task_type='classification'
+):
+    """
+    Create t-SNE visualization using the new class-based approach.
+    
+    This function serves as a bridge between the old function-based API
+    and the new class-based visualization system.
+    """
+    from .tsne.classification import TSNEClassificationVisualization
+    from .tsne.regression import TSNERegressionVisualization
+    from .base import VisualizationConfig
+    import matplotlib.pyplot as plt
+    
+    # Create configuration
+    config = VisualizationConfig(
+        figsize=figsize,
+        use_3d=use_3d,
+        viewing_angles=viewing_angles,
+        use_knn_connections=use_knn_connections,
+        nn_k=k,
+        zoom_factor=zoom_factor,
+        task_type=task_type,
+        tight_layout=True
+    )
+    
+    # Choose visualization class based on task type
+    if task_type == 'regression':
+        viz = TSNERegressionVisualization(config)
+    else:
+        viz = TSNEClassificationVisualization(config)
+    
+    # Set class information for consistent legend generation
+    viz.set_class_info(class_names, use_semantic_names)
+    
+    # Set KNN data if needed
+    if use_knn_connections and train_embeddings is not None:
+        viz.set_knn_data(train_embeddings, train_labels, test_embeddings)
+    
+    # Mock the fitting state (since we already have transformed coordinates)
+    viz._fitted = True
+    viz._train_size = len(train_tsne)
+    
+    # Generate the plot
+    result = viz.generate_plot(
+        transformed_data=train_tsne,
+        y=train_labels,
+        test_data=test_tsne,
+        highlight_test_indices=[highlight_test_idx] if highlight_test_idx is not None else None
+    )
+    
+    # Convert back to old format for compatibility
+    # Create a matplotlib figure from the PIL image
+    fig = plt.figure(figsize=figsize, dpi=config.dpi)
+    ax = fig.add_subplot(111)
+    ax.imshow(result.image)
+    ax.axis('off')
+    
+    return fig, result.legend_text, result.metadata
+
+
+# Wrapper functions that use the new class-based implementation
+def create_combined_tsne_plot_new(
+    train_tsne,
+    test_tsne,
+    train_labels,
+    highlight_test_idx=None,
+    figsize=(10, 8),
+    zoom_factor=2.0,
+    class_names=None,
+    use_semantic_names=False,
+    use_3d=False,
+    semantic_axes_labels=None
+):
+    """
+    Wrapper for create_combined_tsne_plot using new class-based implementation.
+    
+    This function maintains backward compatibility while using the improved
+    TSNEClassificationVisualization class internally.
+    """
+    import warnings
+    warnings.warn(
+        "create_combined_tsne_plot is deprecated. Use TSNEClassificationVisualization directly.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    
+    return _create_tsne_visualization_from_class(
+        train_tsne=train_tsne,
+        test_tsne=test_tsne,
+        train_labels=train_labels,
+        highlight_test_idx=highlight_test_idx,
+        figsize=figsize,
+        zoom_factor=zoom_factor,
+        class_names=class_names,
+        use_semantic_names=use_semantic_names,
+        use_3d=False,
+        semantic_axes_labels=semantic_axes_labels,
+        task_type='classification'
+    )
+
+
+def create_combined_tsne_3d_plot_new(
+    train_tsne,
+    test_tsne,
+    train_labels,
+    highlight_test_idx=None,
+    figsize=(12, 9),
+    viewing_angles=None,
+    zoom_factor=2.0,
+    class_names=None,
+    use_semantic_names=False,
+    semantic_axes_labels=None
+):
+    """
+    Wrapper for create_combined_tsne_3d_plot using new class-based implementation.
+    """
+    import warnings
+    warnings.warn(
+        "create_combined_tsne_3d_plot is deprecated. Use TSNEClassificationVisualization directly.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    
+    return _create_tsne_visualization_from_class(
+        train_tsne=train_tsne,
+        test_tsne=test_tsne,
+        train_labels=train_labels,
+        highlight_test_idx=highlight_test_idx,
+        figsize=figsize,
+        zoom_factor=zoom_factor,
+        class_names=class_names,
+        use_semantic_names=use_semantic_names,
+        use_3d=True,
+        viewing_angles=viewing_angles,
+        semantic_axes_labels=semantic_axes_labels,
+        task_type='classification'
+    )
+
+
+def create_tsne_plot_with_knn_new(
+    train_tsne,
+    test_tsne,
+    train_labels,
+    train_embeddings,
+    test_embeddings,
+    highlight_test_idx=None,
+    k=5,
+    figsize=(14, 10),
+    zoom_factor=2.0,
+    class_names=None,
+    use_semantic_names=False
+):
+    """
+    Wrapper for create_tsne_plot_with_knn using new class-based implementation.
+    """
+    import warnings
+    warnings.warn(
+        "create_tsne_plot_with_knn is deprecated. Use TSNEClassificationVisualization directly.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    
+    return _create_tsne_visualization_from_class(
+        train_tsne=train_tsne,
+        test_tsne=test_tsne,
+        train_labels=train_labels,
+        highlight_test_idx=highlight_test_idx,
+        figsize=figsize,
+        zoom_factor=zoom_factor,
+        class_names=class_names,
+        use_semantic_names=use_semantic_names,
+        use_3d=False,
+        use_knn_connections=True,
+        train_embeddings=train_embeddings,
+        test_embeddings=test_embeddings,
+        k=k,
+        task_type='classification'
+    )
+
+
+def create_tsne_3d_plot_with_knn_new(
+    train_tsne,
+    test_tsne,
+    train_labels,
+    train_embeddings,
+    test_embeddings,
+    highlight_test_idx=None,
+    k=5,
+    figsize=(20, 15),
+    viewing_angles=None,
+    zoom_factor=2.0,
+    class_names=None,
+    use_semantic_names=False
+):
+    """
+    Wrapper for create_tsne_3d_plot_with_knn using new class-based implementation.
+    """
+    import warnings
+    warnings.warn(
+        "create_tsne_3d_plot_with_knn is deprecated. Use TSNEClassificationVisualization directly.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    
+    return _create_tsne_visualization_from_class(
+        train_tsne=train_tsne,
+        test_tsne=test_tsne,
+        train_labels=train_labels,
+        highlight_test_idx=highlight_test_idx,
+        figsize=figsize,
+        zoom_factor=zoom_factor,
+        class_names=class_names,
+        use_semantic_names=use_semantic_names,
+        use_3d=True,
+        viewing_angles=viewing_angles,
+        use_knn_connections=True,
+        train_embeddings=train_embeddings,
+        test_embeddings=test_embeddings,
+        k=k,
+        task_type='classification'
+    )
+
+
+# Regression wrapper functions
+def create_combined_regression_tsne_plot_new(
+    train_tsne,
+    test_tsne,
+    train_targets,
+    highlight_test_idx=0,
+    figsize=(8, 6),
+    zoom_factor=1.0,
+    colormap='RdBu_r'
+):
+    """
+    Wrapper for create_combined_regression_tsne_plot using new class-based implementation.
+    """
+    import warnings
+    warnings.warn(
+        "create_combined_regression_tsne_plot is deprecated. Use TSNERegressionVisualization directly.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    
+    return _create_tsne_visualization_from_class(
+        train_tsne=train_tsne,
+        test_tsne=test_tsne,
+        train_labels=train_targets,
+        highlight_test_idx=highlight_test_idx,
+        figsize=figsize,
+        zoom_factor=zoom_factor,
+        use_3d=False,
+        task_type='regression'
+    )
+
+
+def create_regression_tsne_plot_with_knn_new(
+    train_tsne,
+    test_tsne,
+    train_targets,
+    train_embeddings,
+    test_embeddings,
+    highlight_test_idx=0,
+    k=5,
+    figsize=(14, 10),
+    zoom_factor=2.0,
+    colormap='viridis'
+):
+    """
+    Wrapper for create_regression_tsne_plot_with_knn using new class-based implementation.
+    """
+    import warnings
+    warnings.warn(
+        "create_regression_tsne_plot_with_knn is deprecated. Use TSNERegressionVisualization directly.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    
+    return _create_tsne_visualization_from_class(
+        train_tsne=train_tsne,
+        test_tsne=test_tsne,
+        train_labels=train_targets,
+        highlight_test_idx=highlight_test_idx,
+        figsize=figsize,
+        zoom_factor=zoom_factor,
+        use_3d=False,
+        use_knn_connections=True,
+        train_embeddings=train_embeddings,
+        test_embeddings=test_embeddings,
+        k=k,
+        task_type='regression'
+    )
+
+
+def create_combined_regression_tsne_3d_plot_new(
+    train_tsne,
+    test_tsne,
+    train_targets,
+    highlight_test_idx=0,
+    figsize=(12, 9),
+    viewing_angles=None,
+    zoom_factor=1.0,
+    colormap='RdBu_r'
+):
+    """
+    Wrapper for create_combined_regression_tsne_3d_plot using new class-based implementation.
+    """
+    import warnings
+    warnings.warn(
+        "create_combined_regression_tsne_3d_plot is deprecated. Use TSNERegressionVisualization directly.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    
+    return _create_tsne_visualization_from_class(
+        train_tsne=train_tsne,
+        test_tsne=test_tsne,
+        train_labels=train_targets,
+        highlight_test_idx=highlight_test_idx,
+        figsize=figsize,
+        zoom_factor=zoom_factor,
+        use_3d=True,
+        viewing_angles=viewing_angles,
+        task_type='regression'
+    )
+
+
+def create_regression_tsne_3d_plot_with_knn_new(
+    train_tsne,
+    test_tsne,
+    train_targets,
+    train_embeddings,
+    test_embeddings,
+    highlight_test_idx=0,
+    k=5,
+    figsize=(16, 10),
+    viewing_angles=None,
+    zoom_factor=1.0,
+    colormap='viridis'
+):
+    """
+    Wrapper for create_regression_tsne_3d_plot_with_knn using new class-based implementation.
+    """
+    import warnings
+    warnings.warn(
+        "create_regression_tsne_3d_plot_with_knn is deprecated. Use TSNERegressionVisualization directly.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    
+    return _create_tsne_visualization_from_class(
+        train_tsne=train_tsne,
+        test_tsne=test_tsne,
+        train_labels=train_targets,
+        highlight_test_idx=highlight_test_idx,
+        figsize=figsize,
+        zoom_factor=zoom_factor,
+        use_3d=True,
+        viewing_angles=viewing_angles,
+        use_knn_connections=True,
+        train_embeddings=train_embeddings,
+        test_embeddings=test_embeddings,
+        k=k,
+        task_type='regression'
+    )
+
+
+# Optional: Enable new implementations by setting an environment variable
+import os
+_USE_NEW_IMPLEMENTATIONS = os.environ.get('CLAM_USE_NEW_TSNE', 'false').lower() == 'true'
