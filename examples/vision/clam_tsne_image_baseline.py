@@ -690,8 +690,17 @@ class ClamImageTsneClassifier:
                 )
                 
                 # Create prompt using utility function
+                # Use only the classes visible in training data for the prompt
+                visible_classes = np.unique(self.y_train_plot)
+                if self.use_semantic_names:
+                    # Use semantic names for visible classes only
+                    classes_for_prompt = [self.class_names[i] for i in visible_classes] if self.class_names else visible_classes.tolist()
+                else:
+                    # Use class indices for visible classes only
+                    classes_for_prompt = visible_classes.tolist()
+                
                 prompt = create_classification_prompt(
-                    class_names=self.class_names if self.use_semantic_names else (self.unique_classes.tolist() if hasattr(self.unique_classes, 'tolist') else self.unique_classes),
+                    class_names=classes_for_prompt,
                     modality="image",
                     use_knn=self.use_knn_connections and not self.use_pca_backend,
                     use_3d=self.use_3d,
