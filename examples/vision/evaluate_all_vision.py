@@ -513,7 +513,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
             
             eval_results = classifier.evaluate(
                 test_paths, test_labels, 
-                return_detailed=True,
+                return_detailed=args.return_detailed,
                 save_outputs=args.save_outputs,
                 output_dir=args.output_dir if args.save_outputs else None
             )
@@ -942,6 +942,15 @@ def parse_args():
         dest="save_outputs",
         action="store_false",
         help="Disable saving visualizations and VLM responses"
+    )
+    
+    # Add return_detailed parameter
+    parser.add_argument(
+        "--no_detailed_outputs",
+        dest="return_detailed",
+        action="store_false",
+        default=True,
+        help="Disable detailed prediction outputs (VLM responses, coordinates, etc.)"
     )
     
     # Add new parameters

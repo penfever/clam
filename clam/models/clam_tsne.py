@@ -1363,7 +1363,7 @@ class ClamTsneClassifier:
                                 all_visible_classes.update(self.unique_classes)
                         
                         visible_classes_list = sorted(list(all_visible_classes))
-                        visible_semantic_names = [self.class_to_semantic.get(cls, str(cls)) for cls in visible_classes_list]
+                        visible_class_names = [self.class_to_semantic.get(cls, str(cls)) for cls in visible_classes_list]
                         
                         # Prepare multi-viz info for the enhanced prompt
                         multi_viz_info = []
@@ -1377,7 +1377,7 @@ class ClamTsneClassifier:
                         class_count = len(self.unique_classes) if self.unique_classes is not None else 0
                         highlight_count = len(highlight_indices) if highlight_indices is not None else 0
                         prompt = create_classification_prompt(
-                            class_names=visible_semantic_names,
+                            class_names=visible_class_names,
                             modality=self.modality,
                             dataset_description=f"{self.modality.title()} data with {class_count} classes and {highlight_count} highlighted test point(s)",
                             use_semantic_names=self.use_semantic_names,
@@ -1581,7 +1581,7 @@ class ClamTsneClassifier:
                             visible_classes.update(set(metadata['knn_info']['neighbor_classes']))
                         
                         visible_classes_list = sorted(list(visible_classes))
-                        visible_semantic_names = [self.class_to_semantic[cls] for cls in visible_classes_list]
+                        visible_class_names = [self.class_to_semantic[cls] for cls in visible_classes_list]
                         
                         # Create classification prompt
                         from clam.utils.vlm_prompting import create_classification_prompt, parse_vlm_response
@@ -1597,7 +1597,7 @@ class ClamTsneClassifier:
                                 enhanced_legend = f"{legend_text}\n\n{semantic_axes_legend}"
                         
                         prompt = create_classification_prompt(
-                            class_names=visible_semantic_names,
+                            class_names=visible_class_names,
                             modality=self.modality,
                             use_knn=self.use_knn_connections,
                             use_3d=self.use_3d,
@@ -1605,7 +1605,8 @@ class ClamTsneClassifier:
                             legend_text=enhanced_legend,
                             dataset_description=f"{self.modality.title()} data embedded using appropriate features",
                             use_semantic_names=self.use_semantic_names,
-                            dataset_metadata=self._get_metadata_for_prompt()
+                            dataset_metadata=self._get_metadata_for_prompt(),
+                            visible_classes=visible_class_names
                         )
                         
                         # Create conversation
@@ -1625,14 +1626,14 @@ class ClamTsneClassifier:
                         # Parse prediction for classification
                         prediction = parse_vlm_response(
                             response, 
-                            visible_semantic_names, 
+                            visible_class_names, 
                             self.logger, 
                             use_semantic_names=self.use_semantic_names,
                             task_type='classification'
                         )
                         
                         # Map back to numeric label if needed
-                        if prediction in visible_semantic_names:
+                        if prediction in visible_class_names:
                             semantic_to_numeric = {name: cls for cls, name in self.class_to_semantic.items() if cls in visible_classes_list}
                             prediction = semantic_to_numeric.get(prediction, prediction)
                 
@@ -1668,18 +1669,18 @@ class ClamTsneClassifier:
                                 all_visible_classes.update(self.unique_classes)
                         
                         visible_classes_list = sorted(list(all_visible_classes))
-                        visible_semantic_names = [self.class_to_semantic.get(cls, str(cls)) for cls in visible_classes_list]
+                        visible_class_names = [self.class_to_semantic.get(cls, str(cls)) for cls in visible_classes_list]
                         
                         prediction = parse_vlm_response(
                             response, 
-                            visible_semantic_names, 
+                            visible_class_names, 
                             self.logger, 
                             use_semantic_names=self.use_semantic_names,
                             task_type='classification'
                         )
                         
                         # Map back to numeric label if needed
-                        if prediction in visible_semantic_names:
+                        if prediction in visible_class_names:
                             semantic_to_numeric = {name: cls for cls, name in self.class_to_semantic.items() if cls in visible_classes_list}
                             prediction = semantic_to_numeric.get(prediction, prediction)
                     else:

@@ -167,6 +167,25 @@ def create_class_legend(unique_classes: np.ndarray, class_color_map: Dict, class
     """
     legend_lines = ["Class Legend:"]
     
+    # Get all distinct colors that were actually assigned to ensure unique names
+    distinct_colors = get_distinct_colors(len(unique_classes))
+    color_name_map = {}
+    used_names = set()
+    
+    # Build a mapping from class to unique color name
+    for i, class_label in enumerate(unique_classes):
+        color_array, original_name = distinct_colors[i]
+        
+        # Ensure uniqueness by appending a number if name is already used
+        unique_name = original_name
+        counter = 1
+        while unique_name in used_names:
+            unique_name = f"{original_name}_{counter}"
+            counter += 1
+        
+        used_names.add(unique_name)
+        color_name_map[class_label] = unique_name
+    
     for class_label in unique_classes:
         color = class_color_map[class_label]
         
@@ -176,19 +195,8 @@ def create_class_legend(unique_classes: np.ndarray, class_color_map: Dict, class
         else:
             rgb = (128, 128, 128)  # Default gray
         
-        # Get semantic color name
-        color_name = "Unknown"
-        if hasattr(color, '__len__') and len(color) >= 3:
-            # Find the closest semantic color name
-            color_array = np.array(color[:3])
-            distinct_colors = get_distinct_colors(15)  # Get all available colors
-            
-            min_distance = float('inf')
-            for color_ref, name in distinct_colors:
-                distance = np.linalg.norm(color_array - color_ref)
-                if distance < min_distance:
-                    min_distance = distance
-                    color_name = name
+        # Get the guaranteed unique color name
+        color_name = color_name_map[class_label]
         
         # Format class label consistently
         if use_semantic_names and class_names and class_label < len(class_names):
