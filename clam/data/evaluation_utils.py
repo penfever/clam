@@ -74,6 +74,42 @@ def load_datasets_for_evaluation(args) -> List[Dict[str, Any]]:
             except Exception as e:
                 logger.error(f"Failed to load dataset {dataset_id}: {e}")
     
+    # Case 2b: Load from task IDs
+    elif args.task_ids:
+        task_ids = [int(id.strip()) for id in args.task_ids.split(",")]
+        logger.info(f"Loading {len(task_ids)} datasets from provided task IDs: {task_ids}")
+        preserve_regression = getattr(args, 'preserve_regression', False)
+        
+        # Get resource manager to resolve task IDs to dataset IDs
+        from clam.utils.resource_manager import get_resource_manager
+        rm = get_resource_manager()
+        
+        for task_id in task_ids:
+            try:
+                # Resolve task_id to dataset_id
+                identifiers = rm.resolve_openml_identifiers(task_id=task_id)
+                dataset_id = identifiers.get('dataset_id')
+                
+                if dataset_id is None:
+                    logger.error(f"Could not resolve task ID {task_id} to dataset ID")
+                    continue
+                    
+                logger.info(f"Task ID {task_id} resolves to dataset ID {dataset_id}")
+                
+                X, y, categorical_indicator, attribute_names, dataset_name = load_dataset(str(dataset_id), preserve_regression=preserve_regression)
+                datasets.append({
+                    "id": str(dataset_id),
+                    "name": dataset_name,
+                    "task_id": task_id,  # Include task_id in the dataset dict
+                    "X": X,
+                    "y": y,
+                    "categorical_indicator": categorical_indicator,
+                    "attribute_names": attribute_names
+                })
+                logger.info(f"Successfully loaded dataset {dataset_name} (task ID: {task_id}, dataset ID: {dataset_id})")
+            except Exception as e:
+                logger.error(f"Failed to load dataset for task ID {task_id}: {e}")
+    
     # Case 3: Load from directory of CSV files
     elif args.data_dir:
         logger.info(f"Loading datasets from directory: {args.data_dir}")
