@@ -353,6 +353,18 @@ def process_one_sample(
                 visible_classes.extend(viz_visible)
         visible_classes = list(set(visible_classes))  # Remove duplicates
         
+        # Explicit error check: visible_classes should never be empty for classification tasks
+        if classifier_instance.task_type == 'classification' and not visible_classes:
+            viz_methods = [viz.method_name for viz in classifier_instance.context_composer.visualizations]
+            viz_metadata = {viz.method_name: getattr(viz, 'metadata', {}) for viz in classifier_instance.context_composer.visualizations}
+            raise ValueError(
+                f"Empty visible_classes detected in multi-visualization context. "
+                f"This indicates a bug in visualization metadata generation. "
+                f"Visualization methods: {viz_methods}, "
+                f"All classes: {all_classes}, "
+                f"Visualization metadata: {viz_metadata}"
+            )
+        
         # Create prompt for multi-viz
         if classifier_instance.task_type == 'regression':
             multi_viz_info = _create_multi_viz_info(classifier_instance.context_composer, classifier_instance.modality)
@@ -384,6 +396,15 @@ def process_one_sample(
         
         # Get visible classes from visualization metadata
         visible_classes = _get_visible_classes_from_metadata(metadata)
+        
+        # Explicit error check: visible_classes should never be empty for classification tasks
+        if classifier_instance.task_type == 'classification' and not visible_classes:
+            raise ValueError(
+                f"Empty visible_classes detected in single visualization context. "
+                f"This indicates a bug in visualization metadata generation. "
+                f"All classes: {all_classes}, "
+                f"Visualization metadata: {metadata}"
+            )
         
         # Create prompt for single viz
         if classifier_instance.task_type == 'regression':

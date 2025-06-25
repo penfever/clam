@@ -344,6 +344,9 @@ class BaseVisualization(ABC):
         # Add method-specific quality metrics
         self._add_quality_metrics(result)
         
+        # IMPORTANT: Update the instance metadata so it's available to context composer
+        self.metadata = result.metadata.copy()
+        
         self._last_result = result
         return result
     
