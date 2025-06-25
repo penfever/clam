@@ -131,6 +131,8 @@ def preprocess_features(X: np.ndarray, categorical_indicator: List[bool], preser
                 logger.info(f"Preserving categorical feature at column {col_idx}")
                 # Just handle missing values
                 col_filled = col.fillna('missing')
+                # Ensure we can assign string values by converting the column dtype first
+                df.iloc[:, col_idx] = df.iloc[:, col_idx].astype(object)
                 df.iloc[:, col_idx] = col_filled.astype(str)
                 logger.info(f"  Preserved categorical feature with {col_filled.nunique()} unique values")
             else:
@@ -146,16 +148,24 @@ def preprocess_features(X: np.ndarray, categorical_indicator: List[bool], preser
                     encoder = LabelEncoder()
                     encoded_values = encoder.fit_transform(col_filled)
                     
-                    # Get destination dtype
-                    dest_dtype = df.iloc[:, col_idx].dtype
+                    # Ensure column can accept the encoded values
+                    # Convert to appropriate dtype that can hold the encoded values
+                    if encoded_values.max() <= 127 and encoded_values.min() >= -128:
+                        target_dtype = 'int8'
+                    elif encoded_values.max() <= 32767 and encoded_values.min() >= -32768:
+                        target_dtype = 'int16'
+                    else:
+                        target_dtype = 'int32'
                     
-                    # Assign with same dtype
-                    df.iloc[:, col_idx] = pd.Series(encoded_values, index=df.index, dtype=dest_dtype)
+                    # Assign with compatible dtype
+                    df.iloc[:, col_idx] = df.iloc[:, col_idx].astype(target_dtype)
+                    df.iloc[:, col_idx] = pd.Series(encoded_values, index=df.index, dtype=target_dtype)
                     logger.info(f"  Encoded {len(encoder.classes_)} unique categories for column {col_idx}")
                 except Exception as e:
                     logger.warning(f"  Error encoding column {col_idx}: {e}")
                     # If encoding fails, replace with zeros
-                    df.iloc[:, col_idx] = pd.Series(np.zeros(len(df), dtype=int), index=df.index)
+                    df.iloc[:, col_idx] = df.iloc[:, col_idx].astype('int32')
+                    df.iloc[:, col_idx] = pd.Series(np.zeros(len(df), dtype='int32'), index=df.index)
         else:
             # For numeric features
             if preserve_categorical:
@@ -177,7 +187,11 @@ def preprocess_features(X: np.ndarray, categorical_indicator: List[bool], preser
                         fill_value = col.median() if not np.isnan(col.median()) else 0
                     
                     # Use Series constructor to ensure type compatibility
-                    df.iloc[:, col_idx] = pd.Series(col.fillna(fill_value), index=df.index)
+                    filled_col = col.fillna(fill_value)
+                    # Ensure compatible dtype before assignment
+                    if df.iloc[:, col_idx].dtype != filled_col.dtype:
+                        df.iloc[:, col_idx] = df.iloc[:, col_idx].astype(filled_col.dtype)
+                    df.iloc[:, col_idx] = pd.Series(filled_col, index=df.index)
                     logger.info(f"  Filled {col.isna().sum()} missing values in column {col_idx}")
     
     # Convert back to numpy array
