@@ -1,1 +1,0 @@
-Class: Bad credit risk (not creditworthy) | Reasoning: The red star is consistently closest to the class labeled "2" (Bad credit risk) across both PCA and t-SNE visualizations. This suggests that the query point is more aligned with the characteristics of the "Bad credit risk" class, as indicated by the position of the red star in both PCA and t-SNE plots.

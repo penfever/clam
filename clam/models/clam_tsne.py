@@ -1605,8 +1605,7 @@ class ClamTsneClassifier:
                             legend_text=enhanced_legend,
                             dataset_description=f"{self.modality.title()} data embedded using appropriate features",
                             use_semantic_names=self.use_semantic_names,
-                            dataset_metadata=self._get_metadata_for_prompt(),
-                            visible_classes=visible_class_names
+                            dataset_metadata=self._get_metadata_for_prompt()
                         )
                         
                         # Create conversation
