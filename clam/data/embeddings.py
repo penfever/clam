@@ -664,65 +664,28 @@ def load_dinov2_model(model_name: str = "dinov2_vitb14", device: Optional[str] =
             - "dinov2_vitl14_lc": ViT-Large with linear classifier
             - "dinov2_vitg14_lc": ViT-Giant with linear classifier
             
-        device: Device to load the model on. If None, auto-detects GPU/CPU
+        device: Device to load the model on. If None, auto-detects optimal device
         
     Returns:
         Loaded DINOV2 model
     """
-    if device is None:
-        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    from ..utils.device_utils import configure_device_for_model, log_device_usage, setup_device_environment
     
-    # Mac compatibility: force CPU and disable MPS
-    import sys
-    if sys.platform == "darwin":
-        device = 'cpu'
-        # Disable MPS on Mac to avoid compatibility issues
-        if hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
-            os.environ['PYTORCH_ENABLE_MPS_FALLBACK'] = '1'
-        logger.info("Mac detected: using CPU and MPS fallback for DINOV2")
+    # Configure device for DINOV2
+    device, _ = configure_device_for_model('dinov2', device)
+    setup_device_environment(device)
+    log_device_usage(f"DINOV2 {model_name}", device)
     
     try:
-        # Load model from torch.hub with Mac-specific settings
-        if sys.platform == "darwin":
-            # Set environment variables for Mac compatibility
-            old_force_share = os.environ.get('TORCH_HOME', '')
-            os.environ['TORCH_HOME'] = os.path.expanduser('~/.cache/torch')
-            
-            # Use CPU-specific loading for Mac
-            model = torch.hub.load(
-                'facebookresearch/dinov2', 
-                model_name, 
-                pretrained=True,
-                force_reload=False
-            )
-        else:
-            model = torch.hub.load('facebookresearch/dinov2', model_name, pretrained=True)
-        
+        # Load model from torch.hub
+        model = torch.hub.load('facebookresearch/dinov2', model_name, pretrained=True)
         model = model.to(device)
         model.eval()
-        
-        # Set model to use deterministic algorithms for Mac stability
-        if sys.platform == "darwin":
-            torch.use_deterministic_algorithms(False)  # Disable for compatibility
         
         logger.info(f"Loaded DINOV2 model {model_name} on {device}")
         return model
     except Exception as e:
         logger.error(f"Failed to load DINOV2 model {model_name}: {e}")
-        # Try fallback loading method for Mac
-        if sys.platform == "darwin":
-            logger.info("Trying fallback loading method for Mac...")
-            try:
-                import torchvision.models as models
-                # Create a simpler fallback model for testing
-                model = models.resnet18(pretrained=True)
-                model.fc = torch.nn.Identity()  # Remove final layer to get features
-                model = model.to(device)
-                model.eval()
-                logger.warning(f"Using ResNet18 fallback instead of {model_name}")
-                return model
-            except Exception as e2:
-                logger.error(f"Fallback also failed: {e2}")
         raise
 
 
@@ -777,14 +740,11 @@ def get_dinov2_embeddings(
     Returns:
         embeddings: Array of shape [n_images, embedding_size]
     """
-    if device is None:
-        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    from ..utils.device_utils import configure_device_for_model, log_device_usage
     
-    # Mac compatibility
-    import sys
-    if sys.platform == "darwin":
-        device = 'cpu'
-        batch_size = min(batch_size, 16)  # Reduce batch size on Mac
+    # Configure device and batch size for DINOV2
+    device, batch_size = configure_device_for_model('dinov2', device, batch_size)
+    log_device_usage(f"DINOV2 embeddings {model_name}", device, {'batch_size': batch_size})
     
     # Setup caching if enabled
     cache_file = None

@@ -43,9 +43,10 @@ def load_whisper_model(model_name: str = "large-v2", device: Optional[str] = Non
         
         logger.info(f"Loading Whisper model: {model_name}")
         
-        # Determine device
-        if device is None:
-            device = "cuda" if torch.cuda.is_available() else "cpu"
+        # Determine device using centralized utility
+        from ..utils.device_utils import configure_device_for_model, log_device_usage
+        device, _ = configure_device_for_model('whisper', device)
+        log_device_usage(f"Whisper {model_name}", device)
             
         # Map model names to HuggingFace IDs
         model_map = {
@@ -269,8 +270,11 @@ def load_clap_model(version: str = "2023", use_cuda: Optional[bool] = None) -> A
         logger.info(f"Loading CLAP model version: {version}")
         
         # Auto-detect device if not specified
+        from ..utils.device_utils import detect_optimal_device, log_device_usage
         if use_cuda is None:
-            use_cuda = torch.cuda.is_available()
+            device = detect_optimal_device()
+            use_cuda = (device == 'cuda')
+            log_device_usage(f"CLAP {version}", device)
             
         model = CLAP(version=version, use_cuda=use_cuda)
         

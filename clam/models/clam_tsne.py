@@ -62,8 +62,9 @@ class BioClip2EmbeddingExtractor:
     """Extract embeddings using BioCLIP-2 model."""
     
     def __init__(self, model_name: str = "hf-hub:imageomics/bioclip-2", device: str = "auto"):
+        from clam.utils.device_utils import detect_optimal_device
         self.model_name = model_name
-        self.device = device if device != "auto" else ("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = device if device != "auto" else detect_optimal_device()
         self.model = None
         self.preprocess = None
         self.logger = logging.getLogger(__name__)
