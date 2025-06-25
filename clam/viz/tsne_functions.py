@@ -61,6 +61,32 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 
+def add_semantic_legend_to_plot(fig, ax, semantic_axes_labels, max_chars_per_line=80, max_lines=2):
+    """
+    Add a bottom legend for semantic axes to prevent overlap with plot elements.
+    
+    Args:
+        fig: Matplotlib figure object
+        ax: Matplotlib axes object
+        semantic_axes_labels: Dictionary mapping axis names to semantic descriptions
+        max_chars_per_line: Maximum characters per line in legend
+        max_lines: Maximum number of lines in legend
+    """
+    if not semantic_axes_labels:
+        return
+    
+    # Create bottom legend text
+    legend_text = create_bottom_legend_text(
+        semantic_axes_labels,
+        max_chars_per_line=max_chars_per_line,
+        max_lines=max_lines
+    )
+    
+    if legend_text:
+        # Add text at bottom of figure, outside the plot area
+        fig.text(0.5, 0.02, legend_text, ha='center', va='bottom', 
+                fontsize=8, wrap=True, bbox=dict(boxstyle="round,pad=0.3", 
+                facecolor='lightgray', alpha=0.8))
 
 
 def create_tsne_visualization(

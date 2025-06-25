@@ -170,8 +170,8 @@ def create_classification_prompt(
         Formatted prompt string
     """
     # Format class list consistently - class names are already validated at source
-    if use_semantic_names and not all(isinstance(name, (int, float)) for name in class_names):
-        # Use pre-validated semantic class names (validated in class_name_utils.py)
+    if use_semantic_names:
+        # Use semantic class names when use_semantic_names=True
         class_list_str = ", ".join([f'"{name}"' for name in class_names])
         class_format_example = f'"{class_names[0]}", "{class_names[1]}", etc.' if len(class_names) >= 2 else f'"{class_names[0]}"'
     else:
