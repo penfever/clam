@@ -94,7 +94,6 @@ Vision Examples (``examples/vision/``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ``evaluate_all_vision.py`` - Comprehensive vision evaluation
-* ``clam_tsne_image_baseline.py`` - CLAM t-SNE baseline
 * ``openai_vlm_baseline.py`` - OpenAI API integration
 * ``gemini_vlm_baseline.py`` - Google Gemini integration
 * ``qwen_vl_baseline.py`` - Qwen VL local model

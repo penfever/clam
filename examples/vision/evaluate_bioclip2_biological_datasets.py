@@ -57,7 +57,7 @@ from clam.utils import (
     MetricsLogger
 )
 
-from examples.vision.clam_tsne_image_baseline import ClamImageTsneClassifier
+from clam.models.clam_tsne import ClamImageTsneClassifier
 from examples.vision.qwen_vl_baseline import QwenVLBaseline
 from examples.vision.image_baselines import DINOV2LinearProbe
 
@@ -690,14 +690,39 @@ def test_single_dataset(dataset_name: str, args):
     else:
         raise ValueError(f"Unsupported dataset: {dataset_name}")
     
-    # Use subset for quick testing
-    if args.quick_test:
-        logger.info("Running quick test with subset of data")
-        max_train = min(50, len(train_paths))
-        train_paths = train_paths[:max_train]
-        train_labels = train_labels[:max_train]
-        test_paths = test_paths[:20]
-        test_labels = test_labels[:20]
+    # Apply balanced few-shot sampling if requested
+    if args.balanced_few_shot:
+        logger.info(f"Using balanced few-shot sampling with {args.num_few_shot_examples} examples per class")
+        from sklearn.model_selection import train_test_split
+        from collections import Counter
+        import numpy as np
+        
+        # Group training data by class
+        class_data = {}
+        for path, label in zip(train_paths, train_labels):
+            if label not in class_data:
+                class_data[label] = []
+            class_data[label].append(path)
+        
+        # Sample balanced few-shot examples
+        sampled_paths = []
+        sampled_labels = []
+        for label, paths in class_data.items():
+            n_samples = min(args.num_few_shot_examples, len(paths))
+            sampled_indices = np.random.choice(len(paths), n_samples, replace=False)
+            for idx in sampled_indices:
+                sampled_paths.append(paths[idx])
+                sampled_labels.append(label)
+        
+        train_paths = sampled_paths
+        train_labels = sampled_labels
+        logger.info(f"Sampled {len(train_paths)} training examples across {len(class_names)} classes")
+    
+    # Apply max test samples limit if specified
+    if args.max_test_samples and len(test_paths) > args.max_test_samples:
+        logger.info(f"Limiting test set to {args.max_test_samples} samples")
+        test_paths = test_paths[:args.max_test_samples]
+        test_labels = test_labels[:args.max_test_samples]
     
     # Test BioClip2 + KNN
     if 'bioclip2_knn' in args.models:
@@ -738,6 +763,7 @@ def test_single_dataset(dataset_name: str, args):
                 num_classes=len(class_names),
                 class_names=class_names,
                 model_name=args.vlm_model_id,
+                backend=args.backend,
                 use_semantic_names=args.use_semantic_names
             )
             
@@ -827,12 +853,14 @@ def test_single_dataset(dataset_name: str, args):
         logger.info("Testing CLAM t-SNE with BioClip2 backend...")
         try:
             classifier = ClamImageTsneClassifier(
+                modality="vision",
                 embedding_backend="bioclip2",
                 bioclip2_model=getattr(args, 'bioclip2_model', 'hf-hub:imageomics/bioclip-2'),
                 embedding_size=512,  # Not used for BioClip2 but kept for compatibility
                 tsne_perplexity=min(30.0, len(train_paths) / 4),
                 tsne_max_iter=1000,
                 vlm_model_id=args.vlm_model_id,
+                vlm_backend=args.backend,
                 use_3d=args.use_3d,
                 use_knn_connections=args.use_knn_connections,
                 nn_k=args.nn_k,
@@ -952,7 +980,10 @@ def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names:
             f"{model_name}/error": eval_results['error'],
             "model_name": model_name,
             "dataset": dataset,
-            "quick_test": args.quick_test
+            "backend": args.backend,
+            "balanced_few_shot": args.balanced_few_shot,
+            "num_few_shot_examples": args.num_few_shot_examples,
+            "max_test_samples": args.max_test_samples
         })
         return
     
@@ -964,7 +995,10 @@ def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names:
         "model_name": model_name,
         "dataset": dataset,
         "num_classes": len(class_names),
-        "quick_test": args.quick_test
+        "backend": args.backend,
+        "balanced_few_shot": args.balanced_few_shot,
+        "num_few_shot_examples": args.num_few_shot_examples,
+        "max_test_samples": args.max_test_samples
     }
     
     wandb.log(metrics)
@@ -1057,9 +1091,27 @@ def parse_args():
         help="Models to test"
     )
     parser.add_argument(
-        "--quick_test",
+        "--backend",
+        type=str,
+        default="auto",
+        choices=["auto", "vllm", "transformers"],
+        help="Backend to use for VLM models (default: auto)"
+    )
+    parser.add_argument(
+        "--balanced_few_shot",
         action="store_true",
-        help="Run quick test with subset of data"
+        help="Use balanced few-shot sampling for training data"
+    )
+    parser.add_argument(
+        "--num_few_shot_examples",
+        type=int,
+        default=5,
+        help="Number of few-shot examples per class (default: 5)"
+    )
+    parser.add_argument(
+        "--max_test_samples",
+        type=int,
+        help="Maximum number of test samples to evaluate (default: all)"
     )
     parser.add_argument(
         "--device",
@@ -1216,7 +1268,12 @@ def main():
     logger.info(f"Configuration:")
     logger.info(f"  Datasets: {', '.join(args.dataset)}")
     logger.info(f"  Models: {', '.join(args.models)}")
-    logger.info(f"  Quick test: {args.quick_test}")
+    logger.info(f"  Backend: {args.backend}")
+    logger.info(f"  Balanced few-shot: {args.balanced_few_shot}")
+    if args.balanced_few_shot:
+        logger.info(f"  Few-shot examples per class: {args.num_few_shot_examples}")
+    if args.max_test_samples:
+        logger.info(f"  Max test samples: {args.max_test_samples}")
     logger.info(f"  Use PCA: {getattr(args, 'use_pca_backend', False)}")
     logger.info(f"  3D t-SNE: {getattr(args, 'use_3d', False)}")
     logger.info(f"  KNN connections: {getattr(args, 'use_knn_connections', False)}")

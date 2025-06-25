@@ -18,6 +18,20 @@ import warnings
 
 logger = logging.getLogger(__name__)
 
+# Special task ID constants for non-tabular modalities
+VISION_CLASSIFICATION_TASK_ID = -1
+AUDIO_CLASSIFICATION_TASK_ID = -2
+VISION_REGRESSION_TASK_ID = -3  # For future use
+AUDIO_REGRESSION_TASK_ID = -4   # For future use
+
+# Mapping from special task IDs to task types
+SPECIAL_TASK_IDS = {
+    VISION_CLASSIFICATION_TASK_ID: 'classification',
+    AUDIO_CLASSIFICATION_TASK_ID: 'classification', 
+    VISION_REGRESSION_TASK_ID: 'regression',
+    AUDIO_REGRESSION_TASK_ID: 'regression'
+}
+
 def detect_task_type_from_openml_task(task) -> Optional[str]:
     """
     Detect task type from OpenML task object.
@@ -226,8 +240,16 @@ def detect_task_type(dataset: Optional[Dict[str, Any]] = None,
         else:
             logger.warning(f"Invalid manual override '{manual_override}', ignoring")
     
-    # 2. Try task_id - fetch OpenML task metadata (PRIMARY METHOD)
+    # 2. Try task_id - check for special non-tabular task IDs first, then OpenML
     if task_id is not None:
+        # Check if this is a special task ID for non-tabular modalities
+        if task_id in SPECIAL_TASK_IDS:
+            detected_type = SPECIAL_TASK_IDS[task_id]
+            modality = "vision" if task_id in [VISION_CLASSIFICATION_TASK_ID, VISION_REGRESSION_TASK_ID] else "audio"
+            logger.info(f"Using special {modality} task type: {detected_type} (task_id={task_id})")
+            return detected_type, f"special_{modality}_task_id_{task_id}"
+        
+        # Otherwise, try fetching OpenML task metadata (for tabular)
         try:
             import openml
             logger.debug(f"Fetching OpenML task {task_id} for task type detection")
@@ -248,6 +270,15 @@ def detect_task_type(dataset: Optional[Dict[str, Any]] = None,
         if dataset_task_id:
             try:
                 task_id_int = int(dataset_task_id)
+                
+                # Check if this is a special task ID for non-tabular modalities
+                if task_id_int in SPECIAL_TASK_IDS:
+                    detected_type = SPECIAL_TASK_IDS[task_id_int]
+                    modality = "vision" if task_id_int in [VISION_CLASSIFICATION_TASK_ID, VISION_REGRESSION_TASK_ID] else "audio"
+                    logger.info(f"Using special {modality} task type from dataset: {detected_type} (task_id={task_id_int})")
+                    return detected_type, f"special_{modality}_task_id_{task_id_int}_from_dataset"
+                
+                # Otherwise, try OpenML lookup
                 logger.debug(f"Found task_id {task_id_int} in dataset, attempting OpenML lookup")
                 import openml
                 openml_task = openml.tasks.get_task(task_id_int)

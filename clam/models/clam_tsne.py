@@ -58,6 +58,96 @@ def convert_numpy_types(obj):
         return obj
 
 
+class BioClip2EmbeddingExtractor:
+    """Extract embeddings using BioCLIP-2 model."""
+    
+    def __init__(self, model_name: str = "hf-hub:imageomics/bioclip-2", device: str = "auto"):
+        self.model_name = model_name
+        self.device = device if device != "auto" else ("cuda" if torch.cuda.is_available() else "cpu")
+        self.model = None
+        self.preprocess = None
+        self.logger = logging.getLogger(__name__)
+        
+    def load_model(self):
+        """Load BioCLIP model using OpenCLIP."""
+        try:
+            import open_clip
+            
+            self.logger.info(f"Loading BioCLIP model: {self.model_name}")
+            
+            # Load BioCLIP model with OpenCLIP
+            model, preprocess_train, preprocess_val = open_clip.create_model_and_transforms(self.model_name)
+            
+            # Move to appropriate device
+            self.model = model.to(self.device)
+            
+            # Use validation preprocessing for inference
+            self.preprocess = preprocess_val
+            
+            # Set to eval mode
+            self.model.eval()
+            
+            self.logger.info(f"BioCLIP model loaded successfully on {self.device}")
+            
+        except ImportError as e:
+            raise RuntimeError(f"BioCLIP requires open_clip library: {e}. Install with: pip install open-clip-torch")
+        except Exception as e:
+            raise RuntimeError(f"Failed to load BioCLIP model: {e}")
+    
+    def extract_embeddings(self, image_paths: list) -> np.ndarray:
+        """Extract embeddings from images."""
+        if self.model is None:
+            self.load_model()
+        
+        embeddings = []
+        self.logger.info(f"Extracting BioClip2 embeddings for {len(image_paths)} images")
+        
+        for i, image_path in enumerate(image_paths):
+            if i % 100 == 0:
+                self.logger.info(f"Processing image {i+1}/{len(image_paths)}")
+            
+            try:
+                embedding = self._extract_single_embedding(image_path)
+                embeddings.append(embedding)
+                
+            except Exception as e:
+                self.logger.error(f"Error processing image {image_path}: {e}")
+                raise RuntimeError(f"Failed to extract embedding for {image_path}: {e}")
+        
+        return np.array(embeddings)
+    
+    def _extract_single_embedding(self, image_path: str) -> np.ndarray:
+        """Extract embedding from single image."""
+        from PIL import Image
+        
+        # Load image
+        image = Image.open(image_path).convert('RGB')
+        
+        # Preprocess image
+        image_tensor = self.preprocess(image).unsqueeze(0).to(self.device)
+        
+        # Extract features
+        with torch.no_grad():
+            image_features = self.model.encode_image(image_tensor)
+            # Normalize features (standard for CLIP models)
+            image_features = image_features / image_features.norm(dim=-1, keepdim=True)
+            
+        # Convert to numpy
+        embedding = image_features.cpu().numpy().flatten()
+        return embedding
+
+
+def get_bioclip2_embeddings(
+    image_paths: list,
+    model_name: str = "hf-hub:imageomics/bioclip-2", 
+    cache_dir: Optional[str] = None,
+    device: str = "auto"
+) -> np.ndarray:
+    """Get BioCLIP2 embeddings for a list of images."""
+    extractor = BioClip2EmbeddingExtractor(model_name=model_name, device=device)
+    return extractor.extract_embeddings(image_paths)
+
+
 class ClamTsneClassifier:
     """
     Unified CLAM t-SNE classifier for tabular, audio, and vision data.
@@ -87,6 +177,7 @@ class ClamTsneClassifier:
         use_semantic_names: bool = False,
         device: str = "auto",
         backend: str = "auto",
+        vlm_backend: Optional[str] = None,  # Alias for backend (for backward compatibility)
         tensor_parallel_size: int = 1,
         gpu_memory_utilization: float = 0.9,
         enable_thinking: bool = True,
@@ -113,6 +204,8 @@ class ClamTsneClassifier:
         balanced_few_shot: bool = False,
         # Vision-specific parameters
         dinov2_model: str = "dinov2_vitb14",
+        embedding_backend: str = "dinov2",  # For vision: "dinov2" or "bioclip2"
+        bioclip2_model: str = "hf-hub:imageomics/bioclip-2",
         use_pca_backend: bool = False,
         max_train_plot_samples: int = 1000,
         # Metadata parameters
@@ -146,6 +239,7 @@ class ClamTsneClassifier:
             use_semantic_names: Whether to use semantic class names
             device: Device for computation
             backend: Backend for VLM loading
+            vlm_backend: Alias for backend (for backward compatibility)
             tensor_parallel_size: Tensor parallel size for distributed inference
             gpu_memory_utilization: GPU memory utilization factor
             enable_thinking: Enable thinking mode for compatible API models
@@ -171,7 +265,9 @@ class ClamTsneClassifier:
                 balanced_few_shot: Whether to balance few-shot examples
                 
             Vision-specific parameters:
-                dinov2_model: DINOV2 model variant
+                dinov2_model: DINOV2 model variant (if embedding_backend="dinov2")
+                embedding_backend: Vision embedding backend ("dinov2" or "bioclip2")
+                bioclip2_model: BioCLIP2 model variant (if embedding_backend="bioclip2")
                 use_pca_backend: Use PCA instead of t-SNE
                 max_train_plot_samples: Maximum training samples to plot
                 
@@ -206,6 +302,9 @@ class ClamTsneClassifier:
         self.cache_dir = cache_dir
         self.use_semantic_names = use_semantic_names
         self.device = device
+        # Handle vlm_backend alias for backward compatibility
+        if vlm_backend is not None:
+            backend = vlm_backend
         self.backend = backend
         self.tensor_parallel_size = tensor_parallel_size
         self.gpu_memory_utilization = gpu_memory_utilization
@@ -257,6 +356,8 @@ class ClamTsneClassifier:
         elif self.modality == "vision":
             self.modality_kwargs.update({
                 'dinov2_model': dinov2_model,
+                'embedding_backend': embedding_backend,
+                'bioclip2_model': bioclip2_model,
                 'use_pca_backend': use_pca_backend,
                 'max_train_plot_samples': max_train_plot_samples
             })
@@ -326,9 +427,16 @@ class ClamTsneClassifier:
             else:
                 raise ValueError(f"Unsupported audio embedding model: {embedding_model}")
         elif self.modality == "vision":
-            # Get vision-specific embedding method
-            from clam.data.embeddings import get_dinov2_embeddings
-            return get_dinov2_embeddings
+            # Get vision-specific embedding method based on backend
+            embedding_backend = self.modality_kwargs.get('embedding_backend', 'dinov2')
+            if embedding_backend == 'bioclip2':
+                # Use BioCLIP2 embedding method (defined in this file)
+                return get_bioclip2_embeddings
+            elif embedding_backend == 'dinov2':
+                from clam.data.embeddings import get_dinov2_embeddings
+                return get_dinov2_embeddings
+            else:
+                raise ValueError(f"Unsupported vision embedding backend: {embedding_backend}. Supported: 'dinov2', 'bioclip2'")
         else:
             raise ValueError(f"Unsupported modality: {self.modality}")
     
@@ -763,9 +871,21 @@ class ClamTsneClassifier:
         
         # Detect task type
         try:
-            from clam.utils.task_detection import detect_task_type, get_target_statistics
+            from clam.utils.task_detection import (
+                detect_task_type, get_target_statistics,
+                VISION_CLASSIFICATION_TASK_ID, AUDIO_CLASSIFICATION_TASK_ID
+            )
             dataset_info = kwargs.get('dataset_info')
             task_id = dataset_info.get('task_id') if dataset_info else None
+            
+            # For non-tabular modalities, use special task IDs if task_id not provided
+            if task_id is None and self.modality == "vision":
+                task_id = VISION_CLASSIFICATION_TASK_ID
+                self.logger.debug(f"Using special vision classification task_id: {task_id}")
+            elif task_id is None and self.modality == "audio":
+                task_id = AUDIO_CLASSIFICATION_TASK_ID
+                self.logger.debug(f"Using special audio classification task_id: {task_id}")
+            
             self.task_type, detection_method = detect_task_type(
                 y=y_train_array, 
                 manual_override=task_type,
@@ -928,7 +1048,8 @@ class ClamTsneClassifier:
             
         elif self.modality == "vision":
             # Vision embedding generation
-            self.logger.info(f"Generating DINOv2 embeddings for images...")
+            embedding_backend = self.modality_kwargs.get('embedding_backend', 'dinov2')
+            self.logger.info(f"Generating {embedding_backend.upper()} embeddings for images...")
             
             # Prepare test data
             if X_test is not None:
@@ -936,30 +1057,50 @@ class ClamTsneClassifier:
             else:
                 X_test_for_embedding = X_train_fit[:5]
             
-            # Get embeddings
-            train_embeddings = embedding_method(
-                X_train_fit,  # image files or arrays
-                model_name=self.modality_kwargs.get('dinov2_model', 'dinov2_vitb14'),
-                batch_size=32,
-                cache_dir=self.cache_dir,
-                device=self.device
-            )
-            
-            self.train_embeddings = train_embeddings
-            self.val_embeddings = None  # Vision doesn't use validation split for embeddings
-            
-            # Get test embeddings if available
-            if X_test_for_embedding is not None and len(X_test_for_embedding) > 0:
-                self.test_embeddings = embedding_method(
-                    X_test_for_embedding,
+            # Get embeddings based on backend
+            if embedding_backend == 'bioclip2':
+                # Use BioCLIP2 embeddings
+                train_embeddings = embedding_method(
+                    X_train_fit,  # image files
+                    model_name=self.modality_kwargs.get('bioclip2_model', 'hf-hub:imageomics/bioclip-2'),
+                    cache_dir=self.cache_dir,
+                    device=self.device
+                )
+                
+                # Get test embeddings if available
+                if X_test_for_embedding is not None and len(X_test_for_embedding) > 0:
+                    self.test_embeddings = embedding_method(
+                        X_test_for_embedding,
+                        model_name=self.modality_kwargs.get('bioclip2_model', 'hf-hub:imageomics/bioclip-2'),
+                        cache_dir=self.cache_dir,
+                        device=self.device
+                    )
+                else:
+                    self.test_embeddings = None
+            else:
+                # Use DINOV2 embeddings (default)
+                train_embeddings = embedding_method(
+                    X_train_fit,  # image files or arrays
                     model_name=self.modality_kwargs.get('dinov2_model', 'dinov2_vitb14'),
                     batch_size=32,
                     cache_dir=self.cache_dir,
                     device=self.device
                 )
-            else:
-                self.test_embeddings = None
                 
+                # Get test embeddings if available
+                if X_test_for_embedding is not None and len(X_test_for_embedding) > 0:
+                    self.test_embeddings = embedding_method(
+                        X_test_for_embedding,
+                        model_name=self.modality_kwargs.get('dinov2_model', 'dinov2_vitb14'),
+                        batch_size=32,
+                        cache_dir=self.cache_dir,
+                        device=self.device
+                    )
+                else:
+                    self.test_embeddings = None
+            
+            self.train_embeddings = train_embeddings
+            self.val_embeddings = None  # Vision doesn't use validation split for embeddings
             self.y_train_sample = y_train_fit
             self.tabpfn = None  # Not used for vision
             self._embedding_model = None  # Perturbation method not available for vision
@@ -1750,7 +1891,13 @@ class ClamTsneClassifier:
             'visualization_methods': self.visualization_methods,
             'layout_strategy': self.layout_strategy,
             'reasoning_focus': self.reasoning_focus,
-            'multi_viz_config': self.multi_viz_config
+            'multi_viz_config': self.multi_viz_config,
+            # Vision-specific parameters (if vision modality)
+            'dinov2_model': self.modality_kwargs.get('dinov2_model') if self.modality == 'vision' else None,
+            'embedding_backend': self.modality_kwargs.get('embedding_backend') if self.modality == 'vision' else None,
+            'bioclip2_model': self.modality_kwargs.get('bioclip2_model') if self.modality == 'vision' else None,
+            'use_pca_backend': self.modality_kwargs.get('use_pca_backend') if self.modality == 'vision' else None,
+            'max_train_plot_samples': self.modality_kwargs.get('max_train_plot_samples') if self.modality == 'vision' else None
         }
 
 
@@ -1901,3 +2048,26 @@ class ClamImageTsneClassifier(ClamTsneClassifier):
         # Set modality to vision
         kwargs['modality'] = 'vision'
         super().__init__(**kwargs)
+    
+    def fit(self, train_image_paths, train_labels, test_image_paths=None, class_names=None, **kwargs):
+        """
+        Fit the CLAM image t-SNE classifier.
+        
+        Args:
+            train_image_paths: List of training image paths or training features
+            train_labels: List of training labels
+            test_image_paths: List of test image paths (optional)
+            class_names: List of class names (optional)
+            **kwargs: Additional arguments
+            
+        Returns:
+            Self for method chaining
+        """
+        # Call the parent fit method with appropriate arguments
+        return super().fit(
+            X_train=train_image_paths,
+            y_train=train_labels,
+            X_test=test_image_paths,
+            class_names=class_names,
+            **kwargs
+        )

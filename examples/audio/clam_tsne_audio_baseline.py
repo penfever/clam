@@ -4,7 +4,7 @@ CLAM t-SNE baseline for audio classification.
 This implements the CLAM pipeline for audio:
 Whisper embeddings → t-SNE visualization → VLM classification
 
-Based on the image implementation in examples/vision/clam_tsne_image_baseline.py
+Based on the unified implementation in clam.models.clam_tsne
 """
 
 import os
