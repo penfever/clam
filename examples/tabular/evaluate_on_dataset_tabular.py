@@ -342,41 +342,110 @@ def process_dataset(dataset: Dict[str, Any], args) -> Dict[str, Any]:
     X = preprocess_features(X, categorical_indicator)
     
     # Determine if this is a classification or regression task
-    is_classification = True
+    from clam.utils.task_detection import detect_task_type
     
-    # Check if labels are continuous (regression) or discrete (classification)
-    if isinstance(y, np.ndarray):
-        # If we have string labels, it's definitely classification
-        if y.dtype.kind == 'O':
-            logger.info(f"Dataset {dataset['name']} has string labels. Encoding to integers.")
-            from sklearn.preprocessing import LabelEncoder
-            encoder = LabelEncoder()
-            y = encoder.fit_transform(y)
-            logger.info(f"Encoded {len(encoder.classes_)} unique classes")
-        # If numeric, check if it's continuous or discrete
-        elif y.dtype.kind in ('i', 'u'):  # Integer type
-            # It's likely classification if few unique values
-            unique_vals = np.unique(y)
-            logger.info(f"Dataset {dataset['name']} has {len(unique_vals)} unique integer values")
-            # Keep as classification with integer labels
-        elif y.dtype.kind == 'f':  # Float type
-            # Check if it's actually discrete disguised as float (e.g., 1.0, 2.0, 3.0)
-            unique_vals = np.unique(y)
-            if len(unique_vals) <= 10 and all(float(val).is_integer() for val in unique_vals):
-                # Convert to integers for classification
-                logger.info(f"Dataset {dataset['name']} has {len(unique_vals)} discrete float values. Converting to integers.")
-                y = y.astype(int)
+    # Check for manual task type override in args
+    manual_task_type = getattr(args, 'task_type', None)
+    preserve_regression = getattr(args, 'preserve_regression', False)
+    
+    # Use task detection to determine task type
+    try:
+        # Get task_id from dataset if available
+        task_id = dataset.get('task_id')
+        if task_id is None and 'id' in dataset:
+            try:
+                task_id = int(dataset['id'])
+            except (ValueError, TypeError):
+                task_id = None
+        
+        task_type, detection_method = detect_task_type(
+            dataset=dataset,
+            y=y,
+            manual_override=manual_task_type,
+            task_id=task_id
+        )
+        
+        is_classification = (task_type == 'classification')
+        logger.info(f"Dataset {dataset['name']}: Detected {task_type} task using {detection_method}")
+        
+    except Exception as e:
+        # Fallback to heuristic detection if task detection fails
+        logger.warning(f"Task detection failed for dataset {dataset['name']}: {e}")
+        logger.info("Falling back to heuristic task type detection")
+        
+        if preserve_regression:
+            # Try to preserve regression tasks when flag is set
+            is_classification = False
+            unique_vals = np.unique(y) if isinstance(y, np.ndarray) else np.unique(np.array(y))
+            
+            # Override to classification only if clearly discrete
+            if len(unique_vals) <= 10 and (
+                y.dtype.kind == 'O' or  # String labels
+                (y.dtype.kind in ('i', 'u')) or  # Integer with few values
+                (y.dtype.kind == 'f' and all(float(val).is_integer() for val in unique_vals))  # Integer-like floats
+            ):
+                is_classification = True
+                logger.info(f"Overriding to classification due to {len(unique_vals)} discrete values")
             else:
-                # It's truly continuous - must bin for classification tasks
-                logger.info(f"Dataset {dataset['name']} has continuous target. Converting to classification by binning.")
-                # For TabPFN which expects classification, bin the continuous values into discrete categories
-                from sklearn.preprocessing import KBinsDiscretizer
-                # Use quantile binning to create balanced classes
-                n_bins = min(10, len(np.unique(y)))  # Use at most 10 bins
-                discretizer = KBinsDiscretizer(n_bins=n_bins, encode='ordinal', strategy='quantile')
-                y = discretizer.fit_transform(y.reshape(-1, 1)).flatten().astype(int)
-                logger.info(f"Binned continuous target into {n_bins} classes")
-                dataset["target_discretizer"] = discretizer  # Store for future reference
+                logger.info(f"Preserving as regression task with {len(unique_vals)} unique values")
+        else:
+            # Default to classification (legacy behavior)
+            is_classification = True
+            logger.info("Defaulting to classification task (legacy behavior)")
+    
+    # Process labels based on task type
+    if isinstance(y, np.ndarray):
+        if is_classification:
+            # Classification task processing
+            if y.dtype.kind == 'O':
+                logger.info(f"Dataset {dataset['name']} has string labels. Encoding to integers.")
+                from sklearn.preprocessing import LabelEncoder
+                encoder = LabelEncoder()
+                y = encoder.fit_transform(y)
+                logger.info(f"Encoded {len(encoder.classes_)} unique classes")
+            elif y.dtype.kind == 'f':  # Float type for classification
+                unique_vals = np.unique(y)
+                if len(unique_vals) <= 10 and all(float(val).is_integer() for val in unique_vals):
+                    # Convert to integers for classification
+                    logger.info(f"Dataset {dataset['name']} has {len(unique_vals)} discrete float values. Converting to integers.")
+                    y = y.astype(int)
+                else:
+                    # Bin continuous values for classification
+                    logger.info(f"Dataset {dataset['name']} has continuous target. Converting to classification by binning.")
+                    from sklearn.preprocessing import KBinsDiscretizer
+                    n_bins = min(10, len(np.unique(y)))
+                    discretizer = KBinsDiscretizer(n_bins=n_bins, encode='ordinal', strategy='quantile')
+                    y = discretizer.fit_transform(y.reshape(-1, 1)).flatten().astype(int)
+                    logger.info(f"Binned continuous target into {n_bins} classes")
+                    dataset["target_discretizer"] = discretizer
+            else:
+                # Integer classification - keep as is
+                unique_vals = np.unique(y)
+                logger.info(f"Dataset {dataset['name']} has {len(unique_vals)} unique integer values for classification")
+        else:
+            # Regression task processing
+            if y.dtype.kind == 'O':
+                # String labels for regression - try to convert to numeric
+                logger.warning(f"Dataset {dataset['name']} has string labels but is detected as regression. Attempting conversion.")
+                try:
+                    import pandas as pd
+                    y = pd.to_numeric(y, errors='coerce')
+                    if np.isnan(y).any():
+                        logger.error(f"Cannot convert string labels to numeric for regression. Falling back to classification.")
+                        from sklearn.preprocessing import LabelEncoder
+                        encoder = LabelEncoder()
+                        y = encoder.fit_transform(y)
+                        is_classification = True
+                except Exception:
+                    logger.error(f"Failed to convert string labels for regression. Falling back to classification.")
+                    from sklearn.preprocessing import LabelEncoder
+                    encoder = LabelEncoder()
+                    y = encoder.fit_transform(y)
+                    is_classification = True
+            else:
+                # Numeric regression - keep as is
+                unique_vals = np.unique(y)
+                logger.info(f"Dataset {dataset['name']} has {len(unique_vals)} unique values for regression (range: {y.min():.3f} to {y.max():.3f})")
     
     # Use args.seed and dataset ID to create a dataset-specific but reproducible random state
     # This ensures different datasets get different splits, but the same dataset always gets the same split
@@ -1119,7 +1188,10 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
     # Initialize and train model based on model_name
     if model_name == 'catboost':
         try:
-            from catboost import CatBoostClassifier
+            if dataset['is_classification']:
+                from catboost import CatBoostClassifier as CatBoostModel
+            else:
+                from catboost import CatBoostRegressor as CatBoostModel
             
             # Get categorical features for CatBoost
             categorical_features = []
@@ -1128,7 +1200,8 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
                 max_features = X_train.shape[1]
                 categorical_features = [i for i, is_cat in enumerate(dataset['categorical_indicator_raw']) 
                                       if i < max_features and is_cat]
-                logger.info(f"CatBoost using {len(categorical_features)} categorical features: {categorical_features}")
+                task_type = "classification" if dataset['is_classification'] else "regression"
+                logger.info(f"CatBoost using {len(categorical_features)} categorical features for {task_type}: {categorical_features}")
                 
                 # Log data types for debugging
                 import pandas as pd
@@ -1139,7 +1212,7 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
                                   f"unique values={df_train.iloc[:, cat_idx].nunique()}, "
                                   f"sample values={df_train.iloc[:, cat_idx].unique()[:3].tolist()}")
             
-            model = CatBoostClassifier(
+            model = CatBoostModel(
                 iterations=args.catboost_iterations,
                 depth=args.catboost_depth,
                 learning_rate=args.catboost_learning_rate,
@@ -1164,11 +1237,15 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
     
     elif model_name == 'tabpfn_v2':
         try:
-            # Check if we can import from the ticl package
-            from tabpfn import TabPFNClassifier
+            if dataset['is_classification']:
+                from tabpfn import TabPFNClassifier as TabPFNModel
+            else:
+                from tabpfn import TabPFNRegressor as TabPFNModel
             
             # Initialize the model
-            model = TabPFNClassifier(
+            task_type = "classification" if dataset['is_classification'] else "regression"
+            logger.info(f"Using TabPFN v2 for {task_type}")
+            model = TabPFNModel(
                 device=args.device if args.device != 'auto' else 'cuda' if torch.cuda.is_available() else 'cpu',
                 n_estimators=args.tabpfn_v2_N_ensemble_configurations,
                 ignore_pretraining_limits=True,
@@ -1186,9 +1263,14 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
             }
     
     elif model_name == 'random_forest':
-        from sklearn.ensemble import RandomForestClassifier
+        if dataset['is_classification']:
+            from sklearn.ensemble import RandomForestClassifier as RandomForestModel
+        else:
+            from sklearn.ensemble import RandomForestRegressor as RandomForestModel
         
-        model = RandomForestClassifier(
+        task_type = "classification" if dataset['is_classification'] else "regression"
+        logger.info(f"Using Random Forest for {task_type}")
+        model = RandomForestModel(
             n_estimators=args.rf_n_estimators,
             max_depth=args.rf_max_depth,
             random_state=args.seed,
@@ -1199,14 +1281,21 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
         model.fit(X_train, y_train)
     
     elif model_name == 'gradient_boosting':
-        from sklearn.ensemble import GradientBoostingClassifier
-        from sklearn.feature_selection import SelectKBest, f_classif
+        if dataset['is_classification']:
+            from sklearn.ensemble import GradientBoostingClassifier as GradientBoostingModel
+            from sklearn.feature_selection import SelectKBest, f_classif as score_func
+        else:
+            from sklearn.ensemble import GradientBoostingRegressor as GradientBoostingModel
+            from sklearn.feature_selection import SelectKBest, f_regression as score_func
+        
+        task_type = "classification" if dataset['is_classification'] else "regression"
+        logger.info(f"Using Gradient Boosting for {task_type}")
         
         # Limit features to maximum of 500
         max_features = 500
         if X_train.shape[1] > max_features:
             logger.info(f"Limiting gradient boosting features from {X_train.shape[1]} to {max_features}")
-            feature_selector = SelectKBest(score_func=f_classif, k=max_features)
+            feature_selector = SelectKBest(score_func=score_func, k=max_features)
             X_train_selected = feature_selector.fit_transform(X_train, y_train)
             X_test = feature_selector.transform(X_test)
             logger.info(f"Selected {X_train_selected.shape[1]} features for gradient boosting")
@@ -1214,7 +1303,7 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
             X_train_selected = X_train
             logger.info(f"Using all {X_train.shape[1]} features for gradient boosting (under limit)")
         
-        model = GradientBoostingClassifier(
+        model = GradientBoostingModel(
             n_estimators=args.gb_n_estimators,
             learning_rate=args.gb_learning_rate,
             random_state=args.seed
@@ -1224,20 +1313,33 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
         model.fit(X_train_selected, y_train)
     
     elif model_name == 'logistic_regression':
-        from sklearn.linear_model import LogisticRegression
         from sklearn.preprocessing import StandardScaler
         
-        # Scale features for logistic regression
+        if dataset['is_classification']:
+            from sklearn.linear_model import LogisticRegression as LinearModel
+            task_type = "classification"
+        else:
+            from sklearn.linear_model import LinearRegression as LinearModel
+            task_type = "regression"
+        
+        logger.info(f"Using Linear model for {task_type}")
+        
+        # Scale features for linear models
         scaler = StandardScaler()
         X_train_scaled = scaler.fit_transform(X_train)
         X_test = scaler.transform(X_test)
         
-        model = LogisticRegression(
-            max_iter=args.lr_max_iter,
-            C=args.lr_C,
-            random_state=args.seed,
-            n_jobs=-1  # Use all available cores
-        )
+        if dataset['is_classification']:
+            model = LinearModel(
+                max_iter=args.lr_max_iter,
+                C=args.lr_C,
+                random_state=args.seed,
+                n_jobs=-1  # Use all available cores
+            )
+        else:
+            model = LinearModel(
+                n_jobs=-1  # Use all available cores
+            )
         
         # Train the model
         model.fit(X_train_scaled, y_train)
@@ -1260,80 +1362,109 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
     if model_name == 'logistic_regression':
         # Use the scaled test data
         y_pred = model.predict(X_test)
-        y_prob = model.predict_proba(X_test)
+        y_prob = model.predict_proba(X_test) if dataset['is_classification'] and hasattr(model, 'predict_proba') else None
     else:
         y_pred = model.predict(X_test)
-        y_prob = model.predict_proba(X_test) if hasattr(model, 'predict_proba') else None
+        y_prob = model.predict_proba(X_test) if dataset['is_classification'] and hasattr(model, 'predict_proba') else None
     
     # Measure prediction time
     prediction_time = time.time() - start_time
     logger.info(f"Prediction time for {model_name}: {prediction_time:.2f} seconds")
     
-    # Calculate metrics
-    from sklearn.metrics import accuracy_score, balanced_accuracy_score
-    accuracy = accuracy_score(y_test, y_pred)
-    
-    # Calculate balanced accuracy
-    try:
-        balanced_acc = balanced_accuracy_score(y_test, y_pred)
-        logger.info(f"Accuracy for {model_name} on {dataset['name']}: {accuracy:.4f}, Balanced accuracy: {balanced_acc:.4f}")
-    except Exception as e:
-        logger.warning(f"Could not compute balanced accuracy: {e}")
-        balanced_acc = None
-        logger.info(f"Accuracy for {model_name} on {dataset['name']}: {accuracy:.4f}")
-    
-    # Calculate ROC AUC if probabilities are available
-    roc_auc = None
-    if y_prob is not None:
+    # Calculate metrics based on task type
+    if dataset['is_classification']:
+        # Classification metrics
+        from sklearn.metrics import accuracy_score, balanced_accuracy_score, classification_report, confusion_matrix, roc_auc_score
+        
+        accuracy = accuracy_score(y_test, y_pred)
+        
+        # Calculate balanced accuracy
         try:
-            # Get unique classes
-            unique_classes = np.unique(y_test)
-            
-            # For binary classification
-            if len(unique_classes) == 2:
-                # Get probabilities for the positive class (usually class 1)
-                pos_class_idx = 1 if 1 in unique_classes else unique_classes[1]
-                binary_truth = np.array([1 if y == pos_class_idx else 0 for y in y_test])
-                
-                # Check if class index exists in probability array
-                if y_prob.shape[1] > pos_class_idx:
-                    binary_probs = y_prob[:, pos_class_idx]
-                    roc_auc = roc_auc_score(binary_truth, binary_probs)
-                    logger.info(f"ROC AUC for {model_name} on {dataset['name']}: {roc_auc:.4f}")
-            # For multi-class classification
-            elif len(unique_classes) > 2:
-                # Use one-vs-rest approach
-                from sklearn.preprocessing import label_binarize
-                y_bin = label_binarize(y_test, classes=unique_classes)
-                
-                # Make sure we have probabilities for all classes
-                if y_prob.shape[1] >= len(unique_classes):
-                    # Get probabilities for the classes that are present
-                    probs_array = np.array([y_prob[:, i] for i in unique_classes]).T
-                    roc_auc = roc_auc_score(y_bin, probs_array, multi_class='ovr')
-                    logger.info(f"ROC AUC (OVR) for {model_name} on {dataset['name']}: {roc_auc:.4f}")
+            balanced_acc = balanced_accuracy_score(y_test, y_pred)
+            logger.info(f"Accuracy for {model_name} on {dataset['name']}: {accuracy:.4f}, Balanced accuracy: {balanced_acc:.4f}")
         except Exception as e:
-            logger.warning(f"Could not compute ROC AUC: {e}")
-            import traceback
-            logger.warning(traceback.format_exc())
-    
-    # Generate classification report and confusion matrix
-    try:
-        report = classification_report(y_test, y_pred, output_dict=True)
-        cm = confusion_matrix(y_test, y_pred)
-        logger.info(f"Generated classification report and confusion matrix for {model_name}")
-    except Exception as e:
-        logger.warning(f"Could not generate detailed metrics: {e}")
+            logger.warning(f"Could not compute balanced accuracy: {e}")
+            balanced_acc = None
+            logger.info(f"Accuracy for {model_name} on {dataset['name']}: {accuracy:.4f}")
+        
+        # Calculate ROC AUC if probabilities are available
+        roc_auc = None
+        if y_prob is not None:
+            try:
+                # Get unique classes
+                unique_classes = np.unique(y_test)
+                
+                # For binary classification
+                if len(unique_classes) == 2:
+                    # Get probabilities for the positive class (usually class 1)
+                    pos_class_idx = 1 if 1 in unique_classes else unique_classes[1]
+                    binary_truth = np.array([1 if y == pos_class_idx else 0 for y in y_test])
+                    
+                    # Check if class index exists in probability array
+                    if y_prob.shape[1] > pos_class_idx:
+                        binary_probs = y_prob[:, pos_class_idx]
+                        roc_auc = roc_auc_score(binary_truth, binary_probs)
+                        logger.info(f"ROC AUC for {model_name} on {dataset['name']}: {roc_auc:.4f}")
+                # For multi-class classification
+                elif len(unique_classes) > 2:
+                    # Use one-vs-rest approach
+                    from sklearn.preprocessing import label_binarize
+                    y_bin = label_binarize(y_test, classes=unique_classes)
+                    
+                    # Make sure we have probabilities for all classes
+                    if y_prob.shape[1] >= len(unique_classes):
+                        # Get probabilities for the classes that are present
+                        probs_array = np.array([y_prob[:, i] for i in unique_classes]).T
+                        roc_auc = roc_auc_score(y_bin, probs_array, multi_class='ovr')
+                        logger.info(f"ROC AUC (OVR) for {model_name} on {dataset['name']}: {roc_auc:.4f}")
+            except Exception as e:
+                logger.warning(f"Could not compute ROC AUC: {e}")
+                import traceback
+                logger.warning(traceback.format_exc())
+        
+        # Generate classification report and confusion matrix
+        try:
+            report = classification_report(y_test, y_pred, output_dict=True)
+            cm = confusion_matrix(y_test, y_pred)
+            logger.info(f"Generated classification report and confusion matrix for {model_name}")
+        except Exception as e:
+            logger.warning(f"Could not generate detailed metrics: {e}")
+            report = None
+            cm = None
+        
+        # Compute frequency distributions for classification
+        prediction_distribution = compute_frequency_distribution(y_pred)
+        ground_truth_distribution = compute_frequency_distribution(y_test)
+        
+        # Log the distributions
+        logger.info(f"Prediction frequency distribution: {prediction_distribution['frequencies']}")
+        logger.info(f"Ground truth frequency distribution: {ground_truth_distribution['frequencies']}")
+        
+        # Store classification-specific metrics
+        mse = None
+        rmse = None
+        mae = None
+        r2 = None
+        
+    else:
+        # Regression metrics
+        from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+        
+        mse = mean_squared_error(y_test, y_pred)
+        rmse = np.sqrt(mse)
+        mae = mean_absolute_error(y_test, y_pred)
+        r2 = r2_score(y_test, y_pred)
+        
+        logger.info(f"Regression metrics for {model_name} on {dataset['name']}: MSE={mse:.4f}, RMSE={rmse:.4f}, MAE={mae:.4f}, R²={r2:.4f}")
+        
+        # For regression, these classification metrics are not applicable
+        accuracy = None
+        balanced_acc = None
+        roc_auc = None
         report = None
         cm = None
-    
-    # Compute frequency distributions
-    prediction_distribution = compute_frequency_distribution(y_pred)
-    ground_truth_distribution = compute_frequency_distribution(y_test)
-    
-    # Log the distributions
-    logger.info(f"Prediction frequency distribution: {prediction_distribution['frequencies']}")
-    logger.info(f"Ground truth frequency distribution: {ground_truth_distribution['frequencies']}")
+        prediction_distribution = None
+        ground_truth_distribution = None
     
     # Calculate total time
     total_time = training_time + prediction_time
@@ -1343,30 +1474,46 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
         'model_name': model_name,
         'dataset_name': dataset['name'],
         'dataset_id': dataset['id'],
-        'accuracy': float(accuracy),
-        'balanced_accuracy': float(balanced_acc) if balanced_acc is not None else None,
+        'task_type': 'classification' if dataset['is_classification'] else 'regression',
         'training_time': float(training_time),
         'prediction_time': float(prediction_time),
         'total_time': float(total_time),
         'num_train_samples': len(X_train),
         'num_test_samples': len(X_test),
         'num_features': X_train.shape[1],
-        'num_classes': len(np.unique(y_train)),
-        'prediction_distribution': prediction_distribution,
-        'ground_truth_distribution': ground_truth_distribution,
         'predictions': y_pred.tolist() if hasattr(y_pred, 'tolist') else y_pred,
         'ground_truth': y_test.tolist() if hasattr(y_test, 'tolist') else y_test
     }
     
-    # Add ROC AUC if available
-    if roc_auc is not None:
-        results['roc_auc'] = float(roc_auc)
-    
-    if report is not None:
-        results['classification_report'] = report
-    
-    if cm is not None:
-        results['confusion_matrix'] = cm.tolist()
+    # Add task-specific metrics
+    if dataset['is_classification']:
+        results.update({
+            'accuracy': float(accuracy),
+            'balanced_accuracy': float(balanced_acc) if balanced_acc is not None else None,
+            'num_classes': len(np.unique(y_train)),
+            'prediction_distribution': prediction_distribution,
+            'ground_truth_distribution': ground_truth_distribution,
+        })
+        
+        # Add ROC AUC if available
+        if roc_auc is not None:
+            results['roc_auc'] = float(roc_auc)
+        
+        if report is not None:
+            results['classification_report'] = report
+        
+        if cm is not None:
+            results['confusion_matrix'] = cm.tolist()
+    else:
+        results.update({
+            'mse': float(mse),
+            'rmse': float(rmse),
+            'mae': float(mae),
+            'r2': float(r2),
+            'target_range': [float(y_test.min()), float(y_test.max())],
+            'target_mean': float(y_test.mean()),
+            'target_std': float(y_test.std())
+        })
     
     return results
 
@@ -1537,9 +1684,39 @@ def main():
             
             logger.info(f"Initialized Weights & Biases run with GPU monitoring: {args.wandb_name}")
     
-    # Determine which models to evaluate
+    # 1. Load datasets
+    logger.info("Loading datasets for evaluation")
+    datasets = load_datasets(args)
+    logger.info(f"Loaded {len(datasets)} datasets for evaluation")
+    
+    # 2. Process datasets (one-time operation)
+    processed_datasets = []
+    for dataset in datasets:
+        try:
+            processed_dataset = process_dataset(dataset, args)
+            processed_datasets.append(processed_dataset)
+            logger.info(f"Successfully processed dataset {dataset['name']}")
+        except Exception as e:
+            logger.error(f"Error processing dataset {dataset['name']}: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+    
+    # 2.5. Define baseline models based on whether datasets contain classification or regression tasks
+    all_classification = all(dataset['is_classification'] for dataset in processed_datasets)
+    all_regression = all(not dataset['is_classification'] for dataset in processed_datasets)
+    
+    if all_classification:
+        baseline_models = ['catboost', 'tabpfn_v2', 'random_forest', 'gradient_boosting', 'logistic_regression']
+        logger.info("All datasets are classification tasks - using full baseline model set")
+    elif all_regression:
+        baseline_models = ['catboost', 'random_forest', 'gradient_boosting', 'logistic_regression']  # Exclude TabPFN for now
+        logger.info("All datasets are regression tasks - using regression-compatible baseline models")
+    else:
+        baseline_models = ['catboost', 'random_forest', 'gradient_boosting', 'logistic_regression']  # Safe set for mixed tasks
+        logger.info("Mixed classification/regression tasks - using universally compatible baseline models")
+    
+    # 2.6. Determine which models to evaluate
     models_to_evaluate = []
-    baseline_models = ['catboost', 'tabpfn_v2', 'random_forest', 'gradient_boosting', 'logistic_regression']
     
     if args.baselines_only:
         # Only run baseline models
@@ -1574,23 +1751,6 @@ def main():
                 if not any(m[1] == model_name for m in models_to_evaluate):
                     models_to_evaluate.append(('baseline', model_name))
                     logger.info(f"Will also evaluate baseline model: {model_name}")
-    
-    # 1. Load datasets
-    logger.info("Loading datasets for evaluation")
-    datasets = load_datasets(args)
-    logger.info(f"Loaded {len(datasets)} datasets for evaluation")
-    
-    # 2. Process datasets (one-time operation)
-    processed_datasets = []
-    for dataset in datasets:
-        try:
-            processed_dataset = process_dataset(dataset, args)
-            processed_datasets.append(processed_dataset)
-            logger.info(f"Successfully processed dataset {dataset['name']}")
-        except Exception as e:
-            logger.error(f"Error processing dataset {dataset['name']}: {e}")
-            import traceback
-            logger.error(traceback.format_exc())
     
     # 3. Evaluate each model on each dataset
     all_results = []

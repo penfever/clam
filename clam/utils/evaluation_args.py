@@ -739,6 +739,12 @@ def add_llm_baseline_args(parser: argparse.ArgumentParser):
         action="store_true",
         help="Preserve continuous targets for regression tasks instead of converting to classification"
     )
+    parser.add_argument(
+        "--task_type",
+        type=str,
+        choices=["classification", "regression"],
+        help="Manual override for task type (classification or regression)"
+    )
 
 
 def add_dataset_selection_args(parser: argparse.ArgumentParser):

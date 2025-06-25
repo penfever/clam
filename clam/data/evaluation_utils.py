@@ -39,7 +39,7 @@ def load_datasets_for_evaluation(args) -> List[Dict[str, Any]]:
         logger.info(f"Loading single dataset: {args.dataset_name}")
         try:
             preserve_regression = getattr(args, 'preserve_regression', False)
-            X, y, categorical_indicator, attribute_names, dataset_name = load_dataset(args.dataset_name, preserve_regression=preserve_regression)
+            X, y, categorical_indicator, attribute_names, dataset_name = load_dataset(args.dataset_name, bypass_size_check=True, preserve_regression=preserve_regression)
             datasets.append({
                 "id": args.dataset_name,
                 "name": dataset_name,
@@ -61,7 +61,7 @@ def load_datasets_for_evaluation(args) -> List[Dict[str, Any]]:
         
         for dataset_id in dataset_ids:
             try:
-                X, y, categorical_indicator, attribute_names, dataset_name = load_dataset(dataset_id, preserve_regression=preserve_regression)
+                X, y, categorical_indicator, attribute_names, dataset_name = load_dataset(dataset_id, bypass_size_check=True, preserve_regression=preserve_regression)
                 datasets.append({
                     "id": dataset_id,
                     "name": dataset_name,
@@ -96,7 +96,7 @@ def load_datasets_for_evaluation(args) -> List[Dict[str, Any]]:
                     
                 logger.info(f"Task ID {task_id} resolves to dataset ID {dataset_id}")
                 
-                X, y, categorical_indicator, attribute_names, dataset_name = load_dataset(str(dataset_id), preserve_regression=preserve_regression)
+                X, y, categorical_indicator, attribute_names, dataset_name = load_dataset(str(dataset_id), bypass_size_check=True, preserve_regression=preserve_regression)
                 datasets.append({
                     "id": str(dataset_id),
                     "name": dataset_name,
@@ -183,7 +183,7 @@ def load_datasets_for_evaluation(args) -> List[Dict[str, Any]]:
                     break
                     
                 try:
-                    X, y, categorical_indicator, attribute_names, loaded_name = load_dataset(str(dataset_id), preserve_regression=preserve_regression)
+                    X, y, categorical_indicator, attribute_names, loaded_name = load_dataset(str(dataset_id), bypass_size_check=True, preserve_regression=preserve_regression)
                     datasets.append({
                         "id": str(dataset_id),
                         "name": loaded_name,

@@ -1,23 +1,36 @@
 #!/usr/bin/env python
 """
-Script to train and evaluate CLAM models on the New OpenML Suite 2025 regression collection.
+Script to evaluate non-LLM, non-CLAM baselines on the New OpenML Suite 2025 regression collection.
 
 This script:
 1. Retrieves the New OpenML Suite 2025 regression collection (study_id=455)
 2. For each task in the collection:
-   a. Trains a CLAM model on 3 different splits of the dataset
-   b. Evaluates the trained model and all baselines on each split
+   a. Evaluates all traditional ML regression baselines (Random Forest, XGBoost, etc.) on 3 different splits
 3. Logs the results to Weights & Biases with version control by date
+
+This is a simplified version of run_openml_regression_2025_tabular.py that focuses only on baseline evaluation,
+using the evaluate_on_dataset script with --run_all_baselines and --baselines_only flags.
 
 Requirements:
 - OpenML installed (pip install openml)
-- CLAM installed and configured
+- CLAM installed and configured (for baseline evaluation utilities)
 - W&B account for logging results
 
 Usage:
-    python run_openml_regression_2025_tabular.py --clam_repo_path /path/to/clam --output_dir ./results
-
-The script assumes the CLAM repo structure.
+    # Basic usage - evaluate all baselines on all regression 2025 tasks (default behavior)
+    python run_openml_regression_2025_baselines_tabular.py --clam_repo_path /path/to/clam --output_dir ./baseline_results
+    
+    # Test on specific tasks (optional)
+    python run_openml_regression_2025_baselines_tabular.py --clam_repo_path /path/to/clam --task_ids "361085,361086" --output_dir ./test_results
+    
+    # Run with limited test samples for quick testing
+    python run_openml_regression_2025_baselines_tabular.py --clam_repo_path /path/to/clam --max_test_samples 1000 --output_dir ./quick_test
+    
+    # Run with both training and test sample limits
+    python run_openml_regression_2025_baselines_tabular.py --clam_repo_path /path/to/clam --max_train_samples 5000 --max_test_samples 1000 --output_dir ./limited_test
+    
+    # Run without W&B logging
+    python run_openml_regression_2025_baselines_tabular.py --clam_repo_path /path/to/clam --no_wandb --output_dir ./local_results
 """
 
 import os
@@ -47,7 +60,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("openml_regression_2025_run.log"),
+        logging.FileHandler("openml_regression_2025_baselines_run.log"),
         logging.StreamHandler()
     ]
 )
@@ -57,7 +70,7 @@ logger = logging.getLogger(__name__)
 def parse_args():
     """Parse command line arguments using centralized dataset evaluation parser."""
     # Create a custom parser that doesn't require dataset arguments
-    parser = argparse.ArgumentParser(description="Train and evaluate CLAM on New OpenML Suite 2025 regression collection")
+    parser = argparse.ArgumentParser(description="Evaluate baseline models on New OpenML Suite 2025 regression collection")
     
     # Import and add all the standard evaluation args without the required dataset constraint
     from clam.utils.evaluation_args import (
@@ -84,7 +97,7 @@ def parse_args():
     add_baseline_model_args(parser)
     add_tabpfn_args(parser)
     add_llm_baseline_args(parser)
-    add_evaluation_wandb_args(parser, "clam-openml-regression-2025")
+    add_evaluation_wandb_args(parser, "clam-openml-regression-2025-baselines")
     add_label_fitting_args(parser)
     add_calibration_args(parser)
     add_score_normalization_args(parser)
@@ -105,33 +118,28 @@ def parse_args():
         help="Number of different train/test splits to use for each task"
     )
     parser.add_argument(
-        "--skip_training",
-        action="store_true",
-        help="Skip training and only run evaluation on existing models"
-    )
-    parser.add_argument(
-        "--skip_evaluation",
-        action="store_true",
-        help="Skip evaluation and only run training"
-    )
-    parser.add_argument(
         "--start_idx",
         type=int,
         default=0,
-        help="Start from this task index in the regression collection"
+        help="Start from this task index in the regression 2025 collection"
     )
     parser.add_argument(
         "--end_idx",
         type=int,
         default=None,
-        help="End at this task index in the regression collection (exclusive)"
+        help="End at this task index in the regression 2025 collection (exclusive)"
+    )
+    parser.add_argument(
+        "--no_wandb",
+        action="store_true",
+        help="Disable Weights & Biases logging"
     )
     
     # Override some defaults for OpenML regression 2025 context
     parser.set_defaults(
-        output_dir="./openml_regression_2025_results",
-        wandb_project="clam-openml-regression-2025",
-        model_id="Qwen/Qwen2.5-3B-Instruct"
+        output_dir="./openml_regression_2025_baseline_results",
+        wandb_project="clam-openml-regression-2025-baselines",
+        preserve_regression=True  # Ensure regression tasks are preserved
     )
     
     return parser.parse_args()
@@ -155,7 +163,7 @@ def get_openml_regression_2025_tasks():
     
     try:
         # Try the newer API method first
-        logger.info("Attempting to fetch regression suite using newer API method (get_suite)")
+        logger.info("Attempting to fetch regression 2025 using newer API method (get_suite)")
         suite = openml.study.get_suite(455)  # 455 is the ID for New_OpenML_Suite_2025_regression
         task_ids = suite.tasks
     except Exception as e1:
@@ -168,10 +176,10 @@ def get_openml_regression_2025_tasks():
         except Exception as e2:
             logger.warning(f"Error using get_study fallback: {e2}")
             # If both methods fail, we'll need to fetch individual tasks or use a hardcoded list
-            logger.error("Could not fetch regression suite. Please check study_id=455 exists and contains regression tasks.")
+            logger.error("Could not fetch regression 2025 suite. Please check study_id=455 exists and contains regression tasks.")
             return []
 
-    logger.info(f"Retrieved {len(task_ids)} tasks from regression collection")
+    logger.info(f"Retrieved {len(task_ids)} tasks from regression 2025 collection")
     
     tasks = []
     for task_id in task_ids:
@@ -189,85 +197,13 @@ def get_openml_regression_2025_tasks():
     logger.info(f"Successfully retrieved {len(tasks)} regression tasks")
     return tasks
 
-def train_on_task(task, split_idx, args):
+def evaluate_baselines_on_task(task, split_idx, args):
     """
-    Train a CLAM model on a specific OpenML regression task and split.
+    Evaluate baseline models on a specific OpenML regression task and split.
     
     Args:
         task: OpenML task object
         split_idx: Index of the split to use
-        args: Command line arguments
-    
-    Returns:
-        Path to the trained model
-    """
-    task_id = task.task_id
-    dataset_id = task.dataset_id
-    dataset_name = task.get_dataset().name
-    
-    logger.info(f"Training on regression task {task_id} ({dataset_name}), split {split_idx+1}/{args.num_splits}")
-    
-    # Create output directory
-    model_output_dir = os.path.join(
-        args.output_dir, 
-        f"task_{task_id}", 
-        f"split_{split_idx}", 
-        "model"
-    )
-    os.makedirs(model_output_dir, exist_ok=True)
-    
-    # Generate version tag based on date for W&B project
-    today = datetime.now()
-    version_by_date = f"v{today.strftime('%Y%m%d')}"
-    wandb_project = f"{args.wandb_project}-{version_by_date}"
-    
-    # Build training command
-    train_script = os.path.join(args.clam_repo_path, "examples", "tabular", "train_tabular_dataset_tabular.py")
-    
-    cmd = [
-        "python", train_script,
-        "--task_ids", str(task_id),  # Pass task_id properly
-        "--output_dir", model_output_dir,
-        "--model_id", args.model_id,
-        "--batch_size", "8",
-        # Use total_steps instead of num_epochs for regression
-        "--total_steps", "2000",
-        "--save_steps", "500",
-        "--unfreeze_last_k_layers", "1",
-        "--gradient_accumulation_steps", "1",
-        "--early_stopping_patience", "30",
-        "--early_stopping_threshold", "0.1",  # Lower threshold for regression (MSE-based)
-        "--learning_rate", "1e-4",
-        "--mixup_alpha", "0.0",  # Disable mixup for regression
-        "--bypass_eval",  # Skip evaluation in training script as we'll do it separately
-        "--use_wandb",
-        "--save_best_model",
-        "--wandb_entity", "nyu-dice-lab",
-        "--wandb_project", wandb_project,
-        "--wandb_name", f"train_regression_task{task_id}_split{split_idx}",
-        "--seed", str(args.seed + split_idx),  # Vary seed for different splits
-        "--feature_selection_threshold", str(args.feature_selection_threshold),
-        "--task_type", "regression"  # Explicitly specify regression task type
-    ]
-    
-    # Run training command
-    logger.info(f"Running command: {' '.join(cmd)}")
-    try:
-        subprocess.run(cmd, check=True)
-        logger.info(f"Training completed for regression task {task_id}, split {split_idx+1}")
-        return model_output_dir
-    except subprocess.CalledProcessError as e:
-        logger.error(f"Training failed for regression task {task_id}, split {split_idx+1}: {e}")
-        return None
-
-def evaluate_model(task, split_idx, model_dir, args):
-    """
-    Evaluate a trained CLAM model and baselines on a specific OpenML regression task and split.
-    
-    Args:
-        task: OpenML task object
-        split_idx: Index of the split to use
-        model_dir: Path to the trained model directory
         args: Command line arguments
     
     Returns:
@@ -277,18 +213,18 @@ def evaluate_model(task, split_idx, model_dir, args):
     dataset_id = task.dataset_id
     dataset_name = task.get_dataset().name
     
-    logger.info(f"Evaluating on regression task {task_id} ({dataset_name}), split {split_idx+1}/{args.num_splits}")
+    logger.info(f"Evaluating baselines on regression task {task_id} ({dataset_name}), split {split_idx+1}/{args.num_splits}")
     
     # Create output directory
     eval_output_dir = os.path.join(
         args.output_dir, 
         f"task_{task_id}", 
         f"split_{split_idx}", 
-        "evaluation"
+        "baselines"
     )
     os.makedirs(eval_output_dir, exist_ok=True)
     
-    # Generate version tag based on date for W&B project - keep consistent with training
+    # Generate version tag based on date for W&B project
     today = datetime.now()
     version_by_date = f"v{today.strftime('%Y%m%d')}"
     wandb_project = f"{args.wandb_project}-{version_by_date}"
@@ -300,31 +236,45 @@ def evaluate_model(task, split_idx, model_dir, args):
         "python", eval_script,
         "--task_ids", str(task_id),  # Pass task_id properly
         "--output_dir", eval_output_dir,
-        "--model_path", model_dir,  # Use model_path parameter instead of model_dir
-        "--model_id", args.model_id,  # Add model_id parameter to specify base model architecture
-        "--use_wandb",
-        "--wandb_entity", "nyu-dice-lab",
-        "--wandb_project", wandb_project,
-        "--wandb_name", f"eval_regression_task{task_id}_split{split_idx}",
-        "--run_all_baselines",  # Add run_all_baselines option
-        "--seed", str(args.seed + split_idx),  # Use same seed as training
-        "--feature_selection_threshold", str(args.feature_selection_threshold),
-        "--task_type", "regression"  # Explicitly specify regression task type
+        "--run_all_baselines",  # Run all baseline models
+        "--baselines_only",  # Skip CLAM model evaluation
+        "--only_ground_truth_classes",  # Only use ground truth classes
+        "--preserve_regression",  # Ensure regression tasks are preserved
+        "--task_type", "regression",  # Explicitly specify task type
+        "--seed", str(args.seed + split_idx)  # Use different seed for each split
     ]
+    
+    # Add W&B logging if not disabled
+    if not args.no_wandb:
+        cmd.extend([
+            "--use_wandb",
+            "--wandb_entity", "nyu-dice-lab",
+            "--wandb_project", wandb_project,
+            "--wandb_name", f"baselines_regression_task{task_id}_split{split_idx}"
+        ])
+    
+    # Add sample limits if specified
+    if args.max_test_samples:
+        cmd.extend(["--max_test_samples", str(args.max_test_samples)])
+    if args.max_train_samples:
+        cmd.extend(["--max_train_samples", str(args.max_train_samples)])
+    
+    # Add feature selection parameter
+    cmd.extend(["--feature_selection_threshold", str(args.feature_selection_threshold)])
     
     # Run evaluation command
     logger.info(f"Running command: {' '.join(cmd)}")
     try:
         subprocess.run(cmd, check=True)
-        logger.info(f"Evaluation completed for regression task {task_id}, split {split_idx+1}")
+        logger.info(f"Baseline evaluation completed for regression task {task_id}, split {split_idx+1}")
         return eval_output_dir
     except subprocess.CalledProcessError as e:
-        logger.error(f"Evaluation failed for regression task {task_id}, split {split_idx+1}: {e}")
+        logger.error(f"Baseline evaluation failed for regression task {task_id}, split {split_idx+1}: {e}")
         return None
 
 def process_task(task, args):
     """
-    Process a single regression task: train and evaluate on multiple splits.
+    Process a single regression task: evaluate baselines on multiple splits.
     
     Args:
         task: OpenML task object
@@ -345,7 +295,7 @@ def process_task(task, args):
     run_timestamp = today.strftime("%Y-%m-%d_%H-%M-%S")
     
     # Save task metadata
-    with open(os.path.join(task_dir, f"task_info_{run_timestamp}.json"), "w") as f:
+    with open(os.path.join(task_dir, f"task_info_baselines_{run_timestamp}.json"), "w") as f:
         task_info = {
             "task_id": task_id,
             "dataset_id": task.dataset_id,
@@ -355,40 +305,19 @@ def process_task(task, args):
             "num_features": len(task.get_dataset().features) if hasattr(task.get_dataset(), "features") and isinstance(task.get_dataset().features, dict) else None,
             "version": version_by_date,
             "timestamp": run_timestamp,
-            "training_params": {
-                "total_steps": 2000,
-                "save_steps": 500,
-                "early_stopping_patience": 30,
-                "early_stopping_threshold": 0.1,  # MSE-based threshold for regression
-                "lr_final": "1e-5",
-                "mixup_alpha": "0.0",  # Disabled for regression
-                "bypass_eval": True,
-                "task_type": "regression"
-            }
+            "evaluation_type": "baselines_only",
+            "max_train_samples": args.max_train_samples,
+            "max_test_samples": args.max_test_samples,
+            "num_splits": args.num_splits
         }
         json.dump(task_info, f, indent=2)
     
     # Process each split
     for split_idx in range(args.num_splits):
-        # Train model
-        model_dir = None
-        if not args.skip_training:
-            model_dir = train_on_task(task, split_idx, args)
-            if model_dir is None:
-                logger.error(f"Skipping evaluation for regression task {task_id}, split {split_idx+1} due to training failure")
-                continue
-        else:
-            # If skipping training, look for existing model directory
-            model_dir = os.path.join(args.output_dir, f"task_{task_id}", f"split_{split_idx}", "model")
-            if not os.path.exists(model_dir):
-                logger.error(f"Model directory not found: {model_dir}")
-                continue
-        
-        # Evaluate model
-        if not args.skip_evaluation:
-            eval_dir = evaluate_model(task, split_idx, model_dir, args)
-            if eval_dir is None:
-                logger.error(f"Evaluation failed for regression task {task_id}, split {split_idx+1}")
+        # Evaluate baselines
+        eval_dir = evaluate_baselines_on_task(task, split_idx, args)
+        if eval_dir is None:
+            logger.error(f"Baseline evaluation failed for regression task {task_id}, split {split_idx+1}")
 
 def main():
     args = parse_args()
@@ -401,10 +330,6 @@ def main():
     
     # Get OpenML regression 2025 tasks
     tasks = get_openml_regression_2025_tasks()
-    
-    if not tasks:
-        logger.error("No regression tasks found. Exiting.")
-        return
     
     # Filter tasks if task_ids is provided, otherwise use all regression 2025 tasks
     if args.task_ids:
@@ -428,7 +353,7 @@ def main():
         except Exception as e:
             logger.error(f"Error processing regression task {task.task_id}: {e}")
     
-    logger.info("All regression tasks completed")
+    logger.info("All regression baseline evaluations completed")
 
 if __name__ == "__main__":
     main()
