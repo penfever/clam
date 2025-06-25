@@ -212,7 +212,7 @@ def load_datasets_for_evaluation(args) -> List[Dict[str, Any]]:
     return datasets
 
 
-def apply_train_test_split(dataset: Dict[str, Any], test_size: float = 0.2, random_state: int = 42) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def apply_train_test_split(dataset: Dict[str, Any], test_size: float = 0.2, random_state: int = 42, is_classification: bool = None) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Apply train-test split to a dataset.
     
@@ -220,6 +220,7 @@ def apply_train_test_split(dataset: Dict[str, Any], test_size: float = 0.2, rand
         dataset: Dataset dictionary with 'X' and 'y' keys
         test_size: Fraction of data to use for testing
         random_state: Random seed for reproducible splits
+        is_classification: Whether this is a classification task (if None, will be inferred)
         
     Returns:
         Tuple of (X_train, X_test, y_train, y_test)
@@ -227,7 +228,24 @@ def apply_train_test_split(dataset: Dict[str, Any], test_size: float = 0.2, rand
     X = dataset['X']
     y = dataset['y']
     
-    return train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=y)
+    # Determine task type if not provided
+    if is_classification is None:
+        # Check if this is a regression task by examining y
+        # If y has many unique values (more than 20% of samples), assume regression
+        unique_values = len(np.unique(y))
+        is_classification = unique_values <= len(y) * 0.2
+    
+    if is_classification:
+        # For classification, use stratification
+        try:
+            return train_test_split(X, y, test_size=test_size, random_state=random_state, stratify=y)
+        except ValueError:
+            # Fall back to non-stratified if stratification fails
+            logger.warning(f"Stratification failed, using non-stratified split")
+            return train_test_split(X, y, test_size=test_size, random_state=random_state)
+    else:
+        # For regression, don't use stratification
+        return train_test_split(X, y, test_size=test_size, random_state=random_state)
 
 
 def apply_sampling_strategy(X_train: np.ndarray, y_train: np.ndarray, max_samples: int, 
@@ -317,15 +335,46 @@ def preprocess_dataset_for_evaluation(dataset: Dict[str, Any], args) -> Dict[str
     X = dataset['X']
     y = dataset['y']
     
-    # Apply train-test split
-    X_train, X_test, y_train, y_test = apply_train_test_split(
-        dataset, test_size=0.2, random_state=args.seed
+    # Determine task type using task detection
+    from clam.utils.task_detection import detect_task_type
+    
+    # Get task_id if available for better detection
+    task_id = dataset.get('task_id', None)
+    manual_task_type = getattr(args, 'task_type', None)
+    
+    task_type, detection_method = detect_task_type(
+        dataset=dataset,
+        y=y,
+        manual_override=manual_task_type,
+        task_id=task_id
     )
     
-    # Create validation split from training data
-    X_train, X_val, y_train, y_val = train_test_split(
-        X_train, y_train, test_size=0.5, random_state=args.seed
+    is_classification = (task_type == 'classification')
+    logger.info(f"Detected task type: {task_type} using {detection_method}")
+    
+    # Apply train-test split with proper task type
+    X_train, X_test, y_train, y_test = apply_train_test_split(
+        dataset, test_size=0.2, random_state=args.seed, is_classification=is_classification
     )
+    
+    # Create validation split from training data with proper task type
+    if is_classification:
+        # For classification, use stratification
+        try:
+            X_train, X_val, y_train, y_val = train_test_split(
+                X_train, y_train, test_size=0.5, random_state=args.seed, stratify=y_train
+            )
+        except ValueError:
+            # Fall back to non-stratified if stratification fails
+            logger.warning(f"Validation split stratification failed, using non-stratified split")
+            X_train, X_val, y_train, y_val = train_test_split(
+                X_train, y_train, test_size=0.5, random_state=args.seed
+            )
+    else:
+        # For regression, don't use stratification
+        X_train, X_val, y_train, y_val = train_test_split(
+            X_train, y_train, test_size=0.5, random_state=args.seed
+        )
     
     logger.info(f"Dataset {dataset['name']} shapes - Train: {X_train.shape}, Val: {X_val.shape}, Test: {X_test.shape}")
     
@@ -351,7 +400,9 @@ def preprocess_dataset_for_evaluation(dataset: Dict[str, Any], args) -> Dict[str
         "y_val": y_val,
         "X_test": X_test,
         "y_test": y_test,
-        "is_classification": True  # Assume classification for now
+        "is_classification": is_classification,
+        "task_type": task_type,
+        "detection_method": detection_method
     })
     
     return processed_dataset
