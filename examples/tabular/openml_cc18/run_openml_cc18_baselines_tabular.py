@@ -17,10 +17,10 @@ Requirements:
 - W&B account for logging results
 
 Usage:
-    # Basic usage - evaluate all baselines on all CC18 tasks
+    # Basic usage - evaluate all baselines on all CC18 tasks (default behavior)
     python run_openml_cc18_baselines_tabular.py --clam_repo_path /path/to/clam --output_dir ./baseline_results
     
-    # Test on specific tasks
+    # Test on specific tasks (optional)
     python run_openml_cc18_baselines_tabular.py --clam_repo_path /path/to/clam --task_ids "3573,3902,3903" --output_dir ./test_results
     
     # Run with limited test samples for quick testing
@@ -69,16 +69,40 @@ logger = logging.getLogger(__name__)
 
 def parse_args():
     """Parse command line arguments using centralized dataset evaluation parser."""
-    parser = create_dataset_evaluation_parser()
-    parser.description = "Evaluate baseline models on OpenML CC18 collection"
+    # Create a custom parser that doesn't require dataset arguments
+    parser = argparse.ArgumentParser(description="Evaluate baseline models on OpenML CC18 collection")
     
-    # Make the dataset source arguments optional by finding and modifying the mutually exclusive group
-    for action in parser._actions:
-        if hasattr(action, 'container') and hasattr(action.container, 'required'):
-            # This is a mutually exclusive group - make it not required
-            if any(hasattr(choice_action, 'dest') and choice_action.dest in ['task_ids', 'dataset_ids', 'dataset_name', 'data_dir', 'num_datasets'] 
-                   for choice_action in getattr(action.container, '_group_actions', [])):
-                action.container.required = False
+    # Import and add all the standard evaluation args without the required dataset constraint
+    from clam.utils.evaluation_args import (
+        add_common_evaluation_args, add_model_args, add_data_processing_args, add_embedding_args, 
+        add_baseline_model_args, add_tabpfn_args, add_llm_baseline_args, add_evaluation_wandb_args, 
+        add_label_fitting_args, add_calibration_args, add_score_normalization_args, 
+        add_minority_class_args, add_evaluation_control_args
+    )
+    
+    # Add all argument groups
+    add_common_evaluation_args(parser)
+    add_model_args(parser)
+    
+    # Add dataset source arguments as optional (not in mutually exclusive group)
+    parser.add_argument("--task_ids", type=str, help="Comma-separated list of OpenML task IDs to evaluate on. If not provided, runs on all CC18 tasks.")
+    parser.add_argument("--dataset_name", type=str, help="Name of the OpenML dataset to evaluate on")
+    parser.add_argument("--dataset_ids", type=str, help="Comma-separated list of OpenML dataset IDs to evaluate on")
+    parser.add_argument("--data_dir", type=str, help="Directory containing CSV files to use as datasets")
+    parser.add_argument("--num_datasets", type=int, help="Number of random datasets to sample from OpenML")
+    
+    # Add all other argument groups
+    add_data_processing_args(parser)
+    add_embedding_args(parser)
+    add_baseline_model_args(parser)
+    add_tabpfn_args(parser)
+    add_llm_baseline_args(parser)
+    add_evaluation_wandb_args(parser, "clam-openml-cc18-baselines")
+    add_label_fitting_args(parser)
+    add_calibration_args(parser)
+    add_score_normalization_args(parser)
+    add_minority_class_args(parser)
+    add_evaluation_control_args(parser)
     
     # Add OpenML CC18 orchestration-specific arguments
     parser.add_argument(
