@@ -205,7 +205,7 @@ def _create_single_visualization(classifier_instance, i, viz_methods, viewing_an
                     zoom_factor=classifier_instance.zoom_factor,
                     class_names=classifier_instance.class_names,
                     use_semantic_names=classifier_instance.use_semantic_names,
-                    semantic_axes_labels=classifier_instance.semantic_axes_labels
+                    semantic_axes_labels=getattr(classifier_instance, 'semantic_axes_labels', None)
                 )
             else:
                 fig, legend_text, metadata = viz_methods['create_combined_tsne_plot'](
@@ -215,7 +215,7 @@ def _create_single_visualization(classifier_instance, i, viz_methods, viewing_an
                     zoom_factor=classifier_instance.zoom_factor,
                     class_names=classifier_instance.class_names,
                     use_semantic_names=classifier_instance.use_semantic_names,
-                    semantic_axes_labels=classifier_instance.semantic_axes_labels
+                    semantic_axes_labels=getattr(classifier_instance, 'semantic_axes_labels', None)
                 )
 
     # Convert plot to image

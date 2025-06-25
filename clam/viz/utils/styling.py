@@ -339,7 +339,8 @@ def apply_consistent_point_styling(
     highlight_test_indices: Optional[List[int]] = None,
     use_3d: bool = False,
     class_names: Optional[List[str]] = None,
-    use_semantic_names: bool = False
+    use_semantic_names: bool = False,
+    all_classes: Optional[np.ndarray] = None
 ) -> Dict[str, Any]:
     """
     Apply consistent point styling across all visualization types.
@@ -354,6 +355,7 @@ def apply_consistent_point_styling(
         use_3d: Whether this is a 3D plot
         class_names: Optional semantic class names
         use_semantic_names: Whether to use semantic class names
+        all_classes: Optional array of all possible class labels in the dataset
         
     Returns:
         Dictionary with metadata and legend information
@@ -368,11 +370,16 @@ def apply_consistent_point_styling(
     # 1. Plot training points
     if y is not None:
         unique_classes = np.unique(y)
-        class_color_map = create_distinct_color_map(unique_classes)
+        
+        # Use all_classes for a consistent color map across different plots
+        if all_classes is None:
+            all_classes = unique_classes
+        
+        class_color_map = create_distinct_color_map(all_classes)
         
         for class_label in unique_classes:
             mask = y == class_label
-            color = class_color_map[class_label]
+            color = class_color_map.get(class_label, (0.5, 0.5, 0.5))  # Default to gray if not in map
             training_style = get_standard_training_point_style()
             
             # Format class label
@@ -394,13 +401,16 @@ def apply_consistent_point_styling(
             
             metadata['classes'].append(class_label)
         
-        # Extract visible classes from legend
-        metadata['visible_classes'] = extract_visible_classes_from_legend(
+        # Extract visible classes from the legend
+        visible_classes = extract_visible_classes_from_legend(
             unique_classes, class_names, use_semantic_names
         )
+        metadata['visible_classes'] = visible_classes
         
-        # Create legend text
-        legend_text = create_class_legend(unique_classes, class_color_map, class_names, use_semantic_names)
+        # Create legend text using only visible_classes
+        legend_text = create_class_legend(
+            visible_classes, class_color_map, class_names, use_semantic_names
+        )
         
     else:
         # No labels - use single color (regression case)
