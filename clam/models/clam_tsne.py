@@ -1380,7 +1380,7 @@ class ClamTsneClassifier:
                             class_names=visible_semantic_names,
                             modality=self.modality,
                             dataset_description=f"{self.modality.title()} data with {class_count} classes and {highlight_count} highlighted test point(s)",
-                            use_semantic_names=True,
+                            use_semantic_names=self.use_semantic_names,
                             multi_viz_info=multi_viz_info,
                             dataset_metadata=self._get_metadata_for_prompt()
                         )
@@ -1627,7 +1627,7 @@ class ClamTsneClassifier:
                             response, 
                             visible_semantic_names, 
                             self.logger, 
-                            use_semantic_names=True,
+                            use_semantic_names=self.use_semantic_names,
                             task_type='classification'
                         )
                         
@@ -1674,7 +1674,7 @@ class ClamTsneClassifier:
                             response, 
                             visible_semantic_names, 
                             self.logger, 
-                            use_semantic_names=True,
+                            use_semantic_names=self.use_semantic_names,
                             task_type='classification'
                         )
                         
