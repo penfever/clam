@@ -1565,10 +1565,11 @@ class ClamTsneClassifier:
                         
                         response = self.vlm_wrapper.generate_from_conversation(conversation, gen_config)
                         
+                        visible_class_names = None,
                         # Parse prediction for regression
                         prediction = parse_vlm_response(
                             response, 
-                            unique_classes=None, 
+                            unique_classes=visible_class_names, 
                             logger_instance=self.logger, 
                             use_semantic_names=False,
                             task_type='regression',
@@ -1626,7 +1627,7 @@ class ClamTsneClassifier:
                         # Parse prediction for classification
                         prediction = parse_vlm_response(
                             response, 
-                            visible_class_names, 
+                            unique_classes=visible_class_names, 
                             self.logger, 
                             use_semantic_names=self.use_semantic_names,
                             task_type='classification'
@@ -1673,7 +1674,7 @@ class ClamTsneClassifier:
                         
                         prediction = parse_vlm_response(
                             response, 
-                            visible_class_names, 
+                            unique_classes=visible_class_names, 
                             self.logger, 
                             use_semantic_names=self.use_semantic_names,
                             task_type='classification'
@@ -1686,9 +1687,10 @@ class ClamTsneClassifier:
                     else:
                         # Regression - no classes to track
                         visible_classes_list = []
+                        visible_class_names = None
                         prediction = parse_vlm_response(
                             response, 
-                            unique_classes=None, 
+                            unique_classes=visible_class_names, 
                             logger_instance=self.logger, 
                             use_semantic_names=False,
                             task_type='regression',
