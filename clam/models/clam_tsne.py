@@ -1305,7 +1305,8 @@ class ClamTsneClassifier:
                     visualization_save_cadence=visualization_save_cadence,
                     return_detailed=return_detailed,
                     y_test=y_test,
-                    prediction_details=prediction_details
+                    prediction_details=prediction_details,
+                    all_classes=self.unique_classes
                 )
                 
                 predictions.append(prediction)

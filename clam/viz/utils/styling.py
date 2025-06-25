@@ -22,7 +22,8 @@ __all__ = [
     'apply_consistent_legend_formatting',
     'get_standard_test_point_style',
     'get_standard_target_point_style',
-    'get_standard_training_point_style'
+    'get_standard_training_point_style',
+    'extract_visible_classes_from_legend'
 ]
 
 
@@ -212,6 +213,35 @@ def create_class_legend(unique_classes: np.ndarray, class_color_map: Dict, class
     return "\n".join(legend_lines)
 
 
+def extract_visible_classes_from_legend(unique_classes: np.ndarray, class_names: Optional[List[str]] = None, use_semantic_names: bool = False) -> List[Union[int, str]]:
+    """
+    Extract the visible classes that would appear in a legend.
+    
+    This function returns the class identifiers that are visible in the current
+    visualization context, which correspond to the classes shown in the legend.
+    
+    Args:
+        unique_classes: Array of unique class labels that are present in the data
+        class_names: Optional list of semantic class names
+        use_semantic_names: Whether semantic names are being used
+        
+    Returns:
+        List of visible class identifiers (numeric labels or semantic names)
+    """
+    if use_semantic_names and class_names:
+        # Return semantic names for classes that have them
+        visible = []
+        for class_label in unique_classes:
+            if class_label < len(class_names):
+                visible.append(class_names[class_label])
+            else:
+                visible.append(class_label)  # Fallback to numeric
+        return visible
+    else:
+        # Return numeric class labels
+        return list(unique_classes)
+
+
 def create_regression_color_map(target_values: np.ndarray, colormap: str = 'RdBu_r', n_levels: int = 20) -> Tuple[np.ndarray, mcolors.Colormap, float, float]:
     """
     Create a discrete red-blue colormap for regression target values.
@@ -329,7 +359,11 @@ def apply_consistent_point_styling(
         Dictionary with metadata and legend information
     """
     legend_text_parts = []
-    metadata = {'classes': [], 'plot_type': 'classification'}
+    metadata = {
+        'classes': [],  # Legacy field for backward compatibility
+        'visible_classes': [],  # Classes visible in this visualization
+        'plot_type': 'classification'
+    }
     
     # 1. Plot training points
     if y is not None:
@@ -360,11 +394,19 @@ def apply_consistent_point_styling(
             
             metadata['classes'].append(class_label)
         
+        # Extract visible classes from legend
+        metadata['visible_classes'] = extract_visible_classes_from_legend(
+            unique_classes, class_names, use_semantic_names
+        )
+        
         # Create legend text
         legend_text = create_class_legend(unique_classes, class_color_map, class_names, use_semantic_names)
         
     else:
-        # No labels - use single color
+        # No labels - use single color (regression case)
+        metadata['plot_type'] = 'regression'
+        metadata['visible_classes'] = []  # No classes in regression
+        
         training_style = get_standard_training_point_style()
         if use_3d:
             ax.scatter(

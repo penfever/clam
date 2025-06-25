@@ -31,30 +31,9 @@ def _create_multi_viz_info(context_composer, modality):
     return multi_viz_info
 
 
-def _get_visible_classes_for_multi_viz(context_composer, unique_classes, class_to_semantic):
-    """Get visible classes across all visualizations for multi-viz."""
-    all_visible_classes = set()
-    for viz in context_composer.visualizations:
-        if hasattr(viz, 'metadata') and 'classes' in viz.metadata:
-            all_visible_classes.update(viz.metadata['classes'])
-        # Fallback: use all unique classes from training data
-        elif unique_classes is not None:
-            all_visible_classes.update(unique_classes)
-    
-    visible_classes_list = sorted(list(all_visible_classes))
-    visible_class_names = [class_to_semantic.get(cls, str(cls)) for cls in visible_classes_list]
-    return visible_classes_list, visible_class_names
-
-
-def _get_visible_classes_for_single_viz(metadata, class_to_semantic):
-    """Get visible classes for single visualization."""
-    visible_classes = set(metadata.get('classes', []))
-    if metadata.get('knn_info') and 'neighbor_classes' in metadata['knn_info']:
-        visible_classes.update(set(metadata['knn_info']['neighbor_classes']))
-    
-    visible_classes_list = sorted(list(visible_classes))
-    visible_class_names = [class_to_semantic[cls] for cls in visible_classes_list]
-    return visible_classes_list, visible_class_names
+def _get_visible_classes_from_metadata(metadata):
+    """Extract visible classes from visualization metadata."""
+    return metadata.get('visible_classes', [])
 
 
 def _create_enhanced_legend(legend_text, classifier_instance):
@@ -87,8 +66,8 @@ def _generate_vlm_response(classifier_instance, image, prompt):
     return classifier_instance.vlm_wrapper.generate_from_conversation(conversation, gen_config)
 
 
-def _parse_prediction(response, classifier_instance, visible_classes_list, visible_class_names):
-    """Parse VLM response into prediction with semantic mapping."""
+def _parse_prediction(response, classifier_instance, all_classes):
+    """Parse VLM response into prediction using complete class list."""
     if classifier_instance.task_type == 'regression':
         return parse_vlm_response(
             response, 
@@ -99,19 +78,25 @@ def _parse_prediction(response, classifier_instance, visible_classes_list, visib
             target_stats=classifier_instance.target_stats
         )
     else:
+        # Convert all_classes to the format expected by the parser
+        if classifier_instance.use_semantic_names:
+            all_class_names = [classifier_instance.class_to_semantic.get(cls, str(cls)) for cls in all_classes]
+        else:
+            all_class_names = [str(cls) for cls in all_classes]
+        
         prediction = parse_vlm_response(
             response, 
-            unique_classes=visible_class_names,
+            unique_classes=all_class_names,
             logger_instance=classifier_instance.logger, 
             use_semantic_names=classifier_instance.use_semantic_names,
             task_type='classification'
         )
         
         # Map back to numeric label if needed
-        if prediction in visible_class_names:
+        if prediction in all_class_names and classifier_instance.use_semantic_names:
             semantic_to_numeric = {
                 name: cls for cls, name in classifier_instance.class_to_semantic.items() 
-                if cls in visible_classes_list
+                if cls in all_classes
             }
             prediction = semantic_to_numeric.get(prediction, prediction)
         
@@ -322,7 +307,10 @@ def process_one_sample(
     y_test=None,
     
     # Additional context
-    prediction_details=None
+    prediction_details=None,
+    
+    # Class information
+    all_classes=None
 ):
     """
     Process a single test sample for VLM prediction.
@@ -337,12 +325,17 @@ def process_one_sample(
         return_detailed: Whether to return detailed prediction information
         y_test: True test labels (optional)
         prediction_details: List to append prediction details to (optional)
+        all_classes: Complete list of classes from dataset (required for classification)
         
     Returns:
         tuple: (prediction, response) where prediction is the parsed prediction
                and response is the raw VLM response
     """
     i = sample_index
+    
+    # Ensure all_classes is provided for classification tasks
+    if classifier_instance.task_type == 'classification' and all_classes is None:
+        all_classes = classifier_instance.unique_classes
     
     # Create visualization and get image
     if classifier_instance.enable_multi_viz and classifier_instance.context_composer is not None:
@@ -351,10 +344,16 @@ def process_one_sample(
             classifier_instance, i, save_outputs, visualization_save_cadence
         )
         
-        # Get visible classes and create prompt for multi-viz
+        # Get visible classes from visualization metadata
+        visible_classes = []
+        for viz in classifier_instance.context_composer.visualizations:
+            if hasattr(viz, 'metadata'):
+                viz_visible = _get_visible_classes_from_metadata(viz.metadata)
+                visible_classes.extend(viz_visible)
+        visible_classes = list(set(visible_classes))  # Remove duplicates
+        
+        # Create prompt for multi-viz
         if classifier_instance.task_type == 'regression':
-            visible_classes_list = []
-            visible_class_names = None
             multi_viz_info = _create_multi_viz_info(classifier_instance.context_composer, classifier_instance.modality)
             
             prompt = create_regression_prompt(
@@ -365,16 +364,11 @@ def process_one_sample(
                 dataset_metadata=classifier_instance._get_metadata_for_prompt()
             )
         else:
-            visible_classes_list, visible_class_names = _get_visible_classes_for_multi_viz(
-                classifier_instance.context_composer, 
-                classifier_instance.unique_classes, 
-                classifier_instance.class_to_semantic
-            )
             multi_viz_info = _create_multi_viz_info(classifier_instance.context_composer, classifier_instance.modality)
             
-            class_count = len(classifier_instance.unique_classes) if classifier_instance.unique_classes is not None else 0
+            class_count = len(all_classes) if all_classes is not None else 0
             prompt = create_classification_prompt(
-                class_names=visible_class_names,
+                class_names=visible_classes,
                 modality=classifier_instance.modality,
                 dataset_description=f"{classifier_instance.modality.title()} data with {class_count} classes and highlighted test point",
                 use_semantic_names=classifier_instance.use_semantic_names,
@@ -387,10 +381,11 @@ def process_one_sample(
             classifier_instance, i, viz_methods, viewing_angles, save_outputs, visualization_save_cadence
         )
         
-        # Get visible classes and create prompt for single viz
+        # Get visible classes from visualization metadata
+        visible_classes = _get_visible_classes_from_metadata(metadata)
+        
+        # Create prompt for single viz
         if classifier_instance.task_type == 'regression':
-            visible_classes_list = []
-            visible_class_names = None
             enhanced_legend = _create_enhanced_legend(legend_text, classifier_instance)
             
             prompt = create_regression_prompt(
@@ -404,13 +399,10 @@ def process_one_sample(
                 dataset_metadata=classifier_instance._get_metadata_for_prompt()
             )
         else:
-            visible_classes_list, visible_class_names = _get_visible_classes_for_single_viz(
-                metadata, classifier_instance.class_to_semantic
-            )
             enhanced_legend = _create_enhanced_legend(legend_text, classifier_instance)
             
             prompt = create_classification_prompt(
-                class_names=visible_class_names,
+                class_names=visible_classes,
                 modality=classifier_instance.modality,
                 use_knn=classifier_instance.use_knn_connections,
                 use_3d=classifier_instance.use_3d,
@@ -424,7 +416,7 @@ def process_one_sample(
     # Process image and generate VLM response
     image = _process_image(classifier_instance, image)
     response = _generate_vlm_response(classifier_instance, image, prompt)
-    prediction = _parse_prediction(response, classifier_instance, visible_classes_list, visible_class_names)
+    prediction = _parse_prediction(response, classifier_instance, all_classes)
     
     # Save outputs if requested
     _save_outputs(save_outputs, classifier_instance.temp_dir, i, visualization_save_cadence, prompt, response)
@@ -432,7 +424,7 @@ def process_one_sample(
     # Store details if requested
     _store_prediction_details(
         return_detailed, y_test, prediction_details, i, response, prediction, 
-        classifier_instance.test_tsne, image, visible_classes_list
+        classifier_instance.test_tsne, image, visible_classes
     )
     
     return prediction, response

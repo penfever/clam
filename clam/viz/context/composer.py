@@ -333,6 +333,39 @@ class ContextComposer:
         
         return composed_image
     
+    def get_aggregated_metadata(self) -> Dict[str, Any]:
+        """
+        Get aggregated metadata across all visualizations.
+        
+        Returns:
+            Dictionary with aggregated metadata including visible_classes
+        """
+        if not self._fitted or not self.visualizations:
+            return {'visible_classes': [], 'all_classes': []}
+        
+        all_visible_classes = set()
+        plot_types = set()
+        
+        for viz in self.visualizations:
+            if hasattr(viz, 'metadata'):
+                visible = viz.metadata.get('visible_classes', [])
+                all_visible_classes.update(visible)
+                plot_types.add(viz.metadata.get('plot_type', 'classification'))
+        
+        # Determine overall plot type (if mixed, default to classification)
+        overall_plot_type = 'classification'
+        if len(plot_types) == 1:
+            overall_plot_type = list(plot_types)[0]
+        elif 'regression' in plot_types and len(plot_types) > 1:
+            self.logger.warning("Mixed plot types detected in multi-viz composition")
+        
+        return {
+            'visible_classes': sorted(list(all_visible_classes)),
+            'plot_type': overall_plot_type,
+            'n_visualizations': len(self.visualizations),
+            'visualization_methods': [viz.method_name for viz in self.visualizations]
+        }
+    
     def generate_reasoning_prompt(
         self,
         highlight_indices: Optional[List[int]] = None,

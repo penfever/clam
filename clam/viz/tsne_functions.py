@@ -574,16 +574,20 @@ def create_combined_tsne_plot(
     # Create legend text
     legend_text = create_class_legend(unique_classes, class_color_map, class_names, use_semantic_names)
     
-    # Create metadata
+    # Create metadata with visible classes from legend
+    from .utils.styling import extract_visible_classes_from_legend
+    
     metadata = {
         'n_train_points': len(train_tsne),
         'n_test_points': len(test_tsne),
         'n_classes': len(unique_classes),
-        'classes': unique_classes.tolist(),
+        'classes': unique_classes.tolist(),  # Legacy field
+        'visible_classes': extract_visible_classes_from_legend(unique_classes, class_names, use_semantic_names),
         'highlighted_point': highlight_test_idx,
         'zoom_factor': zoom_factor if highlight_test_idx is not None else None,
         'n_visible_train': len(train_tsne_visible) if 'train_tsne_visible' in locals() else len(train_tsne),
-        'n_visible_test': len(test_tsne_visible) if 'test_tsne_visible' in locals() else len(test_tsne)
+        'n_visible_test': len(test_tsne_visible) if 'test_tsne_visible' in locals() else len(test_tsne),
+        'plot_type': 'classification'
     }
     
     return fig, legend_text, metadata
@@ -1883,7 +1887,9 @@ def create_combined_regression_tsne_plot(
         'target_range': (vmin, vmax),
         'colormap': colormap,
         'query_position': test_tsne[highlight_test_idx].tolist(),
-        'zoom_factor': zoom_factor
+        'zoom_factor': zoom_factor,
+        'visible_classes': [],  # No classes in regression
+        'plot_type': 'regression'
     }
     
     return fig, legend_text, metadata

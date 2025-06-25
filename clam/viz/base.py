@@ -75,7 +75,11 @@ class VisualizationResult:
     config: VisualizationConfig
     
     # Analysis information
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=lambda: {
+        'visible_classes': [],  # Classes visible in this specific visualization
+        'all_classes': [],      # Complete set of classes from the dataset
+        'plot_type': 'classification'  # 'classification' or 'regression'
+    })
     
     # Performance metrics
     fit_time: float = 0.0
