@@ -78,7 +78,6 @@ from .unified_metrics import (
 )
 from .vlm_utils import (
     parse_vlm_response,
-    create_classification_prompt,
     create_vlm_conversation
 )
 # Visualization utilities moved to clam.viz.utils.common
@@ -191,7 +190,6 @@ __all__ = [
     
     # VLM utilities
     "parse_vlm_response",
-    "create_classification_prompt", 
     "create_vlm_conversation",
     
     # Visualization utilities moved to clam.viz.utils.common
