@@ -456,7 +456,7 @@ def process_results(all_results: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, pd
     dataset_info = {}  # Store dataset metadata
     
     # Define datasets to exclude
-    excluded_datasets = {'CIFAR_10', 'Devnagari-Script'}
+    excluded_datasets = {'CIFAR_10', 'Devnagari-Script', 'jungle_chess_2pcs_raw_endgame_complete'}
     
     for result in merged_results:
         original_model_name = result.get('model_name', 'unknown')

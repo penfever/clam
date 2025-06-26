@@ -1,0 +1,142 @@
+{
+  "timestamp": "2025-06-26T15:14:31.488496",
+  "total_models": 9,
+  "total_datasets": 74,
+  "model_performance": {
+    "ranking": [
+      {
+        "model": "tabpfn_v2",
+        "accuracy_mean": 0.878
+      },
+      {
+        "model": "catboost",
+        "accuracy_mean": 0.87
+      },
+      {
+        "model": "random_forest",
+        "accuracy_mean": 0.865
+      },
+      {
+        "model": "gradient_boosting",
+        "accuracy_mean": 0.854
+      },
+      {
+        "model": "CLAM",
+        "accuracy_mean": 0.845
+      },
+      {
+        "model": "logistic_regression",
+        "accuracy_mean": 0.825
+      },
+      {
+        "model": "tabllm_gemini",
+        "accuracy_mean": 0.501
+      },
+      {
+        "model": "tabllm_qwen",
+        "accuracy_mean": 0.429
+      },
+      {
+        "model": "jolt",
+        "accuracy_mean": 0.41
+      }
+    ],
+    "win_rates": {
+      "tabllm_qwen": {
+        "wins": 2,
+        "total_datasets": 74,
+        "win_rate": 0.02702702702702703
+      },
+      "tabllm_gemini": {
+        "wins": 2,
+        "total_datasets": 74,
+        "win_rate": 0.02702702702702703
+      },
+      "CLAM": {
+        "wins": 11,
+        "total_datasets": 74,
+        "win_rate": 0.14864864864864866
+      },
+      "jolt": {
+        "wins": 0,
+        "total_datasets": 74,
+        "win_rate": 0.0
+      },
+      "catboost": {
+        "wins": 7,
+        "total_datasets": 74,
+        "win_rate": 0.0945945945945946
+      },
+      "tabpfn_v2": {
+        "wins": 28,
+        "total_datasets": 74,
+        "win_rate": 0.3783783783783784
+      },
+      "random_forest": {
+        "wins": 14,
+        "total_datasets": 74,
+        "win_rate": 0.1891891891891892
+      },
+      "gradient_boosting": {
+        "wins": 3,
+        "total_datasets": 74,
+        "win_rate": 0.04054054054054054
+      },
+      "logistic_regression": {
+        "wins": 7,
+        "total_datasets": 74,
+        "win_rate": 0.0945945945945946
+      }
+    },
+    "performance_distribution": {
+      "tabllm_qwen": {
+        "accuracy": 0.429,
+        "category": "poor",
+        "f1_macro": 0.309
+      },
+      "tabllm_gemini": {
+        "accuracy": 0.501,
+        "category": "poor",
+        "f1_macro": 0.402
+      },
+      "CLAM": {
+        "accuracy": 0.845,
+        "category": "good",
+        "f1_macro": 0.799
+      },
+      "jolt": {
+        "accuracy": 0.41,
+        "category": "poor",
+        "f1_macro": 0.273
+      },
+      "catboost": {
+        "accuracy": 0.87,
+        "category": "good",
+        "f1_macro": 0.818
+      },
+      "tabpfn_v2": {
+        "accuracy": 0.878,
+        "category": "good",
+        "f1_macro": 0.823
+      },
+      "random_forest": {
+        "accuracy": 0.865,
+        "category": "good",
+        "f1_macro": 0.81
+      },
+      "gradient_boosting": {
+        "accuracy": 0.854,
+        "category": "good",
+        "f1_macro": 0.799
+      },
+      "logistic_regression": {
+        "accuracy": 0.825,
+        "category": "good",
+        "f1_macro": 0.75
+      }
+    }
+  },
+  "statistical_tests": {
+    "note": "Critical difference plots show statistical significance between models"
+  }
+}

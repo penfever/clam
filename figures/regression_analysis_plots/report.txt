@@ -1,0 +1,825 @@
+📊 Total results collected: 845
+
+================================================================================
+📊 DATASET FILTERING
+================================================================================
+  Filtering out 'news_popularity2' - max average R² = 0.011743
+  Filtering out 'heart_failure_clinical_records' - max average R² = 0.011399
+  Filtering out 'cybersecurity_attacks' - max average R² = 0.000000
+  Filtering out 'climate_change_dataset2020-2024' - max average R² = 0.017416
+  Filtering out 'climate_insights_dataset' - max average R² = 0.001715
+  Filtering out 'temperature_emissions_environmental_trends_2000_2024' - max average R² = 0.000000
+  Filtering out 'pakistan_hunger_data' - max average R² = 0.004105
+  Filtering out 'sleep-deprivation-and-cognitive-performance' - max average R² = 0.039066
+  Filtering out 'biosses' - max average R² = 0.000000
+  Filtering out 'reddit_opinion_climate_change' - max average R² = 0.000000
+
+  Total datasets filtered out: 10
+  Remaining valid datasets: 33
+
+================================================================================
+📊 ALGORITHM COMPARISON - OVERALL R² SCORES
+================================================================================
+
+CLAM                
+  Samples:     96
+  Average R²:  0.629434
+  Median R²:   0.651152
+  Min R²:      0.000000
+  Max R²:      0.999972
+
+JOLT                
+  Samples:     90
+  Average R²:  0.007366
+  Median R²:   0.000000
+  Min R²:      0.000000
+  Max R²:      0.662976
+
+catboost            
+  Samples:     99
+  Average R²:  0.714413
+  Median R²:   0.829420
+  Min R²:      0.000000
+  Max R²:      0.999994
+
+gradient_boosting   
+  Samples:     99
+  Average R²:  0.692213
+  Median R²:   0.784451
+  Min R²:      0.000000
+  Max R²:      0.999987
+
+logistic_regression 
+  Samples:     99
+  Average R²:  0.512566
+  Median R²:   0.528391
+  Min R²:      0.000000
+  Max R²:      1.000000
+
+random_forest       
+  Samples:     99
+  Average R²:  0.728109
+  Median R²:   0.877875
+  Min R²:      0.000000
+  Max R²:      1.000000
+
+tabpfn_v2           
+  Samples:     77
+  Average R²:  0.701346
+  Median R²:   0.797216
+  Min R²:      0.000000
+  Max R²:      0.999994
+
+================================================================================
+🏆 ALGORITHM RANKING BY AVERAGE R²
+================================================================================
+1. random_forest       : 0.728109
+2. catboost            : 0.714413
+3. tabpfn_v2           : 0.701346
+4. gradient_boosting   : 0.692213
+5. CLAM                : 0.629434
+6. logistic_regression : 0.512566
+7. JOLT                : 0.007366
+
+================================================================================
+📋 DATASET-LEVEL COMPARISON
+================================================================================
+
+Bike_Sharing_Demand:
+  tabpfn_v2           : 0.955014
+  catboost            : 0.948525
+  random_forest       : 0.943097
+  CLAM                : 0.929393
+  gradient_boosting   : 0.858206
+  logistic_regression : 0.414254
+  JOLT                : 0.000000
+
+Crime_Data_from_2010:
+  CLAM                : 0.197490
+  random_forest       : 0.045385
+  tabpfn_v2           : 0.039064
+  catboost            : 0.022824
+  logistic_regression : 0.019271
+  gradient_boosting   : 0.000000
+
+IoT_Agriculture_2024:
+  catboost            : 0.976081
+  random_forest       : 0.975323
+  tabpfn_v2           : 0.972008
+  gradient_boosting   : 0.970493
+  CLAM                : 0.926014
+  logistic_regression : 0.893726
+  JOLT                : 0.000000
+
+MiamiHousing2016:
+  tabpfn_v2           : 0.932200
+  catboost            : 0.926375
+  CLAM                : 0.921991
+  random_forest       : 0.902882
+  gradient_boosting   : 0.892404
+  logistic_regression : 0.709750
+  JOLT                : 0.000000
+
+Phenotype_202:
+  tabpfn_v2           : 0.994983
+  gradient_boosting   : 0.991842
+  random_forest       : 0.986587
+  catboost            : 0.942369
+  logistic_regression : 0.793275
+  CLAM                : 0.646344
+  JOLT                : 0.000000
+
+QSAR_Bioconcentration_regression:
+  tabpfn_v2           : 0.771844
+  random_forest       : 0.761774
+  catboost            : 0.760376
+  gradient_boosting   : 0.743638
+  CLAM                : 0.699298
+  logistic_regression : 0.678211
+  JOLT                : 0.000000
+
+SGEMM_GPU_kernel_performance:
+  random_forest       : 0.999800
+  gradient_boosting   : 0.999745
+  catboost            : 0.999717
+  CLAM                : 0.999629
+  tabpfn_v2           : 0.994905
+  logistic_regression : 0.676684
+  JOLT                : 0.000000
+
+UCC:
+  catboost            : 0.598219
+  CLAM                : 0.585040
+  gradient_boosting   : 0.575290
+  random_forest       : 0.564133
+  logistic_regression : 0.537106
+  tabpfn_v2           : 0.525490
+  JOLT                : 0.000000
+
+Violent_Crime_by_County_1975_to_2016:
+  logistic_regression : 1.000000
+  tabpfn_v2           : 0.999001
+  gradient_boosting   : 0.998745
+  catboost            : 0.998443
+  random_forest       : 0.997061
+  CLAM                : 0.980312
+  JOLT                : 0.000000
+
+Wheat:
+  gradient_boosting   : 0.873075
+  tabpfn_v2           : 0.871836
+  random_forest       : 0.855057
+  catboost            : 0.764521
+  logistic_regression : 0.600676
+
+ae_price_prediction:
+  random_forest       : 0.994113
+  catboost            : 0.993769
+  tabpfn_v2           : 0.993360
+  gradient_boosting   : 0.985670
+  CLAM                : 0.894014
+  logistic_regression : 0.566863
+  JOLT                : 0.000000
+
+all-natural-disasters-19002021-eosdis:
+  CLAM                : 0.823701
+  logistic_regression : 0.062381
+  tabpfn_v2           : 0.000000
+  random_forest       : 0.000000
+  gradient_boosting   : 0.000000
+  catboost            : 0.000000
+
+bookprice_prediction:
+  CLAM                : 0.340491
+  tabpfn_v2           : 0.334033
+  catboost            : 0.306001
+  random_forest       : 0.304923
+  gradient_boosting   : 0.297266
+  logistic_regression : 0.098213
+  JOLT                : 0.000000
+
+climate_change_impact_on_agriculture_2024:
+  logistic_regression : 0.564387
+  tabpfn_v2           : 0.561462
+  gradient_boosting   : 0.545817
+  catboost            : 0.544035
+  CLAM                : 0.543068
+  random_forest       : 0.531255
+  JOLT                : 0.000000
+
+coffee_distribution_across_94_counties:
+  logistic_regression : 1.000000
+  gradient_boosting   : 0.999787
+  random_forest       : 0.999480
+  catboost            : 0.989679
+  CLAM                : 0.983947
+  tabpfn_v2           : 0.694980
+  JOLT                : 0.000000
+
+convai2_inferred:
+  catboost            : 0.451995
+  random_forest       : 0.439600
+  gradient_boosting   : 0.434142
+  CLAM                : 0.389332
+  logistic_regression : 0.354800
+  tabpfn_v2           : 0.318739
+  JOLT                : 0.000000
+
+google_qa_answer_type_reason_explanation:
+  catboost            : 0.506499
+  gradient_boosting   : 0.495477
+  logistic_regression : 0.488981
+  tabpfn_v2           : 0.473058
+  random_forest       : 0.466394
+  CLAM                : 0.439657
+  JOLT                : 0.000000
+
+google_qa_question_type_reason_explanation:
+  CLAM                : 0.500897
+  tabpfn_v2           : 0.479364
+  catboost            : 0.477821
+  gradient_boosting   : 0.465460
+  logistic_regression : 0.436971
+  random_forest       : 0.422391
+  JOLT                : 0.000000
+
+infrared_thermography_temperature:
+  tabpfn_v2           : 0.577629
+  gradient_boosting   : 0.507583
+  catboost            : 0.504422
+  random_forest       : 0.497835
+  logistic_regression : 0.489136
+  CLAM                : 0.397664
+  JOLT                : 0.000000
+
+jc_penney_products:
+  gradient_boosting   : 0.632858
+  random_forest       : 0.577351
+  catboost            : 0.536756
+  tabpfn_v2           : 0.490227
+  CLAM                : 0.429098
+  logistic_regression : 0.009890
+  JOLT                : 0.000000
+
+jigsaw-unintended-bias-in-toxicity:
+  catboost            : 0.953489
+  gradient_boosting   : 0.951410
+  random_forest       : 0.949323
+  CLAM                : 0.944626
+  logistic_regression : 0.913295
+  tabpfn_v2           : 0.898105
+  JOLT                : 0.000000
+
+light_inferred:
+  catboost            : 0.320833
+  gradient_boosting   : 0.307125
+  random_forest       : 0.249652
+  CLAM                : 0.244757
+  tabpfn_v2           : 0.238189
+  logistic_regression : 0.189859
+  JOLT                : 0.000000
+
+medical_charges:
+  gradient_boosting   : 0.973231
+  catboost            : 0.973159
+  CLAM                : 0.972268
+  random_forest       : 0.970647
+  tabpfn_v2           : 0.935969
+  logistic_regression : 0.813010
+  JOLT                : 0.000000
+
+mercari_price_suggestion100K:
+  tabpfn_v2           : 0.999994
+  random_forest       : 0.999992
+  catboost            : 0.999988
+  gradient_boosting   : 0.999974
+  CLAM                : 0.999877
+  logistic_regression : 0.422824
+  JOLT                : 0.000000
+
+methane_emissions_rice_crop:
+  random_forest       : 0.997734
+  catboost            : 0.917780
+  gradient_boosting   : 0.603730
+  tabpfn_v2           : 0.503770
+  logistic_regression : 0.000732
+  JOLT                : 0.000000
+  CLAM                : 0.000000
+
+opensubtitles_inferred:
+  random_forest       : 0.607410
+  CLAM                : 0.541523
+  catboost            : 0.530384
+  gradient_boosting   : 0.497086
+  logistic_regression : 0.427522
+  tabpfn_v2           : 0.414586
+  JOLT                : 0.000000
+
+particulate-matter-ukair-2017:
+  catboost            : 0.653865
+  CLAM                : 0.638984
+  random_forest       : 0.634143
+  gradient_boosting   : 0.621815
+  tabpfn_v2           : 0.578688
+  logistic_regression : 0.493793
+  JOLT                : 0.000000
+
+social-media-impact-on-suicide-rates:
+  tabpfn_v2           : 0.940195
+  gradient_boosting   : 0.936530
+  catboost            : 0.922900
+  random_forest       : 0.908044
+  logistic_regression : 0.882469
+  JOLT                : 0.220992
+  CLAM                : 0.000000
+
+sulfur:
+  catboost            : 0.898923
+  random_forest       : 0.893937
+  gradient_boosting   : 0.881600
+  tabpfn_v2           : 0.845918
+  CLAM                : 0.825418
+  logistic_regression : 0.393191
+  JOLT                : 0.000000
+
+superconduct:
+  tabpfn_v2           : 0.947221
+  random_forest       : 0.947147
+  catboost            : 0.934065
+  CLAM                : 0.904004
+  gradient_boosting   : 0.897229
+  logistic_regression : 0.749557
+  JOLT                : 0.000000
+
+sustainable_development_report_zero_hunger:
+  tabpfn_v2           : 0.985047
+  CLAM                : 0.982086
+  random_forest       : 0.963874
+  catboost            : 0.963589
+  gradient_boosting   : 0.836620
+  logistic_regression : 0.612950
+  JOLT                : 0.000000
+
+women_clothing_review:
+  catboost            : 0.650518
+  gradient_boosting   : 0.646594
+  random_forest       : 0.643535
+  tabpfn_v2           : 0.622731
+  logistic_regression : 0.615727
+  CLAM                : 0.421859
+  JOLT                : 0.000000
+
+world_food_wealth_bank:
+  random_forest       : 0.997727
+  catboost            : 0.607711
+  gradient_boosting   : 0.422581
+  tabpfn_v2           : 0.178853
+  CLAM                : 0.039118
+  logistic_regression : 0.005179
+  JOLT                : 0.000000
+
+================================================================================
+📊 PERFORMANCE DISTRIBUTION BY ALGORITHM
+================================================================================
+
+CLAM:
+  Excellent (R² ≥ 0.9):   36 ( 37.5%)
+  Good (0.7 ≤ R² < 0.9):  10 ( 10.4%)
+  Fair (0.5 ≤ R² < 0.7):  16 ( 16.7%)
+  Poor (0.0 ≤ R² < 0.5):  34 ( 35.4%)
+
+JOLT:
+  Excellent (R² ≥ 0.9):    0 (  0.0%)
+  Good (0.7 ≤ R² < 0.9):   0 (  0.0%)
+  Fair (0.5 ≤ R² < 0.7):   1 (  1.1%)
+  Poor (0.0 ≤ R² < 0.5):  89 ( 98.9%)
+
+catboost:
+  Excellent (R² ≥ 0.9):   45 ( 45.5%)
+  Good (0.7 ≤ R² < 0.9):  11 ( 11.1%)
+  Fair (0.5 ≤ R² < 0.7):  19 ( 19.2%)
+  Poor (0.0 ≤ R² < 0.5):  24 ( 24.2%)
+
+gradient_boosting:
+  Excellent (R² ≥ 0.9):   34 ( 34.3%)
+  Good (0.7 ≤ R² < 0.9):  20 ( 20.2%)
+  Fair (0.5 ≤ R² < 0.7):  17 ( 17.2%)
+  Poor (0.0 ≤ R² < 0.5):  28 ( 28.3%)
+
+logistic_regression:
+  Excellent (R² ≥ 0.9):   12 ( 12.1%)
+  Good (0.7 ≤ R² < 0.9):  16 ( 16.2%)
+  Fair (0.5 ≤ R² < 0.7):  29 ( 29.3%)
+  Poor (0.0 ≤ R² < 0.5):  42 ( 42.4%)
+
+random_forest:
+  Excellent (R² ≥ 0.9):   49 ( 49.5%)
+  Good (0.7 ≤ R² < 0.9):   7 (  7.1%)
+  Fair (0.5 ≤ R² < 0.7):  20 ( 20.2%)
+  Poor (0.0 ≤ R² < 0.5):  23 ( 23.2%)
+
+tabpfn_v2:
+  Excellent (R² ≥ 0.9):   32 ( 41.6%)
+  Good (0.7 ≤ R² < 0.9):   9 ( 11.7%)
+  Fair (0.5 ≤ R² < 0.7):  16 ( 20.8%)
+  Poor (0.0 ≤ R² < 0.5):  20 ( 26.0%)
+
+================================================================================
+📊 DATASET COVERAGE ANALYSIS (out of 33 valid datasets after filtering)
+================================================================================
+
+Total unique datasets covered across all algorithms: 33
+
+Dataset coverage by algorithm:
+  tabpfn_v2                : 33 datasets (100.0%)
+  random_forest            : 33 datasets (100.0%)
+  logistic_regression      : 33 datasets (100.0%)
+  gradient_boosting        : 33 datasets (100.0%)
+  catboost                 : 33 datasets (100.0%)
+  CLAM                     : 33 datasets (100.0%)
+  JOLT                     : 32 datasets ( 97.0%)
+
+⚠️  10 datasets were not successfully evaluated by any algorithm
+
+================================================================================
+📊 SUBSET ANALYSIS: Comparison on TabPFN v2 Successful Datasets Only
+================================================================================
+TabPFN v2 ran successfully on 33 datasets
+This represents 77 dataset splits
+
+📈 SUBSET PERFORMANCE COMPARISON (TabPFN datasets only)
+============================================================
+
+CLAM                
+  Samples:       96
+  Datasets:      32
+  Average R²:    0.629434
+  Median R²:     0.651152
+
+JOLT                
+  Samples:       90
+  Datasets:      30
+  Average R²:    0.007366
+  Median R²:     0.000000
+
+catboost            
+  Samples:       99
+  Datasets:      33
+  Average R²:    0.714413
+  Median R²:     0.829420
+
+gradient_boosting   
+  Samples:       99
+  Datasets:      33
+  Average R²:    0.692213
+  Median R²:     0.784451
+
+logistic_regression 
+  Samples:       99
+  Datasets:      33
+  Average R²:    0.512566
+  Median R²:     0.528391
+
+random_forest       
+  Samples:       99
+  Datasets:      33
+  Average R²:    0.728109
+  Median R²:     0.877875
+
+tabpfn_v2           
+  Samples:       77
+  Datasets:      33
+  Average R²:    0.701346
+  Median R²:     0.797216
+
+🏆 SUBSET RANKING BY AVERAGE R² (TabPFN datasets only)
+============================================================
+1. random_forest       : 0.728109 (33/33 datasets, 100.0%)
+2. catboost            : 0.714413 (33/33 datasets, 100.0%)
+3. tabpfn_v2           : 0.701346 (33/33 datasets, 100.0%)
+4. gradient_boosting   : 0.692213 (33/33 datasets, 100.0%)
+5. CLAM                : 0.629434 (32/33 datasets, 97.0%)
+6. logistic_regression : 0.512566 (33/33 datasets, 100.0%)
+7. JOLT                : 0.007366 (30/33 datasets, 90.9%)
+
+📊 SUBSET PERFORMANCE DISTRIBUTION
+============================================================
+
+CLAM:
+  Excellent (R² ≥ 0.9):   36 ( 37.5%)
+  Good (0.7 ≤ R² < 0.9):  10 ( 10.4%)
+  Fair (0.5 ≤ R² < 0.7):  16 ( 16.7%)
+  Poor (0.0 ≤ R² < 0.5):  34 ( 35.4%)
+
+JOLT:
+  Excellent (R² ≥ 0.9):    0 (  0.0%)
+  Good (0.7 ≤ R² < 0.9):   0 (  0.0%)
+  Fair (0.5 ≤ R² < 0.7):   1 (  1.1%)
+  Poor (0.0 ≤ R² < 0.5):  89 ( 98.9%)
+
+catboost:
+  Excellent (R² ≥ 0.9):   45 ( 45.5%)
+  Good (0.7 ≤ R² < 0.9):  11 ( 11.1%)
+  Fair (0.5 ≤ R² < 0.7):  19 ( 19.2%)
+  Poor (0.0 ≤ R² < 0.5):  24 ( 24.2%)
+
+gradient_boosting:
+  Excellent (R² ≥ 0.9):   34 ( 34.3%)
+  Good (0.7 ≤ R² < 0.9):  20 ( 20.2%)
+  Fair (0.5 ≤ R² < 0.7):  17 ( 17.2%)
+  Poor (0.0 ≤ R² < 0.5):  28 ( 28.3%)
+
+logistic_regression:
+  Excellent (R² ≥ 0.9):   12 ( 12.1%)
+  Good (0.7 ≤ R² < 0.9):  16 ( 16.2%)
+  Fair (0.5 ≤ R² < 0.7):  29 ( 29.3%)
+  Poor (0.0 ≤ R² < 0.5):  42 ( 42.4%)
+
+random_forest:
+  Excellent (R² ≥ 0.9):   49 ( 49.5%)
+  Good (0.7 ≤ R² < 0.9):   7 (  7.1%)
+  Fair (0.5 ≤ R² < 0.7):  20 ( 20.2%)
+  Poor (0.0 ≤ R² < 0.5):  23 ( 23.2%)
+
+tabpfn_v2:
+  Excellent (R² ≥ 0.9):   32 ( 41.6%)
+  Good (0.7 ≤ R² < 0.9):   9 ( 11.7%)
+  Fair (0.5 ≤ R² < 0.7):  16 ( 20.8%)
+  Poor (0.0 ≤ R² < 0.5):  20 ( 26.0%)
+
+================================================================================
+🏆 WIN RATE ANALYSIS
+================================================================================
+
+Bike_Sharing_Demand:
+  Winner: tabpfn_v2 (R² = 0.955014)
+  1. tabpfn_v2           : 0.955014
+  2. catboost            : 0.948525
+  3. random_forest       : 0.943097
+
+Crime_Data_from_2010:
+  Winner: CLAM (R² = 0.197490)
+  1. CLAM                : 0.197490
+  2. random_forest       : 0.045385
+  3. tabpfn_v2           : 0.039064
+
+IoT_Agriculture_2024:
+  Winner: catboost (R² = 0.976081)
+  1. catboost            : 0.976081
+  2. random_forest       : 0.975323
+  3. tabpfn_v2           : 0.972008
+
+MiamiHousing2016:
+  Winner: tabpfn_v2 (R² = 0.932200)
+  1. tabpfn_v2           : 0.932200
+  2. catboost            : 0.926375
+  3. CLAM                : 0.921991
+
+Phenotype_202:
+  Winner: tabpfn_v2 (R² = 0.994983)
+  1. tabpfn_v2           : 0.994983
+  2. gradient_boosting   : 0.991842
+  3. random_forest       : 0.986587
+
+QSAR_Bioconcentration_regression:
+  Winner: tabpfn_v2 (R² = 0.771844)
+  1. tabpfn_v2           : 0.771844
+  2. random_forest       : 0.761774
+  3. catboost            : 0.760376
+
+SGEMM_GPU_kernel_performance:
+  Winner: random_forest (R² = 0.999800)
+  1. random_forest       : 0.999800
+  2. gradient_boosting   : 0.999745
+  3. catboost            : 0.999717
+
+UCC:
+  Winner: catboost (R² = 0.598219)
+  1. catboost            : 0.598219
+  2. CLAM                : 0.585040
+  3. gradient_boosting   : 0.575290
+
+Violent_Crime_by_County_1975_to_2016:
+  Winner: logistic_regression (R² = 1.000000)
+  1. logistic_regression : 1.000000
+  2. tabpfn_v2           : 0.999001
+  3. gradient_boosting   : 0.998745
+
+Wheat:
+  Winner: gradient_boosting (R² = 0.873075)
+  1. gradient_boosting   : 0.873075
+  2. tabpfn_v2           : 0.871836
+  3. random_forest       : 0.855057
+
+ae_price_prediction:
+  Winner: random_forest (R² = 0.994113)
+  1. random_forest       : 0.994113
+  2. catboost            : 0.993769
+  3. tabpfn_v2           : 0.993360
+
+all-natural-disasters-19002021-eosdis:
+  Winner: CLAM (R² = 0.823701)
+  1. CLAM                : 0.823701
+  2. logistic_regression : 0.062381
+  3. catboost            : 0.000000
+
+bookprice_prediction:
+  Winner: CLAM (R² = 0.340491)
+  1. CLAM                : 0.340491
+  2. tabpfn_v2           : 0.334033
+  3. catboost            : 0.306001
+
+climate_change_impact_on_agriculture_2024:
+  Winner: logistic_regression (R² = 0.564387)
+  1. logistic_regression : 0.564387
+  2. tabpfn_v2           : 0.561462
+  3. gradient_boosting   : 0.545817
+
+coffee_distribution_across_94_counties:
+  Winner: logistic_regression (R² = 1.000000)
+  1. logistic_regression : 1.000000
+  2. gradient_boosting   : 0.999787
+  3. random_forest       : 0.999480
+
+convai2_inferred:
+  Winner: catboost (R² = 0.451995)
+  1. catboost            : 0.451995
+  2. random_forest       : 0.439600
+  3. gradient_boosting   : 0.434142
+
+google_qa_answer_type_reason_explanation:
+  Winner: catboost (R² = 0.506499)
+  1. catboost            : 0.506499
+  2. gradient_boosting   : 0.495477
+  3. logistic_regression : 0.488981
+
+google_qa_question_type_reason_explanation:
+  Winner: CLAM (R² = 0.500897)
+  1. CLAM                : 0.500897
+  2. tabpfn_v2           : 0.479364
+  3. catboost            : 0.477821
+
+infrared_thermography_temperature:
+  Winner: tabpfn_v2 (R² = 0.577629)
+  1. tabpfn_v2           : 0.577629
+  2. gradient_boosting   : 0.507583
+  3. catboost            : 0.504422
+
+jc_penney_products:
+  Winner: gradient_boosting (R² = 0.632858)
+  1. gradient_boosting   : 0.632858
+  2. random_forest       : 0.577351
+  3. catboost            : 0.536756
+
+jigsaw-unintended-bias-in-toxicity:
+  Winner: catboost (R² = 0.953489)
+  1. catboost            : 0.953489
+  2. gradient_boosting   : 0.951410
+  3. random_forest       : 0.949323
+
+light_inferred:
+  Winner: catboost (R² = 0.320833)
+  1. catboost            : 0.320833
+  2. gradient_boosting   : 0.307125
+  3. random_forest       : 0.249652
+
+medical_charges:
+  Winner: gradient_boosting (R² = 0.973231)
+  1. gradient_boosting   : 0.973231
+  2. catboost            : 0.973159
+  3. CLAM                : 0.972268
+
+mercari_price_suggestion100K:
+  Winner: tabpfn_v2 (R² = 0.999994)
+  1. tabpfn_v2           : 0.999994
+  2. random_forest       : 0.999992
+  3. catboost            : 0.999988
+
+methane_emissions_rice_crop:
+  Winner: random_forest (R² = 0.997734)
+  1. random_forest       : 0.997734
+  2. catboost            : 0.917780
+  3. gradient_boosting   : 0.603730
+
+opensubtitles_inferred:
+  Winner: random_forest (R² = 0.607410)
+  1. random_forest       : 0.607410
+  2. CLAM                : 0.541523
+  3. catboost            : 0.530384
+
+particulate-matter-ukair-2017:
+  Winner: catboost (R² = 0.653865)
+  1. catboost            : 0.653865
+  2. CLAM                : 0.638984
+  3. random_forest       : 0.634143
+
+social-media-impact-on-suicide-rates:
+  Winner: tabpfn_v2 (R² = 0.940195)
+  1. tabpfn_v2           : 0.940195
+  2. gradient_boosting   : 0.936530
+  3. catboost            : 0.922900
+
+sulfur:
+  Winner: catboost (R² = 0.898923)
+  1. catboost            : 0.898923
+  2. random_forest       : 0.893937
+  3. gradient_boosting   : 0.881600
+
+superconduct:
+  Winner: tabpfn_v2 (R² = 0.947221)
+  1. tabpfn_v2           : 0.947221
+  2. random_forest       : 0.947147
+  3. catboost            : 0.934065
+
+sustainable_development_report_zero_hunger:
+  Winner: tabpfn_v2 (R² = 0.985047)
+  1. tabpfn_v2           : 0.985047
+  2. CLAM                : 0.982086
+  3. random_forest       : 0.963874
+
+women_clothing_review:
+  Winner: catboost (R² = 0.650518)
+  1. catboost            : 0.650518
+  2. gradient_boosting   : 0.646594
+  3. random_forest       : 0.643535
+
+world_food_wealth_bank:
+  Winner: random_forest (R² = 0.997727)
+  1. random_forest       : 0.997727
+  2. catboost            : 0.607711
+  3. gradient_boosting   : 0.422581
+
+🏆 OVERALL WIN RATES (out of 33 datasets)
+============================================================
+CLAM                     :  4 wins ( 12.1%) | Participated in 32 datasets ( 97.0%)
+catboost                 :  9 wins ( 27.3%) | Participated in 33 datasets (100.0%)
+gradient_boosting        :  3 wins (  9.1%) | Participated in 33 datasets (100.0%)
+logistic_regression      :  3 wins (  9.1%) | Participated in 33 datasets (100.0%)
+random_forest            :  5 wins ( 15.2%) | Participated in 33 datasets (100.0%)
+tabpfn_v2                :  9 wins ( 27.3%) | Participated in 33 datasets (100.0%)
+
+🥇 WIN RATE RANKING
+========================================
+1. tabpfn_v2           :  9 wins ( 27.3%)
+2. catboost            :  9 wins ( 27.3%)
+3. random_forest       :  5 wins ( 15.2%)
+4. CLAM                :  4 wins ( 12.1%)
+5. logistic_regression :  3 wins (  9.1%)
+6. gradient_boosting   :  3 wins (  9.1%)
+
+📈 SUCCESS RATE ANALYSIS (R² ≥ 0.5 per dataset)
+============================================================
+CLAM                     : 21/32 datasets successful ( 65.6%)
+JOLT                     :  0/30 datasets successful (  0.0%)
+catboost                 : 27/33 datasets successful ( 81.8%)
+gradient_boosting        : 24/33 datasets successful ( 72.7%)
+logistic_regression      : 17/33 datasets successful ( 51.5%)
+random_forest            : 25/33 datasets successful ( 75.8%)
+tabpfn_v2                : 23/33 datasets successful ( 69.7%)
+
+📊 SUCCESS RATE RANKING (R² ≥ 0.5)
+==================================================
+1. catboost            : 27/33 ( 81.8%)
+2. random_forest       : 25/33 ( 75.8%)
+3. gradient_boosting   : 24/33 ( 72.7%)
+4. tabpfn_v2           : 23/33 ( 69.7%)
+5. CLAM                : 21/32 ( 65.6%)
+6. logistic_regression : 17/33 ( 51.5%)
+7. JOLT                :  0/30 (  0.0%)
+
+================================================================================
+📊 GENERATING STATISTICAL PLOTS
+================================================================================
+
+📊 Friedman Test Results:
+   Statistic: 96.4538
+   p-value: 0.0000
+   ✅ Significant differences found (p < 0.05)
+
+📊 Average Ranks:
+   1. catboost: 2.367
+   2. random_forest: 2.967
+   3. gradient_boosting: 3.133
+   4. tabpfn_v2: 3.233
+   5. CLAM: 4.283
+   6. logistic_regression: 5.067
+   7. JOLT: 6.950
+   📊 Critical difference plot saved to: /Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/scripts/regression_analysis_plots/critical_difference_r2.png
+📊 Performance matrix plot saved to: /Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/scripts/regression_analysis_plots/performance_matrix_heatmap.png
+
+📊 Friedman Test Results:
+   Statistic: 92.1308
+   p-value: 0.0000
+   ✅ Significant differences found (p < 0.05)
+
+📊 Average Ranks:
+   1. catboost: 3.150
+   2. random_forest: 3.383
+   3. gradient_boosting: 3.500
+   4. tabpfn_v2: 3.617
+   5. CLAM: 3.850
+   6. logistic_regression: 4.317
+   7. JOLT: 6.183
+   📊 Critical difference plot saved to: /Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/scripts/regression_analysis_plots/critical_difference_success_rate.png
+
+✅ All plots saved to: /Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/scripts/regression_analysis_plots

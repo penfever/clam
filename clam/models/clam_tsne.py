@@ -900,15 +900,40 @@ class ClamTsneClassifier:
             if self.task_type == 'regression':
                 self.target_stats = get_target_statistics(y_train_array)
                 self.logger.info(f"Target statistics: {self.target_stats}")
+                
+                # Auto-detect if target transformation is needed for extreme ranges
+                from clam.utils.target_transforms import TargetTransformer
+                self.target_transformer = TargetTransformer(method="auto")
+                self.target_transformer.fit(y_train_array)
+                
+                if self.target_transformer.needs_transform:
+                    transform_info = self.target_transformer.get_transform_info()
+                    self.logger.info(f"Target transformation enabled: {transform_info['transform_method']}")
+                    self.logger.info(f"Original range: {transform_info['original_stats']['range']:.2f}, "
+                                   f"Transformed range: {transform_info['transformed_stats']['range']:.2f}")
+                    
+                    # Store original targets for reference and KNN analysis
+                    self.y_train_original = y_train_array.copy()
+                    
+                    # Transform y_train for embedding and visualization
+                    y_train_array = self.target_transformer.transform(y_train_array)
+                    self.logger.info(f"Targets transformed for training")
+                else:
+                    self.logger.info("Target transformation not needed - normal range detected")
+                    self.y_train_original = y_train_array.copy()
             else:
                 self.unique_classes = np.unique(y_train_array)
                 self.target_stats = None
+                self.target_transformer = None
+                self.y_train_original = None
         except ImportError:
             # Fallback if task detection is not available
             self.logger.warning("Task detection not available, assuming classification")
             self.task_type = 'classification'
             self.unique_classes = np.unique(y_train_array)
             self.target_stats = None
+            self.target_transformer = None
+            self.y_train_original = None
         
         # Load metadata if enabled
         if self.auto_load_metadata or self.dataset_metadata is not None:

@@ -368,7 +368,8 @@ def create_regression_prompt(
     include_spectrogram: bool = False,
     dataset_description: Optional[str] = None,
     multi_viz_info: Optional[List[Dict[str, Any]]] = None,
-    dataset_metadata: Optional[str] = None
+    dataset_metadata: Optional[str] = None,
+    transform_info: Optional[Dict[str, Any]] = None
 ) -> str:
     """
     Create a regression prompt for VLM based on modality and visualization type.
@@ -393,12 +394,35 @@ def create_regression_prompt(
     target_mean = target_stats.get('mean', (target_min + target_max) / 2)
     target_std = target_stats.get('std', (target_max - target_min) / 6)
     
-    # Format target range description
-    range_desc = f"between {target_min:.3g} and {target_max:.3g}"
-    if target_stats.get('dtype', '').startswith('int'):
-        range_desc = f"between {int(target_min)} and {int(target_max)}"
+    # Check if target transformation is active
+    has_transform = transform_info is not None and transform_info.get('needs_transform', False)
     
-    stats_desc = f"(mean: {target_mean:.3g}, std: {target_std:.3g})"
+    if has_transform:
+        # Use original stats for range description but note transformation
+        original_stats = transform_info.get('original_stats', {})
+        orig_min = original_stats.get('min', target_min)
+        orig_max = original_stats.get('max', target_max)
+        orig_mean = original_stats.get('mean', target_mean)
+        orig_std = original_stats.get('std', target_std)
+        transform_method = transform_info.get('transform_method', 'unknown')
+        
+        # Format original range description
+        range_desc = f"between {orig_min:.3g} and {orig_max:.3g}"
+        if original_stats.get('dtype', '').startswith('int'):
+            range_desc = f"between {int(orig_min)} and {int(orig_max)}"
+        
+        stats_desc = f"(original mean: {orig_mean:.3g}, std: {orig_std:.3g})"
+        
+        # Add transformation explanation
+        transform_explanation = f"\n\nIMPORTANT: Due to extreme outliers in this dataset, the target values have been transformed using {transform_method} for better visualization. The visualization shows the transformed scale, but your prediction should be for the original scale {range_desc}."
+    else:
+        # Standard formatting for non-transformed targets
+        range_desc = f"between {target_min:.3g} and {target_max:.3g}"
+        if target_stats.get('dtype', '').startswith('int'):
+            range_desc = f"between {int(target_min)} and {int(target_max)}"
+        
+        stats_desc = f"(mean: {target_mean:.3g}, std: {target_std:.3g})"
+        transform_explanation = ""
     
     # Create modality-specific description
     if modality == "audio":
@@ -557,7 +581,7 @@ The multiple visualizations provide different perspectives on how the target val
     response_format = f'Please respond with just the predicted numerical value followed by a brief explanation of your reasoning based on the {analysis_type}{spectrogram_text}.'
 
     # Combine all parts
-    prompt = f"""{data_description}{dataset_context}{important_note}
+    prompt = f"""{data_description}{dataset_context}{important_note}{transform_explanation}
 
 {analysis_prompt}
 

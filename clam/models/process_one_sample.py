@@ -69,7 +69,7 @@ def _generate_vlm_response(classifier_instance, image, prompt):
 def _parse_prediction(response, classifier_instance, all_classes):
     """Parse VLM response into prediction using complete class list."""
     if classifier_instance.task_type == 'regression':
-        return parse_vlm_response(
+        prediction = parse_vlm_response(
             response, 
             unique_classes=None, 
             logger_instance=classifier_instance.logger, 
@@ -77,6 +77,27 @@ def _parse_prediction(response, classifier_instance, all_classes):
             task_type='regression',
             target_stats=classifier_instance.target_stats
         )
+        
+        # Apply inverse transformation if needed
+        if hasattr(classifier_instance, 'target_transformer') and classifier_instance.target_transformer and classifier_instance.target_transformer.needs_transform:
+            try:
+                # Convert prediction to numpy array for transformation
+                import numpy as np
+                if isinstance(prediction, (int, float)):
+                    pred_array = np.array([prediction])
+                    inverse_pred_array = classifier_instance.target_transformer.inverse_transform(pred_array)
+                    prediction = float(inverse_pred_array[0])
+                    classifier_instance.logger.debug(f"Applied inverse transform: {pred_array[0]:.3f} -> {prediction:.3f}")
+                elif isinstance(prediction, (list, np.ndarray)):
+                    pred_array = np.array(prediction)
+                    inverse_pred_array = classifier_instance.target_transformer.inverse_transform(pred_array)
+                    prediction = inverse_pred_array.tolist()
+                    classifier_instance.logger.debug(f"Applied inverse transform to array: {len(prediction)} values")
+            except Exception as e:
+                classifier_instance.logger.warning(f"Failed to apply inverse transform: {e}")
+                # Keep original prediction if inverse transform fails
+        
+        return prediction
     else:
         # Convert all_classes to the format expected by the parser
         if classifier_instance.use_semantic_names:
@@ -230,6 +251,26 @@ def _create_single_visualization(classifier_instance, i, viz_methods, viewing_an
         fig.savefig(viz_path, dpi=classifier_instance.image_dpi, bbox_inches='tight', facecolor='white')
     
     plt.close(fig)
+    
+    # Enhance legend text with original target range if transformation is active
+    if (classifier_instance.task_type == 'regression' and 
+        hasattr(classifier_instance, 'target_transformer') and 
+        classifier_instance.target_transformer and 
+        classifier_instance.target_transformer.needs_transform):
+        
+        # Get original target statistics
+        original_stats = classifier_instance.target_transformer.get_transform_info().get('original_stats', {})
+        orig_min = original_stats.get('min', 'unknown')
+        orig_max = original_stats.get('max', 'unknown')
+        transform_method = classifier_instance.target_transformer.transform_method
+        
+        # Update legend text to show original range
+        if 'Target range:' in legend_text:
+            # Replace the transformed range with original range and add transformation note
+            import re
+            original_range_text = f"Original target range: [{orig_min:.3g}, {orig_max:.3g}] (visualization shows {transform_method}-transformed values)"
+            legend_text = re.sub(r'Target range: \[.*?\]', original_range_text, legend_text)
+    
     return image, legend_text, metadata
 
 
@@ -367,12 +408,18 @@ def process_one_sample(
         if classifier_instance.task_type == 'regression':
             multi_viz_info = _create_multi_viz_info(classifier_instance.context_composer, classifier_instance.modality)
             
+            # Get transformation info if available
+            transform_info = None
+            if hasattr(classifier_instance, 'target_transformer') and classifier_instance.target_transformer:
+                transform_info = classifier_instance.target_transformer.get_transform_info()
+            
             prompt = create_regression_prompt(
                 target_stats=classifier_instance.target_stats,
                 modality=classifier_instance.modality,
                 dataset_description=f"{classifier_instance.modality.title()} data with highlighted test point",
                 multi_viz_info=multi_viz_info,
-                dataset_metadata=classifier_instance._get_metadata_for_prompt()
+                dataset_metadata=classifier_instance._get_metadata_for_prompt(),
+                transform_info=transform_info
             )
         else:
             multi_viz_info = _create_multi_viz_info(classifier_instance.context_composer, classifier_instance.modality)
@@ -408,6 +455,11 @@ def process_one_sample(
         if classifier_instance.task_type == 'regression':
             enhanced_legend = _create_enhanced_legend(legend_text, classifier_instance)
             
+            # Get transformation info if available
+            transform_info = None
+            if hasattr(classifier_instance, 'target_transformer') and classifier_instance.target_transformer:
+                transform_info = classifier_instance.target_transformer.get_transform_info()
+            
             prompt = create_regression_prompt(
                 target_stats=classifier_instance.target_stats,
                 modality=classifier_instance.modality,
@@ -416,7 +468,8 @@ def process_one_sample(
                 nn_k=classifier_instance.knn_k if classifier_instance.use_knn_connections else None,
                 legend_text=enhanced_legend,
                 dataset_description=f"{classifier_instance.modality.title()} data embedded using appropriate features",
-                dataset_metadata=classifier_instance._get_metadata_for_prompt()
+                dataset_metadata=classifier_instance._get_metadata_for_prompt(),
+                transform_info=transform_info
             )
         else:
             enhanced_legend = _create_enhanced_legend(legend_text, classifier_instance)
