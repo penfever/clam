@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-06-26T08:37:15.104137",
+  "timestamp": "2025-06-26T11:11:15.536343",
   "dataset_info": {
     "name": "**Author**: James P Bridge, Sean B Holden and Lawrence C Paulson \n  \n**Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/First-order+theorem+proving)  \n\n**Please cite**: James P Bridge, Sean B Holden and Lawrence C Paulson . Machine learning for first-order theorem proving: learning to select a good heuristic. Journal of Automated Reasoning, Springer 2012/13. \n\nSource:\n\nJames P Bridge, Sean B Holden and Lawrence C Paulson \n\nUniversity of Cambridge \nComputer Laboratory \nWilliam Gates Building \n15 JJ Thomson Avenue \nCambridge CB3 0FD \nUK \n\n+44 (0)1223 763500 \nforename.surname '@' cl.cam.ac.uk\n\n\nData Set Information:\n\nSee the file dataset file.\n\n\nAttribute Information:\n\nThe attributes are a mixture of static and dynamic features derived from theorems to be proved. See the paper for full details.\n\nDownloaded from openml.org.",
     "n_samples": 500,
@@ -62,18 +62,23 @@
     ]
   },
   "vlm_model": "Qwen/Qwen2.5-VL-3B-Instruct",
-  "total_tests": 1,
-  "successful_tests": 1,
+  "total_tests": 2,
+  "successful_tests": 2,
   "failed_tests": 0,
   "success_rate": 100.0,
-  "single_viz_tests": 1,
-  "multi_viz_tests": 0,
-  "visualization_method_counts": {},
-  "average_prompt_length": 1381.0,
-  "total_test_samples": 20,
+  "single_viz_tests": 0,
+  "multi_viz_tests": 2,
+  "visualization_method_counts": {
+    "pca": 2,
+    "decision_regions": 1,
+    "tsne": 1,
+    "isomap": 1
+  },
+  "average_prompt_length": 1509.0,
+  "total_test_samples": 40,
   "output_directory": "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/test_vlm_outputs_9985",
   "validation_statistics": {
-    "vlm_outputs_valid_tests": 1,
+    "vlm_outputs_valid_tests": 2,
     "vlm_outputs_invalid_tests": 0,
     "pipeline_failed_tests": 0,
     "validation_failed_tests": 0,
@@ -81,71 +86,72 @@
   },
   "overall_metrics": {
     "accuracy": {
-      "mean": 0.1,
-      "std": 0.0,
+      "mean": 0.15000000000000002,
+      "std": 0.05,
       "min": 0.1,
-      "max": 0.1,
-      "count": 1
+      "max": 0.2,
+      "count": 2
     },
     "f1_macro": {
-      "mean": 0.07936507936507936,
-      "std": 0.0,
-      "min": 0.07936507936507936,
-      "max": 0.07936507936507936,
-      "count": 1
+      "mean": 0.04413702239789197,
+      "std": 0.01383399209486166,
+      "min": 0.030303030303030304,
+      "max": 0.057971014492753624,
+      "count": 2
     },
     "balanced_accuracy": {
-      "mean": 0.25,
-      "std": 0.0,
-      "min": 0.25,
-      "max": 0.25,
-      "count": 1
+      "mean": 0.15,
+      "std": 0.016666666666666663,
+      "min": 0.13333333333333333,
+      "max": 0.16666666666666666,
+      "count": 2
     }
   },
   "best_performing_configs": {
     "accuracy": {
-      "config": "tsne_knn",
-      "score": 0.1
+      "config": "metadata_comprehensive",
+      "score": 0.2
     },
     "f1_macro": {
-      "config": "tsne_knn",
-      "score": 0.07936507936507936
+      "config": "metadata_comprehensive",
+      "score": 0.057971014492753624
     },
     "balanced_accuracy": {
-      "config": "tsne_knn",
-      "score": 0.25
+      "config": "decision_regions_svm",
+      "score": 0.16666666666666666
     }
   },
   "single_vs_multi_viz_comparison": {},
   "config_performance": {
-    "tsne_knn": {
-      "config_name": "tsne_knn",
+    "decision_regions_svm": {
+      "config_name": "decision_regions_svm",
+      "task_type": "classification",
       "accuracy": 0.1,
-      "balanced_accuracy": 0.25,
-      "precision_macro": 0.04722222222222222,
-      "recall_macro": 0.25,
-      "f1_macro": 0.07936507936507936,
+      "balanced_accuracy": 0.16666666666666666,
+      "precision_macro": 0.016666666666666666,
+      "recall_macro": 0.16666666666666666,
+      "f1_macro": 0.030303030303030304,
       "precision_micro": 0.1,
       "recall_micro": 0.1,
       "f1_micro": 0.1,
-      "precision_weighted": 0.018333333333333333,
+      "precision_weighted": 0.01,
       "recall_weighted": 0.1,
-      "f1_weighted": 0.030952380952380953,
+      "f1_weighted": 0.01818181818181818,
       "confusion_matrix": [
+        [
+          0,
+          0,
+          0,
+          5,
+          0,
+          0
+        ],
         [
           0,
           0,
           0,
           3,
           0,
-          2
-        ],
-        [
-          0,
-          0,
-          0,
-          2,
-          1,
           0
         ],
         [
@@ -159,26 +165,95 @@
         [
           0,
           0,
-          1,
-          1,
-          0,
-          0
-        ],
-        [
-          0,
-          0,
-          0,
-          0,
-          1,
-          0
-        ],
-        [
-          0,
-          0,
           0,
           2,
-          3,
+          0,
           0
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          5,
+          0,
+          0
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 20,
+      "num_classes": 6,
+      "support": []
+    },
+    "metadata_comprehensive": {
+      "config_name": "metadata_comprehensive",
+      "task_type": "classification",
+      "accuracy": 0.2,
+      "balanced_accuracy": 0.13333333333333333,
+      "precision_macro": 0.037037037037037035,
+      "recall_macro": 0.13333333333333333,
+      "f1_macro": 0.057971014492753624,
+      "precision_micro": 0.2,
+      "recall_micro": 0.2,
+      "f1_micro": 0.2,
+      "precision_weighted": 0.05555555555555556,
+      "recall_weighted": 0.2,
+      "f1_weighted": 0.08695652173913043,
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          5
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          1,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          1,
+          4
         ]
       ],
       "completion_rate": 1.0,
@@ -188,17 +263,17 @@
     }
   },
   "insights": {
-    "best_overall_config": "tsne_knn",
+    "best_overall_config": "metadata_comprehensive",
     "multi_viz_advantage": {},
-    "most_tested_viz_method": null,
-    "configs_with_metrics": 1
+    "most_tested_viz_method": "pca",
+    "configs_with_metrics": 2
   },
   "files_generated": {
-    "visualizations": 1,
-    "prompts": 1,
-    "responses": 1,
-    "configs": 1,
-    "ground_truth": 1,
-    "test_directories": 1
+    "visualizations": 6,
+    "prompts": 6,
+    "responses": 6,
+    "configs": 6,
+    "ground_truth": 6,
+    "test_directories": 6
   }
 }

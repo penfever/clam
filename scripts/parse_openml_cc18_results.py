@@ -24,11 +24,13 @@ import traceback
 from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
+import statistics
 
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score, roc_auc_score
+import matplotlib.pyplot as plt
 
 
 def setup_logging(log_level: str = "INFO") -> logging.Logger:
@@ -305,6 +307,10 @@ def create_unique_model_identifier(model_name: str, archive_source: str, model_u
             # Fall back to archive-based suffix
             return f'tabllm_{archive_lower.replace("_", "").replace("-", "")}'
     
+    # Map clam_tsne to CLAM for display
+    if normalized_name == 'clam_tsne':
+        return 'CLAM'
+    
     return normalized_name
 
 
@@ -340,6 +346,9 @@ def process_results(all_results: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, pd
     organized_results = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
     dataset_info = {}  # Store dataset metadata
     
+    # Define datasets to exclude
+    excluded_datasets = {'CIFAR_10', 'Devnagari-Script'}
+    
     for result in all_results:
         original_model_name = result.get('model_name', 'unknown')
         archive_source = result.get('_archive_source', 'unknown')
@@ -357,6 +366,10 @@ def process_results(all_results: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, pd
         dataset_name = result.get('dataset_name', 'unknown')
         task_id = str(result.get('task_id', result.get('dataset_id', 'unknown')))
         
+        # Skip excluded datasets
+        if dataset_name in excluded_datasets:
+            continue
+        
         # Store dataset info
         if task_id not in dataset_info:
             dataset_info[task_id] = {
@@ -365,6 +378,11 @@ def process_results(all_results: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, pd
                 'task_type': result.get('task_type', 'classification')
             }
         
+        # Only process classification tasks
+        task_type = result.get('task_type', 'classification')
+        if task_type != 'classification':
+            continue
+            
         # Extract key metrics
         metrics = {
             'accuracy': result.get('accuracy'),
@@ -528,6 +546,305 @@ def save_results(aggregated_df: pd.DataFrame, per_dataset_df: pd.DataFrame, outp
     logger.info("Also saved CSV versions of both files")
 
 
+def create_critical_difference_plot(algorithm_scores_matrix: Dict[str, Dict[str, float]], 
+                                  output_path: str, 
+                                  title: str = "Critical Difference Diagram",
+                                  alpha: float = 0.05):
+    """
+    Create a critical difference plot for algorithm comparison.
+    
+    Args:
+        algorithm_scores_matrix: Dict mapping algorithm -> dataset -> score
+        output_path: Path to save the plot
+        title: Title for the plot
+        alpha: Significance level for statistical tests
+    """
+    logger = logging.getLogger(__name__)
+    
+    try:
+        import scikit_posthocs as sp
+    except ImportError:
+        logger.warning("scikit-posthocs not installed. Installing...")
+        os.system("pip install scikit-posthocs")
+        try:
+            import scikit_posthocs as sp
+        except ImportError:
+            logger.error("Failed to install scikit-posthocs. Skipping critical difference plot.")
+            return
+    
+    # Convert to pandas DataFrame
+    algorithms = list(algorithm_scores_matrix.keys())
+    datasets = set()
+    for alg_data in algorithm_scores_matrix.values():
+        datasets.update(alg_data.keys())
+    datasets = sorted(list(datasets))
+    
+    # Create matrix with algorithms as columns and datasets as rows
+    data_matrix = []
+    for dataset in datasets:
+        row = []
+        for algorithm in algorithms:
+            # Use the score if available, otherwise use NaN
+            score = algorithm_scores_matrix[algorithm].get(dataset, np.nan)
+            row.append(score)
+        data_matrix.append(row)
+    
+    df = pd.DataFrame(data_matrix, columns=algorithms, index=datasets)
+    
+    # Remove rows with any NaN values for fair comparison
+    df_clean = df.dropna()
+    
+    if len(df_clean) < 3:
+        logger.warning(f"Not enough complete datasets ({len(df_clean)}) for statistical testing. Skipping CD plot.")
+        return
+    
+    # Perform Friedman test
+    stat, p_value = stats.friedmanchisquare(*[df_clean[col] for col in df_clean.columns])
+    
+    logger.info(f"Friedman Test Results:")
+    logger.info(f"   Statistic: {stat:.4f}")
+    logger.info(f"   p-value: {p_value:.4f}")
+    
+    if p_value < alpha:
+        logger.info(f"   Significant differences found (p < {alpha})")
+        
+        # Perform post-hoc Nemenyi test
+        nemenyi_results = sp.posthoc_nemenyi_friedman(df_clean.values)
+        
+        # Calculate average ranks
+        ranks = df_clean.rank(axis=1, ascending=False, method='average')
+        avg_ranks = ranks.mean(axis=0).sort_values()
+        
+        logger.info("Average Ranks:")
+        for i, (alg, rank) in enumerate(avg_ranks.items(), 1):
+            logger.info(f"   {i}. {alg}: {rank:.3f}")
+        
+        # Create critical difference plot
+        plt.figure(figsize=(10, 6))
+        
+        # Generate color palette for the number of algorithms
+        import matplotlib.cm as cm
+        n_algorithms = len(avg_ranks)
+        colors = [cm.Set1(i/n_algorithms) for i in range(n_algorithms)]
+        
+        # Use scikit-posthocs CD diagram
+        sp.critical_difference_diagram(
+            avg_ranks.to_dict(),
+            nemenyi_results,
+            label_fmt_left='{label} ({rank:.2f})',
+            label_fmt_right='{label} ({rank:.2f})',
+            label_props={'size': 12}
+        )
+        
+        plt.title(title, fontsize=14, pad=20)
+        plt.tight_layout()
+        
+        # Save the plot
+        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        logger.info(f"Critical difference plot saved to: {output_path}")
+    else:
+        logger.info(f"No significant differences found (p >= {alpha})")
+
+
+def create_performance_matrix_plot(algorithm_dataset_results: Dict[str, Dict[str, List[float]]], 
+                                 output_path: str,
+                                 metric_name: str = "Accuracy"):
+    """
+    Create a heatmap showing algorithm performance across datasets.
+    
+    Args:
+        algorithm_dataset_results: Dict mapping algorithm -> dataset -> [scores]
+        output_path: Path to save the plot
+        metric_name: Name of the metric being plotted
+    """
+    logger = logging.getLogger(__name__)
+    
+    # Get all algorithms and datasets
+    algorithms = sorted(algorithm_dataset_results.keys())
+    datasets = set()
+    for alg_data in algorithm_dataset_results.values():
+        datasets.update(alg_data.keys())
+    datasets = sorted(list(datasets))
+    
+    # Create matrix
+    matrix = np.zeros((len(algorithms), len(datasets)))
+    
+    for i, algorithm in enumerate(algorithms):
+        for j, dataset in enumerate(datasets):
+            if dataset in algorithm_dataset_results[algorithm]:
+                scores = algorithm_dataset_results[algorithm][dataset]
+                matrix[i, j] = statistics.mean(scores) if scores else 0
+            else:
+                matrix[i, j] = np.nan
+    
+    # Create heatmap
+    plt.figure(figsize=(20, 8))
+    
+    # Use masked array to handle NaN values
+    masked_matrix = np.ma.masked_invalid(matrix)
+    
+    im = plt.imshow(masked_matrix, cmap='RdYlGn', aspect='auto', vmin=0, vmax=1)
+    
+    # Set ticks
+    plt.xticks(range(len(datasets)), datasets, rotation=90, ha='right')
+    plt.yticks(range(len(algorithms)), algorithms)
+    
+    # Add colorbar
+    cbar = plt.colorbar(im)
+    cbar.set_label(f'Average {metric_name}', rotation=270, labelpad=20)
+    
+    # Add text annotations for values
+    for i in range(len(algorithms)):
+        for j in range(len(datasets)):
+            if not np.isnan(matrix[i, j]):
+                text = plt.text(j, i, f'{matrix[i, j]:.2f}',
+                               ha="center", va="center", color="black", fontsize=6)
+    
+    plt.title(f'Algorithm Performance Matrix ({metric_name})', fontsize=14, pad=20)
+    plt.xlabel('Dataset', fontsize=12)
+    plt.ylabel('Algorithm', fontsize=12)
+    plt.tight_layout()
+    
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close()
+    
+    logger.info(f"Performance matrix plot saved to: {output_path}")
+
+
+def generate_analysis_report(aggregated_df: pd.DataFrame, per_dataset_df: pd.DataFrame, output_dir: str):
+    """Generate additional analysis artifacts including plots and JSON summary."""
+    logger = logging.getLogger(__name__)
+    
+    # Create plots directory
+    plots_dir = Path(output_dir) / "plots"
+    plots_dir.mkdir(exist_ok=True)
+    
+    # Prepare data for analysis
+    algorithm_dataset_results = defaultdict(lambda: defaultdict(list))
+    algorithm_scores_matrix = defaultdict(dict)
+    
+    # Extract data from per-dataset results
+    balanced_accuracy_scores_matrix = defaultdict(dict)
+    for _, row in per_dataset_df.iterrows():
+        model = row['model']
+        dataset = row['dataset_name']
+        task_id = str(row['task_id'])
+        
+        # Use accuracy for performance matrix
+        if not pd.isna(row['accuracy_mean']):
+            algorithm_dataset_results[model][dataset].append(row['accuracy_mean'])
+            algorithm_scores_matrix[model][dataset] = row['accuracy_mean']
+        
+        # Use balanced accuracy for critical difference plot
+        if not pd.isna(row['balanced_accuracy_mean']):
+            balanced_accuracy_scores_matrix[model][dataset] = row['balanced_accuracy_mean']
+    
+    # Create critical difference plot for balanced accuracy
+    if len(balanced_accuracy_scores_matrix) > 1:
+        cd_plot_path = plots_dir / "critical_difference_balanced_accuracy.png"
+        create_critical_difference_plot(
+            dict(balanced_accuracy_scores_matrix),
+            str(cd_plot_path),
+            title="Critical Difference Diagram - Balanced Accuracy Performance",
+            alpha=0.05
+        )
+        
+        # Create performance matrix heatmap
+        matrix_plot_path = plots_dir / "performance_matrix_heatmap.png"
+        create_performance_matrix_plot(
+            dict(algorithm_dataset_results),
+            str(matrix_plot_path),
+            metric_name="Accuracy"
+        )
+    
+    # Calculate win rates and additional statistics
+    win_rates = calculate_win_rates(per_dataset_df)
+    performance_distribution = calculate_performance_distribution(aggregated_df)
+    
+    # Create comprehensive JSON summary
+    analysis_summary = {
+        "timestamp": pd.Timestamp.now().isoformat(),
+        "total_models": len(aggregated_df),
+        "total_datasets": len(per_dataset_df['task_id'].unique()),
+        "model_performance": {
+            "ranking": aggregated_df[['model', 'accuracy_mean']].sort_values('accuracy_mean', ascending=False).to_dict('records'),
+            "win_rates": win_rates,
+            "performance_distribution": performance_distribution
+        },
+        "statistical_tests": {
+            "note": "Critical difference plots show statistical significance between models"
+        }
+    }
+    
+    # Save analysis summary
+    summary_path = Path(output_dir) / "analysis_summary.json"
+    with open(summary_path, 'w') as f:
+        json.dump(analysis_summary, f, indent=2)
+    
+    logger.info(f"Analysis summary saved to: {summary_path}")
+    logger.info(f"Plots saved to: {plots_dir}")
+
+
+def calculate_win_rates(per_dataset_df: pd.DataFrame) -> Dict[str, Dict]:
+    """Calculate win rates for each model across datasets."""
+    win_rates = {}
+    
+    # Group by dataset and find winner for each
+    dataset_winners = {}
+    for task_id in per_dataset_df['task_id'].unique():
+        dataset_data = per_dataset_df[per_dataset_df['task_id'] == task_id]
+        if not dataset_data.empty:
+            # Filter out rows with NaN accuracy values
+            valid_data = dataset_data.dropna(subset=['accuracy_mean'])
+            if not valid_data.empty:
+                winner_row = valid_data.loc[valid_data['accuracy_mean'].idxmax()]
+                dataset_winners[task_id] = winner_row['model']
+    
+    # Count wins for each model
+    total_datasets = len(dataset_winners)
+    for model in per_dataset_df['model'].unique():
+        wins = sum(1 for winner in dataset_winners.values() if winner == model)
+        win_rates[model] = {
+            "wins": wins,
+            "total_datasets": total_datasets,
+            "win_rate": wins / total_datasets if total_datasets > 0 else 0
+        }
+    
+    return win_rates
+
+
+def calculate_performance_distribution(aggregated_df: pd.DataFrame) -> Dict[str, Dict]:
+    """Calculate performance distribution categories for each model."""
+    distribution = {}
+    
+    for _, row in aggregated_df.iterrows():
+        model = row['model']
+        accuracy = row['accuracy_mean']
+        
+        if pd.isna(accuracy):
+            continue
+            
+        # Categorize performance
+        if accuracy >= 0.9:
+            category = "excellent"
+        elif accuracy >= 0.8:
+            category = "good"
+        elif accuracy >= 0.7:
+            category = "fair"
+        else:
+            category = "poor"
+        
+        distribution[model] = {
+            "accuracy": accuracy,
+            "category": category,
+            "f1_macro": row.get('f1_macro_mean', None)
+        }
+    
+    return distribution
+
+
 def main():
     parser = argparse.ArgumentParser(description="Parse OpenML CC18 results from tar archives")
     parser.add_argument(
@@ -560,13 +877,18 @@ def main():
     logger.info(f"Processing results from: {results_dir}")
     logger.info(f"Output directory: {output_dir}")
     
-    # Find tar archives
+    # Find tar archives - exclude regression archives
     tar_files = []
+    regression_archives = {'jolt_reg.tar', 'clam-reg.tar', 'tabular_baselines_reg.tar'}
+    
     for file_name in os.listdir(results_dir):
         if file_name.endswith('.tar'):
+            if file_name in regression_archives:
+                logger.info(f"Skipping regression archive: {file_name}")
+                continue
             tar_path = os.path.join(results_dir, file_name)
             tar_files.append(tar_path)
-            logger.info(f"Found tar archive: {file_name}")
+            logger.info(f"Found classification archive: {file_name}")
     
     if not tar_files:
         logger.error(f"No tar files found in {results_dir}")
@@ -608,6 +930,9 @@ def main():
         
         # Save results
         save_results(aggregated_df, per_dataset_df, output_dir)
+        
+        # Generate additional analysis artifacts
+        generate_analysis_report(aggregated_df, per_dataset_df, output_dir)
         
         logger.info("Analysis complete!")
         

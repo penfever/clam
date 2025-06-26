@@ -9,7 +9,7 @@ This script:
 3. Logs the results to Weights & Biases with version control by date
 
 This is a simplified version of run_openml_cc18_tabular.py that focuses only on baseline evaluation,
-using the evaluate_on_dataset script with --run_all_baselines and --baselines_only flags.
+using the evaluate_on_dataset script with --models all_baselines flag.
 
 Requirements:
 - OpenML installed (pip install openml)
@@ -243,8 +243,7 @@ def evaluate_baselines_on_task(task, split_idx, args):
         "python", eval_script,
         "--task_ids", str(task_id),  # Pass task_id properly
         "--output_dir", eval_output_dir,
-        "--run_all_baselines",  # Run all baseline models
-        "--baselines_only",  # Skip CLAM model evaluation
+        "--models", "all_baselines",  # Run all baseline models
         "--only_ground_truth_classes",  # Only use ground truth classes
         "--seed", str(args.seed + split_idx)  # Use different seed for each split
     ]
