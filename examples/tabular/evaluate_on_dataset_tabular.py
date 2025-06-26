@@ -1257,9 +1257,29 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
             target_preprocessor = None
             
             if not dataset['is_classification']:
+                # Handle NaN/INF values in targets before processing
+                y_train_clean = y_train.copy()
+                y_test_clean = y_test.copy()
+                
+                # Check for NaN/INF values
+                train_nan_mask = np.isnan(y_train_clean) | np.isinf(y_train_clean)
+                test_nan_mask = np.isnan(y_test_clean) | np.isinf(y_test_clean)
+                
+                if np.any(train_nan_mask) or np.any(test_nan_mask):
+                    logger.warning(f"TabPFN v2: Found {np.sum(train_nan_mask)} NaN/INF values in training targets, "
+                                 f"{np.sum(test_nan_mask)} in test targets. Using median imputation.")
+                    
+                    # Use median imputation for NaN/INF values
+                    from sklearn.impute import SimpleImputer
+                    target_imputer = SimpleImputer(strategy='median')
+                    
+                    # Fit on training data (excluding NaN/INF) and transform both
+                    y_train_clean = target_imputer.fit_transform(y_train_clean.reshape(-1, 1)).flatten()
+                    y_test_clean = target_imputer.transform(y_test_clean.reshape(-1, 1)).flatten()
+                
                 # For regression, check if we have too many unique values relative to sample size
-                unique_targets = np.unique(y_train)
-                n_samples = len(y_train)
+                unique_targets = np.unique(y_train_clean)
+                n_samples = len(y_train_clean)
                 n_unique = len(unique_targets)
                 
                 # If we have more unique values than samples * 0.5, we need to bin the targets
@@ -1280,12 +1300,14 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
                     )
                     
                     # Fit on training data and transform both train and test
-                    y_train_processed = target_preprocessor.fit_transform(y_train.reshape(-1, 1)).flatten()
-                    y_test_processed = target_preprocessor.transform(y_test.reshape(-1, 1)).flatten()
+                    y_train_processed = target_preprocessor.fit_transform(y_train_clean.reshape(-1, 1)).flatten()
+                    y_test_processed = target_preprocessor.transform(y_test_clean.reshape(-1, 1)).flatten()
                     
                     logger.info(f"TabPFN v2: Preprocessed target from {n_unique} to {len(np.unique(y_train_processed))} unique values")
                 else:
                     logger.info(f"TabPFN v2: Target has {n_unique} unique values with {n_samples} samples - no preprocessing needed")
+                    y_train_processed = y_train_clean
+                    y_test_processed = y_test_clean
             
             model = TabPFNModel(
                 device=device,
