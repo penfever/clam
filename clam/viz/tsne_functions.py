@@ -137,18 +137,39 @@ class BaseTSNEPlotter(ABC):
         self.use_3d = use_3d
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         
-    def _create_figure(self) -> Tuple[plt.Figure, plt.Axes]:
+    def _create_figure(self) -> Tuple[plt.Figure, Union[plt.Axes, List[plt.Axes]]]:
         """
         Create figure and axis (2D or 3D based on configuration).
         
-        Unified figure creation logic shared across all plotters.
+        For 3D plots, creates a 2x2 grid with 4 different viewing angles.
+        For 2D plots, creates a single axis.
         """
         if self.use_3d:
-            fig = plt.figure(figsize=self.figsize)
-            ax = fig.add_subplot(111, projection='3d')
+            # Create 3D multi-view layout with 4 different perspectives
+            fig = plt.figure(figsize=(15, 12) if self.figsize == (10, 8) else self.figsize)
+            
+            # Create 2x2 subplot grid
+            axes = []
+            for i in range(4):
+                ax = fig.add_subplot(2, 2, i + 1, projection='3d')
+                axes.append(ax)
+            
+            # Set viewing angles for each subplot
+            viewing_angles = [
+                (20, -60, "Isometric View"),
+                (0, -90, "Front View (XZ)"), 
+                (0, 0, "Side View (YZ)"),
+                (90, 0, "Top View (XY)")
+            ]
+            
+            for ax, (elev, azim, title) in zip(axes, viewing_angles):
+                ax.view_init(elev=elev, azim=azim)
+                ax.set_title(title, fontsize=10)
+            
+            return fig, axes
         else:
             fig, ax = plt.subplots(figsize=self.figsize)
-        return fig, ax
+            return fig, ax
         
     def _apply_zoom(
         self,
@@ -285,35 +306,67 @@ class BaseTSNEPlotter(ABC):
             metadata: Plot metadata dictionary
         """
         # Step 1: Create figure
-        fig, ax = self._create_figure()
+        fig, axes = self._create_figure()
         
-        # Step 2: Apply zoom if highlighting a test point
-        if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_coords):
-            target_point = test_coords[highlight_test_idx]
-            self._apply_zoom(ax, target_point, train_coords, test_coords)
-            
-        # Step 3: Task-specific point plotting
-        plot_result = self._plot_points(
-            ax, train_coords, train_data, test_coords, test_data, 
-            highlight_test_idx, **kwargs
-        )
-        
-        # Step 4: Apply consistent legend formatting
-        apply_consistent_legend_formatting(ax, use_3d=self.use_3d)
-        
-        # Step 5: Add semantic legend if provided
-        self._add_semantic_legend(fig, ax, semantic_axes_labels)
-        
-        # Step 6: Set axis labels and title
         if self.use_3d:
-            ax.set_xlabel('t-SNE Component 1')
-            ax.set_ylabel('t-SNE Component 2') 
-            ax.set_zlabel('t-SNE Component 3')
+            # For 3D: axes is a list of 4 subplots
+            plot_results = []
+            for i, ax in enumerate(axes):
+                # Step 2: Apply zoom if highlighting a test point
+                if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_coords):
+                    target_point = test_coords[highlight_test_idx]
+                    self._apply_zoom(ax, target_point, train_coords, test_coords)
+                    
+                # Step 3: Task-specific point plotting
+                plot_result = self._plot_points(
+                    ax, train_coords, train_data, test_coords, test_data, 
+                    highlight_test_idx, 
+                    show_legend=(i == 0),  # Only show legend on first subplot
+                    **kwargs
+                )
+                plot_results.append(plot_result)
+                
+                # Step 4: Apply consistent legend formatting
+                apply_consistent_legend_formatting(ax, use_3d=self.use_3d)
+                
+                # Step 6: Set axis labels
+                ax.set_xlabel('t-SNE Component 1')
+                ax.set_ylabel('t-SNE Component 2') 
+                ax.set_zlabel('t-SNE Component 3')
+            
+            # Use the first plot result for overall metadata
+            main_plot_result = plot_results[0]
+            
+            # Add overall figure adjustments
+            plt.tight_layout()
+            
         else:
+            # For 2D: axes is a single axis
+            ax = axes
+            
+            # Step 2: Apply zoom if highlighting a test point
+            if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_coords):
+                target_point = test_coords[highlight_test_idx]
+                self._apply_zoom(ax, target_point, train_coords, test_coords)
+                
+            # Step 3: Task-specific point plotting
+            main_plot_result = self._plot_points(
+                ax, train_coords, train_data, test_coords, test_data, 
+                highlight_test_idx, **kwargs
+            )
+            
+            # Step 4: Apply consistent legend formatting
+            apply_consistent_legend_formatting(ax, use_3d=self.use_3d)
+            
+            # Step 6: Set axis labels
             ax.set_xlabel('t-SNE Component 1')
             ax.set_ylabel('t-SNE Component 2')
+        
+        # Step 5: Add semantic legend if provided (only for 2D or first 3D subplot)
+        first_ax = axes[0] if self.use_3d else axes
+        self._add_semantic_legend(fig, first_ax, semantic_axes_labels)
             
-        return fig, plot_result['legend_text'], plot_result['metadata']
+        return fig, main_plot_result['legend_text'], main_plot_result['metadata']
 
 
 class ClassificationTSNEPlotter(BaseTSNEPlotter):
@@ -334,6 +387,7 @@ class ClassificationTSNEPlotter(BaseTSNEPlotter):
         highlight_test_idx: Optional[int],
         class_names: Optional[List[str]] = None,
         use_semantic_names: bool = False,
+        show_legend: bool = True,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -390,6 +444,7 @@ class RegressionTSNEPlotter(BaseTSNEPlotter):
         test_targets: Optional[np.ndarray],
         highlight_test_idx: Optional[int],
         colormap: str = 'viridis',
+        show_legend: bool = True,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -434,9 +489,10 @@ class RegressionTSNEPlotter(BaseTSNEPlotter):
                 label='Training Data'
             )
             
-        # Add colorbar
-        cbar = plt.colorbar(scatter, ax=ax)
-        cbar.set_label('Target Value', rotation=270, labelpad=15)
+        # Add colorbar (only for first subplot in 3D multi-view)
+        if show_legend:
+            cbar = plt.colorbar(scatter, ax=ax)
+            cbar.set_label('Target Value', rotation=270, labelpad=15)
         
         # Plot test points with gray styling
         test_style = get_standard_test_point_style()
@@ -489,10 +545,10 @@ class RegressionTSNEPlotter(BaseTSNEPlotter):
 
 class KNNMixin:
     """
-    Mixin class that adds KNN connection functionality to any plotter.
+    Mixin class that adds KNN pie chart functionality to any plotter.
     
     This eliminates the duplication between KNN and non-KNN variants
-    of the plotting functions.
+    of the plotting functions and provides pie chart visualization.
     """
     
     def __init__(self, *args, knn_k: int = 5, **kwargs):
@@ -538,52 +594,26 @@ class KNNMixin:
             'labels': knn_labels
         }
         
-    def _add_knn_connections(
-        self,
-        ax: plt.Axes,
-        query_coord: np.ndarray,
-        knn_coords: np.ndarray,
-        use_3d: bool = False
-    ) -> None:
-        """
-        Add KNN connection lines to the plot.
-        
-        Args:
-            ax: Matplotlib axis
-            query_coord: Query point coordinates [2 or 3]
-            knn_coords: KNN coordinates [k, 2 or 3]
-            use_3d: Whether this is a 3D plot
-        """
-        for knn_coord in knn_coords:
-            if use_3d:
-                ax.plot(
-                    [query_coord[0], knn_coord[0]],
-                    [query_coord[1], knn_coord[1]], 
-                    [query_coord[2], knn_coord[2]],
-                    'r--', alpha=0.5, linewidth=1
-                )
-            else:
-                ax.plot(
-                    [query_coord[0], knn_coord[0]],
-                    [query_coord[1], knn_coord[1]],
-                    'r--', alpha=0.5, linewidth=1
-                )
-                
     def _create_knn_pie_chart(
         self,
         ax: plt.Axes,
         knn_labels: np.ndarray,
+        knn_distances: np.ndarray,
         class_names: Optional[List[str]] = None,
         use_semantic_names: bool = False
-    ) -> None:
+    ) -> str:
         """
-        Create KNN pie chart showing class distribution.
+        Create KNN pie chart showing class distribution with distance information.
         
         Args:
             ax: Matplotlib axis for pie chart
             knn_labels: Labels of KNN points [k]
+            knn_distances: Distances to KNN points [k]
             class_names: Optional class names
             use_semantic_names: Whether to use semantic names
+            
+        Returns:
+            Description text for the KNN analysis
         """
         from collections import Counter
         from .utils.styling import format_class_label, create_distinct_color_map
@@ -595,6 +625,12 @@ class KNNMixin:
         all_classes = np.unique(knn_labels)
         color_map = create_distinct_color_map(all_classes)
         
+        # Calculate average distance for each class
+        class_avg_distances = {}
+        for cls in all_classes:
+            mask = knn_labels == cls
+            class_avg_distances[cls] = np.mean(knn_distances[mask])
+        
         # Prepare data for pie chart
         labels = []
         sizes = []
@@ -602,13 +638,122 @@ class KNNMixin:
         
         for label, count in label_counts.items():
             formatted_label = format_class_label(label, class_names, use_semantic_names)
-            labels.append(f"{formatted_label} ({count})")
+            avg_dist = class_avg_distances[label]
+            labels.append(f"{formatted_label}\n{count}/{len(knn_labels)}\nAvgDist: {avg_dist:.2f}")
             sizes.append(count)
             colors.append(color_map[label])
             
         # Create pie chart
-        ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
-        ax.set_title(f'KNN Class Distribution (k={len(knn_labels)})')
+        wedges, texts, autotexts = ax.pie(
+            sizes, 
+            labels=labels, 
+            colors=colors, 
+            autopct='%1.0f%%', 
+            startangle=90,
+            textprops={'fontsize': 8},
+            wedgeprops={'edgecolor': 'black', 'linewidth': 0.5}
+        )
+        ax.set_title(f'K-NN Distribution (k={len(knn_labels)})', fontsize=10, weight='bold')
+        
+        # Generate description text
+        k = len(knn_labels)
+        description = f"K-NN Analysis (k={k}):\n"
+        for label, count in sorted(label_counts.items()):
+            percentage = (count / k) * 100
+            avg_dist = class_avg_distances[label]
+            formatted_label = format_class_label(label, class_names, use_semantic_names)
+            description += f"• {formatted_label}: {count} neighbors ({percentage:.0f}%), AvgDist: {avg_dist:.2f}\n"
+        
+        return description.strip()
+    
+    def create_plot(
+        self,
+        train_coords: np.ndarray,
+        train_data: np.ndarray,
+        test_coords: np.ndarray,
+        test_data: Optional[np.ndarray] = None,
+        highlight_test_idx: Optional[int] = None,
+        semantic_axes_labels: Optional[Dict[str, str]] = None,
+        train_embeddings: Optional[np.ndarray] = None,
+        test_embeddings: Optional[np.ndarray] = None,
+        **kwargs
+    ) -> Tuple[plt.Figure, str, Dict[str, Any]]:
+        """
+        Create KNN plot with pie chart layout.
+        
+        Overrides the base create_plot to add KNN pie chart functionality.
+        """
+        # Check if we need KNN analysis
+        show_knn = (highlight_test_idx is not None and 
+                   train_embeddings is not None and 
+                   test_embeddings is not None and
+                   0 <= highlight_test_idx < len(test_coords))
+        
+        if show_knn and not self.use_3d:
+            # For 2D with KNN: Create custom GridSpec layout
+            fig = plt.figure(figsize=self.figsize)
+            gs = fig.add_gridspec(1, 5, width_ratios=[2.5, 2.5, 2, 1.5, 1.5], 
+                                hspace=0.1, wspace=0.15)
+            ax = fig.add_subplot(gs[0, :3])  # Main plot spans first 3 columns
+            ax_pie = fig.add_subplot(gs[0, 3:])  # Pie chart spans last 2 columns
+            
+            # Apply zoom if highlighting a test point
+            if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_coords):
+                target_point = test_coords[highlight_test_idx]
+                self._apply_zoom(ax, target_point, train_coords, test_coords)
+                
+            # Task-specific point plotting
+            plot_result = self._plot_points(
+                ax, train_coords, train_data, test_coords, test_data, 
+                highlight_test_idx, **kwargs
+            )
+            
+            # Compute KNN analysis
+            query_embedding = test_embeddings[highlight_test_idx]
+            knn_info = self._compute_knn_analysis(
+                query_embedding, train_embeddings, train_data, self.knn_k
+            )
+            
+            # Create pie chart
+            knn_description = self._create_knn_pie_chart(
+                ax_pie, knn_info['labels'], knn_info['distances'],
+                kwargs.get('class_names'), kwargs.get('use_semantic_names', False)
+            )
+            
+            # Apply consistent legend formatting
+            apply_consistent_legend_formatting(ax, use_3d=self.use_3d)
+            
+            # Add semantic legend if provided
+            self._add_semantic_legend(fig, ax, semantic_axes_labels)
+            
+            # Set axis labels
+            ax.set_xlabel('t-SNE Component 1')
+            ax.set_ylabel('t-SNE Component 2')
+            
+            # Update legend text with KNN description
+            legend_text = plot_result['legend_text']
+            if knn_description:
+                legend_text += f"\n\n{knn_description}"
+            
+            # Update metadata
+            metadata = plot_result['metadata']
+            metadata['has_knn_analysis'] = True
+            metadata['knn_k'] = self.knn_k
+            
+            return fig, legend_text, metadata
+        
+        else:
+            # For 3D or non-KNN: use the parent's create_plot method
+            # This will handle 3D multi-view properly
+            return super().create_plot(
+                train_coords=train_coords,
+                train_data=train_data,
+                test_coords=test_coords,
+                test_data=test_data,
+                highlight_test_idx=highlight_test_idx,
+                semantic_axes_labels=semantic_axes_labels,
+                **kwargs
+            )
 
 
 class TSNEVisualizer:
@@ -743,7 +888,7 @@ class TSNEVisualizer:
             n_components=3 if self.use_3d else 2
         )
         
-        # Step 2: Create plot
+        # Step 2: Create plot (pass embeddings for KNN analysis if needed)
         fig, legend_text, metadata = self.plotter.create_plot(
             train_coords=train_coords,
             train_data=train_data,
@@ -751,6 +896,8 @@ class TSNEVisualizer:
             test_data=test_data,
             highlight_test_idx=highlight_test_idx,
             semantic_axes_labels=semantic_axes_labels,
+            train_embeddings=train_embeddings if self.use_knn else None,
+            test_embeddings=test_embeddings if self.use_knn else None,
             **kwargs
         )
         
@@ -1013,18 +1160,8 @@ def create_tsne_plot_with_knn(
         use_semantic_names=use_semantic_names
     )
     
-    # Add KNN connections if highlight_test_idx is provided
-    if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_tsne):
-        test_embedding = test_embeddings[highlight_test_idx]
-        knn_info = visualizer.plotter._compute_knn_analysis(
-            test_embedding, train_embeddings, train_labels, knn_k
-        )
-        knn_coords = train_tsne[knn_info['indices']]
-        
-        ax = fig.get_axes()[0]
-        visualizer.plotter._add_knn_connections(
-            ax, test_tsne[highlight_test_idx], knn_coords, use_3d=use_3d
-        )
+    # Note: KNN visualization is now handled internally by the TSNEVisualizer
+    # No need to add connections manually - pie chart is generated automatically
     
     return fig, legend_text, metadata
 
@@ -1205,18 +1342,8 @@ def create_regression_tsne_plot_with_knn(
         colormap=colormap
     )
     
-    # Add KNN connections if highlight_test_idx is provided
-    if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_tsne):
-        test_embedding = test_embeddings[highlight_test_idx]
-        knn_info = visualizer.plotter._compute_knn_analysis(
-            test_embedding, train_embeddings, train_targets, knn_k
-        )
-        knn_coords = train_tsne[knn_info['indices']]
-        
-        ax = fig.get_axes()[0]
-        visualizer.plotter._add_knn_connections(
-            ax, test_tsne[highlight_test_idx], knn_coords, use_3d=use_3d
-        )
+    # Note: KNN visualization is now handled internally by the TSNEVisualizer
+    # No need to add connections manually - pie chart is generated automatically
     
     return fig, legend_text, metadata
 

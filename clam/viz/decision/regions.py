@@ -145,14 +145,24 @@ class DecisionRegionsVisualization(BaseVisualization):
         # Create figure
         fig, ax = plt.subplots(figsize=self.config.figsize, dpi=self.config.dpi)
         
-        # Plot decision regions
+        # Plot decision regions (filter out unsupported parameters)
+        # mlxtend's plot_decision_regions doesn't support class_names, use_semantic_names, etc.
+        supported_kwargs = {}
+        mlxtend_supported_params = {
+            'filler_feature_values', 'filler_feature_ranges', 'res', 'colors', 'markers',
+            'zoom_factor', 'X_highlight', 'y_highlight', 'hide_spines', 'legend'
+        }
+        for key, value in kwargs.items():
+            if key in mlxtend_supported_params:
+                supported_kwargs[key] = value
+        
         plot_decision_regions(
             X=transformed_data,
             y=y.astype(int),
             clf=self.classifier,
             ax=ax,
             legend=2,
-            **kwargs
+            **supported_kwargs
         )
         
         # Highlight specific points if requested
