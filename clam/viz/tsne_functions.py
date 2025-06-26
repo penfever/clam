@@ -179,9 +179,9 @@ class BaseTSNEPlotter(ABC):
         test_coords: np.ndarray
     ) -> None:
         """
-        Apply zoom around target point.
+        Apply zoom around target point while ensuring all data points remain visible.
         
-        Shared zoom logic that was duplicated across multiple functions.
+        Improved zoom logic that prevents points from appearing outside plot boundaries.
         """
         if self.zoom_factor <= 1.0:
             return
@@ -194,13 +194,31 @@ class BaseTSNEPlotter(ABC):
             # 3D zoom logic - only apply if target_point has 3 dimensions
             if len(target_point) >= 3:
                 for i, coord_name in enumerate(['X', 'Y', 'Z']):
-                    coord_range = all_coords[:, i].max() - all_coords[:, i].min()
+                    coord_min_data = all_coords[:, i].min()
+                    coord_max_data = all_coords[:, i].max()
+                    coord_range = coord_max_data - coord_min_data
+                    
                     if coord_range > 0:  # Avoid division by zero
                         visible_range = coord_range / self.zoom_factor
                         center = target_point[i]
                         
+                        # Calculate initial zoom bounds
                         coord_min = center - visible_range / 2
                         coord_max = center + visible_range / 2
+                        
+                        # Ensure zoom bounds don't exceed data bounds by too much
+                        # Allow some padding but prevent excessive empty space
+                        padding = coord_range * 0.1  # 10% padding
+                        coord_min = max(coord_min, coord_min_data - padding)
+                        coord_max = min(coord_max, coord_max_data + padding)
+                        
+                        # Ensure minimum zoom window size
+                        if coord_max - coord_min < visible_range * 0.5:
+                            # If bounds got too constrained, expand symmetrically
+                            mid_point = (coord_min + coord_max) / 2
+                            half_range = visible_range * 0.25
+                            coord_min = mid_point - half_range
+                            coord_max = mid_point + half_range
                         
                         if i == 0:
                             ax.set_xlim(coord_min, coord_max)
@@ -211,13 +229,31 @@ class BaseTSNEPlotter(ABC):
         else:
             # 2D zoom logic
             for i, coord_name in enumerate(['X', 'Y']):
-                coord_range = all_coords[:, i].max() - all_coords[:, i].min()
+                coord_min_data = all_coords[:, i].min()
+                coord_max_data = all_coords[:, i].max()
+                coord_range = coord_max_data - coord_min_data
+                
                 if coord_range > 0:  # Avoid division by zero
                     visible_range = coord_range / self.zoom_factor
                     center = target_point[i]
                     
+                    # Calculate initial zoom bounds
                     coord_min = center - visible_range / 2
                     coord_max = center + visible_range / 2
+                    
+                    # Ensure zoom bounds don't exceed data bounds by too much
+                    # Allow some padding but prevent excessive empty space
+                    padding = coord_range * 0.1  # 10% padding
+                    coord_min = max(coord_min, coord_min_data - padding)
+                    coord_max = min(coord_max, coord_max_data + padding)
+                    
+                    # Ensure minimum zoom window size
+                    if coord_max - coord_min < visible_range * 0.5:
+                        # If bounds got too constrained, expand symmetrically
+                        mid_point = (coord_min + coord_max) / 2
+                        half_range = visible_range * 0.25
+                        coord_min = mid_point - half_range
+                        coord_max = mid_point + half_range
                     
                     if i == 0:
                         ax.set_xlim(coord_min, coord_max)
