@@ -1,0 +1,22 @@
+{
+  "timestamp": "20250626_092909",
+  "num_datasets": 1,
+  "num_models": 2,
+  "models": [
+    {
+      "type": "baseline",
+      "identifier": "catboost"
+    },
+    {
+      "type": "baseline",
+      "identifier": "random_forest"
+    }
+  ],
+  "datasets": [
+    {
+      "id": "46725",
+      "name": "Crime_Data_from_2010"
+    }
+  ],
+  "model_summaries": []
+}

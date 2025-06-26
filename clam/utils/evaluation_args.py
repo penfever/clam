@@ -11,17 +11,16 @@ from typing import Optional
 
 def add_model_args(parser: argparse.ArgumentParser):
     """Add model-related arguments for evaluation."""
+    # Keep deprecated arguments for backwards compatibility but raise errors
     parser.add_argument(
         "--model_path",
         type=str,
-        help="Path to the pretrained model directory (for CLAM models)"
+        help=argparse.SUPPRESS  # Hide from help
     )
     parser.add_argument(
         "--model_id",
         type=str,
-        help="Model identifier: 'catboost', 'tabpfn_v2', 'random_forest', 'logistic_regression', 'gradient_boosting', "
-             "or a Hugging Face model ID like 'Qwen/Qwen2.5-3B-Instruct' for CLAM models. "
-             "When used with --model_path, specifies the base model architecture for fallback model creation."
+        help=argparse.SUPPRESS  # Hide from help
     )
     parser.add_argument(
         "--embedding_size",
@@ -288,15 +287,30 @@ def add_evaluation_control_args(parser: argparse.ArgumentParser):
         action="store_true",
         help="Only consider classes that appear in the ground truth test data (default: True)"
     )
+    
+    # Add unified models argument for tabular evaluation
+    parser.add_argument(
+        "--models",
+        nargs="+",
+        default=["clam_tsne"],
+        help="List of models to evaluate. Can include: "
+             "CLAM models (from --model_path or HuggingFace model IDs), "
+             "baseline models (catboost, tabpfn_v2, random_forest, gradient_boosting, logistic_regression), "
+             "LLM baselines (tabllm, tabula_8b, jolt, openai_llm, gemini_llm, api_llm), "
+             "or 'all_baselines' to run all baseline models. "
+             "Examples: --models catboost random_forest, --models all_baselines, --models /path/to/model tabpfn_v2"
+    )
+    
+    # Keep deprecated arguments for backwards compatibility but raise errors
     parser.add_argument(
         "--run_all_baselines",
         action="store_true",
-        help="Run all baseline models in addition to the specified model"
+        help=argparse.SUPPRESS  # Hide from help
     )
     parser.add_argument(
         "--baselines_only",
-        action="store_true",
-        help="Only run baseline models (skip CLAM evaluation)"
+        action="store_true", 
+        help=argparse.SUPPRESS  # Hide from help
     )
     parser.add_argument(
         "--use_semantic_names",
@@ -604,13 +618,7 @@ def add_tsne_visualization_args(parser: argparse.ArgumentParser):
 
 def add_llm_baseline_args(parser: argparse.ArgumentParser):
     """Add LLM baseline model arguments."""
-    parser.add_argument(
-        "--models",
-        nargs="+",
-        default=["tabllm", "tabula_8b", "jolt", "clam_tsne"],
-        choices=["tabllm", "tabula_8b", "jolt", "clam_tsne", "openai_llm", "gemini_llm", "api_llm"],
-        help="List of models to evaluate (default: all models)"
-    )
+    # Note: --models argument is now unified in add_evaluation_control_args
     parser.add_argument(
         "--tabllm_model",
         type=str,

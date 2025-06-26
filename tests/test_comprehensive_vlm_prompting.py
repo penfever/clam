@@ -727,6 +727,24 @@ class VLMPromptingTestSuite:
                 'use_knn_connections': False,
                 'nn_k': 30,
                 'tsne_perplexity': 25
+            },
+            # Basic UMAP
+            {
+                'name': 'basic_umap',
+                'enable_multi_viz': False,
+                'use_3d_tsne': False,
+                'use_knn_connections': False,
+                'nn_k': 30,
+                'visualization_method': 'umap'
+            },
+            # UMAP with KNN
+            {
+                'name': 'umap_knn',
+                'enable_multi_viz': False,
+                'use_3d_tsne': False,
+                'use_knn_connections': True,
+                'nn_k': 30,
+                'visualization_method': 'umap'
             }
         ]
         
@@ -831,6 +849,17 @@ class VLMPromptingTestSuite:
                 'use_knn_connections': False,
                 'nn_k': 30,
                 'tsne_perplexity': 15
+            },
+            # UMAP with semantic names
+            {
+                'name': 'umap_semantic',
+                'enable_multi_viz': False,
+                'use_semantic_names': True,
+                'load_semantic_from_cc18': True,
+                'use_3d_tsne': False,
+                'use_knn_connections': False,
+                'nn_k': 30,
+                'visualization_method': 'umap'
             },
             # Semantic axes test - single visualization with axes interpretation
             {
@@ -1764,9 +1793,9 @@ def main():
     parser = argparse.ArgumentParser(description="Comprehensive VLM Prompting Test Suite")
     parser.add_argument("--output_dir", type=str, default="./test_vlm_outputs",
                        help="Directory to save test outputs")
-    # Backward compatibility
+    # Deprecated argument - will raise error if used
     parser.add_argument("--task_id", type=int, default=None,
-                       help="(DEPRECATED) Use --task_id_or_dataset_name instead")
+                       help="(DEPRECATED) This argument is no longer supported. Use --task_id_or_dataset_name instead")
     parser.add_argument("--task_id_or_dataset_name", type=str, default="23",
                        help="Dataset identifier - can be OpenML task ID (e.g. '23'), dataset name (e.g. 'cifar10', 'esc50')")
     parser.add_argument("--task_type", type=str, default=None, choices=["classification", "regression"],
@@ -1791,10 +1820,18 @@ def main():
     
     args = parser.parse_args()
     
-    # Handle backward compatibility
-    if args.task_id is not None and not hasattr(args, 'task_id_or_dataset_name'):
-        args.task_id_or_dataset_name = str(args.task_id)
-        logger.warning("Using deprecated --task_id argument. Please use --task_id_or_dataset_name instead.")
+    # Check for deprecated argument usage
+    if args.task_id is not None:
+        print("\nERROR: The --task_id argument is deprecated and no longer supported.")
+        print("Please use --task_id_or_dataset_name instead.")
+        print("\nExamples:")
+        print("  # For OpenML tabular datasets:")
+        print("  --task_id_or_dataset_name 23")
+        print("  # For vision datasets:")
+        print("  --task_id_or_dataset_name cifar10")
+        print("  # For audio datasets:")
+        print("  --task_id_or_dataset_name esc50")
+        return 1
     
     # Set random seed
     np.random.seed(args.seed)

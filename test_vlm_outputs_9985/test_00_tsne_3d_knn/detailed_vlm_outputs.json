@@ -1,0 +1,526 @@
+{
+  "test_config": {
+    "name": "tsne_3d_knn",
+    "enable_multi_viz": false,
+    "use_3d_tsne": true,
+    "use_knn_connections": true,
+    "nn_k": 30,
+    "tsne_perplexity": 15
+  },
+  "ground_truth": [
+    1,
+    1,
+    4,
+    0,
+    2,
+    5,
+    3,
+    0,
+    0,
+    1,
+    5,
+    2,
+    5,
+    0,
+    5,
+    2,
+    5,
+    3,
+    2,
+    0
+  ],
+  "prediction_details": [
+    {
+      "test_point_idx": 0,
+      "vlm_response": "Class: Class_5 | Reasoning: The query point is closer to the brown-colored points (Class_5) in all four 3D views. Additionally, the pie chart shows that the nearest neighbors to the query point are predominantly from Class_5, with the smallest average distance to neighbors, indicating higher similarity.",
+      "parsed_prediction": "5",
+      "true_label": "1",
+      "tsne_coords": [
+        -2.195464849472046,
+        -4.031989574432373,
+        5.173041343688965
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 1,
+      "vlm_response": "Class: Class_0 | Reasoning: The query point is closest to the blue-colored class points in the t-SNE visualization, indicating a higher similarity to Class_0. Additionally, the pie chart shows that Class_0 has the highest number of nearest neighbors, suggesting it is the most similar class to the query point.",
+      "parsed_prediction": "0",
+      "true_label": "1",
+      "tsne_coords": [
+        3.8950631618499756,
+        5.228765487670898,
+        1.047970175743103
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 2,
+      "vlm_response": "Class: Class_4 | Reasoning: The query point is located near the purple-colored points in the t-SNE visualization, which are the nearest neighbors according to the pie chart. The purple-colored points are the closest neighbors, indicating a higher similarity to the query point.",
+      "parsed_prediction": "4",
+      "true_label": "4",
+      "tsne_coords": [
+        7.563549041748047,
+        -4.438709259033203,
+        -5.4539408683776855
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 3,
+      "vlm_response": "Class: Class_2 | Reasoning: The query point is located near the green-colored points in the t-SNE visualization, which are the closest neighbors in the pie chart. The green points are also the most frequent among the nearest neighbors, indicating a higher similarity to the query point.",
+      "parsed_prediction": "2",
+      "true_label": "0",
+      "tsne_coords": [
+        11.983790397644043,
+        -5.437110900878906,
+        5.0763421058654785
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 4,
+      "vlm_response": "Class: Class_3 | Reasoning: The query point is located near the cluster of Class_3 points in the t-SNE visualization. Additionally, the pie chart shows that the nearest neighbors of the query point are predominantly from Class_3, with the smallest average distance to neighbors, indicating higher similarity.",
+      "parsed_prediction": "3",
+      "true_label": "2",
+      "tsne_coords": [
+        3.2778244018554688,
+        2.147138833999634,
+        6.089504241943359
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 5,
+      "vlm_response": "Class: Class_0 | Reasoning: The query point is closest to the blue-colored class points in the t-SNE visualization, indicating a higher similarity to Class_0. Additionally, the pie chart shows that Class_0 has the highest number of nearest neighbors, suggesting it is the most similar class to the query point.",
+      "parsed_prediction": "0",
+      "true_label": "5",
+      "tsne_coords": [
+        4.710516452789307,
+        2.0945894718170166,
+        5.405770778656006
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 6,
+      "vlm_response": "Class: Class_3 | Reasoning: The query point is located near the cluster of Class_3 points in the t-SNE visualization. The pie chart shows that the nearest neighbors to the query point are all from Class_3, with the smallest average distance, indicating the highest similarity.",
+      "parsed_prediction": "3",
+      "true_label": "3",
+      "tsne_coords": [
+        -1.5762237310409546,
+        1.9554859399795532,
+        -7.9398298263549805
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 7,
+      "vlm_response": "Class: Class_1 | Reasoning: The query point is located near the orange-colored points, which are the nearest neighbors. The pie chart shows that Class_1 has the highest percentage of nearest neighbors, indicating that it is the most similar class to the query point.",
+      "parsed_prediction": "1",
+      "true_label": "0",
+      "tsne_coords": [
+        -5.602108955383301,
+        -1.7879334688186646,
+        1.2423702478408813
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 8,
+      "vlm_response": "Class: Class_0 | Reasoning: The query point is closest to the blue-colored points, which are the nearest neighbors. The pie chart shows that the nearest neighbors are predominantly from Class_0, indicating that the query point is most likely from Class_0.",
+      "parsed_prediction": "0",
+      "true_label": "0",
+      "tsne_coords": [
+        5.57602596282959,
+        1.5613985061645508,
+        5.065627098083496
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 9,
+      "vlm_response": "Class: Class_3 | Reasoning: The query point is located near the cluster of Class_3 points in the t-SNE visualization. Additionally, the pie chart shows that the nearest neighbors to the query point are all from Class_3, with the smallest average distance, indicating a higher similarity to Class_3.",
+      "parsed_prediction": "3",
+      "true_label": "1",
+      "tsne_coords": [
+        4.349615097045898,
+        3.1835520267486572,
+        4.835440635681152
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 10,
+      "vlm_response": "Class: Class_2 | Reasoning: The query point is located near the green-colored points in the t-SNE visualization, which are the nearest neighbors. The pie chart shows that Class_2 has the highest percentage of nearest neighbors, indicating that it is the most similar class to the query point.",
+      "parsed_prediction": "2",
+      "true_label": "5",
+      "tsne_coords": [
+        5.886957168579102,
+        1.297448754310608,
+        5.142440319061279
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 11,
+      "vlm_response": "Class: Class_3 | Reasoning: The query point is located near the cluster of Class_3 points in the t-SNE visualization. The pie chart shows that the nearest neighbors to the query point are all from Class_3, with the smallest average distance, indicating the highest similarity.",
+      "parsed_prediction": "3",
+      "true_label": "2",
+      "tsne_coords": [
+        3.2510344982147217,
+        2.185814619064331,
+        6.133527755737305
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 12,
+      "vlm_response": "Class: Class_3 | Reasoning: The query point is located near the cluster of Class_3 points in the t-SNE visualization. The pie chart shows that the nearest neighbors to the query point are all from Class_3, with the smallest average distance, indicating the highest similarity.",
+      "parsed_prediction": "3",
+      "true_label": "5",
+      "tsne_coords": [
+        3.1417551040649414,
+        2.968785285949707,
+        6.374683856964111
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 13,
+      "vlm_response": "Class: Class_0 | Reasoning: The query point is closest to the blue-colored class (Class_0) in the t-SNE visualization. Additionally, the pie chart shows that the nearest neighbors to the query point are also from Class_0, with the smallest average distance, indicating higher similarity.",
+      "parsed_prediction": "0",
+      "true_label": "0",
+      "tsne_coords": [
+        3.6505320072174072,
+        2.6654601097106934,
+        6.06504487991333
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 14,
+      "vlm_response": "Class: Class_3 | Reasoning: The query point is located near the cluster of Class_3 points in the t-SNE visualization. Additionally, the pie chart shows that the nearest neighbors to the query point are predominantly from Class_3, with the smallest average distance to neighbors, indicating higher similarity.",
+      "parsed_prediction": "3",
+      "true_label": "5",
+      "tsne_coords": [
+        -15.106225967407227,
+        -2.609272003173828,
+        -1.2737644910812378
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 15,
+      "vlm_response": "Class: Class_0 | Reasoning: The query point is closest to the blue-colored class points in all four views of the t-SNE visualization. Additionally, the pie chart shows that the nearest neighbors of the query point are all from Class_0, with the smallest average distance, indicating the highest similarity.",
+      "parsed_prediction": "0",
+      "true_label": "2",
+      "tsne_coords": [
+        4.230983734130859,
+        3.2998924255371094,
+        5.512126445770264
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 16,
+      "vlm_response": "Class: Class_4 | Reasoning: The query point is located near the center of the t-SNE visualization, surrounded by neighbors from Class_4. The pie chart shows that Class_4 has the highest number of nearest neighbors, indicating a higher similarity to the query point.",
+      "parsed_prediction": "4",
+      "true_label": "5",
+      "tsne_coords": [
+        7.530298233032227,
+        0.004028307739645243,
+        0.19385629892349243
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 17,
+      "vlm_response": "Class: Class_0 | Reasoning: The query point is located near the blue-colored points, which are the closest neighbors in the pie chart. The spatial clustering in all four views also indicates that the query point is more aligned with the blue class.",
+      "parsed_prediction": "0",
+      "true_label": "3",
+      "tsne_coords": [
+        11.771016120910645,
+        -5.048941612243652,
+        5.41208028793335
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 18,
+      "vlm_response": "Class: Class_0 | Reasoning: The query point is located near the blue-colored class points in all four 3D views, indicating a strong spatial clustering with this class. Additionally, the pie chart shows that the nearest neighbors to the query point are predominantly from Class_0, with the smallest average distance to neighbors, suggesting that Class_0 is the most similar class to the query point.",
+      "parsed_prediction": "0",
+      "true_label": "2",
+      "tsne_coords": [
+        4.084540367126465,
+        3.072599411010742,
+        5.431375026702881
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 19,
+      "vlm_response": "Class: Class_3 | Reasoning: The query point is located near the cluster of points labeled as Class_3 in the t-SNE visualization. Additionally, the pie chart shows that the nearest neighbors to the query point are predominantly from Class_3, with the smallest average distance to neighbors, indicating higher similarity.",
+      "parsed_prediction": "3",
+      "true_label": "0",
+      "tsne_coords": [
+        -6.023991107940674,
+        -3.4154279232025146,
+        4.488471508026123
+      ],
+      "image_size": "965x713",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    }
+  ],
+  "completion_rate": 1.0,
+  "test_indices": [
+    6,
+    11,
+    21,
+    26,
+    32,
+    36,
+    43,
+    52,
+    58,
+    66,
+    69,
+    75,
+    77,
+    81,
+    109,
+    121,
+    135,
+    138,
+    139,
+    149
+  ],
+  "metrics": {
+    "config_name": "tsne_3d_knn",
+    "task_type": "classification",
+    "accuracy": 0.2,
+    "balanced_accuracy": 0.31666666666666665,
+    "precision_macro": 0.15476190476190477,
+    "recall_macro": 0.31666666666666665,
+    "f1_macro": 0.20370370370370372,
+    "precision_micro": 0.2,
+    "recall_micro": 0.2,
+    "f1_micro": 0.2,
+    "precision_weighted": 0.1107142857142857,
+    "recall_weighted": 0.2,
+    "f1_weighted": 0.13888888888888887,
+    "confusion_matrix": [
+      [
+        2,
+        1,
+        1,
+        1,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        0,
+        0,
+        2,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      [
+        1,
+        0,
+        1,
+        2,
+        1,
+        0
+      ]
+    ],
+    "completion_rate": 1.0,
+    "num_test_samples": 20,
+    "num_classes": 6,
+    "support": []
+  }
+}

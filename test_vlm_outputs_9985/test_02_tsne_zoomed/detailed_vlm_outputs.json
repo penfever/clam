@@ -1,0 +1,507 @@
+{
+  "test_config": {
+    "name": "tsne_zoomed",
+    "enable_multi_viz": false,
+    "use_3d_tsne": false,
+    "use_knn_connections": false,
+    "nn_k": 30,
+    "tsne_perplexity": 15,
+    "tsne_zoom_factor": 3.0
+  },
+  "ground_truth": [
+    1,
+    1,
+    4,
+    0,
+    2,
+    5,
+    3,
+    0,
+    0,
+    1,
+    5,
+    2,
+    5,
+    0,
+    5,
+    2,
+    5,
+    3,
+    2,
+    0
+  ],
+  "prediction_details": [
+    {
+      "test_point_idx": 0,
+      "vlm_response": "Class: Class_1 | Reasoning: The red star is closest to the orange-colored class points, indicating that the query point is most similar to the data points in Class_1.",
+      "parsed_prediction": "1",
+      "true_label": "1",
+      "tsne_coords": [
+        -2.51397967338562,
+        12.211896896362305
+      ],
+      "image_size": "935x530",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 1,
+      "vlm_response": "Class: Class_4 | Reasoning: The red star is closest to the purple-colored class points, indicating that the query point is embedded within the cluster of Class_4 data.",
+      "parsed_prediction": "4",
+      "true_label": "1",
+      "tsne_coords": [
+        9.698301315307617,
+        0.7362481355667114
+      ],
+      "image_size": "938x525",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 2,
+      "vlm_response": "Class: Class_4 | Reasoning: The red star is closest to the purple-colored class points in the t-SNE visualization, indicating that it is embedded within the cluster of Class_4 data points.",
+      "parsed_prediction": "4",
+      "true_label": "4",
+      "tsne_coords": [
+        26.612512588500977,
+        -11.388303756713867
+      ],
+      "image_size": "947x525",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 3,
+      "vlm_response": "Class: Class_3 | Reasoning: The red star is closest to the cluster of points representing Class_3, indicating that it is most similar to the data points in that class.",
+      "parsed_prediction": "3",
+      "true_label": "0",
+      "tsne_coords": [
+        30.90056610107422,
+        17.029104232788086
+      ],
+      "image_size": "935x525",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 4,
+      "vlm_response": "Class: Class_3 | Reasoning: The red star is closest to the cluster of points representing Class_3, indicating that it is most likely to belong to this class based on its spatial proximity.",
+      "parsed_prediction": "3",
+      "true_label": "2",
+      "tsne_coords": [
+        10.832724571228027,
+        16.233694076538086
+      ],
+      "image_size": "935x528",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 5,
+      "vlm_response": "Class: Class_3 | Reasoning: The red star (query point) is closest to the cluster of points representing Class_3, as it is positioned near the center of the cluster in the t-SNE visualization.",
+      "parsed_prediction": "3",
+      "true_label": "5",
+      "tsne_coords": [
+        12.013590812683105,
+        14.719624519348145
+      ],
+      "image_size": "935x525",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 6,
+      "vlm_response": "Class: Class_2 | Reasoning: The red star is closest to the green-colored class points in the t-SNE visualization, indicating that it is embedded within the cluster of Class_2 data.",
+      "parsed_prediction": "2",
+      "true_label": "3",
+      "tsne_coords": [
+        -0.5589160323143005,
+        -16.409809112548828
+      ],
+      "image_size": "947x525",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 7,
+      "vlm_response": "Class: Class_5 | Reasoning: The red star (query point) is closest to the brown-colored class points, indicating that it is embedded within the cluster of Class_5 data.",
+      "parsed_prediction": "5",
+      "true_label": "0",
+      "tsne_coords": [
+        -16.172531127929688,
+        -0.8720687031745911
+      ],
+      "image_size": "938x525",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 8,
+      "vlm_response": "Class: Class_3 | Reasoning: The red star (query point) is closest to the cluster of points representing Class_3, as it is positioned near the center of the cluster in the t-SNE visualization.",
+      "parsed_prediction": "3",
+      "true_label": "0",
+      "tsne_coords": [
+        13.238752365112305,
+        14.203017234802246
+      ],
+      "image_size": "935x525",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 9,
+      "vlm_response": "Class: Class_4 | Reasoning: The red star is closest to the purple-colored class points, indicating that the query point is most similar to the data points in Class_4.",
+      "parsed_prediction": "4",
+      "true_label": "1",
+      "tsne_coords": [
+        10.945845603942871,
+        13.707088470458984
+      ],
+      "image_size": "935x525",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 10,
+      "vlm_response": "Class: Class_3 | Reasoning: The red star is closest to the cluster of points representing Class_3, indicating that it is most likely to belong to this class.",
+      "parsed_prediction": "3",
+      "true_label": "5",
+      "tsne_coords": [
+        13.807938575744629,
+        14.237982749938965
+      ],
+      "image_size": "935x528",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 11,
+      "vlm_response": "Class: Class_3 | Reasoning: The red star (query point) is closest to the cluster of points representing Class_3, as it is positioned near the center of the cluster in the t-SNE visualization.",
+      "parsed_prediction": "3",
+      "true_label": "2",
+      "tsne_coords": [
+        10.635929107666016,
+        16.306320190429688
+      ],
+      "image_size": "935x525",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 12,
+      "vlm_response": "Class: Class_3 | Reasoning: The red star (query point) is closest to the cluster of points representing Class_3, as it is positioned near the center of the cluster in the t-SNE visualization.",
+      "parsed_prediction": "3",
+      "true_label": "5",
+      "tsne_coords": [
+        9.707038879394531,
+        15.903824806213379
+      ],
+      "image_size": "935x525",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 13,
+      "vlm_response": "Class: Class_3 | Reasoning: The red star query point is closest to the cluster of points representing Class_3, as it is positioned near the center of the cluster in the t-SNE visualization.",
+      "parsed_prediction": "3",
+      "true_label": "0",
+      "tsne_coords": [
+        10.484893798828125,
+        15.494985580444336
+      ],
+      "image_size": "935x525",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 14,
+      "vlm_response": "Class: Class_3 | Reasoning: The red star is closest to the cluster of points labeled as Class_3 in the t-SNE visualization.",
+      "parsed_prediction": "3",
+      "true_label": "5",
+      "tsne_coords": [
+        -36.57490158081055,
+        -4.411712646484375
+      ],
+      "image_size": "938x525",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 15,
+      "vlm_response": "Class: Class_3 | Reasoning: The red star (query point) is closest to the cluster of points representing Class_3, as it is positioned near the center of the cluster in the t-SNE visualization.",
+      "parsed_prediction": "3",
+      "true_label": "2",
+      "tsne_coords": [
+        10.295549392700195,
+        14.314483642578125
+      ],
+      "image_size": "935x525",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 16,
+      "vlm_response": "Class: Class_4 | Reasoning: The red star (query point) is closest to the purple-colored class points in the t-SNE visualization, indicating that it is embedded within the cluster of Class_4 data.",
+      "parsed_prediction": "4",
+      "true_label": "5",
+      "tsne_coords": [
+        22.345062255859375,
+        0.2690630853176117
+      ],
+      "image_size": "938x526",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 17,
+      "vlm_response": "Class: Class_3 | Reasoning: The red star is closest to the cluster of points representing Class_3, indicating that it is most likely to belong to this class.",
+      "parsed_prediction": "3",
+      "true_label": "3",
+      "tsne_coords": [
+        30.258625030517578,
+        16.335535049438477
+      ],
+      "image_size": "935x525",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 18,
+      "vlm_response": "Class: Class_3 | Reasoning: The red star is closest to the cluster of points representing Class_3, indicating that it is most likely to belong to this class.",
+      "parsed_prediction": "3",
+      "true_label": "2",
+      "tsne_coords": [
+        10.6637544631958,
+        14.538328170776367
+      ],
+      "image_size": "935x525",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    {
+      "test_point_idx": 19,
+      "vlm_response": "Class: Class_5 | Reasoning: The red star is closest to the brown-colored class points, indicating that the query point is most similar to the data points in Class_5.",
+      "parsed_prediction": "5",
+      "true_label": "0",
+      "tsne_coords": [
+        -28.658477783203125,
+        3.9379734992980957
+      ],
+      "image_size": "927x525",
+      "visible_classes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    }
+  ],
+  "completion_rate": 1.0,
+  "test_indices": [
+    6,
+    11,
+    21,
+    26,
+    32,
+    36,
+    43,
+    52,
+    58,
+    66,
+    69,
+    75,
+    77,
+    81,
+    109,
+    121,
+    135,
+    138,
+    139,
+    149
+  ],
+  "metrics": {
+    "config_name": "tsne_zoomed",
+    "task_type": "classification",
+    "accuracy": 0.15,
+    "balanced_accuracy": 0.3055555555555555,
+    "precision_macro": 0.2222222222222222,
+    "recall_macro": 0.3055555555555555,
+    "f1_macro": 0.17380952380952377,
+    "precision_micro": 0.15,
+    "recall_micro": 0.15,
+    "f1_micro": 0.15,
+    "precision_weighted": 0.17083333333333334,
+    "recall_weighted": 0.15,
+    "f1_weighted": 0.10928571428571428,
+    "confusion_matrix": [
+      [
+        0,
+        0,
+        0,
+        3,
+        0,
+        2
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        2,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        4,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        4,
+        1,
+        0
+      ]
+    ],
+    "completion_rate": 1.0,
+    "num_test_samples": 20,
+    "num_classes": 6,
+    "support": []
+  }
+}

@@ -1,0 +1,96 @@
+[
+  {
+    "model_name": "catboost",
+    "dataset_name": "Crime_Data_from_2010",
+    "dataset_id": "46725",
+    "task_type": "regression",
+    "training_time": 0.32362985610961914,
+    "prediction_time": 0.00041484832763671875,
+    "total_time": 0.32404470443725586,
+    "num_train_samples": 42,
+    "num_test_samples": 10,
+    "num_features": 25,
+    "predictions": [
+      28.06999829692967,
+      25.46389156438986,
+      35.923297374157215,
+      33.17130066755171,
+      34.47578172224065,
+      24.517431268817838,
+      24.54858312012126,
+      27.486514508290686,
+      30.675383433823658,
+      30.66259831381888
+    ],
+    "ground_truth": [
+      26,
+      17,
+      56,
+      19,
+      38,
+      53,
+      27,
+      15,
+      20,
+      32
+    ],
+    "mse": 178.11738843095898,
+    "rmse": 13.346062656490078,
+    "mae": 10.373939667182974,
+    "r2": 0.06847242073657767,
+    "target_range": [
+      15.0,
+      56.0
+    ],
+    "target_mean": 30.3,
+    "target_std": 13.827870407260837,
+    "model_type": "baseline"
+  },
+  {
+    "model_name": "random_forest",
+    "dataset_name": "Crime_Data_from_2010",
+    "dataset_id": "46725",
+    "task_type": "regression",
+    "training_time": 0.10875701904296875,
+    "prediction_time": 0.014058113098144531,
+    "total_time": 0.12281513214111328,
+    "num_train_samples": 42,
+    "num_test_samples": 10,
+    "num_features": 25,
+    "predictions": [
+      26.0,
+      28.95,
+      36.02,
+      26.51,
+      37.03,
+      25.15,
+      27.25,
+      26.33,
+      32.14,
+      32.99
+    ],
+    "ground_truth": [
+      26,
+      17,
+      56,
+      19,
+      38,
+      53,
+      27,
+      15,
+      20,
+      32
+    ],
+    "mse": 165.17574999999997,
+    "rmse": 12.852071817415275,
+    "mae": 9.297,
+    "r2": 0.13615527430573726,
+    "target_range": [
+      15.0,
+      56.0
+    ],
+    "target_mean": 30.3,
+    "target_std": 13.827870407260837,
+    "model_type": "baseline"
+  }
+]

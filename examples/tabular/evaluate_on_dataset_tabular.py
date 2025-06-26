@@ -513,9 +513,10 @@ def process_dataset(dataset: Dict[str, Any], args) -> Dict[str, Any]:
         y_train = y_train.iloc[indices] if hasattr(y_train, 'iloc') else y_train[indices]
         logger.info(f"Training data limited to {len(X_train)} samples")
     
-    # Skip embeddings if only running baselines
-    if args.baselines_only:
-        logger.info(f"Skipping TabPFN embeddings for dataset {dataset['name']} (baselines_only mode)")
+    # Skip embeddings if only running baseline models (no CLAM models needed)
+    needs_embeddings = any('/' in model or model.startswith('.') or model.startswith('/') or model == 'clam_tsne' for model in args.models)
+    if not needs_embeddings:
+        logger.info(f"Skipping TabPFN embeddings for dataset {dataset['name']} (no CLAM models specified)")
         
         # Add processed data to the dataset dictionary without embeddings
         dataset.update({
@@ -1043,7 +1044,7 @@ def evaluate_dataset(dataset: Dict[str, Any], model, tokenizer, prefix_start_id,
     result_summary = {
         'dataset': dataset['name'],
         'dataset_id': dataset['id'],
-        'model_path': args.model_path,
+        'models': args.models,
         'accuracy': float(results['accuracy']),
         'num_samples': len(test_dataset),
     }
@@ -1250,14 +1251,50 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
             n_estimators = 8  # Aligned with CLAM's TabPFN usage
             logger.info(f"TabPFN v2 initialized with n_estimators={n_estimators}, device={device}")
             
+            # Fix for quantiles issue: preprocess targets with too many unique values for regression
+            y_train_processed = y_train.copy()
+            y_test_processed = y_test.copy()
+            target_preprocessor = None
+            
+            if not dataset['is_classification']:
+                # For regression, check if we have too many unique values relative to sample size
+                unique_targets = np.unique(y_train)
+                n_samples = len(y_train)
+                n_unique = len(unique_targets)
+                
+                # If we have more unique values than samples * 0.5, we need to bin the targets
+                # This prevents the quantiles error in TabPFN v2's internal preprocessing
+                max_quantiles = min(n_samples // 2, 1000)  # Conservative limit for quantiles
+                
+                if n_unique > max_quantiles:
+                    logger.info(f"TabPFN v2: Target has {n_unique} unique values but only {n_samples} samples. "
+                               f"Binning to {max_quantiles} quantiles to prevent quantile overflow.")
+                    
+                    from sklearn.preprocessing import KBinsDiscretizer
+                    # Use quantile-uniform strategy to preserve distribution while limiting quantiles
+                    target_preprocessor = KBinsDiscretizer(
+                        n_bins=max_quantiles, 
+                        encode='ordinal', 
+                        strategy='quantile',
+                        subsample=None  # Use all data for quantile calculation
+                    )
+                    
+                    # Fit on training data and transform both train and test
+                    y_train_processed = target_preprocessor.fit_transform(y_train.reshape(-1, 1)).flatten()
+                    y_test_processed = target_preprocessor.transform(y_test.reshape(-1, 1)).flatten()
+                    
+                    logger.info(f"TabPFN v2: Preprocessed target from {n_unique} to {len(np.unique(y_train_processed))} unique values")
+                else:
+                    logger.info(f"TabPFN v2: Target has {n_unique} unique values with {n_samples} samples - no preprocessing needed")
+            
             model = TabPFNModel(
                 device=device,
                 n_estimators=n_estimators,
                 ignore_pretraining_limits=True,
             )
             
-            # Train (fit) the model
-            model.fit(X_train, y_train)
+            # Train (fit) the model with preprocessed targets
+            model.fit(X_train, y_train_processed)
             
         except ImportError as e:
             logger.error(f"TabPFN v2 not properly installed: {e}")
@@ -1372,6 +1409,32 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
         y_pred = model.predict(X_test)
         y_prob = model.predict_proba(X_test) if dataset['is_classification'] and hasattr(model, 'predict_proba') else None
     
+    # For TabPFN v2 regression with preprocessed targets, inverse transform the predictions
+    if model_name == 'tabpfn_v2' and not dataset['is_classification'] and 'target_preprocessor' in locals() and target_preprocessor is not None:
+        logger.info(f"TabPFN v2: Inverse transforming predictions from binned space back to original target space")
+        
+        # Inverse transform predictions back to original scale
+        # TabPFN outputs ordinal bin indices, we need to map them back to target values
+        
+        # Get the bin centers from the preprocessor
+        bin_edges = target_preprocessor.bin_edges_[0]  # Get bin edges for the single feature
+        
+        # Map ordinal predictions to bin centers
+        y_pred_original_scale = []
+        for pred in y_pred:
+            bin_idx = int(np.clip(pred, 0, len(bin_edges) - 2))  # Ensure valid bin index
+            # Use bin center as the predicted value
+            bin_center = (bin_edges[bin_idx] + bin_edges[bin_idx + 1]) / 2
+            y_pred_original_scale.append(bin_center)
+        
+        y_pred = np.array(y_pred_original_scale)
+        logger.info(f"TabPFN v2: Transformed {len(y_pred)} predictions back to original scale")
+        
+        # Also need to use original scale targets for evaluation
+        y_test_for_eval = y_test  # Original targets for evaluation
+    else:
+        y_test_for_eval = y_test
+    
     # Measure prediction time
     prediction_time = time.time() - start_time
     logger.info(f"Prediction time for {model_name}: {prediction_time:.2f} seconds")
@@ -1381,11 +1444,11 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
         # Classification metrics
         from sklearn.metrics import accuracy_score, balanced_accuracy_score, classification_report, confusion_matrix, roc_auc_score
         
-        accuracy = accuracy_score(y_test, y_pred)
+        accuracy = accuracy_score(y_test_for_eval, y_pred)
         
         # Calculate balanced accuracy
         try:
-            balanced_acc = balanced_accuracy_score(y_test, y_pred)
+            balanced_acc = balanced_accuracy_score(y_test_for_eval, y_pred)
             logger.info(f"Accuracy for {model_name} on {dataset['name']}: {accuracy:.4f}, Balanced accuracy: {balanced_acc:.4f}")
         except Exception as e:
             logger.warning(f"Could not compute balanced accuracy: {e}")
@@ -1397,13 +1460,13 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
         if y_prob is not None:
             try:
                 # Get unique classes
-                unique_classes = np.unique(y_test)
+                unique_classes = np.unique(y_test_for_eval)
                 
                 # For binary classification
                 if len(unique_classes) == 2:
                     # Get probabilities for the positive class (usually class 1)
                     pos_class_idx = 1 if 1 in unique_classes else unique_classes[1]
-                    binary_truth = np.array([1 if y == pos_class_idx else 0 for y in y_test])
+                    binary_truth = np.array([1 if y == pos_class_idx else 0 for y in y_test_for_eval])
                     
                     # Check if class index exists in probability array
                     if y_prob.shape[1] > pos_class_idx:
@@ -1414,7 +1477,7 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
                 elif len(unique_classes) > 2:
                     # Use one-vs-rest approach
                     from sklearn.preprocessing import label_binarize
-                    y_bin = label_binarize(y_test, classes=unique_classes)
+                    y_bin = label_binarize(y_test_for_eval, classes=unique_classes)
                     
                     # Make sure we have probabilities for all classes
                     if y_prob.shape[1] >= len(unique_classes):
@@ -1429,8 +1492,8 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
         
         # Generate classification report and confusion matrix
         try:
-            report = classification_report(y_test, y_pred, output_dict=True)
-            cm = confusion_matrix(y_test, y_pred)
+            report = classification_report(y_test_for_eval, y_pred, output_dict=True)
+            cm = confusion_matrix(y_test_for_eval, y_pred)
             logger.info(f"Generated classification report and confusion matrix for {model_name}")
         except Exception as e:
             logger.warning(f"Could not generate detailed metrics: {e}")
@@ -1439,7 +1502,7 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
         
         # Compute frequency distributions for classification
         prediction_distribution = compute_frequency_distribution(y_pred)
-        ground_truth_distribution = compute_frequency_distribution(y_test)
+        ground_truth_distribution = compute_frequency_distribution(y_test_for_eval)
         
         # Log the distributions
         logger.info(f"Prediction frequency distribution: {prediction_distribution['frequencies']}")
@@ -1455,10 +1518,10 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
         # Regression metrics
         from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
         
-        mse = mean_squared_error(y_test, y_pred)
+        mse = mean_squared_error(y_test_for_eval, y_pred)
         rmse = np.sqrt(mse)
-        mae = mean_absolute_error(y_test, y_pred)
-        r2 = r2_score(y_test, y_pred)
+        mae = mean_absolute_error(y_test_for_eval, y_pred)
+        r2 = r2_score(y_test_for_eval, y_pred)
         
         logger.info(f"Regression metrics for {model_name} on {dataset['name']}: MSE={mse:.4f}, RMSE={rmse:.4f}, MAE={mae:.4f}, R²={r2:.4f}")
         
@@ -1645,10 +1708,18 @@ def create_and_evaluate_llm_model(model_id, dataset, args, cached_model=None):
 def main():
     args = parse_args()
     
-    # Validate arguments
-    if not args.baselines_only and not args.model_path and not args.model_id:
-        parser = argparse.ArgumentParser()
-        parser.error("Either --model_path or --model_id is required when not using --baselines_only")
+    # Check for deprecated arguments and raise errors
+    if hasattr(args, 'run_all_baselines') and args.run_all_baselines:
+        raise ValueError("--run_all_baselines is deprecated. Use --models all_baselines instead.")
+    
+    if hasattr(args, 'baselines_only') and args.baselines_only:
+        raise ValueError("--baselines_only is deprecated. Use --models with baseline model names instead (e.g., --models catboost tabpfn_v2).")
+    
+    if hasattr(args, 'model_path') and args.model_path:
+        raise ValueError("--model_path is deprecated. Use --models with the model path instead (e.g., --models /path/to/model).")
+    
+    if hasattr(args, 'model_id') and args.model_id:
+        raise ValueError("--model_id is deprecated. Use --models with the model identifier instead (e.g., --models Qwen/Qwen2.5-7B-Instruct).")
     
     # Set random seed for reproducibility across all sources
     from clam.utils import set_seed
@@ -1720,42 +1791,53 @@ def main():
         baseline_models = ['catboost', 'tabpfn_v2', 'random_forest', 'gradient_boosting', 'logistic_regression']  # Safe set for mixed tasks
         logger.info("Mixed classification/regression tasks - using universally compatible baseline models")
     
-    # 2.6. Determine which models to evaluate
+    # 2.6. Determine which models to evaluate using unified --models argument
     models_to_evaluate = []
     
-    if args.baselines_only:
-        # Only run baseline models
-        if args.model_id and args.model_id.lower() in baseline_models:
-            # If a specific baseline is requested
-            models_to_evaluate.append(('baseline', args.model_id.lower()))
-            logger.info(f"Will evaluate baseline model: {args.model_id}")
-        else:
-            # Run all baseline models
-            for model_name in baseline_models:
-                models_to_evaluate.append(('baseline', model_name))
-                logger.info(f"Will evaluate baseline model: {model_name}")
-    else:
-        # Normal behavior when not baselines_only
-        if args.model_path:
-            # Evaluate the model from model_path
-            models_to_evaluate.append(('clam', args.model_path))
-            logger.info(f"Will evaluate CLAM model from path: {args.model_path}")
-        elif args.model_id:
-            # Check if it's a baseline model
-            if args.model_id.lower() in baseline_models:
-                models_to_evaluate.append(('baseline', args.model_id.lower()))
-                logger.info(f"Will evaluate baseline model: {args.model_id}")
-            else:
-                # Assume it's a Hugging Face model ID
-                models_to_evaluate.append(('llm', args.model_id))
-                logger.info(f"Will evaluate LLM model with ID: {args.model_id}")
-        
-        # Add all baseline models if requested
-        if args.run_all_baselines:
+    # Define known baseline and LLM model types
+    baseline_model_names = set(baseline_models)
+    llm_model_names = {'tabllm', 'tabula_8b', 'jolt', 'openai_llm', 'gemini_llm', 'api_llm'}
+    
+    for model_spec in args.models:
+        if model_spec == 'all_baselines':
+            # Add all baseline models
             for model_name in baseline_models:
                 if not any(m[1] == model_name for m in models_to_evaluate):
                     models_to_evaluate.append(('baseline', model_name))
-                    logger.info(f"Will also evaluate baseline model: {model_name}")
+                    logger.info(f"Will evaluate baseline model: {model_name}")
+        elif model_spec.lower() in baseline_model_names:
+            # It's a baseline model
+            models_to_evaluate.append(('baseline', model_spec.lower()))
+            logger.info(f"Will evaluate baseline model: {model_spec}")
+        elif model_spec in llm_model_names:
+            # It's an LLM baseline model
+            models_to_evaluate.append(('llm_baseline', model_spec))
+            logger.info(f"Will evaluate LLM baseline model: {model_spec}")
+        elif model_spec == 'clam_tsne' or '/' in model_spec or model_spec.startswith('.') or os.path.exists(model_spec):
+            # It's either a default CLAM model, a path, or a HuggingFace model ID
+            if model_spec == 'clam_tsne':
+                # Default CLAM behavior - need a model path or ID
+                logger.error("clam_tsne requires a model path. Please specify the path to your trained CLAM model.")
+                continue
+            elif os.path.exists(model_spec) or model_spec.startswith('.') or model_spec.startswith('/'):
+                # It's a local path
+                models_to_evaluate.append(('clam', model_spec))
+                logger.info(f"Will evaluate CLAM model from path: {model_spec}")
+            else:
+                # Assume it's a HuggingFace model ID
+                models_to_evaluate.append(('llm', model_spec))
+                logger.info(f"Will evaluate LLM model with ID: {model_spec}")
+        else:
+            # Unknown model type - try to infer
+            if '/' in model_spec:
+                # Looks like a HuggingFace model ID
+                models_to_evaluate.append(('llm', model_spec))
+                logger.info(f"Will evaluate LLM model with ID: {model_spec}")
+            else:
+                logger.warning(f"Unknown model specification: {model_spec}. Skipping.")
+    
+    if not models_to_evaluate:
+        raise ValueError("No valid models specified. Use --models to specify models to evaluate.")
     
     # 3. Evaluate each model on each dataset
     all_results = []
@@ -1777,14 +1859,14 @@ def main():
                     model_identifier, 
                     device_map=args.device,
                     embedding_size=args.embedding_size,
-                    model_id=args.model_id
+                    model_id=None
                 )
                 model_cache[cache_key] = (model, tokenizer, prefix_start_id, prefix_end_id, class_token_ids, is_vq)
             else:
                 logger.info(f"Using cached CLAM model for {model_identifier}")
                 model, tokenizer, prefix_start_id, prefix_end_id, class_token_ids, is_vq = model_cache[cache_key]
         
-        elif model_type == 'llm':
+        elif model_type in ['llm', 'llm_baseline']:
             cache_key = f"llm_{model_identifier}"
             if cache_key not in model_cache:
                 logger.info(f"Loading LLM model {model_identifier}")
@@ -1830,7 +1912,7 @@ def main():
                     # Add model type to results
                     results['model_type'] = 'baseline'
                     
-                elif model_type == 'llm':
+                elif model_type in ['llm', 'llm_baseline']:
                     # Check if model was loaded successfully
                     if model_cache.get(cache_key) is None:
                         results = {
@@ -1846,7 +1928,7 @@ def main():
                         )
                     
                     # Add model type to results
-                    results['model_type'] = 'llm'
+                    results['model_type'] = 'llm_baseline' if model_type == 'llm_baseline' else 'llm'
                 
                 # Add to results
                 model_results.append(results)

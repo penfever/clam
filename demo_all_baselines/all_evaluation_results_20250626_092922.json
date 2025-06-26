@@ -1,0 +1,187 @@
+[
+  {
+    "model_name": "catboost",
+    "dataset_name": "Crime_Data_from_2010",
+    "dataset_id": "46725",
+    "task_type": "regression",
+    "training_time": 0.3879368305206299,
+    "prediction_time": 0.00040078163146972656,
+    "total_time": 0.3883376121520996,
+    "num_train_samples": 42,
+    "num_test_samples": 5,
+    "num_features": 25,
+    "predictions": [
+      28.06999829692967,
+      25.46389156438986,
+      35.923297374157215,
+      33.17130066755171,
+      34.47578172224065
+    ],
+    "ground_truth": [
+      26,
+      17,
+      56,
+      19,
+      38
+    ],
+    "mse": 138.44844375380177,
+    "rmse": 11.766411677049286,
+    "mae": 9.661222286494676,
+    "r2": 0.3336135745388824,
+    "target_range": [
+      17.0,
+      56.0
+    ],
+    "target_mean": 31.2,
+    "target_std": 14.4138821973818,
+    "model_type": "baseline"
+  },
+  {
+    "model_name": "tabpfn_v2",
+    "dataset_name": "Crime_Data_from_2010",
+    "dataset_id": "46725",
+    "task_type": "regression",
+    "training_time": 0.3474099636077881,
+    "prediction_time": 1.1628620624542236,
+    "total_time": 1.5102720260620117,
+    "num_train_samples": 42,
+    "num_test_samples": 5,
+    "num_features": 25,
+    "predictions": [
+      26.261904761904763,
+      26.261904761904763,
+      28.57142857142857,
+      26.261904761904763,
+      28.57142857142857
+    ],
+    "ground_truth": [
+      26,
+      17,
+      56,
+      19,
+      38
+    ],
+    "mse": 195.96224489795924,
+    "rmse": 13.998651538557535,
+    "mae": 10.728571428571431,
+    "r2": 0.05678549818078915,
+    "target_range": [
+      17.0,
+      56.0
+    ],
+    "target_mean": 31.2,
+    "target_std": 14.4138821973818,
+    "model_type": "baseline"
+  },
+  {
+    "model_name": "random_forest",
+    "dataset_name": "Crime_Data_from_2010",
+    "dataset_id": "46725",
+    "task_type": "regression",
+    "training_time": 0.05571413040161133,
+    "prediction_time": 0.014214038848876953,
+    "total_time": 0.06992816925048828,
+    "num_train_samples": 42,
+    "num_test_samples": 5,
+    "num_features": 25,
+    "predictions": [
+      26.0,
+      28.95,
+      36.02,
+      26.51,
+      37.03
+    ],
+    "ground_truth": [
+      26,
+      17,
+      56,
+      19,
+      38
+    ],
+    "mse": 119.86877999999997,
+    "rmse": 10.948460165703667,
+    "mae": 8.081999999999999,
+    "r2": 0.42304206777050457,
+    "target_range": [
+      17.0,
+      56.0
+    ],
+    "target_mean": 31.2,
+    "target_std": 14.4138821973818,
+    "model_type": "baseline"
+  },
+  {
+    "model_name": "gradient_boosting",
+    "dataset_name": "Crime_Data_from_2010",
+    "dataset_id": "46725",
+    "task_type": "regression",
+    "training_time": 0.022390127182006836,
+    "prediction_time": 0.0002040863037109375,
+    "total_time": 0.022594213485717773,
+    "num_train_samples": 42,
+    "num_test_samples": 5,
+    "num_features": 25,
+    "predictions": [
+      24.66837607150666,
+      18.389332000155115,
+      36.04725762555386,
+      30.8302835032694,
+      33.86589416141068
+    ],
+    "ground_truth": [
+      26,
+      17,
+      56,
+      19,
+      38
+    ],
+    "mse": 111.77236656139921,
+    "rmse": 10.572245105056883,
+    "mae": 7.727617528990663,
+    "r2": 0.462012097798425,
+    "target_range": [
+      17.0,
+      56.0
+    ],
+    "target_mean": 31.2,
+    "target_std": 14.4138821973818,
+    "model_type": "baseline"
+  },
+  {
+    "model_name": "logistic_regression",
+    "dataset_name": "Crime_Data_from_2010",
+    "dataset_id": "46725",
+    "task_type": "regression",
+    "training_time": 0.0009958744049072266,
+    "prediction_time": 5.793571472167969e-05,
+    "total_time": 0.0010538101196289062,
+    "num_train_samples": 42,
+    "num_test_samples": 5,
+    "num_features": 25,
+    "predictions": [
+      20.457743164692857,
+      -7.767964975544075,
+      45.62629710386272,
+      14.994547906818884,
+      29.496415871318312
+    ],
+    "ground_truth": [
+      26,
+      17,
+      56,
+      19,
+      38
+    ],
+    "mse": 168.02740022798997,
+    "rmse": 12.962538340463645,
+    "mae": 10.63859218577026,
+    "r2": 0.19124277903354847,
+    "target_range": [
+      17.0,
+      56.0
+    ],
+    "target_mean": 31.2,
+    "target_std": 14.4138821973818,
+    "model_type": "baseline"
+  }
+]
