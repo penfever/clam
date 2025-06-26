@@ -15,6 +15,13 @@ import logging
 
 from ..base import VisualizationResult
 
+# Import shared styling utilities
+from ..utils.styling import (
+    apply_consistent_legend_formatting,
+    create_distinct_color_map,
+    get_class_color_name_map
+)
+
 logger = logging.getLogger(__name__)
 
 

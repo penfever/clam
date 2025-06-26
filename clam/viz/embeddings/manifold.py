@@ -17,6 +17,14 @@ from sklearn.manifold import (
 )
 from ..base import BaseVisualization, VisualizationResult
 
+# Import shared styling utilities
+from ..utils.styling import (
+    apply_consistent_point_styling,
+    apply_consistent_legend_formatting,
+    create_distinct_color_map,
+    create_regression_color_map
+)
+
 logger = logging.getLogger(__name__)
 
 

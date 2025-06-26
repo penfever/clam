@@ -12,6 +12,16 @@ from sklearn.neighbors import NearestNeighbors
 from typing import Dict, List, Optional, Any, Tuple, Union
 import logging
 
+# Import shared styling utilities
+from ..utils.styling import (
+    apply_consistent_point_styling,
+    apply_consistent_legend_formatting,
+    get_standard_test_point_style,
+    get_standard_target_point_style,
+    create_distinct_color_map,
+    get_class_color_name_map
+)
+
 logger = logging.getLogger(__name__)
 
 

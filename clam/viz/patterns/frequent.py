@@ -21,6 +21,14 @@ except ImportError:
 
 from ..base import BaseVisualization, VisualizationResult
 
+# Import shared styling utilities
+from ..utils.styling import (
+    apply_consistent_point_styling,
+    apply_consistent_legend_formatting,
+    create_distinct_color_map,
+    get_class_color_name_map
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -183,10 +191,18 @@ class FrequentPatternsVisualization(BaseVisualization):
         fig, axes = plt.subplots(2, 2, figsize=(16, 12), dpi=self.config.dpi)
         fig.suptitle('Frequent Patterns Analysis', fontsize=16)
         
-        # Plot 1: Support vs Length of itemsets
+        # Plot 1: Support vs Length of itemsets using unified styling
         if len(self.frequent_itemsets) > 0:
             itemset_lengths = self.frequent_itemsets['itemsets'].apply(len)
-            axes[0, 0].scatter(itemset_lengths, self.frequent_itemsets['support'], alpha=0.7)
+            
+            # Use unified color mapping for scatter plot
+            color_map = create_distinct_color_map(itemset_lengths.nunique())
+            colors = [color_map[length] for length in itemset_lengths]
+            
+            apply_consistent_point_styling(
+                axes[0, 0], itemset_lengths, self.frequent_itemsets['support'], 
+                colors=colors, alpha=0.7, s=60
+            )
             axes[0, 0].set_xlabel('Itemset Length')
             axes[0, 0].set_ylabel('Support')
             axes[0, 0].set_title('Frequent Itemsets: Support vs Length')
@@ -196,14 +212,12 @@ class FrequentPatternsVisualization(BaseVisualization):
                            ha='center', va='center', transform=axes[0, 0].transAxes)
             axes[0, 0].set_title('Frequent Itemsets')
         
-        # Plot 2: Association rules scatter plot
+        # Plot 2: Association rules scatter plot using unified styling
         if len(self.rules) > 0:
-            scatter = axes[0, 1].scatter(
-                self.rules['support'], 
-                self.rules['confidence'],
-                c=self.rules['lift'], 
-                cmap='viridis', 
-                alpha=0.7
+            # Apply consistent point styling with lift as color coding
+            scatter = apply_consistent_point_styling(
+                axes[0, 1], self.rules['support'], self.rules['confidence'],
+                colors=self.rules['lift'], cmap='viridis', alpha=0.7, s=60
             )
             axes[0, 1].set_xlabel('Support')
             axes[0, 1].set_ylabel('Confidence')
@@ -255,6 +269,10 @@ class FrequentPatternsVisualization(BaseVisualization):
             axes[1, 1].text(0.5, 0.5, 'No discretization data available', 
                            ha='center', va='center', transform=axes[1, 1].transAxes)
             axes[1, 1].set_title('Feature Correlation')
+        
+        # Apply consistent legend formatting to all subplots
+        for ax in axes.flat:
+            apply_consistent_legend_formatting(ax, use_3d=False)
         
         plt.tight_layout()
         

@@ -13,6 +13,14 @@ import logging
 from sklearn.decomposition import PCA
 from ..base import BaseVisualization, VisualizationResult
 
+# Import shared styling utilities
+from ..utils.styling import (
+    apply_consistent_point_styling,
+    apply_consistent_legend_formatting,
+    create_distinct_color_map,
+    create_regression_color_map
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -218,21 +226,29 @@ class PCAVisualization(BaseVisualization):
         n_components = len(self._transformer.explained_variance_ratio_)
         components = range(1, n_components + 1)
         
-        # Individual explained variance
-        ax1.bar(components, self._transformer.explained_variance_ratio_)
+        # Individual explained variance using unified styling
+        color_map = create_distinct_color_map(n_components)
+        bar_colors = [color_map[i % len(color_map)] for i in range(n_components)]
+        
+        ax1.bar(components, self._transformer.explained_variance_ratio_, color=bar_colors, alpha=0.7)
         ax1.set_xlabel('Principal Component')
         ax1.set_ylabel('Explained Variance Ratio')
         ax1.set_title('Explained Variance by Component')
         ax1.grid(True, alpha=0.3)
         
-        # Cumulative explained variance
+        # Cumulative explained variance using unified styling
         cumulative_var = np.cumsum(self._transformer.explained_variance_ratio_)
-        ax2.plot(components, cumulative_var, 'bo-')
+        primary_color = list(color_map.values())[0] if color_map else 'blue'
+        ax2.plot(components, cumulative_var, 'o-', color=primary_color, linewidth=2, markersize=6)
         ax2.set_xlabel('Number of Components')
         ax2.set_ylabel('Cumulative Explained Variance Ratio')
         ax2.set_title('Cumulative Explained Variance')
         ax2.grid(True, alpha=0.3)
         ax2.set_ylim(0, 1)
+        
+        # Apply consistent legend formatting
+        apply_consistent_legend_formatting(ax1, use_3d=False)
+        apply_consistent_legend_formatting(ax2, use_3d=False)
         
         plt.tight_layout()
         

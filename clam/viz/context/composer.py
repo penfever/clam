@@ -17,6 +17,14 @@ from ..base import BaseVisualization, VisualizationConfig, VisualizationResult
 from .layouts import LayoutManager, LayoutStrategy
 # Removed PromptGenerator - using unified VLM prompting utilities
 
+# Import shared styling utilities
+from ..utils.styling import (
+    apply_consistent_point_styling,
+    apply_consistent_legend_formatting,
+    create_distinct_color_map,
+    get_class_color_name_map
+)
+
 logger = logging.getLogger(__name__)
 
 
