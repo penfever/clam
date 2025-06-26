@@ -1,0 +1,12 @@
+{
+  "test_indices": [
+    18
+  ],
+  "ground_truth_labels": [
+    1
+  ],
+  "class_names": [
+    "Good credit risk (creditworthy)",
+    "Bad credit risk (not creditworthy)"
+  ]
+}

@@ -1,1 +1,0 @@
-Class: Bad credit risk (not creditworthy) | Reasoning: The red star is closest to the orange-colored points, which represent the "Bad credit risk (not creditworthy)" class. This suggests that the query point is more aligned with the characteristics of the "Bad credit risk" class.

@@ -111,7 +111,9 @@ def _create_multi_visualization(classifier_instance, i, save_outputs, visualizat
     composed_image = classifier_instance.context_composer.compose_layout(
         highlight_indices=highlight_indices,
         highlight_test_indices=[i],  # Highlight the current test point
-        layout_strategy=LayoutStrategy[classifier_instance.layout_strategy.upper()]
+        layout_strategy=LayoutStrategy[classifier_instance.layout_strategy.upper()],
+        class_names=classifier_instance.class_names,
+        use_semantic_names=classifier_instance.use_semantic_names
     )
     
     # Save multi-visualization if requested (respecting cadence)

@@ -256,7 +256,9 @@ class ContextComposer:
         self,
         highlight_indices: Optional[List[int]] = None,
         highlight_test_indices: Optional[List[int]] = None,
-        layout_strategy: Optional[LayoutStrategy] = None
+        layout_strategy: Optional[LayoutStrategy] = None,
+        class_names: Optional[List[str]] = None,
+        use_semantic_names: bool = False
     ) -> Image.Image:
         """
         Create a composed layout of all visualizations.
@@ -265,6 +267,8 @@ class ContextComposer:
             highlight_indices: Indices of training points to highlight across all visualizations
             highlight_test_indices: Indices of test points to highlight with red X markers
             layout_strategy: Override the default layout strategy
+            class_names: Optional semantic class names for consistent styling
+            use_semantic_names: Whether to use semantic names in legends
             
         Returns:
             Composed image
@@ -298,7 +302,9 @@ class ContextComposer:
                     y=self._y_train,
                     highlight_indices=highlight_indices,
                     test_data=test_data,
-                    highlight_test_indices=highlight_test_indices
+                    highlight_test_indices=highlight_test_indices,
+                    class_names=class_names,
+                    use_semantic_names=use_semantic_names
                 )
                 results.append(result)
                 
