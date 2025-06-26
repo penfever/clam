@@ -22,6 +22,10 @@ from pathlib import Path
 from collections import defaultdict
 import statistics
 from typing import Dict, List, Tuple, Optional
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from scipy import stats
 
 def extract_tar_and_find_results(tar_path: str, temp_dir: str) -> List[str]:
     """
@@ -225,6 +229,161 @@ def process_json_file(file_path: str, source: str) -> List[Dict]:
     else:
         return parse_baseline_format(file_path, data)
 
+def create_critical_difference_plot(algorithm_scores_matrix: Dict[str, Dict[str, float]], 
+                                  output_path: str, 
+                                  title: str = "Critical Difference Diagram",
+                                  alpha: float = 0.05):
+    """
+    Create a critical difference plot for algorithm comparison.
+    
+    Args:
+        algorithm_scores_matrix: Dict mapping algorithm -> dataset -> score
+        output_path: Path to save the plot
+        title: Title for the plot
+        alpha: Significance level for statistical tests
+    """
+    try:
+        import scikit_posthocs as sp
+        from matplotlib.backends.backend_pdf import PdfPages
+    except ImportError:
+        print("⚠️  scikit-posthocs not installed. Installing...")
+        os.system("pip install scikit-posthocs")
+        import scikit_posthocs as sp
+        from matplotlib.backends.backend_pdf import PdfPages
+    
+    # Convert to pandas DataFrame
+    algorithms = list(algorithm_scores_matrix.keys())
+    datasets = set()
+    for alg_data in algorithm_scores_matrix.values():
+        datasets.update(alg_data.keys())
+    datasets = sorted(list(datasets))
+    
+    # Create matrix with algorithms as columns and datasets as rows
+    data_matrix = []
+    for dataset in datasets:
+        row = []
+        for algorithm in algorithms:
+            # Use the score if available, otherwise use NaN
+            score = algorithm_scores_matrix[algorithm].get(dataset, np.nan)
+            row.append(score)
+        data_matrix.append(row)
+    
+    df = pd.DataFrame(data_matrix, columns=algorithms, index=datasets)
+    
+    # Remove rows with any NaN values for fair comparison
+    df_clean = df.dropna()
+    
+    if len(df_clean) < 3:
+        print(f"⚠️  Not enough complete datasets ({len(df_clean)}) for statistical testing. Skipping CD plot.")
+        return
+    
+    # Perform Friedman test
+    stat, p_value = stats.friedmanchisquare(*[df_clean[col] for col in df_clean.columns])
+    
+    print(f"\n📊 Friedman Test Results:")
+    print(f"   Statistic: {stat:.4f}")
+    print(f"   p-value: {p_value:.4f}")
+    
+    if p_value < alpha:
+        print(f"   ✅ Significant differences found (p < {alpha})")
+        
+        # Perform post-hoc Nemenyi test
+        nemenyi_results = sp.posthoc_nemenyi_friedman(df_clean.values)
+        
+        # Calculate average ranks
+        ranks = df_clean.rank(axis=1, ascending=False, method='average')
+        avg_ranks = ranks.mean(axis=0).sort_values()
+        
+        print(f"\n📊 Average Ranks:")
+        for i, (alg, rank) in enumerate(avg_ranks.items(), 1):
+            print(f"   {i}. {alg}: {rank:.3f}")
+        
+        # Create critical difference plot
+        plt.figure(figsize=(10, 6))
+        
+        # Use scikit-posthocs CD diagram
+        sp.critical_difference_diagram(
+            avg_ranks.to_dict(),
+            nemenyi_results,
+            label_fmt_left='{label} ({rank:.2f})',
+            label_fmt_right='{label} ({rank:.2f})',
+            label_props={'size': 12},
+            color_palette=['red', 'blue', 'green', 'orange', 'purple', 'brown', 'pink']
+        )
+        
+        plt.title(title, fontsize=14, pad=20)
+        plt.tight_layout()
+        
+        # Save the plot
+        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        print(f"   📊 Critical difference plot saved to: {output_path}")
+    else:
+        print(f"   ❌ No significant differences found (p >= {alpha})")
+        
+def create_performance_matrix_plot(algorithm_dataset_results: Dict[str, Dict[str, List[float]]], 
+                                 output_path: str,
+                                 metric_name: str = "R²"):
+    """
+    Create a heatmap showing algorithm performance across datasets.
+    
+    Args:
+        algorithm_dataset_results: Dict mapping algorithm -> dataset -> [scores]
+        output_path: Path to save the plot
+        metric_name: Name of the metric being plotted
+    """
+    # Get all algorithms and datasets
+    algorithms = sorted(algorithm_dataset_results.keys())
+    datasets = set()
+    for alg_data in algorithm_dataset_results.values():
+        datasets.update(alg_data.keys())
+    datasets = sorted(list(datasets))
+    
+    # Create matrix
+    matrix = np.zeros((len(algorithms), len(datasets)))
+    
+    for i, algorithm in enumerate(algorithms):
+        for j, dataset in enumerate(datasets):
+            if dataset in algorithm_dataset_results[algorithm]:
+                scores = algorithm_dataset_results[algorithm][dataset]
+                matrix[i, j] = statistics.mean(scores) if scores else 0
+            else:
+                matrix[i, j] = np.nan
+    
+    # Create heatmap
+    plt.figure(figsize=(20, 8))
+    
+    # Use masked array to handle NaN values
+    masked_matrix = np.ma.masked_invalid(matrix)
+    
+    im = plt.imshow(masked_matrix, cmap='RdYlGn', aspect='auto', vmin=0, vmax=1)
+    
+    # Set ticks
+    plt.xticks(range(len(datasets)), datasets, rotation=90, ha='right')
+    plt.yticks(range(len(algorithms)), algorithms)
+    
+    # Add colorbar
+    cbar = plt.colorbar(im)
+    cbar.set_label(f'Average {metric_name}', rotation=270, labelpad=20)
+    
+    # Add text annotations for values
+    for i in range(len(algorithms)):
+        for j in range(len(datasets)):
+            if not np.isnan(matrix[i, j]):
+                text = plt.text(j, i, f'{matrix[i, j]:.2f}',
+                               ha="center", va="center", color="black", fontsize=6)
+    
+    plt.title(f'Algorithm Performance Matrix ({metric_name})', fontsize=14, pad=20)
+    plt.xlabel('Dataset', fontsize=12)
+    plt.ylabel('Algorithm', fontsize=12)
+    plt.tight_layout()
+    
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close()
+    
+    print(f"📊 Performance matrix plot saved to: {output_path}")
+
 def analyze_all_results(results: List[Dict]):
     """Analyze combined results from all sources."""
     
@@ -234,12 +393,57 @@ def analyze_all_results(results: List[Dict]):
     algorithm_dataset_coverage = defaultdict(set)
     algorithm_task_split_results = defaultdict(list)  # For subset analysis
     
+    # First pass: collect all results
+    all_dataset_results = defaultdict(lambda: defaultdict(list))
+    
     for result in results:
         algorithm = result['algorithm']
         r2_score = result['r2_score']
         dataset = result['dataset_name']
         task_id = result.get('task_id', 'unknown')
         
+        if dataset != 'unknown' and r2_score is not None:
+            # Apply minimum of 0
+            if r2_score < 0:
+                r2_score = 0.0
+            all_dataset_results[dataset][algorithm].append(r2_score)
+    
+    # Filter out datasets where all algorithms perform poorly
+    valid_datasets = set()
+    filtered_dataset_count = 0
+    
+    print("\n" + "="*80)
+    print("📊 DATASET FILTERING")
+    print("="*80)
+    
+    for dataset, algorithm_scores in all_dataset_results.items():
+        max_avg_score = 0.0
+        for algorithm, scores in algorithm_scores.items():
+            if scores:
+                # Use average across splits, not max of individual splits
+                avg_score = statistics.mean(scores)
+                max_avg_score = max(max_avg_score, avg_score)
+        
+        if max_avg_score >= 0.1:
+            valid_datasets.add(dataset)
+        else:
+            filtered_dataset_count += 1
+            print(f"  Filtering out '{dataset}' - max average R² = {max_avg_score:.6f}")
+    
+    print(f"\n  Total datasets filtered out: {filtered_dataset_count}")
+    print(f"  Remaining valid datasets: {len(valid_datasets)}")
+    
+    # Second pass: only include results from valid datasets
+    for result in results:
+        algorithm = result['algorithm']
+        r2_score = result['r2_score']
+        dataset = result['dataset_name']
+        task_id = result.get('task_id', 'unknown')
+        
+        # Only process if dataset is valid
+        if dataset not in valid_datasets:
+            continue
+            
         # Track dataset coverage
         if dataset != 'unknown':
             algorithm_dataset_coverage[algorithm].add(dataset)
@@ -344,7 +548,7 @@ def analyze_all_results(results: List[Dict]):
     
     # Dataset coverage analysis
     print("\n" + "="*80)
-    print("📊 DATASET COVERAGE ANALYSIS (out of 43 total regression datasets)")
+    print(f"📊 DATASET COVERAGE ANALYSIS (out of {len(valid_datasets)} valid datasets after filtering)")
     print("="*80)
     
     # Get all unique datasets across all algorithms
@@ -364,7 +568,7 @@ def analyze_all_results(results: List[Dict]):
     
     print("\nDataset coverage by algorithm:")
     for num_datasets, algorithm in coverage_stats:
-        coverage_percent = (num_datasets / 43) * 100
+        coverage_percent = (num_datasets / len(valid_datasets)) * 100
         print(f"  {algorithm:25s}: {num_datasets:2d} datasets ({coverage_percent:5.1f}%)")
     
     # Find datasets not covered by any algorithm
@@ -448,6 +652,189 @@ def analyze_all_results(results: List[Dict]):
             print(f"  Good (0.7 ≤ R² < 0.9): {good:3d} ({good/total*100:5.1f}%)")
             print(f"  Fair (0.5 ≤ R² < 0.7): {fair:3d} ({fair/total*100:5.1f}%)")
             print(f"  Poor (0.0 ≤ R² < 0.5): {poor:3d} ({poor/total*100:5.1f}%)")
+    
+    # Win rate analysis
+    print("\n" + "="*80)
+    print("🏆 WIN RATE ANALYSIS")
+    print("="*80)
+    
+    # Calculate per-dataset wins
+    dataset_wins = defaultdict(lambda: defaultdict(int))  # dataset -> algorithm -> wins
+    dataset_algorithm_results = defaultdict(lambda: defaultdict(list))  # dataset -> algorithm -> [scores]
+    
+    # Group all results by dataset and algorithm
+    for result in results:
+        algorithm = result['algorithm']
+        dataset = result['dataset_name']
+        r2_score = result['r2_score']
+        
+        if r2_score is not None and dataset != 'unknown':
+            # Apply minimum of 0
+            if r2_score < 0:
+                r2_score = 0.0
+            dataset_algorithm_results[dataset][algorithm].append(r2_score)
+    
+    # For each dataset, find the best average performer
+    total_datasets_evaluated = 0
+    algorithm_wins = defaultdict(int)
+    algorithm_dataset_participation = defaultdict(int)
+    
+    for dataset in sorted(dataset_algorithm_results.keys()):
+        # Only process valid datasets
+        if dataset not in valid_datasets:
+            continue
+            
+        # Calculate average performance for each algorithm on this dataset
+        dataset_avg_scores = {}
+        for algorithm, scores in dataset_algorithm_results[dataset].items():
+            if scores:  # Only consider algorithms that have results
+                avg_score = statistics.mean(scores)
+                dataset_avg_scores[algorithm] = avg_score
+                algorithm_dataset_participation[algorithm] += 1
+        
+        if dataset_avg_scores:
+            total_datasets_evaluated += 1
+            # Find the winner (highest average R²)
+            winner = max(dataset_avg_scores.items(), key=lambda x: x[1])
+            winner_algorithm = winner[0]
+            winner_score = winner[1]
+            
+            algorithm_wins[winner_algorithm] += 1
+            
+            # Show dataset result
+            print(f"\n{dataset}:")
+            print(f"  Winner: {winner_algorithm} (R² = {winner_score:.6f})")
+            
+            # Show top 3 performers
+            sorted_performers = sorted(dataset_avg_scores.items(), key=lambda x: x[1], reverse=True)
+            for rank, (alg, score) in enumerate(sorted_performers[:3], 1):
+                print(f"  {rank}. {alg:20s}: {score:.6f}")
+    
+    # Calculate win rates
+    print(f"\n🏆 OVERALL WIN RATES (out of {total_datasets_evaluated} datasets)")
+    print("="*60)
+    
+    win_rate_stats = []
+    for algorithm in sorted(algorithm_wins.keys()):
+        wins = algorithm_wins[algorithm]
+        participation = algorithm_dataset_participation[algorithm]
+        win_rate = (wins / total_datasets_evaluated) * 100
+        participation_rate = (participation / total_datasets_evaluated) * 100
+        
+        win_rate_stats.append((wins, win_rate, algorithm))
+        
+        print(f"{algorithm:25s}: {wins:2d} wins ({win_rate:5.1f}%) | Participated in {participation} datasets ({participation_rate:5.1f}%)")
+    
+    # Sort by wins
+    win_rate_stats.sort(reverse=True)
+    
+    print(f"\n🥇 WIN RATE RANKING")
+    print("="*40)
+    for rank, (wins, win_rate, algorithm) in enumerate(win_rate_stats, 1):
+        print(f"{rank}. {algorithm:20s}: {wins:2d} wins ({win_rate:5.1f}%)")
+    
+    # Success rate analysis (R² ≥ 0.5 threshold)
+    print(f"\n📈 SUCCESS RATE ANALYSIS (R² ≥ 0.5 per dataset)")
+    print("="*60)
+    
+    algorithm_success_stats = defaultdict(lambda: {'successes': 0, 'total_datasets': 0})
+    
+    for dataset in dataset_algorithm_results:
+        # Only process valid datasets
+        if dataset not in valid_datasets:
+            continue
+            
+        for algorithm, scores in dataset_algorithm_results[dataset].items():
+            if scores:  # Algorithm participated in this dataset
+                avg_score = statistics.mean(scores)
+                algorithm_success_stats[algorithm]['total_datasets'] += 1
+                if avg_score >= 0.5:
+                    algorithm_success_stats[algorithm]['successes'] += 1
+    
+    success_rate_stats = []
+    for algorithm in sorted(algorithm_success_stats.keys()):
+        stats = algorithm_success_stats[algorithm]
+        successes = stats['successes']
+        total = stats['total_datasets']
+        success_rate = (successes / total) * 100 if total > 0 else 0
+        
+        success_rate_stats.append((success_rate, successes, total, algorithm))
+        
+        print(f"{algorithm:25s}: {successes:2d}/{total:2d} datasets successful ({success_rate:5.1f}%)")
+    
+    # Sort by success rate
+    success_rate_stats.sort(reverse=True)
+    
+    print(f"\n📊 SUCCESS RATE RANKING (R² ≥ 0.5)")
+    print("="*50)
+    for rank, (success_rate, successes, total, algorithm) in enumerate(success_rate_stats, 1):
+        print(f"{rank}. {algorithm:20s}: {successes:2d}/{total:2d} ({success_rate:5.1f}%)")
+    
+    # Generate plots
+    print("\n" + "="*80)
+    print("📊 GENERATING STATISTICAL PLOTS")
+    print("="*80)
+    
+    # Create output directory for plots
+    script_dir = Path(__file__).parent
+    plots_dir = script_dir / "regression_analysis_plots"
+    plots_dir.mkdir(exist_ok=True)
+    
+    # Prepare data for critical difference plot
+    algorithm_scores_matrix = {}
+    for algorithm in algorithm_dataset_results:
+        algorithm_scores_matrix[algorithm] = {}
+        for dataset in dataset_algorithm_results:
+            # Only include valid datasets
+            if dataset not in valid_datasets:
+                continue
+            if algorithm in dataset_algorithm_results[dataset]:
+                scores = dataset_algorithm_results[dataset][algorithm]
+                if scores:
+                    avg_score = statistics.mean(scores)
+                    algorithm_scores_matrix[algorithm][dataset] = avg_score
+    
+    # Create critical difference plot
+    cd_plot_path = plots_dir / "critical_difference_r2.png"
+    create_critical_difference_plot(
+        algorithm_scores_matrix,
+        str(cd_plot_path),
+        title="Critical Difference Diagram - R² Performance",
+        alpha=0.05
+    )
+    
+    # Create performance matrix heatmap
+    matrix_plot_path = plots_dir / "performance_matrix_heatmap.png"
+    create_performance_matrix_plot(
+        algorithm_dataset_results,
+        str(matrix_plot_path),
+        metric_name="R²"
+    )
+    
+    # Create separate CD plot for success rates (binary: success or not)
+    algorithm_success_matrix = {}
+    for algorithm in algorithm_dataset_results:
+        algorithm_success_matrix[algorithm] = {}
+        for dataset in dataset_algorithm_results:
+            # Only include valid datasets
+            if dataset not in valid_datasets:
+                continue
+            if algorithm in dataset_algorithm_results[dataset]:
+                scores = dataset_algorithm_results[dataset][algorithm]
+                if scores:
+                    avg_score = statistics.mean(scores)
+                    # Binary success: 1 if R² >= 0.5, 0 otherwise
+                    algorithm_success_matrix[algorithm][dataset] = 1.0 if avg_score >= 0.5 else 0.0
+    
+    cd_success_plot_path = plots_dir / "critical_difference_success_rate.png"
+    create_critical_difference_plot(
+        algorithm_success_matrix,
+        str(cd_success_plot_path),
+        title="Critical Difference Diagram - Success Rate (R² ≥ 0.5)",
+        alpha=0.05
+    )
+    
+    print(f"\n✅ All plots saved to: {plots_dir}")
 
 def main():
     """Main function."""
@@ -483,6 +870,36 @@ def main():
                 results = process_json_file(json_file, source)
                 all_results.extend(results)
                 print(f"    Extracted {len(results)} results")
+    
+    # Process supplemental TabPFN v2 results
+    supplemental_file = results_dir / "all_evaluation_results_20250626_133915.json"
+    if supplemental_file.exists():
+        print(f"\n📦 Processing supplemental TabPFN v2 results from {supplemental_file.name}")
+        
+        # Get new TabPFN v2 results
+        supplemental_results = process_json_file(str(supplemental_file), 'baselines')
+        new_tabpfn_results = [r for r in supplemental_results if r['algorithm'] == 'tabpfn_v2']
+        
+        # Create a set of dataset names from the new results
+        new_dataset_names = {r['dataset_name'] for r in new_tabpfn_results}
+        
+        # Remove existing TabPFN v2 results ONLY for datasets that have new results
+        original_count = len(all_results)
+        all_results = [r for r in all_results if not (r['algorithm'] == 'tabpfn_v2' and r['dataset_name'] in new_dataset_names)]
+        removed_count = original_count - len(all_results)
+        
+        if removed_count > 0:
+            print(f"  Replaced {removed_count} existing TabPFN v2 results for datasets: {sorted(new_dataset_names)}")
+        
+        # Add new TabPFN v2 results
+        all_results.extend(new_tabpfn_results)
+        print(f"  Added {len(new_tabpfn_results)} new TabPFN v2 results")
+        
+        # Count total TabPFN v2 results after merge
+        total_tabpfn = len([r for r in all_results if r['algorithm'] == 'tabpfn_v2'])
+        print(f"  Total TabPFN v2 results after merge: {total_tabpfn}")
+    else:
+        print(f"\n⚠️  Supplemental file not found: {supplemental_file}")
     
     # Analyze all results
     if all_results:

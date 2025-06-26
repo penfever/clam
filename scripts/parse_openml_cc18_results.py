@@ -91,8 +91,15 @@ def extract_results_from_tar(tar_path: str, temp_dir: str) -> List[Dict[str, Any
                     logger.info(f"Found {len(aggregated_files)} individual aggregated_results.json files in {archive_name}")
                     all_results_files = aggregated_files
                 else:
-                    logger.warning(f"No all_results_*.json or aggregated_results.json files found in {tar_path}")
-                    return results
+                    # Look for tabular baseline files (all_evaluation_results_*.json)
+                    eval_results_files = [name for name in tar.getnames() 
+                                        if name.endswith('.json') and 'all_evaluation_results_' in name]
+                    if eval_results_files:
+                        logger.info(f"Found {len(eval_results_files)} tabular baseline result files in {archive_name}")
+                        all_results_files = eval_results_files
+                    else:
+                        logger.warning(f"No recognizable result files found in {tar_path}")
+                        return results
             
             for file_name in all_results_files:
                 try:
@@ -104,17 +111,25 @@ def extract_results_from_tar(tar_path: str, temp_dir: str) -> List[Dict[str, Any
                     with open(extracted_path, 'r') as f:
                         data = json.load(f)
                     
-                    # Add archive source information to each result
-                    if isinstance(data, list):
-                        for result in data:
-                            if isinstance(result, dict):
-                                result['_archive_source'] = archive_name
-                        results.extend(data)
-                    elif isinstance(data, dict):
-                        data['_archive_source'] = archive_name
-                        results.append(data)
-                    
-                    logger.info(f"Loaded {len(data) if isinstance(data, list) else 1} results from {file_name}")
+                    # Handle tabular baseline format
+                    if 'all_evaluation_results_' in file_name:
+                        # Process tabular baseline results
+                        processed_results = process_tabular_baseline_results(data, file_name, archive_name)
+                        results.extend(processed_results)
+                        logger.info(f"Loaded {len(processed_results)} tabular baseline results from {file_name}")
+                    else:
+                        # Handle existing formats
+                        # Add archive source information to each result
+                        if isinstance(data, list):
+                            for result in data:
+                                if isinstance(result, dict):
+                                    result['_archive_source'] = archive_name
+                            results.extend(data)
+                        elif isinstance(data, dict):
+                            data['_archive_source'] = archive_name
+                            results.append(data)
+                        
+                        logger.info(f"Loaded {len(data) if isinstance(data, list) else 1} results from {file_name}")
                     
                 except Exception as e:
                     logger.error(f"Error processing {file_name}: {e}")
@@ -124,6 +139,73 @@ def extract_results_from_tar(tar_path: str, temp_dir: str) -> List[Dict[str, Any
         logger.error(f"Error extracting {tar_path}: {e}")
     
     return results
+
+
+def process_tabular_baseline_results(data: List[Dict[str, Any]], file_name: str, archive_name: str) -> List[Dict[str, Any]]:
+    """Process tabular baseline results into the standard format."""
+    logger = logging.getLogger(__name__)
+    processed_results = []
+    
+    # Extract task information from file path
+    # Format: clam/tabular_baselines/task_XXXXX/split_X/baselines/all_evaluation_results_TIMESTAMP.json
+    path_parts = file_name.split('/')
+    task_id = None
+    split_id = None
+    
+    for part in path_parts:
+        if part.startswith('task_'):
+            task_id = part.replace('task_', '')
+        elif part.startswith('split_'):
+            split_id = part.replace('split_', '')
+    
+    if not task_id:
+        logger.warning(f"Could not extract task_id from {file_name}")
+        task_id = 'unknown'
+    
+    if not split_id:
+        logger.warning(f"Could not extract split_id from {file_name}")
+        split_id = '0'
+    
+    # Process each model result
+    for result in data:
+        if not isinstance(result, dict):
+            continue
+            
+        # Convert to standard format
+        processed_result = {
+            'model_name': result.get('model_name', 'unknown'),
+            'dataset_name': result.get('dataset_name', 'unknown'), 
+            'dataset_id': result.get('dataset_id', task_id),
+            'task_id': task_id,
+            'split_id': split_id,
+            'task_type': result.get('task_type', 'classification'),
+            'num_classes': result.get('num_classes', 2),
+            'accuracy': result.get('accuracy'),
+            'balanced_accuracy': result.get('balanced_accuracy'),
+            'roc_auc': result.get('roc_auc'),
+            'training_time': result.get('training_time'),
+            'prediction_time': result.get('prediction_time'),
+            'total_time': result.get('total_time'),
+            'num_train_samples': result.get('num_train_samples'),
+            'num_test_samples': result.get('num_test_samples'),
+            'num_features': result.get('num_features'),
+            '_archive_source': archive_name,
+            '_file_source': file_name
+        }
+        
+        # Calculate additional metrics if not present
+        if 'f1_macro' not in result and 'classification_report' in result:
+            try:
+                # Try to extract F1 macro from classification report
+                classification_report = result['classification_report']
+                if isinstance(classification_report, dict) and 'macro avg' in classification_report:
+                    processed_result['f1_macro'] = classification_report['macro avg'].get('f1-score')
+            except Exception as e:
+                logger.debug(f"Could not extract F1 macro from classification report: {e}")
+        
+        processed_results.append(processed_result)
+    
+    return processed_results
 
 
 def get_chance_level_performance(n_classes: int) -> Dict[str, float]:
@@ -159,7 +241,18 @@ def normalize_model_name(model_name: str) -> str:
         'jolt': 'jolt',
         'tabllm': 'tabllm',
         'tabula-8b': 'tabula_8b',
-        'tabula_8b': 'tabula_8b'
+        'tabula_8b': 'tabula_8b',
+        # Tabular baseline models
+        'catboost': 'catboost',
+        'tabpfn_v2': 'tabpfn_v2',
+        'random_forest': 'random_forest',
+        'gradient_boosting': 'gradient_boosting',
+        'logistic_regression': 'logistic_regression',
+        'xgboost': 'xgboost',
+        'lightgbm': 'lightgbm',
+        'svm': 'svm',
+        'naive_bayes': 'naive_bayes',
+        'knn': 'knn'
     }
     
     return name_mapping.get(model_name, model_name)

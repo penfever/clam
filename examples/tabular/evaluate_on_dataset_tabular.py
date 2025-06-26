@@ -16,25 +16,28 @@ Datasets can be specified in multiple ways:
 
 Usage examples:
     # Basic usage with a single dataset
-    python evaluate_on_dataset.py --model_path ./models/clam_output --dataset_name har
+    python evaluate_on_dataset_tabular.py --model_path ./models/clam_output --dataset_name har
     
     # Using limited training samples with balanced sampling (default)
-    python evaluate_on_dataset.py --model_path ./models/clam_output --dataset_name har --max_train_samples 1000
+    python evaluate_on_dataset_tabular.py --model_path ./models/clam_output --dataset_name har --max_train_samples 1000
     
     # Using limited training samples with random sampling
-    python evaluate_on_dataset.py --model_path ./models/clam_output --dataset_name airlines --max_train_samples 500 --sampling_strategy random
+    python evaluate_on_dataset_tabular.py --model_path ./models/clam_output --dataset_name airlines --max_train_samples 500 --sampling_strategy random
     
     # Evaluating on multiple specific datasets
-    python evaluate_on_dataset.py --model_path ./models/clam_output --dataset_ids 1590,40975,37,54 --output_dir ./eval_results
+    python evaluate_on_dataset_tabular.py --model_path ./models/clam_output --dataset_ids 1590,40975,37,54 --output_dir ./eval_results
     
     # Evaluating on 5 randomly sampled datasets from OpenML
-    python evaluate_on_dataset.py --model_path ./models/clam_output --num_datasets 5 --output_dir ./eval_results
+    python evaluate_on_dataset_tabular.py --model_path ./models/clam_output --num_datasets 5 --output_dir ./eval_results
     
     # Evaluating on all CSV files in a directory
-    python evaluate_on_dataset.py --model_path ./models/clam_output --data_dir ./datasets --output_dir ./eval_results
+    python evaluate_on_dataset_tabular.py --model_path ./models/clam_output --data_dir ./datasets --output_dir ./eval_results
     
     # Using Weights & Biases for experiment tracking
-    python evaluate_on_dataset.py --model_path ./models/clam_output --dataset_ids 1590,40975 --use_wandb --wandb_project myproject
+    python evaluate_on_dataset_tabular.py --model_path ./models/clam_output --dataset_ids 1590,40975 --use_wandb --wandb_project myproject
+
+    # TabPFNv2 on specific tasks
+    python evaluate_on_dataset_tabular.py --models tabpfn_v2 --task_ids "363432,361104,363396,363387,363391,363388,361086,363377,363444,363389,361103,363438,363442" --output_dir ./tabpfn_reg_fix --max_test_samples 200 --seed 42 --task_type regression
 """
 
 import os
