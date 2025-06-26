@@ -751,7 +751,29 @@ def main():
                     elif model_name.lower() == 'jolt':
                         result = evaluate_jolt(dataset, args)
                     elif model_name.lower() == 'clam_tsne':
-                        result = evaluate_clam_tsne(dataset, args)
+                        # Cap nn_k at 10% of training dataset size to avoid over-averaging
+                        # Get training dataset size
+                        X_train = dataset.get('X_train', dataset.get('X', []))
+                        if hasattr(X_train, 'shape'):
+                            train_size = X_train.shape[0]
+                        elif hasattr(X_train, '__len__'):
+                            train_size = len(X_train)
+                        else:
+                            train_size = 100  # fallback default
+                        
+                        # Calculate 10% cap (minimum of 1, maximum of original nn_k)
+                        nn_k_cap = max(1, int(train_size * 0.1))
+                        original_nn_k = args.nn_k
+                        effective_nn_k = min(original_nn_k, nn_k_cap)
+                        
+                        if effective_nn_k != original_nn_k:
+                            logger.info(f"Capping nn_k from {original_nn_k} to {effective_nn_k} (10% of {train_size} training samples)")
+                        
+                        # Create modified args with capped nn_k
+                        modified_args = argparse.Namespace(**vars(args))
+                        modified_args.nn_k = effective_nn_k
+                        
+                        result = evaluate_clam_tsne(dataset, modified_args)
                     elif model_name.lower() in ['openai_llm', 'api_llm'] and hasattr(args, 'openai_model') and args.openai_model:
                         from examples.tabular.llm_baselines.openai_llm_baseline import evaluate_openai_llm
                         result = evaluate_openai_llm(dataset, args)
