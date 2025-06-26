@@ -578,13 +578,47 @@ def load_dataset(dataset_name: str, bypass_size_check: bool = False, preserve_re
         if not preserve_regression and np.issubdtype(y.dtype, np.floating) and len(np.unique(y)) > 10:
             logger.info(f"Converting continuous target to classification by binning")
             from sklearn.preprocessing import KBinsDiscretizer
-            # Use quantile binning to create balanced classes
-            n_bins = min(10, len(np.unique(y)))  # Use at most 10 bins
-            discretizer = KBinsDiscretizer(n_bins=n_bins, encode='ordinal', strategy='quantile')
+            # Use quantile binning to create balanced classes with safety checks
+            n_unique_targets = len(np.unique(y))
+            n_samples = len(y)
+            # Ensure safe quantile computation: need at least 2 samples per bin
+            max_safe_bins = min(10, n_samples // 2, n_unique_targets)
+            
+            if max_safe_bins < 2:
+                logger.warning(f"Too few samples ({n_samples}) or unique targets ({n_unique_targets}) for quantile binning, using uniform strategy")
+                discretizer = KBinsDiscretizer(n_bins=2, encode='ordinal', strategy='uniform')
+                n_bins = 2
+            else:
+                discretizer = KBinsDiscretizer(n_bins=max_safe_bins, encode='ordinal', strategy='quantile')
+                n_bins = max_safe_bins
+            
             y = discretizer.fit_transform(y.reshape(-1, 1)).flatten().astype(int)
-            logger.info(f"Binned continuous target into {n_bins} classes")
+            logger.info(f"Binned continuous target into {n_bins} classes using {discretizer.strategy} strategy")
         elif preserve_regression and np.issubdtype(y.dtype, np.floating) and len(np.unique(y)) > 10:
             logger.info(f"Preserving continuous target for regression task (preserve_regression=True)")
+        
+        # Clean NaN and inf values from dataset
+        logger.info("Cleaning NaN and inf values from dataset")
+        
+        # Clean target variable y
+        if np.any(np.isnan(y)) or np.any(np.isinf(y)):
+            before_count = len(y)
+            mask_y = ~(np.isnan(y) | np.isinf(y))
+            X = X[mask_y]
+            y = y[mask_y] 
+            after_count = len(y)
+            logger.warning(f"Removed {before_count - after_count} samples with NaN/inf in target variable")
+        
+        # Clean feature matrix X  
+        if np.any(np.isnan(X)) or np.any(np.isinf(X)):
+            before_count = len(X)
+            mask_X = ~(np.isnan(X).any(axis=1) | np.isinf(X).any(axis=1))
+            X = X[mask_X]
+            y = y[mask_X]
+            after_count = len(X) 
+            logger.warning(f"Removed {before_count - after_count} samples with NaN/inf in features")
+        
+        logger.info(f"Final dataset size after cleaning: {len(X)} samples")
         
         # Log basic dataset information
         num_features = X.shape[1]

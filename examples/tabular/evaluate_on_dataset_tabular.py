@@ -1245,9 +1245,14 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
             # Initialize the model
             task_type = "classification" if dataset['is_classification'] else "regression"
             logger.info(f"Using TabPFN v2 for {task_type}")
+            # Use n_estimators=8 to align with CLAM's TabPFN implementation
+            device = args.device if args.device != 'auto' else 'cuda' if torch.cuda.is_available() else 'cpu'
+            n_estimators = 8  # Aligned with CLAM's TabPFN usage
+            logger.info(f"TabPFN v2 initialized with n_estimators={n_estimators}, device={device}")
+            
             model = TabPFNModel(
-                device=args.device if args.device != 'auto' else 'cuda' if torch.cuda.is_available() else 'cpu',
-                n_estimators=args.tabpfn_v2_N_ensemble_configurations,
+                device=device,
+                n_estimators=n_estimators,
                 ignore_pretraining_limits=True,
             )
             

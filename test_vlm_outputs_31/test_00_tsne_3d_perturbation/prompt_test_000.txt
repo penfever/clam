@@ -1,0 +1,28 @@
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Class Legend:
+- Good credit risk (creditworthy): Blue RGB(30, 119, 181)
+- Bad credit risk (not creditworthy): Orange RGB(255, 127, 12)
+- Test points: Light Gray RGB(211, 211, 211)
+
+Semantic Axis Interpretation:
+• X-axis (8.6% var): Mixed factors
+• Y-axis (3.6% var): Mixed factors
+• Z-axis (2.5% var): Mixed factors
+
+Dataset Context: Tabular data embedded using appropriate features
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Good credit risk (creditworthy)", "Bad credit risk (not creditworthy)", etc.) followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 

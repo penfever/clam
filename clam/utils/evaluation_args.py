@@ -181,8 +181,8 @@ def add_tabpfn_args(parser: argparse.ArgumentParser):
     parser.add_argument(
         "--tabpfn_v2_N_ensemble_configurations",
         type=int,
-        default=32,
-        help="Number of ensemble configurations for TabPFN v2"
+        default=8,
+        help="Number of ensemble configurations for TabPFN v2 (aligned with CLAM's TabPFN implementation)"
     )
 
 
