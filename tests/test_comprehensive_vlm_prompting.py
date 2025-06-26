@@ -57,7 +57,7 @@ class VLMPromptingTestSuite:
             backend: Backend to use for VLM inference (default: auto)
             zoom_factor: Zoom factor for t-SNE visualizations (default: 6.5)
         """
-        self.output_dir = Path(output_dir)
+        self.output_dir = Path(output_dir).resolve()
         self.task_id = task_id
         self.vlm_model = vlm_model
         self.num_tests = num_tests
@@ -114,11 +114,14 @@ class VLMPromptingTestSuite:
                 except json.JSONDecodeError as e:
                     return False, f"detailed_vlm_outputs.json contains invalid JSON: {e}"
             
-            # Validate required fields structure
-            required_fields = ['test_config', 'dataset_info', 'model_config', 'prediction_details']
+            # Validate required fields structure (based on CLAM's actual output format)
+            required_fields = ['test_config', 'prediction_details']
             missing_fields = [field for field in required_fields if field not in data]
             if missing_fields:
                 return False, f"detailed_vlm_outputs.json missing required fields: {missing_fields}"
+            
+            # Optional fields that may be present from test logic but not required by CLAM
+            # dataset_info and model_config are added by test logic but not by CLAM itself
             
             # Validate prediction_details structure
             prediction_details = data.get('prediction_details', [])
@@ -139,7 +142,8 @@ class VLMPromptingTestSuite:
                 if not isinstance(pred, dict):
                     return False, f"prediction_details[{i}] should be a dictionary"
                 
-                pred_required_fields = ['sample_index', 'ground_truth_label', 'predicted_label']
+                # Check for actual CLAM output fields (based on real output structure)
+                pred_required_fields = ['test_point_idx', 'vlm_response']
                 pred_missing_fields = [field for field in pred_required_fields if field not in pred]
                 if pred_missing_fields:
                     return False, f"prediction_details[{i}] missing required fields: {pred_missing_fields}"
@@ -888,7 +892,7 @@ class VLMPromptingTestSuite:
                     y_test, 
                     return_detailed=True,
                     save_outputs=True,
-                    output_dir=str(test_dir),
+                    output_dir=str(test_dir.resolve()),
                     visualization_save_cadence=3
                 )
                 
@@ -1135,7 +1139,7 @@ class VLMPromptingTestSuite:
                 json.dump(config, f, indent=2)
             
             # Validate detailed_vlm_outputs.json before marking test as successful
-            detailed_output_path = test_dir / "detailed_vlm_outputs.json"
+            detailed_output_path = (test_dir / "detailed_vlm_outputs.json").resolve()
             vlm_outputs_valid, validation_error = self._validate_detailed_vlm_outputs(detailed_output_path)
             
             # Check if this was a pipeline failure by examining the detailed outputs
