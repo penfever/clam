@@ -288,11 +288,18 @@ class BaseVisualization(ABC):
         else:
             fig, ax = plt.subplots(figsize=self.config.figsize, dpi=self.config.dpi)
         
+        # Extract class naming parameters from kwargs
+        class_names = kwargs.get('class_names', None)
+        use_semantic_names = kwargs.get('use_semantic_names', False)
+        
+        # Remove class naming parameters from kwargs to avoid conflicts
+        filtered_kwargs = {k: v for k, v in kwargs.items() if k not in ['class_names', 'use_semantic_names']}
+        
         # Plot based on task type
         if self.config.task_type == 'regression' and y is not None:
-            plot_result = self._plot_regression(ax, transformed_data, y, highlight_indices, test_data, highlight_test_indices, use_3d)
+            plot_result = self._plot_regression(ax, transformed_data, y, highlight_indices, test_data, highlight_test_indices, use_3d, **filtered_kwargs)
         else:
-            plot_result = self._plot_classification(ax, transformed_data, y, highlight_indices, test_data, highlight_test_indices, use_3d)
+            plot_result = self._plot_classification(ax, transformed_data, y, highlight_indices, test_data, highlight_test_indices, use_3d, class_names, use_semantic_names, **filtered_kwargs)
         
         # Apply styling
         self._apply_plot_styling(ax, use_3d)
@@ -358,14 +365,19 @@ class BaseVisualization(ABC):
         highlight_indices: Optional[List[int]],
         test_data: Optional[np.ndarray],
         highlight_test_indices: Optional[List[int]],
-        use_3d: bool
+        use_3d: bool,
+        class_names: Optional[List[str]] = None,
+        use_semantic_names: bool = False,
+        **kwargs
     ) -> Dict[str, Any]:
         """Plot for classification tasks using consistent styling."""
         from .utils.styling import apply_consistent_point_styling
         
-        # Check if this instance has class names stored (e.g., from TSNEVisualization)
-        class_names = getattr(self, '_class_names', None)
-        use_semantic_names = getattr(self, '_use_semantic_names', False)
+        # Use passed parameters, fallback to instance attributes if they exist
+        if class_names is None:
+            class_names = getattr(self, '_class_names', None)
+        if not use_semantic_names:
+            use_semantic_names = getattr(self, '_use_semantic_names', False)
         
         # Use the shared styling utilities for consistent appearance
         plot_result = apply_consistent_point_styling(
@@ -434,7 +446,8 @@ class BaseVisualization(ABC):
         highlight_indices: Optional[List[int]],
         test_data: Optional[np.ndarray],
         highlight_test_indices: Optional[List[int]],
-        use_3d: bool
+        use_3d: bool,
+        **kwargs
     ) -> Dict[str, Any]:
         """Plot for regression tasks."""
         
