@@ -1,0 +1,19 @@
+{
+  "name": "tsne_3d_perturbation",
+  "enable_multi_viz": false,
+  "use_semantic_names": true,
+  "load_semantic_from_cc18": true,
+  "semantic_axes": true,
+  "semantic_axes_method": "perturbation",
+  "use_smart_feature_selection": true,
+  "max_features_to_test": 10,
+  "feature_selection_method": "f_score",
+  "use_3d_tsne": true,
+  "use_knn_connections": false,
+  "nn_k": 30,
+  "tsne_perplexity": 15,
+  "semantic_class_names": [
+    "Good credit risk (creditworthy)",
+    "Bad credit risk (not creditworthy)"
+  ]
+}

@@ -138,9 +138,8 @@ def _create_single_visualization(classifier_instance, i, viz_methods, viewing_an
                     classifier_instance.train_tsne, classifier_instance.test_tsne, classifier_instance.y_train_sample,
                     classifier_instance.train_embeddings, classifier_instance.test_embeddings,
                     highlight_test_idx=i,
-                    k=classifier_instance.knn_k,
+                    knn_k=classifier_instance.knn_k,
                     figsize=(12, 9),
-                    viewing_angles=viewing_angles,
                     zoom_factor=classifier_instance.zoom_factor
                 )
             else:
@@ -148,7 +147,7 @@ def _create_single_visualization(classifier_instance, i, viz_methods, viewing_an
                     classifier_instance.train_tsne, classifier_instance.test_tsne, classifier_instance.y_train_sample,
                     classifier_instance.train_embeddings, classifier_instance.test_embeddings,
                     highlight_test_idx=i,
-                    k=classifier_instance.knn_k,
+                    knn_k=classifier_instance.knn_k,
                     figsize=(10, 8),
                     zoom_factor=classifier_instance.zoom_factor
                 )
@@ -159,7 +158,6 @@ def _create_single_visualization(classifier_instance, i, viz_methods, viewing_an
                     classifier_instance.train_tsne, classifier_instance.test_tsne, classifier_instance.y_train_sample,
                     highlight_test_idx=i,
                     figsize=(12, 9),
-                    viewing_angles=viewing_angles,
                     zoom_factor=classifier_instance.zoom_factor
                 )
             else:
@@ -178,9 +176,8 @@ def _create_single_visualization(classifier_instance, i, viz_methods, viewing_an
                     classifier_instance.train_tsne, classifier_instance.test_tsne, classifier_instance.y_train_sample,
                     classifier_instance.train_embeddings, classifier_instance.test_embeddings,
                     highlight_test_idx=i,
-                    k=classifier_instance.knn_k,
+                    knn_k=classifier_instance.knn_k,
                     figsize=(12, 9),
-                    viewing_angles=viewing_angles,
                     zoom_factor=classifier_instance.zoom_factor,
                     class_names=classifier_instance.class_names,
                     use_semantic_names=classifier_instance.use_semantic_names,
@@ -191,7 +188,7 @@ def _create_single_visualization(classifier_instance, i, viz_methods, viewing_an
                     classifier_instance.train_tsne, classifier_instance.test_tsne, classifier_instance.y_train_sample,
                     classifier_instance.train_embeddings, classifier_instance.test_embeddings,
                     highlight_test_idx=i,
-                    k=classifier_instance.knn_k,
+                    knn_k=classifier_instance.knn_k,
                     figsize=(10, 8),
                     zoom_factor=classifier_instance.zoom_factor,
                     class_names=classifier_instance.class_names,
@@ -204,7 +201,6 @@ def _create_single_visualization(classifier_instance, i, viz_methods, viewing_an
                     classifier_instance.train_tsne, classifier_instance.test_tsne, classifier_instance.y_train_sample,
                     highlight_test_idx=i,
                     figsize=(12, 9),
-                    viewing_angles=viewing_angles,
                     zoom_factor=classifier_instance.zoom_factor,
                     class_names=classifier_instance.class_names,
                     use_semantic_names=classifier_instance.use_semantic_names,

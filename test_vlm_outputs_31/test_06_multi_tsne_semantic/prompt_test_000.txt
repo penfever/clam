@@ -19,6 +19,6 @@ Consider:
 - Patterns that appear in multiple visualizations (these are more reliable than method-specific patterns)
 - How different visualization methods agree or disagree about the query point's classification
 
-Please respond with just the class label (e.g., "0", "1", etc.) followed by a brief explanation of your reasoning based on the multi-visualization analysis across 2 methods (PCA, T-SNE).
+Please respond with just the class label (e.g., "Good credit risk (creditworthy)", "Bad credit risk (not creditworthy)", etc.) followed by a brief explanation of your reasoning based on the multi-visualization analysis across 2 methods (PCA, T-SNE).
 
 Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 

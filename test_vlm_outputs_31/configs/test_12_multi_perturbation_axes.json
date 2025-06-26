@@ -1,0 +1,22 @@
+{
+  "name": "multi_perturbation_axes",
+  "enable_multi_viz": true,
+  "visualization_methods": [
+    "pca",
+    "tsne"
+  ],
+  "layout_strategy": "sequential",
+  "reasoning_focus": "comparison",
+  "use_semantic_names": true,
+  "load_semantic_from_cc18": true,
+  "nn_k": 30,
+  "semantic_axes": true,
+  "semantic_axes_method": "perturbation",
+  "use_smart_feature_selection": true,
+  "max_features_to_test": 15,
+  "feature_selection_method": "pca_variance",
+  "semantic_class_names": [
+    "Good credit risk (creditworthy)",
+    "Bad credit risk (not creditworthy)"
+  ]
+}
