@@ -73,6 +73,35 @@ def calculate_confidence_interval(values: List[float], confidence: float = 0.95)
     return ci_lower, ci_upper
 
 
+def extract_results_from_retry_dir(retry_dir: str) -> List[Dict[str, Any]]:
+    """Extract and parse results from retry directory."""
+    logger = logging.getLogger(__name__)
+    results = []
+    
+    if not os.path.exists(retry_dir):
+        logger.info(f"Retry directory {retry_dir} does not exist, skipping")
+        return results
+    
+    # Look for JSON result files in retry directory
+    for file_name in os.listdir(retry_dir):
+        if file_name.endswith('.json') and 'all_evaluation_results_' in file_name:
+            file_path = os.path.join(retry_dir, file_name)
+            try:
+                with open(file_path, 'r') as f:
+                    data = json.load(f)
+                
+                # Process retry results similar to tabular baseline format
+                processed_results = process_tabular_baseline_results(data, file_name, 'retry_results')
+                results.extend(processed_results)
+                logger.info(f"Loaded {len(processed_results)} retry results from {file_name}")
+                
+            except Exception as e:
+                logger.error(f"Error processing retry file {file_name}: {e}")
+                continue
+    
+    return results
+
+
 def extract_results_from_tar(tar_path: str, temp_dir: str) -> List[Dict[str, Any]]:
     """Extract and parse results from a tar archive."""
     logger = logging.getLogger(__name__)
@@ -150,6 +179,7 @@ def process_tabular_baseline_results(data: List[Dict[str, Any]], file_name: str,
     
     # Extract task information from file path
     # Format: clam/tabular_baselines/task_XXXXX/split_X/baselines/all_evaluation_results_TIMESTAMP.json
+    # For retry results, task_id and split_id will be extracted from individual results
     path_parts = file_name.split('/')
     task_id = None
     split_id = None
@@ -160,26 +190,39 @@ def process_tabular_baseline_results(data: List[Dict[str, Any]], file_name: str,
         elif part.startswith('split_'):
             split_id = part.replace('split_', '')
     
-    if not task_id:
-        logger.warning(f"Could not extract task_id from {file_name}")
-        task_id = 'unknown'
-    
-    if not split_id:
-        logger.warning(f"Could not extract split_id from {file_name}")
-        split_id = '0'
+    # For retry results, we'll extract task_id and split_id from the individual results
+    if archive_name == 'retry_results':
+        task_id = None  # Will be extracted from individual results
+        split_id = None  # Will be extracted from individual results
+    else:
+        if not task_id:
+            logger.warning(f"Could not extract task_id from {file_name}")
+            task_id = 'unknown'
+        
+        if not split_id:
+            logger.warning(f"Could not extract split_id from {file_name}")
+            split_id = '0'
     
     # Process each model result
     for result in data:
         if not isinstance(result, dict):
             continue
+        
+        # For retry results, extract task_id and split_id from the result itself
+        if archive_name == 'retry_results':
+            result_task_id = str(result.get('task_id', result.get('dataset_id', 'unknown')))
+            result_split_id = str(result.get('split_id', '0'))
+        else:
+            result_task_id = task_id
+            result_split_id = split_id
             
         # Convert to standard format
         processed_result = {
             'model_name': result.get('model_name', 'unknown'),
             'dataset_name': result.get('dataset_name', 'unknown'), 
-            'dataset_id': result.get('dataset_id', task_id),
-            'task_id': task_id,
-            'split_id': split_id,
+            'dataset_id': result.get('dataset_id', result_task_id),
+            'task_id': result_task_id,
+            'split_id': result_split_id,
             'task_type': result.get('task_type', 'classification'),
             'num_classes': result.get('num_classes', 2),
             'accuracy': result.get('accuracy'),
@@ -330,12 +373,78 @@ def detect_model_conflicts(all_results: List[Dict[str, Any]]) -> Dict[str, List[
     return conflicts
 
 
+def merge_results_superset(all_results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Merge results taking the superset of valid predictions for each dataset/split/algorithm triple."""
+    logger = logging.getLogger(__name__)
+    
+    # Group results by unique key: (model_name, dataset_id, split_id, archive_source)
+    # Note: We include archive_source to distinguish between different variants of the same model
+    # We use dataset_id instead of task_id for matching since retry results only have dataset_id
+    result_groups = defaultdict(list)
+    
+    for result in all_results:
+        model_name = result.get('model_name', 'unknown')
+        dataset_id = str(result.get('dataset_id', result.get('task_id', 'unknown')))
+        split_id = str(result.get('split_id', '0'))
+        archive_source = result.get('_archive_source', 'unknown')
+        
+        # Use dataset_id as primary key for matching across retry and original results
+        # Include archive_source to prevent merging different model variants
+        key = (model_name, dataset_id, split_id, archive_source)
+        result_groups[key].append(result)
+    
+    # For each group, prefer retry results over original results if they have valid metrics
+    merged_results = []
+    retry_count = 0
+    for key, group in result_groups.items():
+        if len(group) == 1:
+            merged_results.append(group[0])
+        else:
+            # Multiple results for the same key - prioritize retry results with valid metrics
+            retry_results = [r for r in group if r.get('_archive_source') == 'retry_results']
+            original_results = [r for r in group if r.get('_archive_source') != 'retry_results']
+            
+            chosen_result = None
+            
+            # Always prefer retry results if they exist and have valid metrics
+            for retry_result in retry_results:
+                if (retry_result.get('accuracy') is not None or 
+                    retry_result.get('balanced_accuracy') is not None):
+                    chosen_result = retry_result
+                    retry_count += 1
+                    logger.debug(f"Using retry result for {key[0]} on dataset {key[1]} (split {key[2]}, archive {key[3]})")
+                    break
+            
+            # If no valid retry result, use original results
+            if chosen_result is None:
+                for original_result in original_results:
+                    if (original_result.get('accuracy') is not None or 
+                        original_result.get('balanced_accuracy') is not None):
+                        chosen_result = original_result
+                        break
+            
+            # If still no valid result, take the first available
+            if chosen_result is None:
+                chosen_result = group[0]
+            
+            # Mark as merged result
+            chosen_result['_merged_from'] = len(group)
+            merged_results.append(chosen_result)
+    
+    logger.info(f"Merged {len(all_results)} results into {len(merged_results)} unique dataset/model combinations")
+    logger.info(f"Used {retry_count} retry results to replace original results with missing metrics")
+    return merged_results
+
+
 def process_results(all_results: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Process results and generate summary dataframes."""
     logger = logging.getLogger(__name__)
     
+    # Merge results to create superset
+    merged_results = merge_results_superset(all_results)
+    
     # Detect and report model conflicts
-    conflicts = detect_model_conflicts(all_results)
+    conflicts = detect_model_conflicts(merged_results)
     if conflicts:
         logger.info("Detected model name conflicts across archives:")
         for model, archives in conflicts.items():
@@ -349,7 +458,7 @@ def process_results(all_results: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, pd
     # Define datasets to exclude
     excluded_datasets = {'CIFAR_10', 'Devnagari-Script'}
     
-    for result in all_results:
+    for result in merged_results:
         original_model_name = result.get('model_name', 'unknown')
         archive_source = result.get('_archive_source', 'unknown')
         model_used = result.get('model_used', None)
@@ -359,9 +468,13 @@ def process_results(all_results: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, pd
             original_model_name, archive_source, model_used
         )
         
-        # Log unique identifier creation for first occurrence
+        # Log unique identifier creation for first occurrence  
         if unique_model_name != normalize_model_name(original_model_name):
             logger.debug(f"Created unique identifier: {original_model_name} -> {unique_model_name} (archive: {archive_source})")
+        
+        # Additional debug for TabLLM to track all variants
+        if 'tabllm' in original_model_name.lower():
+            logger.debug(f"TabLLM processing: {original_model_name} -> {unique_model_name} (archive: {archive_source}, model_used: {model_used})")
         
         dataset_name = result.get('dataset_name', 'unknown')
         task_id = str(result.get('task_id', result.get('dataset_id', 'unknown')))
@@ -404,7 +517,7 @@ def process_results(all_results: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, pd
         result_with_metadata['_original_model_name'] = original_model_name
         organized_results[unique_model_name][task_id]['raw_results'].append(result_with_metadata)
     
-    logger.info(f"Processed {len(all_results)} results across {len(organized_results)} models and {len(dataset_info)} datasets")
+    logger.info(f"Processed {len(merged_results)} results across {len(organized_results)} models and {len(dataset_info)} datasets")
     
     # Generate aggregated summary
     aggregated_data = []
@@ -866,6 +979,12 @@ def main():
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
         help="Logging level"
     )
+    parser.add_argument(
+        "--retry_dir", 
+        type=str, 
+        default=None,
+        help="Path to retry results directory (defaults to results_dir/tabular_baselines_retry)"
+    )
     
     args = parser.parse_args()
     logger = setup_logging(args.log_level)
@@ -907,6 +1026,18 @@ def main():
             except Exception as e:
                 logger.error(f"Error processing {tar_path}: {e}")
                 logger.debug(traceback.format_exc())
+    
+    # Also process retry results if they exist
+    retry_dir = args.retry_dir if args.retry_dir else os.path.join(results_dir, "tabular_baselines_retry")
+    if os.path.exists(retry_dir):
+        logger.info(f"Processing retry results from {retry_dir}")
+        try:
+            retry_results = extract_results_from_retry_dir(retry_dir)
+            all_results.extend(retry_results)
+            logger.info(f"Extracted {len(retry_results)} retry results")
+        except Exception as e:
+            logger.error(f"Error processing retry results: {e}")
+            logger.debug(traceback.format_exc())
     
     if not all_results:
         logger.error("No results found in any tar archives")
