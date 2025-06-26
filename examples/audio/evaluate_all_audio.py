@@ -31,12 +31,13 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 # Import centralized argument parser
 from clam.utils.evaluation_args import create_audio_evaluation_parser
 
-from clam.utils.json_utils import convert_for_json_serialization
+from clam.utils.json_utils import convert_for_json_serialization, safe_json_dump
 from clam.utils.platform_utils import log_platform_info
 from clam.utils import (
     init_wandb_with_gpu_monitoring, 
     cleanup_gpu_monitoring,
-    MetricsLogger
+    MetricsLogger,
+    set_seed_with_args
 )
 
 from examples.audio.clam_tsne_audio_baseline import ClamAudioTsneClassifier
@@ -51,282 +52,20 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def test_dataset(dataset_class, dataset_name, data_dir, args, use_wandb_logging=False):
-    """Test a single audio dataset."""
-    logger.info(f"\\n{'='*60}")
-    logger.info(f"TESTING {dataset_name.upper()}")
-    logger.info(f"{'='*60}")
-    
-    try:
-        # Load dataset
-        dataset = dataset_class(data_dir, download=not args.no_download)
-        
-        # Create few-shot splits
-        splits = dataset.create_few_shot_split(
-            k_shot=args.k_shot,
-            val_size=0.2,
-            test_size=0.3,
-            random_state=42
-        )
-        
-        train_paths, train_labels = splits['train']
-        val_paths, val_labels = splits['val']
-        test_paths, test_labels = splits['test']
-        class_names = splits['class_names']
-        
-        logger.info(f"Dataset: {dataset_name}")
-        logger.info(f"  Train: {len(train_paths)} samples ({args.k_shot} per class)")
-        logger.info(f"  Val: {len(val_paths)} samples")
-        logger.info(f"  Test: {len(test_paths)} samples")
-        logger.info(f"  Classes: {len(class_names)} - {', '.join(class_names[:5])}{'...' if len(class_names) > 5 else ''}")
-        
-        # Use subset for quick testing
-        if args.quick_test:
-            logger.info("Running quick test with subset of data")
-            test_paths = test_paths[:min(20, len(test_paths))]
-            test_labels = test_labels[:min(20, len(test_labels))]
-        
-        # Configure audio duration based on dataset
-        audio_duration = args.audio_duration
-        if dataset_name.lower() == 'ravdess' and audio_duration is None:
-            audio_duration = 3.0  # RAVDESS clips are ~3 seconds
-        elif audio_duration is None:
-            audio_duration = 5.0  # Default for ESC-50 and others
-            
-        results = {}
-        
-        # Test CLAM t-SNE
-        if 'clam_tsne' in args.models:
-            backend_name = "PCA" if args.use_pca_backend else "t-SNE"
-            features = []
-            if args.use_3d:
-                features.append("3D")
-            if args.use_knn_connections:
-                features.append(f"KNN-{args.nn_k}")
-            feature_str = f" ({', '.join(features)})" if features else ""
-            
-            logger.info(f"Testing CLAM {backend_name}{feature_str} ({args.embedding_model.upper()} → {backend_name} → VLM)...")
-            
-            try:
-                classifier = ClamAudioTsneClassifier(
-                    embedding_model=args.embedding_model,
-                    whisper_model=args.whisper_model,
-                    embedding_layer="encoder_last",
-                    clap_version=args.clap_version,
-                    tsne_perplexity=min(30.0, len(train_paths) / 4),
-                    tsne_max_iter=1000,
-                    vlm_model_id="Qwen/Qwen2.5-VL-3B-Instruct",
-                    use_3d=args.use_3d,
-                    use_knn_connections=args.use_knn_connections,
-                    nn_k=args.nn_k,
-                    max_vlm_image_size=1024,
-                    zoom_factor=args.zoom_factor,
-                    use_pca_backend=args.use_pca_backend,
-                    include_spectrogram=args.include_spectrogram,
-                    audio_duration=audio_duration,
-                    cache_dir=args.cache_dir,
-                    use_semantic_names=args.use_semantic_names,
-                    num_few_shot_examples=args.num_few_shot_examples,
-                    balanced_few_shot=args.balanced_few_shot,
-                    device='cpu' if sys.platform == "darwin" else None,
-                    seed=42
-                )
-                
-                # Pass save_every_n parameter
-                classifier.save_every_n = args.save_every_n
-                
-                start_time = time.time()
-                classifier.fit(train_paths, train_labels, test_paths[:5], class_names)
-                training_time = time.time() - start_time
-                
-                eval_results = classifier.evaluate(
-                    test_paths, test_labels, 
-                    return_detailed=True,
-                    save_outputs=args.save_outputs,
-                    output_dir=os.path.join(args.output_dir, dataset_name.lower()) if args.save_outputs else None
-                )
-                eval_results['training_time'] = training_time
-                eval_results['config'] = classifier.get_config()
-                eval_results['dataset_info'] = {
-                    'name': dataset_name,
-                    'num_classes': len(class_names),
-                    'class_names': class_names,
-                    'train_samples': len(train_paths),
-                    'test_samples': len(test_paths),
-                    'k_shot': args.k_shot
-                }
-                
-                results['clam_tsne'] = eval_results
-                logger.info(f"{dataset_name} CLAM t-SNE completed: {eval_results['accuracy']:.4f} accuracy")
-                
-                # Log to wandb
-                if use_wandb_logging:
-                    log_results_to_wandb(f'{dataset_name.lower()}_clam_tsne', eval_results, args, class_names)
-                
-            except Exception as e:
-                logger.error(f"{dataset_name} CLAM t-SNE failed: {e}")
-                results['clam_tsne'] = {'error': str(e)}
-        
-        # Test Whisper KNN baseline
-        if 'whisper_knn' in args.models:
-            logger.info(f"Testing Whisper KNN baseline (Whisper → KNN)...")
-            try:
-                classifier = WhisperKNNClassifier(
-                    whisper_model=args.whisper_model,
-                    n_neighbors=5,
-                    metric="cosine",
-                    weights="distance",
-                    standardize=True,
-                    cache_dir=args.cache_dir,
-                    device='cpu' if sys.platform == "darwin" else None,
-                    seed=42
-                )
-                
-                start_time = time.time()
-                classifier.fit(train_paths, train_labels, class_names)
-                training_time = time.time() - start_time
-                
-                eval_results = classifier.evaluate(
-                    test_paths, test_labels,
-                    return_detailed=True
-                )
-                eval_results['training_time'] = training_time
-                eval_results['config'] = classifier.get_config()
-                eval_results['dataset_info'] = {
-                    'name': dataset_name,
-                    'num_classes': len(class_names),
-                    'class_names': class_names,
-                    'train_samples': len(train_paths),
-                    'test_samples': len(test_paths),
-                    'k_shot': args.k_shot
-                }
-                
-                results['whisper_knn'] = eval_results
-                logger.info(f"{dataset_name} Whisper KNN completed: {eval_results['accuracy']:.4f} accuracy")
-                
-                # Log to wandb
-                if use_wandb_logging:
-                    log_results_to_wandb(f'{dataset_name.lower()}_whisper_knn', eval_results, args, class_names)
-                
-            except Exception as e:
-                logger.error(f"{dataset_name} Whisper KNN failed: {e}")
-                results['whisper_knn'] = {'error': str(e)}
-        
-        # Test CLAP zero-shot baseline
-        if 'clap_zero_shot' in args.models:
-            logger.info(f"Testing CLAP zero-shot baseline...")
-            try:
-                classifier = CLAPZeroShotClassifier(
-                    version=args.clap_version,  # "2022", "2023", or "clapcap"
-                    use_cuda=False if sys.platform == "darwin" else None,  # Auto-detect if not Mac
-                    batch_size=4  # Smaller batch for CPU
-                )
-                
-                start_time = time.time()
-                classifier.fit(train_paths, train_labels, class_names)  # Only for class names
-                training_time = time.time() - start_time
-                
-                eval_results = classifier.evaluate(
-                    test_paths, test_labels,
-                    return_detailed=True
-                )
-                eval_results['training_time'] = training_time
-                eval_results['config'] = classifier.get_config()
-                eval_results['dataset_info'] = {
-                    'name': dataset_name,
-                    'num_classes': len(class_names),
-                    'class_names': class_names,
-                    'train_samples': len(train_paths),
-                    'test_samples': len(test_paths),
-                    'k_shot': args.k_shot
-                }
-                
-                results['clap_zero_shot'] = eval_results
-                logger.info(f"{dataset_name} CLAP zero-shot completed: {eval_results['accuracy']:.4f} accuracy")
-                
-                # Log to wandb
-                if use_wandb_logging:
-                    log_results_to_wandb(f'{dataset_name.lower()}_clap_zero_shot', eval_results, args, class_names)
-                
-            except Exception as e:
-                logger.error(f"{dataset_name} CLAP zero-shot failed: {e}")
-                results['clap_zero_shot'] = {'error': str(e)}
-        
-        # Return first successful result for compatibility, or error if all failed
-        if results:
-            for model_name, result in results.items():
-                if 'error' not in result:
-                    return {
-                        'status': 'success',
-                        'results': result,
-                        'all_results': results  # Include all results
-                    }
-            # All models failed
-            return {
-                'status': 'error',
-                'error': f"All models failed",
-                'all_results': results
-            }
-        else:
-            return {
-                'status': 'error',
-                'error': f"No models specified for testing"
-            }
-        
-    except Exception as e:
-        logger.error(f"{dataset_name} test failed: {e}")
-        return {
-            'status': 'error',
-            'error': str(e)
-        }
-
-
-def run_all_audio_tests(args):
-    """Run tests on selected audio datasets."""
-    all_results = {}
-    
-    # Store wandb availability for logging
-    use_wandb_logging = args.use_wandb and WANDB_AVAILABLE
-    
-    # Define all available datasets
-    available_datasets = {
-        "esc50": (ESC50Dataset, "ESC-50", os.path.join(args.data_dir, "esc50")),
-        "ravdess": (RAVDESSDataset, "RAVDESS", os.path.join(args.data_dir, "ravdess")),
-        "urbansound8k": (UrbanSound8KDataset, "UrbanSound8K", os.path.join(args.data_dir, "urbansound8k"))
-    }
-    
-    # Select datasets to test based on arguments
-    datasets_to_test = []
-    for dataset_key in args.datasets:
-        if dataset_key in available_datasets:
-            datasets_to_test.append(available_datasets[dataset_key])
-        else:
-            logger.warning(f"Unknown dataset: {dataset_key}. Available: {list(available_datasets.keys())}")
-    
-    if not datasets_to_test:
-        logger.error("No valid datasets specified for testing")
-        return {}
-    
-    # Test each selected dataset
-    for dataset_class, dataset_name, data_dir in datasets_to_test:
-        result = test_dataset(dataset_class, dataset_name, data_dir, args, use_wandb_logging)
-        all_results[dataset_name.lower()] = result
-    
-    return all_results
-
-
-def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names: list):
-    """Log evaluation results to Weights & Biases."""
-    dataset_name = model_name.split('_')[0].upper()  # Extract dataset name
-    
+def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names: list, dataset_name: str = None):
+    """Log evaluation results to Weights & Biases (adapted for audio)."""
     if 'error' in eval_results:
+        # Log failed runs
         wandb.log({
             f"{model_name}/status": "failed",
             f"{model_name}/error": eval_results['error'],
             "model_name": model_name,
-            "dataset": dataset_name,
-            "k_shot": args.k_shot,
-            "quick_test": args.quick_test
+            "dataset": (dataset_name or getattr(args, 'datasets', ['unknown'])[0]).upper(),
+            "k_shot": getattr(args, 'k_shot', 5),
+            "embedding_model": getattr(args, 'embedding_model', 'whisper'),
+            "whisper_model": getattr(args, 'whisper_model', 'large-v2'),
+            "clap_version": getattr(args, 'clap_version', '2023'),
+            "audio_duration": getattr(args, 'audio_duration', None)
         })
         return
     
@@ -337,76 +76,465 @@ def log_results_to_wandb(model_name: str, eval_results: dict, args, class_names:
         f"{model_name}/prediction_time": eval_results.get('prediction_time', 0),
         f"{model_name}/num_test_samples": eval_results.get('num_test_samples', 0),
         "model_name": model_name,
-        "dataset": dataset_name,
+        "dataset": (dataset_name or getattr(args, 'datasets', ['unknown'])[0]).upper(),
         "num_classes": len(class_names),
-        "k_shot": args.k_shot,
-        "quick_test": args.quick_test
+        "k_shot": getattr(args, 'k_shot', 5),
+        "embedding_model": getattr(args, 'embedding_model', 'whisper'),
+        "whisper_model": getattr(args, 'whisper_model', 'large-v2'),
+        "clap_version": getattr(args, 'clap_version', '2023'),
+        "audio_duration": getattr(args, 'audio_duration', None)
     }
     
-    # Add model-specific metrics
-    config = eval_results.get('config', {})
-    if 'clam_tsne' in model_name:
-        # CLAM t-SNE specific metrics
+    # Add CLAM t-SNE specific metrics
+    if model_name == 'clam_tsne':
+        config = eval_results.get('config', {})
         metrics.update({
-            f"{model_name}/embedding_model": config.get('embedding_model', 'unknown'),
-            f"{model_name}/whisper_model": config.get('whisper_model', 'unknown'),
-            f"{model_name}/clap_version": config.get('clap_version', 'unknown'),
             f"{model_name}/use_3d": config.get('use_3d', False),
             f"{model_name}/use_knn_connections": config.get('use_knn_connections', False),
             f"{model_name}/nn_k": config.get('nn_k', 0),
             f"{model_name}/use_pca_backend": config.get('use_pca_backend', False),
-            f"{model_name}/include_spectrogram": config.get('include_spectrogram', False),
-            f"{model_name}/audio_duration": config.get('audio_duration', None),
             f"{model_name}/zoom_factor": config.get('zoom_factor', 1.0),
+            f"{model_name}/include_spectrogram": config.get('include_spectrogram', True),
             f"{model_name}/vlm_model": config.get('vlm_model_id', 'unknown'),
+            f"{model_name}/embedding_model": config.get('embedding_model', 'whisper'),
+            f"{model_name}/embedding_size": config.get('embedding_size', 0),
         })
-    elif 'whisper_knn' in model_name:
-        # Whisper KNN specific metrics
-        metrics.update({
-            f"{model_name}/whisper_model": config.get('whisper_model', 'unknown'),
-            f"{model_name}/n_neighbors": config.get('n_neighbors', 0),
-            f"{model_name}/metric": config.get('metric', 'unknown'),
-            f"{model_name}/weights": config.get('weights', 'unknown'),
-            f"{model_name}/standardize": config.get('standardize', False),
-        })
-    elif 'clap_zero_shot' in model_name:
-        # CLAP zero-shot specific metrics
-        metrics.update({
-            f"{model_name}/model_name": config.get('model_name', 'unknown'),
-            f"{model_name}/batch_size": config.get('batch_size', 0),
-            f"{model_name}/use_amp": config.get('use_amp', False),
-        })
+        
+        # Add visualization info if available
+        if eval_results.get('visualizations_saved', False):
+            metrics[f"{model_name}/visualizations_saved"] = True
+            metrics[f"{model_name}/output_directory"] = eval_results.get('output_directory', 'unknown')
     
-    # Add dataset info
-    dataset_info = eval_results.get('dataset_info', {})
-    if dataset_info:
-        metrics.update({
-            f"{model_name}/train_samples": dataset_info.get('train_samples', 0),
-            f"{model_name}/test_samples": dataset_info.get('test_samples', 0),
-        })
+    # Add additional audio-specific metrics
+    if 'detailed_results' in eval_results:
+        detailed = eval_results['detailed_results']
+        if isinstance(detailed, dict):
+            # Add balanced accuracy if available
+            if 'balanced_accuracy' in detailed:
+                metrics[f"{model_name}/balanced_accuracy"] = detailed['balanced_accuracy']
+            # Add F1 scores if available
+            if 'f1_macro' in detailed:
+                metrics[f"{model_name}/f1_macro"] = detailed['f1_macro']
+            if 'f1_weighted' in detailed:
+                metrics[f"{model_name}/f1_weighted"] = detailed['f1_weighted']
     
-    # Add visualization info if available
-    if eval_results.get('visualizations_saved', False):
-        metrics[f"{model_name}/visualizations_saved"] = True
-        metrics[f"{model_name}/output_directory"] = eval_results.get('output_directory', 'unknown')
+    # Add class names for reference
+    metrics["class_names"] = class_names[:10]  # Limit to first 10 for wandb
+    metrics["num_classes"] = len(class_names)
     
-    # Add classification report metrics if available
-    if 'classification_report' in eval_results:
-        class_report = eval_results['classification_report']
-        if isinstance(class_report, dict):
-            # Log macro/weighted averages
-            for avg_type in ['macro avg', 'weighted avg']:
-                if avg_type in class_report:
-                    avg_metrics = class_report[avg_type]
-                    avg_prefix = avg_type.replace(' ', '_')
-                    metrics.update({
-                        f"{model_name}/precision_{avg_prefix}": avg_metrics.get('precision', 0),
-                        f"{model_name}/recall_{avg_prefix}": avg_metrics.get('recall', 0),
-                        f"{model_name}/f1_{avg_prefix}": avg_metrics.get('f1-score', 0),
-                    })
-    
-    # Log all metrics to wandb
     wandb.log(metrics)
+
+
+def load_esc50_dataset(data_dir: str, args) -> tuple:
+    """
+    Load ESC-50 dataset.
+    
+    Args:
+        data_dir: Directory to store/find the dataset
+        args: Arguments containing configuration
+    
+    Returns:
+        Tuple of (train_paths, train_labels, test_paths, test_labels, class_names)
+    """
+    try:
+        dataset = ESC50Dataset(data_dir, download=not args.no_download)
+        
+        # Create few-shot splits
+        splits = dataset.create_few_shot_split(
+            k_shot=args.k_shot,
+            val_size=0.2,
+            test_size=0.3,
+            random_state=42
+        )
+        
+        train_paths, train_labels = splits['train']
+        val_paths, val_labels = splits['val']  # Currently not used but available
+        test_paths, test_labels = splits['test']
+        class_names = splits['class_names']
+        
+        logger.info(f"ESC-50 loaded: {len(train_paths)} train, {len(test_paths)} test samples")
+        logger.info(f"Classes: {len(class_names)} - {', '.join(class_names[:5])}{'...' if len(class_names) > 5 else ''}")
+        
+        return train_paths, train_labels, test_paths, test_labels, class_names
+        
+    except Exception as e:
+        raise ValueError(f"Failed to load ESC-50 dataset: {e}")
+
+
+def load_ravdess_dataset(data_dir: str, args) -> tuple:
+    """
+    Load RAVDESS dataset.
+    
+    Args:
+        data_dir: Directory to store/find the dataset
+        args: Arguments containing configuration
+    
+    Returns:
+        Tuple of (train_paths, train_labels, test_paths, test_labels, class_names)
+    """
+    try:
+        dataset = RAVDESSDataset(data_dir, download=not args.no_download)
+        
+        # Create few-shot splits
+        splits = dataset.create_few_shot_split(
+            k_shot=args.k_shot,
+            val_size=0.2,
+            test_size=0.3,
+            random_state=42
+        )
+        
+        train_paths, train_labels = splits['train']
+        val_paths, val_labels = splits['val']  # Currently not used but available
+        test_paths, test_labels = splits['test']
+        class_names = splits['class_names']
+        
+        logger.info(f"RAVDESS loaded: {len(train_paths)} train, {len(test_paths)} test samples")
+        logger.info(f"Classes: {len(class_names)} - {', '.join(class_names[:5])}{'...' if len(class_names) > 5 else ''}")
+        
+        return train_paths, train_labels, test_paths, test_labels, class_names
+        
+    except Exception as e:
+        raise ValueError(f"Failed to load RAVDESS dataset: {e}")
+
+
+def load_urbansound8k_dataset(data_dir: str, args) -> tuple:
+    """
+    Load UrbanSound8K dataset.
+    
+    Args:
+        data_dir: Directory to store/find the dataset
+        args: Arguments containing configuration
+    
+    Returns:
+        Tuple of (train_paths, train_labels, test_paths, test_labels, class_names)
+    """
+    try:
+        dataset = UrbanSound8KDataset(data_dir, download=not args.no_download)
+        
+        # Create few-shot splits
+        splits = dataset.create_few_shot_split(
+            k_shot=args.k_shot,
+            val_size=0.2,
+            test_size=0.3,
+            random_state=42
+        )
+        
+        train_paths, train_labels = splits['train']
+        val_paths, val_labels = splits['val']  # Currently not used but available
+        test_paths, test_labels = splits['test']
+        class_names = splits['class_names']
+        
+        logger.info(f"UrbanSound8K loaded: {len(train_paths)} train, {len(test_paths)} test samples")
+        logger.info(f"Classes: {len(class_names)} - {', '.join(class_names[:5])}{'...' if len(class_names) > 5 else ''}")
+        
+        return train_paths, train_labels, test_paths, test_labels, class_names
+        
+    except Exception as e:
+        raise ValueError(f"Failed to load UrbanSound8K dataset: {e}")
+
+
+def test_single_dataset(dataset_name: str, args):
+    """Test a single dataset (reusing vision script pattern)."""
+    logger.info(f"\\n{'='*60}")
+    logger.info(f"TESTING {dataset_name.upper()}")
+    logger.info(f"{'='*60}")
+    
+    try:
+        # Load dataset based on name
+        data_dir = os.path.join(args.data_dir, dataset_name)
+        
+        if dataset_name == 'esc50':
+            train_paths, train_labels, test_paths, test_labels, class_names = load_esc50_dataset(data_dir, args)
+        elif dataset_name == 'ravdess':
+            train_paths, train_labels, test_paths, test_labels, class_names = load_ravdess_dataset(data_dir, args)
+        elif dataset_name == 'urbansound8k':
+            train_paths, train_labels, test_paths, test_labels, class_names = load_urbansound8k_dataset(data_dir, args)
+        else:
+            raise ValueError(f"Unsupported dataset: {dataset_name}")
+        
+        logger.info(f"Dataset: {dataset_name}")
+        logger.info(f"  Train: {len(train_paths)} samples ({args.k_shot} per class)")
+        logger.info(f"  Test: {len(test_paths)} samples")
+        logger.info(f"  Classes: {len(class_names)} - {', '.join(class_names[:5])}{'...' if len(class_names) > 5 else ''}")
+        
+        return run_models_on_dataset(dataset_name, train_paths, train_labels, test_paths, test_labels, class_names, args)
+        
+    except Exception as e:
+        logger.error(f"{dataset_name} dataset loading failed: {e}")
+        return {
+            'status': 'error',
+            'error': str(e)
+        }
+
+
+def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_paths, test_labels, class_names, args):
+    """Run all models on a single dataset (reusing vision script pattern)."""
+    
+    # Debug: Check models argument
+    logger.info(f"Models to evaluate: {getattr(args, 'models', 'MISSING')}")
+    if not hasattr(args, 'models') or not args.models:
+        logger.error("No models specified for evaluation! Using default models.")
+        args.models = ["clam_tsne"]
+    
+    # Store wandb availability for logging
+    use_wandb_logging = args.use_wandb and WANDB_AVAILABLE
+    
+    # Apply quick test mode if requested
+    if args.quick_test:
+        logger.info("Running quick test with subset of data")
+        test_paths = test_paths[:min(20, len(test_paths))]
+        test_labels = test_labels[:min(20, len(test_labels))]
+    
+    # Configure audio duration based on dataset
+    audio_duration = args.audio_duration
+    if dataset_name.lower() == 'ravdess' and audio_duration is None:
+        audio_duration = 3.0  # RAVDESS clips are ~3 seconds
+    elif audio_duration is None:
+        audio_duration = 5.0  # Default for ESC-50 and others
+    
+    results = {}
+    
+    # Test CLAM t-SNE (audio → embeddings → t-SNE/PCA → VLM)
+    if 'clam_tsne' in args.models:
+        backend_name = "PCA" if args.use_pca_backend else "t-SNE"
+        features = []
+        if args.use_3d:
+            features.append("3D")
+        if args.use_knn_connections:
+            features.append(f"KNN-{args.nn_k}")
+        feature_str = f" ({', '.join(features)})" if features else ""
+        
+        # Validate feature combinations (reusing vision script pattern)
+        if args.use_knn_connections and args.use_pca_backend:
+            logger.warning("KNN connections are only supported with t-SNE, not PCA. KNN will be disabled for PCA backend.")
+        
+        logger.info(f"Testing CLAM {backend_name}{feature_str} ({args.embedding_model.upper()} → {backend_name} → VLM)...")
+        try:
+            classifier = ClamAudioTsneClassifier(
+                embedding_model=args.embedding_model,
+                whisper_model=args.whisper_model,
+                embedding_layer="encoder_last",
+                clap_version=args.clap_version,
+                tsne_perplexity=min(30.0, len(train_paths) / 4),
+                tsne_max_iter=1000,
+                vlm_model_id="Qwen/Qwen2.5-VL-3B-Instruct",
+                use_3d=args.use_3d,
+                use_knn_connections=args.use_knn_connections,
+                nn_k=args.nn_k,
+                max_vlm_image_size=1024,
+                zoom_factor=args.zoom_factor,
+                use_pca_backend=args.use_pca_backend,
+                include_spectrogram=args.include_spectrogram,
+                audio_duration=audio_duration,
+                cache_dir=args.cache_dir,
+                use_semantic_names=args.use_semantic_names,
+                num_few_shot_examples=args.num_few_shot_examples,
+                balanced_few_shot=args.balanced_few_shot,
+                device='cpu' if sys.platform == "darwin" else None,
+                seed=42
+            )
+            
+            # Pass save_every_n parameter
+            classifier.save_every_n = args.save_every_n
+            
+            start_time = time.time()
+            classifier.fit(train_paths, train_labels, test_paths[:5], class_names)
+            training_time = time.time() - start_time
+            
+            eval_results = classifier.evaluate(
+                test_paths, test_labels, 
+                return_detailed=True,
+                save_outputs=args.save_outputs,
+                output_dir=os.path.join(args.output_dir, dataset_name.lower()) if args.save_outputs else None
+            )
+            eval_results['training_time'] = training_time
+            eval_results['config'] = classifier.get_config()
+            eval_results['dataset_info'] = {
+                'name': dataset_name,
+                'num_classes': len(class_names),
+                'class_names': class_names,
+                'train_samples': len(train_paths),
+                'test_samples': len(test_paths),
+                'k_shot': args.k_shot
+            }
+            
+            results['clam_tsne'] = eval_results
+            logger.info(f"{dataset_name} CLAM t-SNE completed: {eval_results['accuracy']:.4f} accuracy")
+            
+            # Log to wandb
+            if use_wandb_logging:
+                log_results_to_wandb('clam_tsne', eval_results, args, class_names, dataset_name)
+                
+        except Exception as e:
+            import traceback
+            error_msg = f"CLAM t-SNE failed: {e}"
+            logger.error(error_msg)
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            results['clam_tsne'] = {'error': str(e), 'traceback': traceback.format_exc()}
+    
+    # Test Whisper KNN baseline
+    if 'whisper_knn' in args.models:
+        logger.info(f"Testing Whisper KNN baseline...")
+        try:
+            classifier = WhisperKNNClassifier(
+                model_name=args.whisper_model,
+                k=5,  # KNN neighbors
+                audio_duration=audio_duration,
+                use_cuda=False if sys.platform == "darwin" else None
+            )
+            
+            start_time = time.time()
+            classifier.fit(train_paths, train_labels, class_names)
+            training_time = time.time() - start_time
+            
+            eval_results = classifier.evaluate(
+                test_paths, test_labels,
+                return_detailed=True
+            )
+            eval_results['training_time'] = training_time
+            eval_results['config'] = classifier.get_config()
+            eval_results['dataset_info'] = {
+                'name': dataset_name,
+                'num_classes': len(class_names),
+                'class_names': class_names,
+                'train_samples': len(train_paths),
+                'test_samples': len(test_paths),
+                'k_shot': args.k_shot
+            }
+            
+            results['whisper_knn'] = eval_results
+            logger.info(f"{dataset_name} Whisper KNN completed: {eval_results['accuracy']:.4f} accuracy")
+            
+            # Log to wandb
+            if use_wandb_logging:
+                log_results_to_wandb('whisper_knn', eval_results, args, class_names, dataset_name)
+                
+        except Exception as e:
+            import traceback
+            error_msg = f"Whisper KNN failed: {e}"
+            logger.error(error_msg)
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            results['whisper_knn'] = {'error': str(e), 'traceback': traceback.format_exc()}
+    
+    # Test CLAP zero-shot baseline
+    if 'clap_zero_shot' in args.models:
+        logger.info(f"Testing CLAP zero-shot baseline...")
+        try:
+            classifier = CLAPZeroShotClassifier(
+                version=args.clap_version,  # "2022", "2023", or "clapcap"
+                use_cuda=False if sys.platform == "darwin" else None,  # Auto-detect if not Mac
+                batch_size=4  # Smaller batch for CPU
+            )
+            
+            start_time = time.time()
+            classifier.fit(train_paths, train_labels, class_names)  # Only for class names
+            training_time = time.time() - start_time
+            
+            eval_results = classifier.evaluate(
+                test_paths, test_labels,
+                return_detailed=True
+            )
+            eval_results['training_time'] = training_time
+            eval_results['config'] = classifier.get_config()
+            eval_results['dataset_info'] = {
+                'name': dataset_name,
+                'num_classes': len(class_names),
+                'class_names': class_names,
+                'train_samples': len(train_paths),
+                'test_samples': len(test_paths),
+                'k_shot': args.k_shot
+            }
+            
+            results['clap_zero_shot'] = eval_results
+            logger.info(f"{dataset_name} CLAP zero-shot completed: {eval_results['accuracy']:.4f} accuracy")
+            
+            # Log to wandb
+            if use_wandb_logging:
+                log_results_to_wandb('clap_zero_shot', eval_results, args, class_names, dataset_name)
+                
+        except Exception as e:
+            import traceback
+            error_msg = f"CLAP zero-shot failed: {e}"
+            logger.error(error_msg)
+            logger.error(f"Full traceback: {traceback.format_exc()}")
+            results['clap_zero_shot'] = {'error': str(e), 'traceback': traceback.format_exc()}
+    
+    # Return results in the expected format for compatibility with save_results
+    if results:
+        # Check if any models succeeded  
+        successful_results = {k: v for k, v in results.items() if 'error' not in v}
+        if successful_results:
+            # Return first successful result as primary, but include all results
+            first_success = next(iter(successful_results.values()))
+            return {
+                'status': 'success',
+                'results': first_success,
+                'all_results': results  # Include all model results
+            }
+        else:
+            # All models failed
+            return {
+                'status': 'error', 
+                'error': "All models failed",
+                'all_results': results
+            }
+    else:
+        return {
+            'status': 'error',
+            'error': "No models specified for testing"
+        }
+
+
+# Old test_dataset function removed - functionality moved to test_single_dataset and run_models_on_dataset
+
+
+def run_all_audio_tests(args):
+    """Run tests on selected audio datasets (modernized to match vision script pattern)."""
+    all_results = {}
+    
+    # Set seed before any dataset operations
+    set_seed_with_args(args)
+    
+    # Validate available datasets
+    available_datasets = ["esc50", "ravdess", "urbansound8k"]
+    
+    # Select datasets to test based on arguments
+    datasets_to_test = []
+    for dataset_key in args.datasets:
+        if dataset_key in available_datasets:
+            datasets_to_test.append(dataset_key)
+        else:
+            logger.warning(f"Unknown dataset: {dataset_key}. Available: {available_datasets}")
+    
+    if not datasets_to_test:
+        logger.error("No valid datasets specified for testing")
+        return {}
+    
+    logger.info(f"Testing {len(datasets_to_test)} audio datasets: {', '.join(datasets_to_test)}")
+    
+    # Test each selected dataset using the new structure
+    for dataset_name in datasets_to_test:
+        try:
+            result = test_single_dataset(dataset_name, args)
+            all_results[dataset_name.lower()] = result
+            
+            # Log success/failure for this dataset
+            if result.get('status') == 'success':
+                logger.info(f"✓ {dataset_name.upper()} completed successfully")
+            else:
+                logger.error(f"✗ {dataset_name.upper()} failed: {result.get('error', 'Unknown error')}")
+                
+        except Exception as e:
+            logger.error(f"Unexpected error testing {dataset_name}: {e}")
+            all_results[dataset_name.lower()] = {
+                'status': 'error',
+                'error': str(e)
+            }
+    
+    return all_results
+
+
+# Old log_results_to_wandb function removed - using improved version at top of file
 
 
 def save_results(results: dict, output_dir: str, k_shot: int):
