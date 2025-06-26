@@ -1,0 +1,204 @@
+{
+  "timestamp": "2025-06-26T08:37:15.104137",
+  "dataset_info": {
+    "name": "**Author**: James P Bridge, Sean B Holden and Lawrence C Paulson \n  \n**Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/First-order+theorem+proving)  \n\n**Please cite**: James P Bridge, Sean B Holden and Lawrence C Paulson . Machine learning for first-order theorem proving: learning to select a good heuristic. Journal of Automated Reasoning, Springer 2012/13. \n\nSource:\n\nJames P Bridge, Sean B Holden and Lawrence C Paulson \n\nUniversity of Cambridge \nComputer Laboratory \nWilliam Gates Building \n15 JJ Thomson Avenue \nCambridge CB3 0FD \nUK \n\n+44 (0)1223 763500 \nforename.surname '@' cl.cam.ac.uk\n\n\nData Set Information:\n\nSee the file dataset file.\n\n\nAttribute Information:\n\nThe attributes are a mixture of static and dynamic features derived from theorems to be proved. See the paper for full details.\n\nDownloaded from openml.org.",
+    "n_samples": 500,
+    "n_features": 51,
+    "n_classes": 6,
+    "task_id": 9985,
+    "data_source": "openml",
+    "feature_names": [
+      "V1",
+      "V2",
+      "V3",
+      "V4",
+      "V5",
+      "V6",
+      "V7",
+      "V8",
+      "V9",
+      "V10",
+      "V11",
+      "V12",
+      "V13",
+      "V14",
+      "V15",
+      "V16",
+      "V17",
+      "V18",
+      "V19",
+      "V20",
+      "V21",
+      "V22",
+      "V23",
+      "V24",
+      "V25",
+      "V26",
+      "V27",
+      "V28",
+      "V29",
+      "V30",
+      "V31",
+      "V32",
+      "V33",
+      "V34",
+      "V35",
+      "V36",
+      "V37",
+      "V38",
+      "V39",
+      "V40",
+      "V41",
+      "V42",
+      "V43",
+      "V44",
+      "V45",
+      "V46",
+      "V47",
+      "V48",
+      "V49",
+      "V50",
+      "V51"
+    ]
+  },
+  "vlm_model": "Qwen/Qwen2.5-VL-3B-Instruct",
+  "total_tests": 1,
+  "successful_tests": 1,
+  "failed_tests": 0,
+  "success_rate": 100.0,
+  "single_viz_tests": 1,
+  "multi_viz_tests": 0,
+  "visualization_method_counts": {},
+  "average_prompt_length": 1381.0,
+  "total_test_samples": 20,
+  "output_directory": "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/test_vlm_outputs_9985",
+  "validation_statistics": {
+    "vlm_outputs_valid_tests": 1,
+    "vlm_outputs_invalid_tests": 0,
+    "pipeline_failed_tests": 0,
+    "validation_failed_tests": 0,
+    "validation_success_rate": 100.0
+  },
+  "overall_metrics": {
+    "accuracy": {
+      "mean": 0.1,
+      "std": 0.0,
+      "min": 0.1,
+      "max": 0.1,
+      "count": 1
+    },
+    "f1_macro": {
+      "mean": 0.07936507936507936,
+      "std": 0.0,
+      "min": 0.07936507936507936,
+      "max": 0.07936507936507936,
+      "count": 1
+    },
+    "balanced_accuracy": {
+      "mean": 0.25,
+      "std": 0.0,
+      "min": 0.25,
+      "max": 0.25,
+      "count": 1
+    }
+  },
+  "best_performing_configs": {
+    "accuracy": {
+      "config": "tsne_knn",
+      "score": 0.1
+    },
+    "f1_macro": {
+      "config": "tsne_knn",
+      "score": 0.07936507936507936
+    },
+    "balanced_accuracy": {
+      "config": "tsne_knn",
+      "score": 0.25
+    }
+  },
+  "single_vs_multi_viz_comparison": {},
+  "config_performance": {
+    "tsne_knn": {
+      "config_name": "tsne_knn",
+      "accuracy": 0.1,
+      "balanced_accuracy": 0.25,
+      "precision_macro": 0.04722222222222222,
+      "recall_macro": 0.25,
+      "f1_macro": 0.07936507936507936,
+      "precision_micro": 0.1,
+      "recall_micro": 0.1,
+      "f1_micro": 0.1,
+      "precision_weighted": 0.018333333333333333,
+      "recall_weighted": 0.1,
+      "f1_weighted": 0.030952380952380953,
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          0,
+          3,
+          0,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          2,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          4,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          2,
+          3,
+          0
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 20,
+      "num_classes": 6,
+      "support": []
+    }
+  },
+  "insights": {
+    "best_overall_config": "tsne_knn",
+    "multi_viz_advantage": {},
+    "most_tested_viz_method": null,
+    "configs_with_metrics": 1
+  },
+  "files_generated": {
+    "visualizations": 1,
+    "prompts": 1,
+    "responses": 1,
+    "configs": 1,
+    "ground_truth": 1,
+    "test_directories": 1
+  }
+}

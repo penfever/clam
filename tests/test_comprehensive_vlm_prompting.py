@@ -31,9 +31,25 @@ from clam.utils.vlm_prompting import create_classification_prompt, create_regres
 from clam.utils.unified_metrics import MetricsLogger
 from clam.utils.json_utils import safe_json_dump
 from clam.utils.class_name_utils import extract_class_names_from_labels
+from clam.utils.task_detection import detect_task_type, VISION_CLASSIFICATION_TASK_ID, AUDIO_CLASSIFICATION_TASK_ID
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import fetch_openml
-from sklearn.metrics import accuracy_score, balanced_accuracy_score, precision_recall_fscore_support, confusion_matrix
+from sklearn.metrics import accuracy_score, balanced_accuracy_score, precision_recall_fscore_support, confusion_matrix, mean_squared_error, mean_absolute_error
+
+# Audio/Vision dataset imports
+try:
+    from examples.audio.audio_datasets import ESC50Dataset, UrbanSound8KDataset, RAVDESSDataset
+    AUDIO_AVAILABLE = True
+except ImportError:
+    AUDIO_AVAILABLE = False
+    
+try:
+    import torchvision
+    import torchvision.transforms as transforms
+    from torch.utils.data import DataLoader
+    VISION_AVAILABLE = True
+except ImportError:
+    VISION_AVAILABLE = False
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -43,27 +59,33 @@ logger = logging.getLogger(__name__)
 class VLMPromptingTestSuite:
     """Comprehensive test suite for VLM prompting with various configurations."""
     
-    def __init__(self, output_dir: str, task_id: int = 23, vlm_model: str = "Qwen/Qwen2-VL-2B-Instruct", 
-                 num_tests: int = None, num_samples_per_test: int = 10, backend: str = "auto", zoom_factor: float = 6.5):
+    def __init__(self, output_dir: str, task_id_or_dataset_name: str = "23", vlm_model: str = "Qwen/Qwen2-VL-2B-Instruct", 
+                 num_tests: int = None, num_samples_per_test: int = 10, backend: str = "auto", zoom_factor: float = 6.5,
+                 task_type: Optional[str] = None):
         """
         Initialize the test suite.
         
         Args:
             output_dir: Directory to save outputs
-            task_id: OpenML task ID (default: 23 = cmc contraceptive method choice)
+            task_id_or_dataset_name: Dataset identifier - can be OpenML task ID (e.g. "23"), dataset name (e.g. "cifar10", "esc50") 
             vlm_model: VLM model to use (default: small Qwen model)
             num_tests: Number of test configurations to run (default: None, runs all available)
             num_samples_per_test: Number of test samples per configuration (default: 10)
             backend: Backend to use for VLM inference (default: auto)
             zoom_factor: Zoom factor for t-SNE visualizations (default: 6.5)
+            task_type: Override task type ("classification" or "regression")
         """
         self.output_dir = Path(output_dir).resolve()
-        self.task_id = task_id
+        self.task_id_or_dataset_name = task_id_or_dataset_name
         self.vlm_model = vlm_model
         self.num_tests = num_tests
         self.num_samples_per_test = num_samples_per_test
         self.backend = backend
         self.zoom_factor = zoom_factor
+        self.task_type_override = task_type
+        
+        # Parse dataset identifier to determine modality and task_id
+        self.modality, self.task_id = self._parse_dataset_identifier(task_id_or_dataset_name)
         
         # Create output directories with nested structure
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -82,11 +104,77 @@ class VLMPromptingTestSuite:
         # Number of responses per test (use the provided parameter)
         self.responses_per_test = num_samples_per_test
         
-        # Load dataset
+        # Load dataset based on modality
         self.X, self.y, self.dataset_info = self._load_dataset()
         
-        logger.info(f"Initialized test suite with task {task_id}")
-        logger.info(f"Dataset shape: {self.X.shape}, Classes: {len(np.unique(self.y))}")
+        # Determine task type
+        self.task_type, self.task_type_method = self._determine_task_type()
+        
+        logger.info(f"Initialized test suite with dataset: {task_id_or_dataset_name}, modality: {self.modality}")
+        logger.info(f"Dataset shape: {self.X.shape if hasattr(self.X, 'shape') else len(self.X) if isinstance(self.X, list) else 'N/A'}")
+        logger.info(f"Task type: {self.task_type} (detected via: {self.task_type_method})")
+        if self.task_type == 'classification':
+            logger.info(f"Classes: {len(np.unique(self.y))}")
+        else:
+            logger.info(f"Target range: [{np.min(self.y):.3f}, {np.max(self.y):.3f}]")
+    
+    def _parse_dataset_identifier(self, identifier: str) -> Tuple[str, Optional[int]]:
+        """
+        Parse dataset identifier to determine modality and task_id.
+        
+        Args:
+            identifier: Dataset identifier (e.g. "23", "cifar10", "esc50")
+            
+        Returns:
+            Tuple of (modality, task_id)
+        """
+        # Known audio datasets
+        audio_datasets = {'esc50', 'ravdess', 'urbansound8k'}
+        
+        # Known vision datasets
+        vision_datasets = {'cifar10', 'cifar100', 'mnist', 'imagenet'}
+        
+        # Check if it's a known audio dataset
+        if identifier.lower() in audio_datasets:
+            return "audio", AUDIO_CLASSIFICATION_TASK_ID
+        
+        # Check if it's a known vision dataset
+        if identifier.lower() in vision_datasets:
+            return "vision", VISION_CLASSIFICATION_TASK_ID
+        
+        # Try to parse as numeric task_id (tabular)
+        try:
+            task_id = int(identifier)
+            return "tabular", task_id
+        except ValueError:
+            pass
+        
+        # Default to tabular with no task_id (will try to resolve later)
+        logger.warning(f"Unknown dataset identifier '{identifier}', defaulting to tabular modality")
+        return "tabular", None
+    
+    def _determine_task_type(self) -> Tuple[str, str]:
+        """
+        Determine task type (classification vs regression).
+        
+        Returns:
+            Tuple of (task_type, detection_method)
+        """
+        # Manual override takes precedence
+        if self.task_type_override:
+            return self.task_type_override, "manual_override"
+        
+        # Use task detection utilities
+        try:
+            task_type, method = detect_task_type(
+                task_id=self.task_id,
+                y=self.y,
+                dataset_info=self.dataset_info
+            )
+            return task_type, method
+        except Exception as e:
+            logger.warning(f"Task type detection failed: {e}, defaulting to classification")
+            return "classification", "fallback_default"
     
     def _validate_detailed_vlm_outputs(self, detailed_output_path: Path) -> Tuple[bool, str]:
         """
@@ -256,8 +344,12 @@ class VLMPromptingTestSuite:
         for detail in prediction_details:
             if 'parsed_prediction' in detail and 'true_label' in detail:
                 try:
-                    pred = int(detail['parsed_prediction'])
-                    true = int(detail['true_label'])
+                    if self.task_type == 'classification':
+                        pred = int(detail['parsed_prediction'])
+                        true = int(detail['true_label'])
+                    else:  # regression
+                        pred = float(detail['parsed_prediction'])
+                        true = float(detail['true_label'])
                     predictions.append(pred)
                     true_labels.append(true)
                 except (ValueError, TypeError):
@@ -267,49 +359,74 @@ class VLMPromptingTestSuite:
         if len(predictions) == 0:
             return None
         
-        # Calculate basic metrics
-        accuracy = accuracy_score(true_labels, predictions)
-        balanced_acc = balanced_accuracy_score(true_labels, predictions)
-        
-        # Calculate precision, recall, F1
-        precision, recall, f1, support = precision_recall_fscore_support(
-            true_labels, predictions, average='macro', zero_division=0
-        )
-        
-        # Calculate per-class metrics
-        precision_micro, recall_micro, f1_micro, _ = precision_recall_fscore_support(
-            true_labels, predictions, average='micro', zero_division=0
-        )
-        
-        precision_weighted, recall_weighted, f1_weighted, _ = precision_recall_fscore_support(
-            true_labels, predictions, average='weighted', zero_division=0
-        )
-        
-        # Confusion matrix
-        cm = confusion_matrix(true_labels, predictions)
-        
         # Completion rate
         completion_rate = len(predictions) / len(prediction_details)
         
-        return {
-            'config_name': config_name,
-            'accuracy': float(accuracy),
-            'balanced_accuracy': float(balanced_acc),
-            'precision_macro': float(precision),
-            'recall_macro': float(recall), 
-            'f1_macro': float(f1),
-            'precision_micro': float(precision_micro),
-            'recall_micro': float(recall_micro),
-            'f1_micro': float(f1_micro),
-            'precision_weighted': float(precision_weighted),
-            'recall_weighted': float(recall_weighted),
-            'f1_weighted': float(f1_weighted),
-            'confusion_matrix': cm.tolist() if cm is not None else [],
-            'completion_rate': float(completion_rate),
-            'num_test_samples': len(predictions),
-            'num_classes': len(np.unique(true_labels)),
-            'support': support.tolist() if support is not None else []
-        }
+        if self.task_type == 'classification':
+            # Classification metrics
+            accuracy = accuracy_score(true_labels, predictions)
+            balanced_acc = balanced_accuracy_score(true_labels, predictions)
+            
+            # Calculate precision, recall, F1
+            precision, recall, f1, support = precision_recall_fscore_support(
+                true_labels, predictions, average='macro', zero_division=0
+            )
+            
+            # Calculate per-class metrics
+            precision_micro, recall_micro, f1_micro, _ = precision_recall_fscore_support(
+                true_labels, predictions, average='micro', zero_division=0
+            )
+            
+            precision_weighted, recall_weighted, f1_weighted, _ = precision_recall_fscore_support(
+                true_labels, predictions, average='weighted', zero_division=0
+            )
+            
+            # Confusion matrix
+            cm = confusion_matrix(true_labels, predictions)
+            
+            return {
+                'config_name': config_name,
+                'task_type': 'classification',
+                'accuracy': float(accuracy),
+                'balanced_accuracy': float(balanced_acc),
+                'precision_macro': float(precision),
+                'recall_macro': float(recall), 
+                'f1_macro': float(f1),
+                'precision_micro': float(precision_micro),
+                'recall_micro': float(recall_micro),
+                'f1_micro': float(f1_micro),
+                'precision_weighted': float(precision_weighted),
+                'recall_weighted': float(recall_weighted),
+                'f1_weighted': float(f1_weighted),
+                'confusion_matrix': cm.tolist() if cm is not None else [],
+                'completion_rate': float(completion_rate),
+                'num_test_samples': len(predictions),
+                'num_classes': len(np.unique(true_labels)),
+                'support': support.tolist() if support is not None else []
+            }
+        else:
+            # Regression metrics
+            mse = mean_squared_error(true_labels, predictions)
+            mae = mean_absolute_error(true_labels, predictions)
+            rmse = np.sqrt(mse)
+            
+            # R-squared
+            ss_res = np.sum((true_labels - predictions) ** 2)
+            ss_tot = np.sum((true_labels - np.mean(true_labels)) ** 2)
+            r2 = 1 - (ss_res / ss_tot) if ss_tot != 0 else 0
+            
+            return {
+                'config_name': config_name,
+                'task_type': 'regression',
+                'mse': float(mse),
+                'mae': float(mae),
+                'rmse': float(rmse),
+                'r2': float(r2),
+                'completion_rate': float(completion_rate),
+                'num_test_samples': len(predictions),
+                'target_range': [float(np.min(true_labels)), float(np.max(true_labels))],
+                'prediction_range': [float(np.min(predictions)), float(np.max(predictions))]
+            }
     
     def _load_dataset(self):
         """Load OpenML dataset with robust error handling."""
@@ -415,6 +532,148 @@ class VLMPromptingTestSuite:
                 'task_id': None,
                 'data_source': 'synthetic',
                 'feature_names': [f'feature_{i}' for i in range(X.shape[1])]
+            }
+            return X, y, dataset_info
+    
+    def _load_audio_dataset(self):
+        """Load audio dataset with robust error handling."""
+        if not AUDIO_AVAILABLE:
+            raise ImportError("Audio datasets not available. Install required dependencies for audio support.")
+        
+        try:
+            dataset_name = self.task_id_or_dataset_name.lower()
+            
+            # Default data directory
+            data_dir = Path.home() / ".clam" / "audio_datasets" / dataset_name
+            
+            if dataset_name == 'esc50':
+                dataset = ESC50Dataset(str(data_dir), download=True)
+            elif dataset_name == 'ravdess':
+                dataset = RAVDESSDataset(str(data_dir), download=True)
+            elif dataset_name == 'urbansound8k':
+                dataset = UrbanSound8KDataset(str(data_dir), download=True)
+            else:
+                raise ValueError(f"Unsupported audio dataset: {dataset_name}")
+            
+            # Create few-shot splits
+            splits = dataset.create_few_shot_split(
+                k_shot=5,  # Small for testing
+                val_size=0.2,
+                test_size=0.3,
+                random_state=42
+            )
+            
+            # Combine train and test for our purposes
+            audio_paths = splits['train'][0] + splits['test'][0]
+            labels = splits['train'][1] + splits['test'][1]
+            class_names = splits['class_names']
+            
+            # Convert to numpy arrays
+            X = np.array(audio_paths)  # Store as paths
+            y = np.array(labels)
+            
+            # Limit size for testing
+            if len(X) > 100:
+                indices = np.random.choice(len(X), 100, replace=False)
+                X = X[indices]
+                y = y[indices]
+            
+            dataset_info = {
+                'name': f'{dataset_name}_audio',
+                'n_samples': len(X),
+                'n_features': 1,  # Audio path
+                'n_classes': len(class_names),
+                'task_id': self.task_id,
+                'data_source': 'audio',
+                'class_names': class_names,
+                'modality': 'audio'
+            }
+            
+            logger.info(f"Successfully loaded {dataset_name} audio dataset")
+            return X, y, dataset_info
+            
+        except Exception as e:
+            logger.warning(f"Failed to load audio dataset {self.task_id_or_dataset_name}: {e}")
+            logger.info("Using synthetic dataset as fallback")
+            
+            # Fallback to synthetic data
+            from sklearn.datasets import make_classification
+            X, y = make_classification(n_samples=50, n_features=10, n_classes=3, 
+                                     n_informative=6, random_state=42)
+            dataset_info = {
+                'name': 'synthetic_audio_fallback',
+                'n_samples': len(X),
+                'n_features': X.shape[1], 
+                'n_classes': len(np.unique(y)),
+                'task_id': None,
+                'data_source': 'synthetic',
+                'class_names': [f'audio_class_{i}' for i in range(len(np.unique(y)))],
+                'modality': 'audio'
+            }
+            return X, y, dataset_info
+    
+    def _load_vision_dataset(self):
+        """Load vision dataset with robust error handling."""
+        if not VISION_AVAILABLE:
+            raise ImportError("Vision datasets not available. Install required dependencies for vision support.")
+        
+        try:
+            dataset_name = self.task_id_or_dataset_name.lower()
+            
+            # Use resource manager to prepare dataset
+            from clam.utils.resource_manager import get_resource_manager
+            rm = get_resource_manager()
+            
+            if dataset_name in ['cifar10', 'cifar100']:
+                train_paths, train_labels, test_paths, test_labels, class_names = rm.prepare_cifar_dataset(dataset_name)
+                
+                # Combine train and test for our purposes
+                image_paths = train_paths + test_paths
+                labels = train_labels + test_labels
+                
+                # Convert to numpy arrays
+                X = np.array(image_paths)  # Store as paths
+                y = np.array(labels)
+                
+                # Limit size for testing
+                if len(X) > 200:
+                    indices = np.random.choice(len(X), 200, replace=False)
+                    X = X[indices]
+                    y = y[indices]
+                
+                dataset_info = {
+                    'name': f'{dataset_name}_vision',
+                    'n_samples': len(X),
+                    'n_features': 1,  # Image path
+                    'n_classes': len(class_names),
+                    'task_id': self.task_id,
+                    'data_source': 'vision',
+                    'class_names': class_names,
+                    'modality': 'vision'
+                }
+                
+                logger.info(f"Successfully loaded {dataset_name} vision dataset")
+                return X, y, dataset_info
+            else:
+                raise ValueError(f"Unsupported vision dataset: {dataset_name}")
+            
+        except Exception as e:
+            logger.warning(f"Failed to load vision dataset {self.task_id_or_dataset_name}: {e}")
+            logger.info("Using synthetic dataset as fallback")
+            
+            # Fallback to synthetic data
+            from sklearn.datasets import make_classification
+            X, y = make_classification(n_samples=50, n_features=10, n_classes=3, 
+                                     n_informative=6, random_state=42)
+            dataset_info = {
+                'name': 'synthetic_vision_fallback',
+                'n_samples': len(X),
+                'n_features': X.shape[1], 
+                'n_classes': len(np.unique(y)),
+                'task_id': None,
+                'data_source': 'synthetic',
+                'class_names': [f'vision_class_{i}' for i in range(len(np.unique(y)))],
+                'modality': 'vision'
             }
             return X, y, dataset_info
     
@@ -772,9 +1031,59 @@ class VLMPromptingTestSuite:
             }
         ]
         
-        # Combine all configurations - semantic tests first
-        all_configs = (semantic_configs + single_viz_configs + multi_viz_configs + 
-                      parameter_configs)
+        # Add modality-specific configurations
+        modality_configs = []
+        
+        if self.modality == "audio":
+            # Audio-specific configurations
+            modality_configs.extend([
+                {
+                    'name': 'audio_basic_tsne',
+                    'enable_multi_viz': False,
+                    'use_3d_tsne': False,
+                    'use_knn_connections': False,
+                    'nn_k': 10,
+                    'tsne_perplexity': 10,
+                    'include_spectrogram': True
+                },
+                {
+                    'name': 'audio_tsne_knn',
+                    'enable_multi_viz': False,
+                    'use_3d_tsne': False,
+                    'use_knn_connections': True,
+                    'nn_k': 10,
+                    'tsne_perplexity': 10,
+                    'include_spectrogram': True
+                }
+            ])
+        elif self.modality == "vision":
+            # Vision-specific configurations
+            modality_configs.extend([
+                {
+                    'name': 'vision_basic_tsne',
+                    'enable_multi_viz': False,
+                    'use_3d_tsne': False,
+                    'use_knn_connections': False,
+                    'nn_k': 10,
+                    'tsne_perplexity': 10
+                },
+                {
+                    'name': 'vision_tsne_knn',
+                    'enable_multi_viz': False,
+                    'use_3d_tsne': False,
+                    'use_knn_connections': True,
+                    'nn_k': 10,
+                    'tsne_perplexity': 10
+                }
+            ])
+        
+        # For non-tabular modalities, use simpler configs by default
+        if self.modality != "tabular":
+            all_configs = modality_configs + single_viz_configs[:3]  # Just a few basic configs
+        else:
+            # Combine all configurations - semantic tests first for tabular
+            all_configs = (semantic_configs + single_viz_configs + multi_viz_configs + 
+                          parameter_configs)
         
         return all_configs
     
@@ -821,7 +1130,7 @@ class VLMPromptingTestSuite:
             
             # Create classifier with configuration
             classifier_config = {
-                'modality': 'tabular',
+                'modality': self.modality,
                 'vlm_model_id': self.vlm_model,
                 'tsne_perplexity': config.get('tsne_perplexity', 15),
                 'tsne_max_iter': 500,  # Reduced for speed
@@ -935,28 +1244,52 @@ class VLMPromptingTestSuite:
                         
                         from clam.utils.vlm_prompting import create_classification_prompt
                         # Use semantic class names if available, otherwise generic ones
-                        prompt_class_names = config.get('semantic_class_names', [f"Class_{i}" for i in range(len(np.unique(y_train)))])
-                        sample_prompt = create_classification_prompt(
-                            class_names=prompt_class_names,
-                            modality='tabular',
-                            dataset_description=f"Test dataset with {len(np.unique(y_train))} classes",
-                            use_semantic_names=config.get('use_semantic_names', False),
-                            multi_viz_info=multi_viz_info
-                        )
+                        if self.task_type == 'classification':
+                            prompt_class_names = config.get('semantic_class_names', [f"Class_{i}" for i in range(len(np.unique(y_train)))])
+                            sample_prompt = create_classification_prompt(
+                                class_names=prompt_class_names,
+                                modality=self.modality,
+                                dataset_description=f"Test dataset with {len(np.unique(y_train))} classes",
+                                use_semantic_names=config.get('use_semantic_names', False),
+                                multi_viz_info=multi_viz_info
+                            )
+                        else:  # regression
+                            sample_prompt = create_regression_prompt(
+                                modality=self.modality,
+                                dataset_description=f"Test dataset for regression",
+                                target_min=float(np.min(y_train)),
+                                target_max=float(np.max(y_train)),
+                                target_mean=float(np.mean(y_train)),
+                                target_std=float(np.std(y_train)),
+                                multi_viz_info=multi_viz_info
+                            )
                     else:
                         # Single viz prompt
                         from clam.utils.vlm_prompting import create_classification_prompt
                         # Use semantic class names if available, otherwise generic ones
-                        prompt_class_names = config.get('semantic_class_names', [f"Class_{i}" for i in range(len(np.unique(y_train)))])
-                        sample_prompt = create_classification_prompt(
-                            class_names=prompt_class_names,
-                            modality='tabular',
-                            use_knn=config.get('use_knn_connections', False),
-                            use_3d=config.get('use_3d_tsne', False),
-                            nn_k=config.get('knn_k', 5),
-                            dataset_description=f"Test dataset with {len(np.unique(y_train))} classes",
-                            use_semantic_names=config.get('use_semantic_names', False)
-                        )
+                        if self.task_type == 'classification':
+                            prompt_class_names = config.get('semantic_class_names', [f"Class_{i}" for i in range(len(np.unique(y_train)))])
+                            sample_prompt = create_classification_prompt(
+                                class_names=prompt_class_names,
+                                modality=self.modality,
+                                use_knn=config.get('use_knn_connections', False),
+                                use_3d=config.get('use_3d_tsne', False),
+                                nn_k=config.get('knn_k', 5),
+                                dataset_description=f"Test dataset with {len(np.unique(y_train))} classes",
+                                use_semantic_names=config.get('use_semantic_names', False)
+                            )
+                        else:  # regression
+                            sample_prompt = create_regression_prompt(
+                                modality=self.modality,
+                                use_knn=config.get('use_knn_connections', False),
+                                use_3d=config.get('use_3d_tsne', False),
+                                nn_k=config.get('knn_k', 5),
+                                dataset_description=f"Test dataset for regression",
+                                target_min=float(np.min(y_train)),
+                                target_max=float(np.max(y_train)),
+                                target_mean=float(np.mean(y_train)),
+                                target_std=float(np.std(y_train))
+                            )
                     
                     # Use the same prompt for all samples (this is typically how CLAM works)
                     all_prompts = [sample_prompt] * len(all_responses)
@@ -977,13 +1310,24 @@ class VLMPromptingTestSuite:
                     else:
                         fallback_class_names = [f"Class_{i}" for i in range(len(np.unique(y_train)))]
                     
-                    from clam.utils.vlm_prompting import create_classification_prompt
-                    sample_prompt = create_classification_prompt(
-                        class_names=fallback_class_names,
-                        modality='tabular',
-                        dataset_description=f"Test dataset with {len(np.unique(y_train))} classes",
-                        use_semantic_names=config.get('use_semantic_names', False)
-                    )
+                    if self.task_type == 'classification':
+                        from clam.utils.vlm_prompting import create_classification_prompt
+                        sample_prompt = create_classification_prompt(
+                            class_names=fallback_class_names,
+                            modality=self.modality,
+                            dataset_description=f"Test dataset with {len(np.unique(y_train))} classes",
+                            use_semantic_names=config.get('use_semantic_names', False)
+                        )
+                    else:  # regression
+                        from clam.utils.vlm_prompting import create_regression_prompt
+                        sample_prompt = create_regression_prompt(
+                            modality=self.modality,
+                            dataset_description=f"Test dataset for regression",
+                            target_min=float(np.min(y_train)),
+                            target_max=float(np.max(y_train)),
+                            target_mean=float(np.mean(y_train)),
+                            target_std=float(np.std(y_train))
+                        )
                     all_prompts = [sample_prompt] * len(all_responses)
                 
                 # Save the actual outputs manually since CLAM's save_outputs isn't implemented
@@ -1420,8 +1764,13 @@ def main():
     parser = argparse.ArgumentParser(description="Comprehensive VLM Prompting Test Suite")
     parser.add_argument("--output_dir", type=str, default="./test_vlm_outputs",
                        help="Directory to save test outputs")
-    parser.add_argument("--task_id", type=int, default=23,
-                       help="OpenML task ID (default: 23 = cmc, alternatives: 61=iris, 1046=wine, 1461=banknote)")
+    # Backward compatibility
+    parser.add_argument("--task_id", type=int, default=None,
+                       help="(DEPRECATED) Use --task_id_or_dataset_name instead")
+    parser.add_argument("--task_id_or_dataset_name", type=str, default="23",
+                       help="Dataset identifier - can be OpenML task ID (e.g. '23'), dataset name (e.g. 'cifar10', 'esc50')")
+    parser.add_argument("--task_type", type=str, default=None, choices=["classification", "regression"],
+                       help="Override task type (classification or regression)")
     parser.add_argument("--vlm_model", type=str, default="Qwen/Qwen2.5-VL-3B-Instruct",
                        help="VLM model to use")
     parser.add_argument("--seed", type=int, default=42,
@@ -1442,18 +1791,24 @@ def main():
     
     args = parser.parse_args()
     
+    # Handle backward compatibility
+    if args.task_id is not None and not hasattr(args, 'task_id_or_dataset_name'):
+        args.task_id_or_dataset_name = str(args.task_id)
+        logger.warning("Using deprecated --task_id argument. Please use --task_id_or_dataset_name instead.")
+    
     # Set random seed
     np.random.seed(args.seed)
     
     # Create test suite
     test_suite = VLMPromptingTestSuite(
         output_dir=args.output_dir,
-        task_id=args.task_id,
+        task_id_or_dataset_name=args.task_id_or_dataset_name,
         vlm_model=args.vlm_model,
         num_tests=args.num_tests,
         num_samples_per_test=args.num_samples_per_test,
         backend=args.backend,
-        zoom_factor=args.zoom_factor
+        zoom_factor=args.zoom_factor,
+        task_type=args.task_type
     )
     
     # Handle list_configs option
@@ -1520,7 +1875,7 @@ def main():
     print("\n" + "=" * 60)
     print("VLM PROMPTING TEST SUITE SUMMARY")
     print("=" * 60)
-    print(f"Dataset: {summary['dataset_info']['name']}")
+    print(f"Dataset: {summary['dataset_info']['name']} ({test_suite.modality})")
     print(f"Total Tests: {summary['total_tests']}")
     print(f"Successful: {summary['successful_tests']}")
     print(f"Failed: {summary['failed_tests']}")
