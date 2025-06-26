@@ -407,9 +407,9 @@ def apply_consistent_point_styling(
         )
         metadata['visible_classes'] = visible_classes
         
-        # Create legend text using only visible_classes
+        # Create legend text using unique_classes (numeric labels) for proper color mapping
         legend_text = create_class_legend(
-            visible_classes, class_color_map, class_names, use_semantic_names
+            unique_classes, class_color_map, class_names, use_semantic_names
         )
         
     else:
