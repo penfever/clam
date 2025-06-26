@@ -1229,7 +1229,19 @@ class VLMPromptingTestSuite:
         configs = self._get_test_configurations()
         
         # Handle specific target config selection
-        if hasattr(self, '_target_config') and self._target_config:
+        if hasattr(self, '_target_configs') and self._target_configs:
+            matching_configs = [config for config in configs if config['name'] in self._target_configs]
+            if matching_configs:
+                configs = matching_configs
+                if len(self._target_configs) == 1:
+                    logger.info(f"Running specific test configuration: {self._target_configs[0]}")
+                else:
+                    logger.info(f"Running {len(self._target_configs)} specific test configurations: {', '.join(self._target_configs)}")
+            else:
+                logger.error(f"Target configurations not found: {', '.join(self._target_configs)}")
+                return {}
+        # Handle legacy single target config (for backward compatibility)
+        elif hasattr(self, '_target_config') and self._target_config:
             matching_configs = [config for config in configs if config['name'] == self._target_config]
             if matching_configs:
                 configs = [matching_configs[0]]
@@ -1423,8 +1435,8 @@ def main():
                        help="Backend to use for VLM inference (default: auto)")
     parser.add_argument("--zoom_factor", type=float, default=6.5,
                        help="Zoom factor for t-SNE visualizations (default: 6.5)")
-    parser.add_argument("--test_config", type=str, default=None,
-                       help="Run only a specific test configuration by name (e.g., 'tsne_perturbation_axes')")
+    parser.add_argument("--test_config", type=str, nargs='*', default=None,
+                       help="Run only specific test configurations by name (e.g., 'tsne_3d_knn' 'basic_tsne'). Can specify multiple configs separated by spaces.")
     parser.add_argument("--list_configs", action="store_true",
                        help="List all available test configuration names and exit")
     
@@ -1467,23 +1479,40 @@ def main():
             print(f"{i+1:2d}. {config['name']}{status_str}")
         
         print(f"\nTotal: {len(test_configs)} configurations")
-        print("\nUse --test_config <name> to run a specific configuration")
+        print("\nUse --test_config <name1> [<name2> ...] to run specific configuration(s)")
+        print("Examples:")
+        print("  --test_config tsne_3d_knn")
+        print("  --test_config basic_tsne tsne_knn tsne_3d")
         return
     
     # Handle specific test config option
     if args.test_config:
         test_configs = test_suite._get_test_configurations()
-        matching_configs = [config for config in test_configs if config['name'] == args.test_config]
         
-        if not matching_configs:
-            print(f"Error: Test configuration '{args.test_config}' not found.")
+        # Find matching configurations for all specified config names
+        matching_configs = []
+        missing_configs = []
+        
+        for config_name in args.test_config:
+            matches = [config for config in test_configs if config['name'] == config_name]
+            if matches:
+                matching_configs.extend(matches)
+            else:
+                missing_configs.append(config_name)
+        
+        if missing_configs:
+            print(f"Error: Test configuration(s) not found: {', '.join(missing_configs)}")
             print("Use --list_configs to see available configurations.")
             return 1
         
-        print(f"Running specific test configuration: {args.test_config}")
-        # Override num_tests to run only the specific config
-        test_suite.num_tests = 1
-        test_suite._target_config = args.test_config
+        if len(args.test_config) == 1:
+            print(f"Running specific test configuration: {args.test_config[0]}")
+        else:
+            print(f"Running {len(args.test_config)} specific test configurations: {', '.join(args.test_config)}")
+        
+        # Override num_tests to run only the specific configs
+        test_suite.num_tests = len(matching_configs)
+        test_suite._target_configs = args.test_config  # Store list of target configs
     
     summary = test_suite.run_all_tests()
     
