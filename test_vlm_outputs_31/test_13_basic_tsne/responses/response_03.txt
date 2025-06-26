@@ -1,1 +1,0 @@
-Class: Class_1 | Reasoning: The red star is closest to the orange-colored points, which represent Class_1 in the t-SNE visualization.

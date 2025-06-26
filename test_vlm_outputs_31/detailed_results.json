@@ -1,0 +1,92 @@
+[
+  {
+    "test_idx": 0,
+    "config_name": "tsne_3d_knn",
+    "success": true,
+    "num_test_samples": 20,
+    "test_indices": [
+      2,
+      15,
+      18,
+      20,
+      27,
+      33,
+      43,
+      45,
+      55,
+      60,
+      80,
+      87,
+      90,
+      91,
+      101,
+      103,
+      112,
+      125,
+      138,
+      140
+    ],
+    "ground_truth_labels": [
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      0
+    ],
+    "avg_prompt_length": 1475.0,
+    "visualization_path": "visualizations/test_00_tsne_3d_knn.png",
+    "prompt_path": "prompts/test_00_tsne_3d_knn_all.txt",
+    "response_path": "responses/test_00_tsne_3d_knn_all.txt",
+    "ground_truth_path": "ground_truth/test_00_tsne_3d_knn.json",
+    "config_path": "configs/test_00_tsne_3d_knn.json",
+    "test_directory": "test_00_tsne_3d_knn",
+    "is_multi_viz": false,
+    "visualization_methods": [
+      "tsne"
+    ],
+    "metrics": {
+      "config_name": "tsne_3d_knn",
+      "accuracy": 0.4,
+      "balanced_accuracy": 0.6,
+      "precision_macro": 0.6470588235294118,
+      "recall_macro": 0.6,
+      "f1_macro": 0.3939393939393939,
+      "precision_micro": 0.4,
+      "recall_micro": 0.4,
+      "f1_micro": 0.4,
+      "precision_weighted": 0.8235294117647058,
+      "recall_weighted": 0.4,
+      "f1_weighted": 0.36363636363636365,
+      "confusion_matrix": [
+        [
+          5,
+          0
+        ],
+        [
+          12,
+          3
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 20,
+      "num_classes": 2,
+      "support": []
+    },
+    "error": null
+  }
+]

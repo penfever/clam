@@ -20,7 +20,7 @@ import logging
 import shutil
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -87,6 +87,77 @@ class VLMPromptingTestSuite:
         
         logger.info(f"Initialized test suite with task {task_id}")
         logger.info(f"Dataset shape: {self.X.shape}, Classes: {len(np.unique(self.y))}")
+    
+    def _validate_detailed_vlm_outputs(self, detailed_output_path: Path) -> Tuple[bool, str]:
+        """
+        Validate that detailed_vlm_outputs.json was properly saved and formatted.
+        
+        Args:
+            detailed_output_path: Path to the detailed_vlm_outputs.json file
+            
+        Returns:
+            Tuple of (is_valid, error_message)
+        """
+        try:
+            # Check if file exists
+            if not detailed_output_path.exists():
+                return False, f"detailed_vlm_outputs.json file not found at {detailed_output_path}"
+            
+            # Check if file is readable and properly formatted JSON
+            with open(detailed_output_path, 'r') as f:
+                content = f.read().strip()
+                if not content:
+                    return False, "detailed_vlm_outputs.json file is empty"
+                
+                try:
+                    data = json.loads(content)
+                except json.JSONDecodeError as e:
+                    return False, f"detailed_vlm_outputs.json contains invalid JSON: {e}"
+            
+            # Validate required fields structure
+            required_fields = ['test_config', 'dataset_info', 'model_config', 'prediction_details']
+            missing_fields = [field for field in required_fields if field not in data]
+            if missing_fields:
+                return False, f"detailed_vlm_outputs.json missing required fields: {missing_fields}"
+            
+            # Validate prediction_details structure
+            prediction_details = data.get('prediction_details', [])
+            if not isinstance(prediction_details, list):
+                return False, "prediction_details should be a list"
+            
+            # Check if this is a failed test case
+            pipeline_failed = data.get('pipeline_failed', False)
+            if len(prediction_details) == 0:
+                if pipeline_failed:
+                    # For failed tests, empty prediction_details is expected
+                    return True, "detailed_vlm_outputs.json validation passed (failed test case with expected empty predictions)"
+                else:
+                    return False, "prediction_details is empty - no predictions were recorded"
+            
+            # Validate each prediction entry has required fields
+            for i, pred in enumerate(prediction_details):
+                if not isinstance(pred, dict):
+                    return False, f"prediction_details[{i}] should be a dictionary"
+                
+                pred_required_fields = ['sample_index', 'ground_truth_label', 'predicted_label']
+                pred_missing_fields = [field for field in pred_required_fields if field not in pred]
+                if pred_missing_fields:
+                    return False, f"prediction_details[{i}] missing required fields: {pred_missing_fields}"
+            
+            # Validate metrics if present
+            if 'metrics' in data and data['metrics'] is not None:
+                metrics = data['metrics']
+                if not isinstance(metrics, dict):
+                    return False, "metrics should be a dictionary"
+                
+                # Check for basic accuracy metric
+                if 'accuracy' not in metrics:
+                    return False, "metrics missing required 'accuracy' field"
+            
+            return True, "detailed_vlm_outputs.json validation passed"
+            
+        except Exception as e:
+            return False, f"Error validating detailed_vlm_outputs.json: {str(e)}"
     
     def _load_semantic_class_names(self, task_id: int, num_classes: int) -> Optional[List[str]]:
         """
@@ -1003,6 +1074,26 @@ class VLMPromptingTestSuite:
                 all_responses = [f"Class: FAILED | Reasoning: Pipeline error: {str(e)}"] * len(X_test)
                 all_prompts = ["FAILED"] * len(X_test)
                 viz_path = self.output_dir / "visualizations" / f"test_{test_idx:02d}_{config['name']}_failed.png"
+                
+                # Create a minimal detailed_vlm_outputs.json for failed tests to ensure consistency
+                test_dir = self.output_dir / f"test_{test_idx:02d}_{config['name']}"
+                test_dir.mkdir(exist_ok=True)
+                detailed_output_path = test_dir / "detailed_vlm_outputs.json"
+                failed_detailed_output = {
+                    'test_config': config,
+                    'dataset_info': self.dataset_info,
+                    'model_config': {'vlm_model': self.vlm_model, 'backend': self.backend},
+                    'prediction_details': [],  # Empty because pipeline failed
+                    'error': f"CLAM pipeline failed: {str(e)}",
+                    'pipeline_failed': True
+                }
+                
+                try:
+                    with open(detailed_output_path, 'w') as f:
+                        json.dump(failed_detailed_output, f, indent=2, default=str)
+                    logger.info(f"Created minimal detailed_vlm_outputs.json for failed test: {detailed_output_path}")
+                except Exception as json_error:
+                    logger.error(f"Failed to create detailed_vlm_outputs.json for failed test: {json_error}")
             
             # Save aggregated prompt and responses
             prompt_path = self.output_dir / "prompts" / f"test_{test_idx:02d}_{config['name']}_all.txt"
@@ -1043,11 +1134,36 @@ class VLMPromptingTestSuite:
             with open(config_path, 'w') as f:
                 json.dump(config, f, indent=2)
             
+            # Validate detailed_vlm_outputs.json before marking test as successful
+            detailed_output_path = test_dir / "detailed_vlm_outputs.json"
+            vlm_outputs_valid, validation_error = self._validate_detailed_vlm_outputs(detailed_output_path)
+            
+            # Check if this was a pipeline failure by examining the detailed outputs
+            pipeline_failed = False
+            if vlm_outputs_valid and detailed_output_path.exists():
+                try:
+                    with open(detailed_output_path, 'r') as f:
+                        data = json.load(f)
+                        pipeline_failed = data.get('pipeline_failed', False)
+                except:
+                    pass  # If we can't read it, vlm_outputs_valid will already be False
+            
+            # Determine final test success status
+            # Test is successful only if VLM outputs are valid AND pipeline didn't fail
+            test_success = vlm_outputs_valid and not pipeline_failed
+            
+            if not vlm_outputs_valid:
+                test_error = f"detailed_vlm_outputs.json validation failed: {validation_error}"
+            elif pipeline_failed:
+                test_error = "CLAM pipeline failed during test execution"
+            else:
+                test_error = None
+            
             # Collect test result
             result = {
                 'test_idx': test_idx,
                 'config_name': config['name'],
-                'success': True,
+                'success': test_success,
                 'num_test_samples': len(X_test),
                 'test_indices': self.test_indices.tolist() if self.test_indices is not None else [],
                 'ground_truth_labels': ground_truth_labels,
@@ -1061,10 +1177,26 @@ class VLMPromptingTestSuite:
                 'is_multi_viz': config.get('enable_multi_viz', False),
                 'visualization_methods': config.get('visualization_methods', ['tsne']),
                 'metrics': metrics if 'metrics' in locals() else None,
-                'error': None
+                'error': test_error,
+                'detailed_vlm_outputs_valid': vlm_outputs_valid,
+                'detailed_vlm_outputs_path': str(detailed_output_path.relative_to(self.output_dir))
             }
             
-            logger.info(f"✓ Test {test_idx + 1} completed successfully")
+            if test_success:
+                logger.info(f"✓ Test {test_idx + 1} completed successfully")
+                logger.info(f"  detailed_vlm_outputs.json validation: PASSED")
+                logger.info(f"  CLAM pipeline execution: SUCCESS")
+            else:
+                logger.error(f"✗ Test {test_idx + 1} FAILED")
+                if not vlm_outputs_valid:
+                    logger.error(f"  detailed_vlm_outputs.json validation: FAILED - {validation_error}")
+                else:
+                    logger.error(f"  detailed_vlm_outputs.json validation: PASSED")
+                
+                if pipeline_failed:
+                    logger.error(f"  CLAM pipeline execution: FAILED")
+                
+                logger.error(f"  Overall error: {test_error}")
             
             # Final cleanup: ensure all figures are closed after this test
             import matplotlib.pyplot as plt
@@ -1131,6 +1263,12 @@ class VLMPromptingTestSuite:
         """Generate comprehensive test summary with comparative analysis."""
         successful_tests = [r for r in self.test_results if r.get('success', False)]
         failed_tests = [r for r in self.test_results if not r.get('success', False)]
+        
+        # Analyze detailed VLM outputs validation results
+        vlm_outputs_valid_tests = [r for r in self.test_results if r.get('detailed_vlm_outputs_valid', False)]
+        vlm_outputs_invalid_tests = [r for r in self.test_results if not r.get('detailed_vlm_outputs_valid', False)]
+        pipeline_failed_tests = [r for r in failed_tests if 'pipeline failed' in r.get('error', '').lower()]
+        validation_failed_tests = [r for r in failed_tests if 'validation failed' in r.get('error', '').lower()]
         
         single_viz_tests = [r for r in successful_tests if not r.get('is_multi_viz', False)]
         multi_viz_tests = [r for r in successful_tests if r.get('is_multi_viz', False)]
@@ -1221,6 +1359,15 @@ class VLMPromptingTestSuite:
             'average_prompt_length': np.mean([r.get('avg_prompt_length', 0) for r in successful_tests]),
             'total_test_samples': sum([r.get('num_test_samples', 0) for r in successful_tests]),
             'output_directory': str(self.output_dir),
+            
+            # Detailed VLM outputs validation statistics
+            'validation_statistics': {
+                'vlm_outputs_valid_tests': len(vlm_outputs_valid_tests),
+                'vlm_outputs_invalid_tests': len(vlm_outputs_invalid_tests),
+                'pipeline_failed_tests': len(pipeline_failed_tests),
+                'validation_failed_tests': len(validation_failed_tests),
+                'validation_success_rate': len(vlm_outputs_valid_tests) / len(self.test_results) * 100 if self.test_results else 0
+            },
             
             # New metrics analysis
             'overall_metrics': aggregate_stats,
@@ -1349,6 +1496,15 @@ def main():
     print(f"Multi-viz Tests: {summary['multi_viz_tests']}")
     print(f"Total Test Samples: {summary['total_test_samples']}")
     print(f"Average Prompt Length: {summary['average_prompt_length']:.0f} characters")
+    
+    # Print validation statistics
+    validation_stats = summary['validation_statistics']
+    print(f"\nDetailed VLM Outputs Validation:")
+    print(f"Valid VLM Outputs: {validation_stats['vlm_outputs_valid_tests']}")
+    print(f"Invalid VLM Outputs: {validation_stats['vlm_outputs_invalid_tests']}")
+    print(f"Pipeline Failures: {validation_stats['pipeline_failed_tests']}")
+    print(f"Validation Failures: {validation_stats['validation_failed_tests']}")
+    print(f"Validation Success Rate: {validation_stats['validation_success_rate']:.1f}%")
     print(f"\nFiles Generated:")
     for file_type, count in summary['files_generated'].items():
         print(f"  {file_type}: {count}")
