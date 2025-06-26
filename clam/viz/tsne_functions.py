@@ -1054,12 +1054,6 @@ def create_tsne_visualization(
     DEPRECATED: This function is deprecated. Use TSNEVisualizer instead.
     This wrapper is provided for backward compatibility.
     """
-    import warnings
-    warnings.warn(
-        "create_tsne_visualization is deprecated. Use TSNEVisualizer instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
     
     visualizer = TSNEVisualizer(
         task_type='classification',
@@ -1094,12 +1088,6 @@ def create_tsne_3d_visualization(
     
     DEPRECATED: This function is deprecated. Use TSNEVisualizer instead.
     """
-    import warnings
-    warnings.warn(
-        "create_tsne_3d_visualization is deprecated. Use TSNEVisualizer instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
     
     return create_tsne_visualization(
         train_embeddings, train_labels, test_embeddings, test_labels,
@@ -1124,12 +1112,6 @@ def create_combined_tsne_plot(
     
     DEPRECATED: This function is deprecated. Use TSNEVisualizer instead.
     """
-    import warnings
-    warnings.warn(
-        "create_combined_tsne_plot is deprecated. Use TSNEVisualizer instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
     
     # Create a dummy visualizer to use the plotter
     plotter = ClassificationTSNEPlotter(figsize=figsize, zoom_factor=zoom_factor, use_3d=use_3d)
@@ -1164,12 +1146,6 @@ def create_combined_tsne_3d_plot(
     
     DEPRECATED: This function is deprecated. Use TSNEVisualizer instead.
     """
-    import warnings
-    warnings.warn(
-        "create_combined_tsne_3d_plot is deprecated. Use TSNEVisualizer instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
     
     return create_combined_tsne_plot(
         train_tsne, test_tsne, train_labels, highlight_test_idx,
@@ -1194,12 +1170,6 @@ def create_regression_tsne_visualization(
     
     DEPRECATED: This function is deprecated. Use TSNEVisualizer instead.
     """
-    import warnings
-    warnings.warn(
-        "create_regression_tsne_visualization is deprecated. Use TSNEVisualizer instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
     
     visualizer = TSNEVisualizer(
         task_type='regression',
@@ -1236,12 +1206,6 @@ def create_tsne_plot_with_knn(
     
     DEPRECATED: This function is deprecated. Use TSNEVisualizer instead.
     """
-    import warnings
-    warnings.warn(
-        "create_tsne_plot_with_knn is deprecated. Use TSNEVisualizer instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
     
     # Create KNN-enabled visualizer
     visualizer = TSNEVisualizer(
@@ -1290,12 +1254,6 @@ def create_tsne_3d_plot_with_knn(
     
     DEPRECATED: This function is deprecated. Use TSNEVisualizer instead.
     """
-    import warnings
-    warnings.warn(
-        "create_tsne_3d_plot_with_knn is deprecated. Use TSNEVisualizer instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
     
     return create_tsne_plot_with_knn(
         train_tsne, test_tsne, train_labels, train_embeddings, test_embeddings,
@@ -1320,12 +1278,6 @@ def create_regression_tsne_3d_visualization(
     
     DEPRECATED: This function is deprecated. Use TSNEVisualizer instead.
     """
-    import warnings
-    warnings.warn(
-        "create_regression_tsne_3d_visualization is deprecated. Use TSNEVisualizer instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
     
     return create_regression_tsne_visualization(
         train_embeddings, train_targets, test_embeddings, test_targets,
@@ -1349,12 +1301,6 @@ def create_combined_regression_tsne_plot(
     
     DEPRECATED: This function is deprecated. Use TSNEVisualizer instead.
     """
-    import warnings
-    warnings.warn(
-        "create_combined_regression_tsne_plot is deprecated. Use TSNEVisualizer instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
     
     # Create a regression plotter
     plotter = RegressionTSNEPlotter(figsize=figsize, zoom_factor=zoom_factor, use_3d=use_3d)
@@ -1387,12 +1333,6 @@ def create_combined_regression_tsne_3d_plot(
     
     DEPRECATED: This function is deprecated. Use TSNEVisualizer instead.
     """
-    import warnings
-    warnings.warn(
-        "create_combined_regression_tsne_3d_plot is deprecated. Use TSNEVisualizer instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
     
     return create_combined_regression_tsne_plot(
         train_tsne, test_tsne, train_targets, highlight_test_idx,
@@ -1419,12 +1359,6 @@ def create_regression_tsne_plot_with_knn(
     
     DEPRECATED: This function is deprecated. Use TSNEVisualizer instead.
     """
-    import warnings
-    warnings.warn(
-        "create_regression_tsne_plot_with_knn is deprecated. Use TSNEVisualizer instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
     
     # Create KNN-enabled regression visualizer
     visualizer = TSNEVisualizer(
@@ -1471,12 +1405,6 @@ def create_regression_tsne_3d_plot_with_knn(
     
     DEPRECATED: This function is deprecated. Use TSNEVisualizer instead.
     """
-    import warnings
-    warnings.warn(
-        "create_regression_tsne_3d_plot_with_knn is deprecated. Use TSNEVisualizer instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
     
     return create_regression_tsne_plot_with_knn(
         train_tsne, test_tsne, train_targets, train_embeddings, test_embeddings,

@@ -1,0 +1,417 @@
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 
+
+=== PROMPT ===
+
+Looking at this 3D t-SNE visualization of tabular data, you can see:
+
+1. Colored points representing training data, where each color corresponds to a different class
+2. Gray square points representing test data  
+3. One red star point which is the query point I want you to classify
+4. Four different views of the same 3D space: Isometric, Front (XZ), Side (YZ), and Top (XY)
+
+Dataset Context: Test dataset with 2 classes
+
+Based on the position of the red star (query point) relative to the colored training points across ALL viewing angles, which class should this query point belong to?
+
+Consider:
+- The spatial relationships in 3D space by examining all four views
+- Which colored class clusters the red star is closest to or embedded within
+
+Please respond with just the class label (e.g., "Class_0", "Class_1", "Class_2") followed by a brief explanation of your reasoning based on the 3D spatial clustering patterns you observe across the multiple views.
+
+Format your response as: "Class: [class_label] | Reasoning: [brief explanation]" 

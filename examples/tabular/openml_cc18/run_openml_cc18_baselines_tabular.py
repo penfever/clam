@@ -243,7 +243,7 @@ def evaluate_baselines_on_task(task, split_idx, args):
         "python", eval_script,
         "--task_ids", str(task_id),  # Pass task_id properly
         "--output_dir", eval_output_dir,
-        "--models", "all_baselines",  # Run all baseline models
+        "--models", "all_baselines",  # Run all baseline models (replaces deprecated --run_all_baselines and --baselines_only)
         "--only_ground_truth_classes",  # Only use ground truth classes
         "--seed", str(args.seed + split_idx)  # Use different seed for each split
     ]
