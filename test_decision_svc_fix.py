@@ -16,7 +16,7 @@ def test_decision_svc():
         from clam.viz.decision.regions import create_decision_regions_visualization
         
         # Create synthetic 2D data for decision regions
-        X, y = make_classification(
+        X_train, y_train = make_classification(
             n_samples=100, 
             n_features=2, 
             n_redundant=0, 
@@ -25,14 +25,22 @@ def test_decision_svc():
             random_state=42
         )
         
+        # Create some test points to classify
+        X_test = np.array([
+            [0.5, 0.5],   # Point in the middle
+            [-1.0, 1.0],  # Point in one region
+            [1.0, -1.0]   # Point in another region
+        ])
+        
         # Create and train classifier
         classifier = SVC(kernel='rbf', random_state=42)
         
-        # Test with class_names parameter (this should not cause an error)
+        # Test with class_names parameter and test data (this should not cause an error)
         result = create_decision_regions_visualization(
-            X_train=X,
-            y_train=y,
+            X_train=X_train,
+            y_train=y_train,
             classifier=classifier,
+            X_test=X_test,  # Add test points
             embedding_method='pca',
             random_state=42,
             class_names=['Class A', 'Class B'],  # This used to cause an error

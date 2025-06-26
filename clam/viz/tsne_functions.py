@@ -121,7 +121,7 @@ class BaseTSNEPlotter(ABC):
     def __init__(
         self, 
         figsize: Tuple[int, int] = (10, 8),
-        zoom_factor: float = 2.0,
+        zoom_factor: float = 1.0,
         use_3d: bool = False
     ):
         """
@@ -191,35 +191,38 @@ class BaseTSNEPlotter(ABC):
         all_coords = np.vstack([train_coords, test_coords])
         
         if self.use_3d:
-            # 3D zoom logic
-            for i, coord_name in enumerate(['X', 'Y', 'Z']):
-                coord_range = all_coords[:, i].max() - all_coords[:, i].min()
-                visible_range = coord_range / self.zoom_factor
-                center = target_point[i]
-                
-                coord_min = center - visible_range / 2
-                coord_max = center + visible_range / 2
-                
-                if i == 0:
-                    ax.set_xlim(coord_min, coord_max)
-                elif i == 1:
-                    ax.set_ylim(coord_min, coord_max)
-                else:
-                    ax.set_zlim(coord_min, coord_max)
+            # 3D zoom logic - only apply if target_point has 3 dimensions
+            if len(target_point) >= 3:
+                for i, coord_name in enumerate(['X', 'Y', 'Z']):
+                    coord_range = all_coords[:, i].max() - all_coords[:, i].min()
+                    if coord_range > 0:  # Avoid division by zero
+                        visible_range = coord_range / self.zoom_factor
+                        center = target_point[i]
+                        
+                        coord_min = center - visible_range / 2
+                        coord_max = center + visible_range / 2
+                        
+                        if i == 0:
+                            ax.set_xlim(coord_min, coord_max)
+                        elif i == 1:
+                            ax.set_ylim(coord_min, coord_max)
+                        else:
+                            ax.set_zlim(coord_min, coord_max)
         else:
             # 2D zoom logic
             for i, coord_name in enumerate(['X', 'Y']):
                 coord_range = all_coords[:, i].max() - all_coords[:, i].min()
-                visible_range = coord_range / self.zoom_factor
-                center = target_point[i]
-                
-                coord_min = center - visible_range / 2
-                coord_max = center + visible_range / 2
-                
-                if i == 0:
-                    ax.set_xlim(coord_min, coord_max)
-                else:
-                    ax.set_ylim(coord_min, coord_max)
+                if coord_range > 0:  # Avoid division by zero
+                    visible_range = coord_range / self.zoom_factor
+                    center = target_point[i]
+                    
+                    coord_min = center - visible_range / 2
+                    coord_max = center + visible_range / 2
+                    
+                    if i == 0:
+                        ax.set_xlim(coord_min, coord_max)
+                    else:
+                        ax.set_ylim(coord_min, coord_max)
                     
     def _add_semantic_legend(
         self,
@@ -329,10 +332,20 @@ class BaseTSNEPlotter(ABC):
                 # Step 4: Apply consistent legend formatting
                 apply_consistent_legend_formatting(ax, use_3d=self.use_3d)
                 
-                # Step 6: Set axis labels
+                # Step 6: Set axis labels with view-specific positioning to prevent overlap
                 ax.set_xlabel('t-SNE Component 1')
-                ax.set_ylabel('t-SNE Component 2') 
-                ax.set_zlabel('t-SNE Component 3')
+                ax.set_ylabel('t-SNE Component 2')
+                
+                # Get viewing angles to adjust z-label positioning
+                elev, azim = ax.elev, ax.azim
+                
+                # For frontal views that cause text overlap, adjust z-label positioning
+                if abs(elev) < 10:  # Front view (elev=0) or near-front views
+                    ax.set_zlabel('t-SNE Component 3', labelpad=20)
+                elif abs(azim) < 10 or abs(azim - 360) < 10:  # Side view (azim=0) or similar
+                    ax.set_zlabel('t-SNE Component 3', labelpad=15)
+                else:
+                    ax.set_zlabel('t-SNE Component 3')
             
             # Use the first plot result for overall metadata
             main_plot_result = plot_results[0]
@@ -689,62 +702,154 @@ class KNNMixin:
                    test_embeddings is not None and
                    0 <= highlight_test_idx < len(test_coords))
         
-        if show_knn and not self.use_3d:
-            # For 2D with KNN: Create custom GridSpec layout
-            fig = plt.figure(figsize=self.figsize)
-            gs = fig.add_gridspec(1, 5, width_ratios=[2.5, 2.5, 2, 1.5, 1.5], 
-                                hspace=0.1, wspace=0.15)
-            ax = fig.add_subplot(gs[0, :3])  # Main plot spans first 3 columns
-            ax_pie = fig.add_subplot(gs[0, 3:])  # Pie chart spans last 2 columns
-            
-            # Apply zoom if highlighting a test point
-            if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_coords):
-                target_point = test_coords[highlight_test_idx]
-                self._apply_zoom(ax, target_point, train_coords, test_coords)
+        if show_knn:
+            if not self.use_3d:
+                # For 2D with KNN: Create custom GridSpec layout
+                fig = plt.figure(figsize=self.figsize)
+                gs = fig.add_gridspec(1, 5, width_ratios=[2.5, 2.5, 2, 1.5, 1.5], 
+                                    hspace=0.1, wspace=0.15)
+                ax = fig.add_subplot(gs[0, :3])  # Main plot spans first 3 columns
+                ax_pie = fig.add_subplot(gs[0, 3:])  # Pie chart spans last 2 columns
                 
-            # Task-specific point plotting
-            plot_result = self._plot_points(
-                ax, train_coords, train_data, test_coords, test_data, 
-                highlight_test_idx, **kwargs
-            )
-            
-            # Compute KNN analysis
-            query_embedding = test_embeddings[highlight_test_idx]
-            knn_info = self._compute_knn_analysis(
-                query_embedding, train_embeddings, train_data, self.knn_k
-            )
-            
-            # Create pie chart
-            knn_description = self._create_knn_pie_chart(
-                ax_pie, knn_info['labels'], knn_info['distances'],
-                kwargs.get('class_names'), kwargs.get('use_semantic_names', False)
-            )
-            
-            # Apply consistent legend formatting
-            apply_consistent_legend_formatting(ax, use_3d=self.use_3d)
-            
-            # Add semantic legend if provided
-            self._add_semantic_legend(fig, ax, semantic_axes_labels)
-            
-            # Set axis labels
-            ax.set_xlabel('t-SNE Component 1')
-            ax.set_ylabel('t-SNE Component 2')
-            
-            # Update legend text with KNN description
-            legend_text = plot_result['legend_text']
-            if knn_description:
-                legend_text += f"\n\n{knn_description}"
-            
-            # Update metadata
-            metadata = plot_result['metadata']
-            metadata['has_knn_analysis'] = True
-            metadata['knn_k'] = self.knn_k
-            
-            return fig, legend_text, metadata
+                # Apply zoom if highlighting a test point
+                if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_coords):
+                    target_point = test_coords[highlight_test_idx]
+                    self._apply_zoom(ax, target_point, train_coords, test_coords)
+                    
+                # Task-specific point plotting
+                plot_result = self._plot_points(
+                    ax, train_coords, train_data, test_coords, test_data, 
+                    highlight_test_idx, **kwargs
+                )
+                
+                # Compute KNN analysis and create pie chart
+                query_embedding = test_embeddings[highlight_test_idx]
+                knn_info = self._compute_knn_analysis(
+                    query_embedding, train_embeddings, train_data, self.knn_k
+                )
+                
+                knn_description = self._create_knn_pie_chart(
+                    ax_pie, knn_info['labels'], knn_info['distances'],
+                    kwargs.get('class_names'), kwargs.get('use_semantic_names', False)
+                )
+                
+                # Apply consistent legend formatting
+                apply_consistent_legend_formatting(ax, use_3d=self.use_3d)
+                
+                # Add semantic legend if provided
+                self._add_semantic_legend(fig, ax, semantic_axes_labels)
+                
+                # Set axis labels
+                ax.set_xlabel('t-SNE Component 1')
+                ax.set_ylabel('t-SNE Component 2')
+                
+                # Update legend text with KNN description
+                legend_text = plot_result['legend_text']
+                if knn_description:
+                    legend_text += f"\n\n{knn_description}"
+                
+                # Update metadata
+                metadata = plot_result['metadata']
+                metadata['has_knn_analysis'] = True
+                metadata['knn_k'] = self.knn_k
+                
+                return fig, legend_text, metadata
+                
+            else:
+                # For 3D with KNN: Create 4-panel 3D view + pie chart
+                fig = plt.figure(figsize=(20, 12))  # Larger figure for 3D + pie chart
+                
+                # Create GridSpec: 2x3 layout (4 3D plots + 1 pie chart)
+                gs = fig.add_gridspec(2, 3, width_ratios=[1, 1, 0.6], 
+                                    height_ratios=[1, 1], hspace=0.2, wspace=0.15)
+                
+                # Create 4 3D subplots
+                axes = []
+                viewing_angles = [
+                    (20, -60, "Isometric View"),
+                    (0, -90, "Front View (XZ)"), 
+                    (0, 0, "Side View (YZ)"),
+                    (90, 0, "Top View (XY)")
+                ]
+                
+                # Add 3D subplots
+                for i in range(4):
+                    row, col = divmod(i, 2)
+                    ax = fig.add_subplot(gs[row, col], projection='3d')
+                    elev, azim, title = viewing_angles[i]
+                    ax.view_init(elev=elev, azim=azim)
+                    ax.set_title(title, fontsize=10)
+                    axes.append(ax)
+                
+                # Add pie chart in the right column
+                ax_pie = fig.add_subplot(gs[:, 2])  # Spans both rows in column 2
+                
+                # Plot on all 3D axes
+                plot_results = []
+                for i, ax in enumerate(axes):
+                    # Apply zoom if highlighting a test point
+                    if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_coords):
+                        target_point = test_coords[highlight_test_idx]
+                        self._apply_zoom(ax, target_point, train_coords, test_coords)
+                        
+                    # Task-specific point plotting
+                    plot_result = self._plot_points(
+                        ax, train_coords, train_data, test_coords, test_data, 
+                        highlight_test_idx, 
+                        show_legend=(i == 0),  # Only show legend on first subplot
+                        **kwargs
+                    )
+                    plot_results.append(plot_result)
+                    
+                    # Apply consistent legend formatting
+                    apply_consistent_legend_formatting(ax, use_3d=self.use_3d)
+                    
+                    # Set axis labels with view-specific positioning to prevent overlap
+                    ax.set_xlabel('t-SNE Component 1')
+                    ax.set_ylabel('t-SNE Component 2')
+                    
+                    # Get viewing angles to adjust z-label positioning
+                    elev, azim = ax.elev, ax.azim
+                    
+                    # For frontal views that cause text overlap, adjust z-label positioning
+                    if abs(elev) < 10:  # Front view (elev=0) or near-front views
+                        ax.set_zlabel('t-SNE Component 3', labelpad=20)
+                    elif abs(azim) < 10 or abs(azim - 360) < 10:  # Side view (azim=0) or similar
+                        ax.set_zlabel('t-SNE Component 3', labelpad=15)
+                    else:
+                        ax.set_zlabel('t-SNE Component 3')
+                
+                # Compute KNN analysis and create pie chart
+                query_embedding = test_embeddings[highlight_test_idx]
+                knn_info = self._compute_knn_analysis(
+                    query_embedding, train_embeddings, train_data, self.knn_k
+                )
+                
+                knn_description = self._create_knn_pie_chart(
+                    ax_pie, knn_info['labels'], knn_info['distances'],
+                    kwargs.get('class_names'), kwargs.get('use_semantic_names', False)
+                )
+                
+                # Use the first plot result for overall metadata
+                main_plot_result = plot_results[0]
+                
+                # Add semantic legend if provided (only to first subplot)
+                self._add_semantic_legend(fig, axes[0], semantic_axes_labels)
+                
+                # Update legend text with KNN description
+                legend_text = main_plot_result['legend_text']
+                if knn_description:
+                    legend_text += f"\n\n{knn_description}"
+                
+                # Update metadata
+                metadata = main_plot_result['metadata']
+                metadata['has_knn_analysis'] = True
+                metadata['knn_k'] = self.knn_k
+                
+                return fig, legend_text, metadata
         
         else:
-            # For 3D or non-KNN: use the parent's create_plot method
-            # This will handle 3D multi-view properly
+            # For non-KNN: use the parent's create_plot method
             return super().create_plot(
                 train_coords=train_coords,
                 train_data=train_data,
@@ -774,7 +879,7 @@ class TSNEVisualizer:
         max_iter: int = 1000,
         random_state: int = 42,
         figsize: Tuple[int, int] = (10, 8),
-        zoom_factor: float = 2.0
+        zoom_factor: float = 1.0
     ):
         """
         Initialize unified t-SNE visualizer.

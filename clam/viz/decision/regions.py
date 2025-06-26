@@ -18,6 +18,15 @@ except ImportError:
 
 from ..base import BaseVisualization, VisualizationResult
 
+# Import shared styling utilities
+from ..utils.styling import (
+    apply_consistent_point_styling,
+    apply_consistent_legend_formatting,
+    get_standard_test_point_style,
+    get_standard_target_point_style,
+    create_distinct_color_map
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -174,23 +183,32 @@ class DecisionRegionsVisualization(BaseVisualization):
                 marker='x', linewidths=3, label='Highlighted'
             )
         
-        # Plot test data
+        # Plot test data using unified styling
         if test_data is not None:
+            test_style = get_standard_test_point_style()
             ax.scatter(
                 test_data[:, 0],
                 test_data[:, 1],
-                c='black', s=self.config.point_size * 1.5, alpha=0.8,
-                marker='^', label='Test points'
+                c=test_style['c'], 
+                s=test_style['s'], 
+                alpha=test_style['alpha'],
+                marker=test_style['marker'], 
+                label='Test points'
             )
             
-            # Highlight specific test points with red X markers
+            # Highlight specific test points with red star markers using unified styling
             if highlight_test_indices:
                 highlighted_test_data = test_data[highlight_test_indices]
+                target_style = get_standard_target_point_style()
                 ax.scatter(
                     highlighted_test_data[:, 0],
                     highlighted_test_data[:, 1],
-                    c='red', s=self.config.point_size * 3, alpha=1.0,
-                    marker='x', linewidths=4, label='Query points'
+                    c=target_style['c'], 
+                    s=target_style['s'], 
+                    alpha=target_style['alpha'],
+                    marker=target_style['marker'], 
+                    linewidth=target_style.get('linewidth', 2),
+                    label='Query points'
                 )
         
         # Apply styling
@@ -281,11 +299,13 @@ def create_decision_regions_visualization(
     train_embedding = viz.fit_transform(X_train, y_train)
     test_embedding = viz.transform(X_test) if X_test is not None else None
     
-    # Generate plot
+    # Generate plot with highlighted test point if test data provided
+    highlight_test_indices = [0] if test_embedding is not None else None
     result = viz.generate_plot(
         transformed_data=train_embedding,
         y=y_train,
-        test_data=test_embedding
+        test_data=test_embedding,
+        highlight_test_indices=highlight_test_indices
     )
     
     return {

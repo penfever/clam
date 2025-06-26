@@ -80,7 +80,8 @@ def test_3d_multiview():
         task_type='classification',
         use_3d=True,
         use_knn=False,
-        figsize=(15, 12)
+        figsize=(15, 12),
+        zoom_factor=1.0  # No zoom
     )
     
     # Create visualization
@@ -127,13 +128,14 @@ def test_3d_knn():
     # Generate test data
     test_embeddings = np.random.randn(n_test, n_features)
     
-    # Create 3D KNN visualizer
+    # Create 3D KNN visualizer  
     visualizer = TSNEVisualizer(
         task_type='classification',
         use_3d=True,
         use_knn=True,
         knn_k=5,
-        figsize=(15, 12)
+        figsize=(20, 12),  # Larger for pie chart
+        zoom_factor=1.0  # No zoom
     )
     
     # Create visualization
@@ -152,9 +154,9 @@ def test_3d_knn():
         plt.close(fig)
         
         print("✓ 3D KNN test completed successfully")
-        print(f"  - Figure has {len(fig.get_axes())} axes (should be 4 for 3D multi-view)")
+        print(f"  - Figure has {len(fig.get_axes())} axes (should be 5: 4 3D plots + 1 pie chart)")
         
-        return len(fig.get_axes()) == 4
+        return len(fig.get_axes()) == 5
         
     except Exception as e:
         print(f"✗ 3D KNN test failed: {e}")
