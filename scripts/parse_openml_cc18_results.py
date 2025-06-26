@@ -722,7 +722,8 @@ def create_critical_difference_plot(algorithm_scores_matrix: Dict[str, Dict[str,
         logger.info(f"   Significant differences found (p < {alpha})")
         
         # Perform post-hoc Nemenyi test
-        nemenyi_results = sp.posthoc_nemenyi_friedman(df_clean.values)
+        # Pass the dataframe directly so column names are preserved
+        nemenyi_results = sp.posthoc_nemenyi_friedman(df_clean)
         
         # Calculate average ranks
         ranks = df_clean.rank(axis=1, ascending=False, method='average')
@@ -742,7 +743,7 @@ def create_critical_difference_plot(algorithm_scores_matrix: Dict[str, Dict[str,
         
         # Use scikit-posthocs CD diagram
         sp.critical_difference_diagram(
-            avg_ranks.to_dict(),
+            avg_ranks,
             nemenyi_results,
             label_fmt_left='{label} ({rank:.2f})',
             label_fmt_right='{label} ({rank:.2f})',
