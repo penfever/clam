@@ -25,6 +25,81 @@ from ..utils.styling import (
 logger = logging.getLogger(__name__)
 
 
+def create_knn_regression_analysis(
+    neighbor_targets: np.ndarray,
+    neighbor_distances: np.ndarray,
+    ax: plt.Axes,
+    k: int
+) -> str:
+    """
+    Create KNN regression analysis visualization (bar chart) with target values and distances.
+    
+    This function was missing from the original implementation but is called by the 
+    deprecated regression KNN functions.
+    
+    Args:
+        neighbor_targets: Target values of KNN neighbors [k]
+        neighbor_distances: Distances to KNN neighbors [k]
+        ax: Matplotlib axis for the bar chart
+        k: Number of neighbors
+        
+    Returns:
+        Description text for the KNN analysis
+    """
+    # Clear the axis
+    ax.clear()
+    
+    # Sort neighbors by distance for better visualization
+    sorted_indices = np.argsort(neighbor_distances)
+    sorted_targets = neighbor_targets[sorted_indices]
+    sorted_distances = neighbor_distances[sorted_indices]
+    
+    # Create bar chart of neighbor target values
+    neighbor_indices = np.arange(len(sorted_targets))
+    bars = ax.bar(neighbor_indices, sorted_targets, alpha=0.7)
+    
+    # Color bars by target value (gradient)
+    target_min, target_max = np.min(sorted_targets), np.max(sorted_targets)
+    if target_max > target_min:
+        # Normalize target values for coloring
+        normalized_targets = (sorted_targets - target_min) / (target_max - target_min)
+        colors = plt.cm.viridis(normalized_targets)
+        for bar, color in zip(bars, colors):
+            bar.set_color(color)
+    
+    # Add distance labels on top of bars
+    for i, (target, distance) in enumerate(zip(sorted_targets, sorted_distances)):
+        ax.text(i, target + (target_max - target_min) * 0.02, 
+                f'd={distance:.3f}', 
+                ha='center', va='bottom', fontsize=8)
+    
+    # Customize the plot
+    ax.set_xlabel('Neighbor Rank (by distance)')
+    ax.set_ylabel('Target Value')
+    ax.set_title(f'KNN Analysis: {k} Nearest Neighbors')
+    ax.set_xticks(neighbor_indices)
+    ax.set_xticklabels([f'#{i+1}' for i in range(len(sorted_targets))])
+    
+    # Add statistics as text
+    mean_target = np.mean(sorted_targets)
+    median_target = np.median(sorted_targets)
+    std_target = np.std(sorted_targets)
+    
+    stats_text = f'Mean: {mean_target:.2f}\nMedian: {median_target:.2f}\nStd: {std_target:.2f}'
+    ax.text(0.02, 0.98, stats_text, transform=ax.transAxes, 
+            verticalalignment='top', fontsize=10,
+            bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+    
+    # Create description text
+    description = f"Neighbor Analysis: {k} nearest neighbors found in embedding space:\n"
+    for i, (target, distance) in enumerate(zip(sorted_targets, sorted_distances)):
+        description += f"  #{i+1}: target={target:.3f}, distance={distance:.3f}\n"
+    
+    description += f"\nStatistics: mean={mean_target:.3f}, median={median_target:.3f}, std={std_target:.3f}"
+    
+    return description
+
+
 class BaseKNNVisualization:
     """
     Mixin class that adds KNN functionality to visualizations.

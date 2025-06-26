@@ -32,6 +32,9 @@ except ImportError:
     def create_bottom_legend_text(semantic_axes, **kwargs):
         return ""
 
+# Import KNN regression analysis function
+from .mixins.knn import create_knn_regression_analysis
+
 logger = logging.getLogger(__name__)
 
 
@@ -600,15 +603,17 @@ class KNNMixin:
     of the plotting functions and provides pie chart visualization.
     """
     
-    def __init__(self, *args, knn_k: int = 5, **kwargs):
+    def __init__(self, *args, knn_k: int = 5, task_type: str = 'classification', **kwargs):
         """
         Initialize KNN mixin.
         
         Args:
             knn_k: Number of nearest neighbors to find and visualize
+            task_type: 'classification' or 'regression' for appropriate chart type
         """
         super().__init__(*args, **kwargs)
         self.knn_k = knn_k
+        self.task_type = task_type
         
     def _compute_knn_analysis(
         self,
@@ -715,6 +720,76 @@ class KNNMixin:
         
         return description.strip()
     
+    def _create_knn_regression_chart(
+        self,
+        ax: plt.Axes,
+        knn_targets: np.ndarray,
+        knn_distances: np.ndarray
+    ) -> str:
+        """
+        Create KNN regression bar chart showing target values with distance information.
+        
+        Args:
+            ax: Matplotlib axis for bar chart
+            knn_targets: Target values of KNN points [k]
+            knn_distances: Distances to KNN points [k]
+            
+        Returns:
+            Description text for the KNN analysis
+        """
+        k = len(knn_targets)
+        
+        # Sort neighbors by distance for better visualization
+        sorted_indices = np.argsort(knn_distances)
+        sorted_targets = knn_targets[sorted_indices]
+        sorted_distances = knn_distances[sorted_indices]
+        
+        # Create bar chart of neighbor target values
+        neighbor_indices = np.arange(len(sorted_targets))
+        bars = ax.bar(neighbor_indices, sorted_targets, alpha=0.7)
+        
+        # Color bars by target value (gradient)
+        target_min, target_max = np.min(sorted_targets), np.max(sorted_targets)
+        if target_max > target_min:
+            # Normalize target values for coloring
+            normalized_targets = (sorted_targets - target_min) / (target_max - target_min)
+            colors = plt.cm.viridis(normalized_targets)
+            for bar, color in zip(bars, colors):
+                bar.set_color(color)
+        
+        # Add distance labels on top of bars
+        for i, (target, distance) in enumerate(zip(sorted_targets, sorted_distances)):
+            y_offset = (target_max - target_min) * 0.02 if target_max > target_min else 0.1
+            ax.text(i, target + y_offset, 
+                    f'd={distance:.3f}', 
+                    ha='center', va='bottom', fontsize=8)
+        
+        # Customize the plot
+        ax.set_xlabel('Neighbor Rank (by distance)')
+        ax.set_ylabel('Target Value')
+        ax.set_title(f'K-NN Analysis (k={k})', fontsize=10, weight='bold')
+        ax.set_xticks(neighbor_indices)
+        ax.set_xticklabels([f'#{i+1}' for i in range(len(sorted_targets))])
+        
+        # Add statistics as text
+        mean_target = np.mean(sorted_targets)
+        median_target = np.median(sorted_targets)
+        std_target = np.std(sorted_targets)
+        
+        stats_text = f'Mean: {mean_target:.2f}\nMedian: {median_target:.2f}\nStd: {std_target:.2f}'
+        ax.text(0.02, 0.98, stats_text, transform=ax.transAxes, 
+                verticalalignment='top', fontsize=9,
+                bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+        
+        # Generate description text
+        description = f"K-NN Analysis (k={k}):\n"
+        for i, (target, distance) in enumerate(zip(sorted_targets, sorted_distances)):
+            description += f"• #{i+1}: target={target:.3f}, distance={distance:.3f}\n"
+        
+        description += f"\nStatistics: mean={mean_target:.3f}, median={median_target:.3f}, std={std_target:.3f}"
+        
+        return description.strip()
+    
     def create_plot(
         self,
         train_coords: np.ndarray,
@@ -732,11 +807,17 @@ class KNNMixin:
         
         Overrides the base create_plot to add KNN pie chart functionality.
         """
-        # Check if we need KNN analysis
-        show_knn = (highlight_test_idx is not None and 
-                   train_embeddings is not None and 
-                   test_embeddings is not None and
-                   0 <= highlight_test_idx < len(test_coords))
+        # Check if KNN analysis was requested (this is a KNNMixin, so it should always do KNN)
+        if highlight_test_idx is not None:
+            # Validate that we have the required data for KNN analysis
+            if train_embeddings is None:
+                raise ValueError("KNN analysis requested but train_embeddings not provided")
+            if test_embeddings is None:
+                raise ValueError("KNN analysis requested but test_embeddings not provided")
+            if not (0 <= highlight_test_idx < len(test_coords)):
+                raise ValueError(f"Invalid highlight_test_idx {highlight_test_idx} for {len(test_coords)} test points")
+        
+        show_knn = highlight_test_idx is not None
         
         if show_knn:
             if not self.use_3d:
@@ -764,10 +845,16 @@ class KNNMixin:
                     query_embedding, train_embeddings, train_data, self.knn_k
                 )
                 
-                knn_description = self._create_knn_pie_chart(
-                    ax_pie, knn_info['labels'], knn_info['distances'],
-                    kwargs.get('class_names'), kwargs.get('use_semantic_names', False)
-                )
+                # Use the known task type instead of guessing from data
+                if self.task_type == 'regression':
+                    knn_description = self._create_knn_regression_chart(
+                        ax_pie, knn_info['labels'], knn_info['distances']
+                    )
+                else:
+                    knn_description = self._create_knn_pie_chart(
+                        ax_pie, knn_info['labels'], knn_info['distances'],
+                        kwargs.get('class_names'), kwargs.get('use_semantic_names', False)
+                    )
                 
                 # Apply consistent legend formatting
                 apply_consistent_legend_formatting(ax, use_3d=self.use_3d)
@@ -861,10 +948,16 @@ class KNNMixin:
                     query_embedding, train_embeddings, train_data, self.knn_k
                 )
                 
-                knn_description = self._create_knn_pie_chart(
-                    ax_pie, knn_info['labels'], knn_info['distances'],
-                    kwargs.get('class_names'), kwargs.get('use_semantic_names', False)
-                )
+                # Use the known task type instead of guessing from data
+                if self.task_type == 'regression':
+                    knn_description = self._create_knn_regression_chart(
+                        ax_pie, knn_info['labels'], knn_info['distances']
+                    )
+                else:
+                    knn_description = self._create_knn_pie_chart(
+                        ax_pie, knn_info['labels'], knn_info['distances'],
+                        kwargs.get('class_names'), kwargs.get('use_semantic_names', False)
+                    )
                 
                 # Use the first plot result for overall metadata
                 main_plot_result = plot_results[0]
@@ -980,7 +1073,7 @@ class TSNEVisualizer:
             # Create a new class that combines KNNMixin with the base plotter
             class_name = f"KNN{base_class.__name__}"
             plotter_class = type(class_name, (KNNMixin, base_class), {})
-            return plotter_class(figsize=figsize, zoom_factor=zoom_factor, use_3d=use_3d, knn_k=knn_k)
+            return plotter_class(figsize=figsize, zoom_factor=zoom_factor, use_3d=use_3d, knn_k=knn_k, task_type=task_type)
         else:
             return base_class(figsize=figsize, zoom_factor=zoom_factor, use_3d=use_3d)
             
@@ -1407,6 +1500,7 @@ def create_regression_tsne_plot_with_knn(
     )
     
     # Since we already have coordinates, use the plotter directly
+    # IMPORTANT: Must pass train_embeddings and test_embeddings for KNN analysis
     fig, legend_text, metadata = visualizer.plotter.create_plot(
         train_coords=train_tsne,
         train_data=train_targets,
@@ -1414,6 +1508,8 @@ def create_regression_tsne_plot_with_knn(
         test_data=None,
         highlight_test_idx=highlight_test_idx,
         semantic_axes_labels=semantic_axes_labels,
+        train_embeddings=train_embeddings,
+        test_embeddings=test_embeddings,
         colormap=colormap
     )
     
