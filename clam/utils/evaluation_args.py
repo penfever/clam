@@ -384,17 +384,6 @@ def add_audio_args(parser: argparse.ArgumentParser):
         help="Maximum audio duration to process (seconds)"
     )
     parser.add_argument(
-        "--num_few_shot_examples",
-        type=int,
-        default=32,
-        help="Number of few-shot examples for baseline evaluation"
-    )
-    parser.add_argument(
-        "--balanced_few_shot",
-        action="store_true",
-        help="Use balanced sampling for few-shot examples"
-    )
-    parser.add_argument(
         "--include_spectrogram",
         action="store_true",
         default=True,
@@ -707,17 +696,6 @@ def add_llm_baseline_args(parser: argparse.ArgumentParser):
         type=int,
         default=None,
         help="Number of training examples per class for few-shot learning"
-    )
-    parser.add_argument(
-        "--num_few_shot_examples",
-        type=int,
-        default=32,
-        help="Number of few-shot examples to use for in-context learning"
-    )
-    parser.add_argument(
-        "--balanced_few_shot",
-        action="store_true",
-        help="Use class-balanced few-shot examples in LLM prompts instead of random selection"
     )
     parser.add_argument(
         "--feature_selection_threshold",
