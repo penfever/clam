@@ -586,6 +586,7 @@ class ClamTsneClassifier:
                     'device_map': "auto",
                     'low_cpu_mem_usage': True
                 })
+                self.logger.info("Configured VLM for CUDA")
             elif actual_device == "mps" and hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
                 vlm_kwargs.update({
                     'torch_dtype': torch.float16,
@@ -597,6 +598,7 @@ class ClamTsneClassifier:
                 vlm_kwargs.update({
                     'low_cpu_mem_usage': True
                 })
+                self.logger.info(f"Configured VLM for {actual_device}")
             
             backend = self.backend
         
@@ -611,7 +613,7 @@ class ClamTsneClassifier:
             self.vlm_wrapper = model_loader.load_vlm(
                 model_to_load,
                 backend=backend,
-                device=self.device if not self.is_api_model else None,
+                device=actual_device if not self.is_api_model else None,
                 tensor_parallel_size=self.tensor_parallel_size if not self.is_api_model else None,
                 gpu_memory_utilization=self.gpu_memory_utilization if not self.is_api_model else None,
                 **vlm_kwargs
