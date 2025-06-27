@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
-Analyze regression results from multiple tar files and JSON formats.
+Analyze regression results from per-dataset results instead of overall aggregated files.
 
 This script reads regression results from:
 - results/clam-reg.tar (CLAM results)  
 - results/jolt_reg.tar (JOLT results)
 - results/tabular_baselines_reg.tar (Tabular baseline results)
 
-It handles different JSON structures and provides a unified comparison.
+It loads individual per-dataset results from task_*/split_*/*/aggregated_results.json files
+and provides a unified comparison.
 
 Usage:
     python scripts/analyze_all_regression_results.py
@@ -27,16 +28,16 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from scipy import stats
 
-def extract_tar_and_find_results(tar_path: str, temp_dir: str) -> List[str]:
+def extract_tar_and_find_per_dataset_results(tar_path: str, temp_dir: str) -> List[Tuple[str, str, str, str]]:
     """
-    Extract tar file and find all result JSON files.
+    Extract tar file and find all per-dataset result JSON files.
     
     Args:
         tar_path: Path to tar file
         temp_dir: Temporary directory to extract to
         
     Returns:
-        List of paths to result JSON files
+        List of tuples (file_path, task_id, split_id, source_type)
     """
     result_files = []
     
@@ -45,154 +46,116 @@ def extract_tar_and_find_results(tar_path: str, temp_dir: str) -> List[str]:
     
     temp_path = Path(temp_dir)
     
-    # First priority: Look for main aggregated results files
-    main_results = list(temp_path.glob('**/all_regression_results*.json'))
-    if main_results:
-        # If we have a main results file, use only that to avoid duplicates
-        result_files.extend(main_results)
-        return [str(f) for f in result_files]
+    # Pattern 1: CLAM results - look for actual metrics files
+    for clam_file in temp_path.glob('**/task_*/split_*/llm_baselines/dataset_*/clam_t_sne_tabular_results.json'):
+        parts = clam_file.parts
+        task_id = None
+        split_id = None
+        
+        for part in parts:
+            if part.startswith('task_'):
+                task_id = part
+            elif part.startswith('split_'):
+                split_id = part
+        
+        if task_id and split_id:
+            result_files.append((str(clam_file), task_id, split_id, 'clam'))
     
-    # Second priority: For baselines, look for evaluation results
-    eval_results = list(temp_path.glob('**/all_evaluation_results*.json'))
-    if eval_results:
-        # For baselines, each all_evaluation_results file contains results for one task/split
-        # So we should include all of them
-        result_files.extend(eval_results)
-        return [str(f) for f in result_files]
+    # Pattern 2: JOLT results - look for jolt_results.json files  
+    for jolt_file in temp_path.glob('**/task_*/split_*/llm_baselines/dataset_*/jolt_results.json'):
+        parts = jolt_file.parts
+        task_id = None
+        split_id = None
+        
+        for part in parts:
+            if part.startswith('task_'):
+                task_id = part
+            elif part.startswith('split_'):
+                split_id = part
+        
+        if task_id and split_id:
+            result_files.append((str(jolt_file), task_id, split_id, 'jolt'))
     
-    # Third priority: If no main files, look for individual result files
-    # but track task/split to avoid duplicates
-    processed_task_splits = set()
+    # Pattern 3: Tabular baselines - task_*/split_*/baselines/all_evaluation_results_*.json
+    for eval_file in temp_path.glob('**/task_*/split_*/baselines/all_evaluation_results_*.json'):
+        parts = eval_file.parts
+        task_id = None
+        split_id = None
+        
+        for part in parts:
+            if part.startswith('task_'):
+                task_id = part
+            elif part.startswith('split_'):
+                split_id = part
+        
+        if task_id and split_id:
+            result_files.append((str(eval_file), task_id, split_id, 'baselines'))
     
-    # Process individual files, ensuring one per task/split
-    for pattern in ['**/jolt_results.json', '**/aggregated_results.json']:
-        for file_path in temp_path.glob(pattern):
-            # Extract task and split from path
-            parts = file_path.parts
-            task_id = None
-            split_id = None
-            
-            for i, part in enumerate(parts):
-                if part.startswith('task_'):
-                    task_id = part
-                elif part.startswith('split_'):
-                    split_id = part
-            
-            if task_id and split_id:
-                key = f"{task_id}/{split_id}"
-                if key not in processed_task_splits:
-                    processed_task_splits.add(key)
-                    result_files.append(file_path)
-    
-    return [str(f) for f in result_files]
+    return result_files
 
-def parse_clam_format(data: List[Dict]) -> List[Dict]:
-    """Parse CLAM format results."""
-    results = []
-    for entry in data:
-        results.append({
-            'algorithm': 'CLAM',
-            'dataset_name': entry.get('dataset_name', 'unknown'),
-            'task_id': entry.get('task_id', 'unknown'),
-            'r2_score': entry.get('r2_score', None),
-            'mae': entry.get('mae', None),
-            'rmse': entry.get('rmse', None)
-        })
-    return results
-
-def parse_jolt_format(file_path: str, data: Dict) -> List[Dict]:
-    """Parse JOLT format results."""
+def parse_clam_per_dataset_format(data: Dict, task_id: str, split_id: str) -> List[Dict]:
+    """Parse CLAM per-dataset format results."""
     results = []
     
-    # JOLT results might be nested in different ways
-    if 'results' in data:
-        # Format 1: {results: {dataset: {metric: value}}}
-        for dataset, metrics in data['results'].items():
-            r2_score = metrics.get('r2_score', metrics.get('r2', None))
+    # CLAM results format - metrics are directly in the JSON
+    if isinstance(data, dict):
+        # Use task_id as the consistent dataset identifier
+        dataset_name = task_id
+        
+        # Metrics are at the top level
+        r2_score = data.get('r2_score', data.get('r2', None))
+        mae = data.get('mae', None)
+        rmse = data.get('rmse', None)
+        
+        if r2_score is not None:
             results.append({
-                'algorithm': 'JOLT',
-                'dataset_name': dataset,
-                'task_id': 'unknown',
+                'algorithm': 'CLAM',
+                'dataset_name': dataset_name,
+                'task_id': task_id,
+                'split_id': split_id,
                 'r2_score': r2_score,
-                'mae': metrics.get('mae', None),
-                'rmse': metrics.get('rmse', None)
+                'mae': mae,
+                'rmse': rmse
             })
-    elif isinstance(data, list):
-        # Format 2: List of results
-        for entry in data:
-            if 'model' in entry:
-                algorithm = entry['model']
-            else:
-                algorithm = 'JOLT'
-                
-            results.append({
-                'algorithm': algorithm,
-                'dataset_name': entry.get('dataset', entry.get('dataset_name', 'unknown')),
-                'task_id': entry.get('task_id', 'unknown'),
-                'r2_score': entry.get('r2_score', entry.get('r2', None)),
-                'mae': entry.get('mae', None),
-                'rmse': entry.get('rmse', None)
-            })
-    else:
-        # Format 3: Direct metrics
-        # Try to extract dataset name from file path
-        path_parts = Path(file_path).parts
-        dataset_name = 'unknown'
-        for i, part in enumerate(path_parts):
-            if part.startswith('dataset_'):
-                dataset_name = part.replace('dataset_', '')
-            elif part.startswith('task_'):
-                dataset_name = part
-                
-        r2_score = data.get('r2_score', data.get('r2', data.get('test_r2', None)))
-        results.append({
-            'algorithm': 'JOLT',
-            'dataset_name': dataset_name,
-            'task_id': 'unknown',
-            'r2_score': r2_score,
-            'mae': data.get('mae', data.get('test_mae', None)),
-            'rmse': data.get('rmse', data.get('test_rmse', None))
-        })
     
     return results
 
-def parse_baseline_format(file_path: str, data: any) -> List[Dict]:
-    """Parse tabular baseline format results."""
+def parse_jolt_per_dataset_format(data: Dict, task_id: str, split_id: str) -> List[Dict]:
+    """Parse JOLT per-dataset format results."""
     results = []
     
     if isinstance(data, dict):
-        # Check if it's an evaluation summary
-        if 'model_results' in data:
-            # Format: {model_results: {model_name: {metrics}}}
-            for model_name, metrics in data['model_results'].items():
-                r2_score = metrics.get('r2_score', metrics.get('r2', metrics.get('test_r2', None)))
-                results.append({
-                    'algorithm': model_name,
-                    'dataset_name': data.get('dataset_name', 'unknown'),
-                    'task_id': data.get('task_id', 'unknown'),
-                    'r2_score': r2_score,
-                    'mae': metrics.get('mae', metrics.get('test_mae', None)),
-                    'rmse': metrics.get('rmse', metrics.get('test_rmse', None))
-                })
-        else:
-            # Try to handle as single model result
-            for key, value in data.items():
-                if isinstance(value, dict) and any(k in value for k in ['r2', 'r2_score', 'test_r2']):
-                    r2_score = value.get('r2_score', value.get('r2', value.get('test_r2', None)))
-                    results.append({
-                        'algorithm': key,
-                        'dataset_name': 'unknown',
-                        'task_id': 'unknown', 
-                        'r2_score': r2_score,
-                        'mae': value.get('mae', value.get('test_mae', None)),
-                        'rmse': value.get('rmse', value.get('test_rmse', None))
-                    })
-    elif isinstance(data, list):
-        # List format - most common for baseline results
+        # Use task_id as the consistent dataset identifier
+        dataset_name = task_id
+        
+        # JOLT metrics are at the top level
+        r2_score = data.get('r2_score', data.get('r2', None))
+        mae = data.get('mae', None)
+        rmse = data.get('rmse', None)
+        
+        if r2_score is not None:
+            results.append({
+                'algorithm': 'JOLT',
+                'dataset_name': dataset_name,
+                'task_id': task_id,
+                'split_id': split_id,
+                'r2_score': r2_score,
+                'mae': mae,
+                'rmse': rmse
+            })
+    
+    return results
+
+def parse_baseline_per_dataset_format(data: any, task_id: str, split_id: str) -> List[Dict]:
+    """Parse tabular baseline per-dataset format results."""
+    results = []
+    
+    if isinstance(data, list):
+        # List of model results
         for entry in data:
-            # Extract the specific model name (e.g., 'catboost', 'random_forest')
             model_name = entry.get('model_name', entry.get('algorithm', entry.get('model', 'baseline')))
-            dataset_name = entry.get('dataset_name', entry.get('dataset', 'unknown'))
+            # Use task_id as consistent dataset identifier
+            dataset_name = task_id
             
             # Extract R² score from various possible locations
             r2_score = None
@@ -202,18 +165,49 @@ def parse_baseline_format(file_path: str, data: any) -> List[Dict]:
                 r2_score = entry.get('r2_score', entry.get('r2', entry.get('test_r2', None)))
             
             results.append({
-                'algorithm': model_name,  # Use specific model name
+                'algorithm': model_name,
                 'dataset_name': dataset_name,
-                'task_id': entry.get('task_id', entry.get('dataset_id', 'unknown')),
+                'task_id': task_id,
+                'split_id': split_id,
                 'r2_score': r2_score,
                 'mae': entry.get('mae', entry.get('test_mae', None)),
                 'rmse': entry.get('rmse', entry.get('test_rmse', None))
             })
+    elif isinstance(data, dict):
+        # Check if it's an evaluation summary with model_results
+        if 'model_results' in data:
+            # Use task_id as consistent dataset identifier
+            dataset_name = task_id
+            for model_name, metrics in data['model_results'].items():
+                r2_score = metrics.get('r2_score', metrics.get('r2', metrics.get('test_r2', None)))
+                results.append({
+                    'algorithm': model_name,
+                    'dataset_name': dataset_name,
+                    'task_id': task_id,
+                    'split_id': split_id,
+                    'r2_score': r2_score,
+                    'mae': metrics.get('mae', metrics.get('test_mae', None)),
+                    'rmse': metrics.get('rmse', metrics.get('test_rmse', None))
+                })
+        else:
+            # Try to handle as single model results
+            for key, value in data.items():
+                if isinstance(value, dict) and any(k in value for k in ['r2', 'r2_score', 'test_r2']):
+                    r2_score = value.get('r2_score', value.get('r2', value.get('test_r2', None)))
+                    results.append({
+                        'algorithm': key,
+                        'dataset_name': task_id,  # Use task_id consistently
+                        'task_id': task_id,
+                        'split_id': split_id,
+                        'r2_score': r2_score,
+                        'mae': value.get('mae', value.get('test_mae', None)),
+                        'rmse': value.get('rmse', value.get('test_rmse', None))
+                    })
     
     return results
 
-def process_json_file(file_path: str, source: str) -> List[Dict]:
-    """Process a single JSON file and extract results."""
+def process_per_dataset_json_file(file_path: str, task_id: str, split_id: str, source: str) -> List[Dict]:
+    """Process a single per-dataset JSON file and extract results."""
     try:
         with open(file_path, 'r') as f:
             data = json.load(f)
@@ -222,12 +216,12 @@ def process_json_file(file_path: str, source: str) -> List[Dict]:
         return []
     
     # Determine format and parse accordingly
-    if source == 'clam' and isinstance(data, list):
-        return parse_clam_format(data)
-    elif source == 'jolt' or 'jolt' in file_path.lower():
-        return parse_jolt_format(file_path, data)
-    else:
-        return parse_baseline_format(file_path, data)
+    if source == 'clam':
+        return parse_clam_per_dataset_format(data, task_id, split_id)
+    elif source == 'jolt':
+        return parse_jolt_per_dataset_format(data, task_id, split_id)
+    else:  # baselines
+        return parse_baseline_per_dataset_format(data, task_id, split_id)
 
 def create_critical_difference_plot(algorithm_scores_matrix: Dict[str, Dict[str, float]], 
                                   output_path: str, 
@@ -270,15 +264,73 @@ def create_critical_difference_plot(algorithm_scores_matrix: Dict[str, Dict[str,
     
     df = pd.DataFrame(data_matrix, columns=algorithms, index=datasets)
     
-    # Remove rows with any NaN values for fair comparison
-    df_clean = df.dropna()
+    # For critical difference plot, we need datasets with results from most algorithms
+    # Let's require all major algorithms (at least 5) to have results for a dataset
+    min_algorithms = min(5, len(algorithms) - 1)  # Require most algorithms, but be flexible
     
-    if len(df_clean) < 3:
-        print(f"⚠️  Not enough complete datasets ({len(df_clean)}) for statistical testing. Skipping CD plot.")
+    # Only keep rows (datasets) that have data for at least min_algorithms
+    df_filtered = df.dropna(thresh=min_algorithms)
+    
+    if len(df_filtered) < 3:
+        print(f"⚠️  Not enough datasets with {min_algorithms}+ algorithms ({len(df_filtered)}) for statistical testing. Skipping CD plot.")
         return
     
+    # Only keep algorithms (columns) that have reasonable data coverage
+    # More permissive to include CLAM and JOLT which have good coverage
+    min_datasets_per_algorithm = max(1, len(df_filtered) // 3)  # Algorithm must have data for at least 1/3 of datasets
+    algorithms_to_keep = []
+    for alg in df_filtered.columns:
+        non_nan_count = df_filtered[alg].count()
+        print(f"   Algorithm {alg}: {non_nan_count}/{len(df_filtered)} datasets ({non_nan_count/len(df_filtered)*100:.1f}%)")
+        if non_nan_count >= min_datasets_per_algorithm:
+            algorithms_to_keep.append(alg)
+    
+    if len(algorithms_to_keep) < 3:
+        print(f"⚠️  Not enough algorithms with sufficient data coverage for statistical testing. Skipping CD plot.")
+        return
+    
+    # Keep only the algorithms with good coverage, but fill NaN values for fair comparison
+    df_algorithms_filtered = df_filtered[algorithms_to_keep]
+    
+    # For missing values, use a conservative approach: fill with the algorithm's mean across other datasets
+    df_clean = df_algorithms_filtered.fillna(df_algorithms_filtered.mean())
+    
+    if len(df_clean) < 3:
+        print(f"⚠️  After filtering, only {len(df_clean)} complete datasets remain. Need at least 3 for statistical testing. Skipping CD plot.")
+        return
+        
+    print(f"📊 Using {len(df_clean)} datasets and {len(algorithms_to_keep)} algorithms for critical difference analysis")
+    print(f"📊 Datasets: {list(df_clean.index)}")
+    print(f"📊 Algorithms: {algorithms_to_keep}")
+    
+    # Check for issues that might cause Friedman test to fail
+    print(f"📊 Data shape: {df_clean.shape}")
+    print(f"📊 Data summary:")
+    for col in df_clean.columns:
+        col_data = df_clean[col]
+        print(f"   {col}: mean={col_data.mean():.4f}, std={col_data.std():.4f}, min={col_data.min():.4f}, max={col_data.max():.4f}")
+    
+    # Check if any columns have identical values (which would cause issues)
+    identical_cols = []
+    for col in df_clean.columns:
+        if df_clean[col].std() == 0:
+            identical_cols.append(col)
+    
+    if identical_cols:
+        print(f"⚠️  Warning: Algorithms with identical scores across all datasets: {identical_cols}")
+        # Remove algorithms with no variance
+        df_clean = df_clean.drop(columns=identical_cols)
+        if len(df_clean.columns) < 3:
+            print(f"⚠️  After removing constant algorithms, only {len(df_clean.columns)} remain. Skipping CD plot.")
+            return
+    
     # Perform Friedman test
-    stat, p_value = stats.friedmanchisquare(*[df_clean[col] for col in df_clean.columns])
+    try:
+        stat, p_value = stats.friedmanchisquare(*[df_clean[col] for col in df_clean.columns])
+    except Exception as e:
+        print(f"⚠️  Error in Friedman test: {e}")
+        print(f"📊 Skipping statistical analysis due to data issues.")
+        return
     
     print(f"\n📊 Friedman Test Results:")
     print(f"   Statistic: {stat:.4f}")
@@ -288,7 +340,7 @@ def create_critical_difference_plot(algorithm_scores_matrix: Dict[str, Dict[str,
         print(f"   ✅ Significant differences found (p < {alpha})")
         
         # Perform post-hoc Nemenyi test
-        nemenyi_results = sp.posthoc_nemenyi_friedman(df_clean.values)
+        nemenyi_results = sp.posthoc_nemenyi_friedman(df_clean)
         
         # Calculate average ranks
         ranks = df_clean.rank(axis=1, ascending=False, method='average')
@@ -303,7 +355,7 @@ def create_critical_difference_plot(algorithm_scores_matrix: Dict[str, Dict[str,
         
         # Use scikit-posthocs CD diagram
         sp.critical_difference_diagram(
-            avg_ranks.to_dict(),
+            avg_ranks,
             nemenyi_results,
             label_fmt_left='{label} ({rank:.2f})',
             label_fmt_right='{label} ({rank:.2f})',
@@ -321,7 +373,7 @@ def create_critical_difference_plot(algorithm_scores_matrix: Dict[str, Dict[str,
         print(f"   📊 Critical difference plot saved to: {output_path}")
     else:
         print(f"   ❌ No significant differences found (p >= {alpha})")
-        
+
 def create_performance_matrix_plot(algorithm_dataset_results: Dict[str, Dict[str, List[float]]], 
                                  output_path: str,
                                  metric_name: str = "R²"):
@@ -333,12 +385,63 @@ def create_performance_matrix_plot(algorithm_dataset_results: Dict[str, Dict[str
         output_path: Path to save the plot
         metric_name: Name of the metric being plotted
     """
+    # Mapping from task_id to friendly dataset names (from regression_semantic directory)
+    task_to_name_mapping = {
+        "task_361085": "sulfur",
+        "task_361086": "medical_charges",
+        "task_361087": "MiamiHousing2016",
+        "task_361088": "superconduct",
+        "task_361099": "Bike_Sharing_Demand",
+        "task_361103": "particulate-matter-ukair-2017",
+        "task_361104": "SGEMM_GPU_kernel_performance",
+        "task_363370": "google_qa_answer_type_reason_explanation",
+        "task_363371": "google_qa_question_type_reason_explanation",
+        "task_363372": "bookprice_prediction",
+        "task_363373": "jc_penney_products",
+        "task_363374": "women_clothing_review",
+        "task_363375": "ae_price_prediction",
+        "task_363376": "news_popularity2",
+        "task_363377": "mercari_price_suggestion100K",
+        "task_363387": "convai2_inferred",
+        "task_363388": "light_inferred",
+        "task_363389": "opensubtitles_inferred",
+        "task_363391": "jigsaw-unintended-bias-in-toxicity",
+        "task_363394": "UCC (Unhealthy Comments Corpus)",
+        "task_363397": "Phenotype_202",
+        "task_363399": "QSAR_Bioconcentration_regression",
+        "task_363417": "heart_failure_clinical_records",
+        "task_363418": "infrared_thermography_temperature",
+        "task_363426": "biosses",
+        "task_363431": "Violent_Crime_by_County_1975_to_2016",
+        "task_363432": "Crime_Data_from_2010",
+        "task_363434": "climate_change_impact_on_agriculture_2024",
+        "task_363435": "all-natural-disasters-19002021-eosdis",
+        "task_363436": "climate_change_dataset2020-2024",
+        "task_363437": "climate_insights_dataset",
+        "task_363438": "reddit_opinion_climate_change",
+        "task_363439": "temperature_emissions_environmental_trends_2000_2024",
+        "task_363440": "pakistan_hunger_data",
+        "task_363442": "world_food_wealth_bank",
+        "task_363443": "sustainable_development_report_zero_hunger",
+        "task_363444": "methane_emissions_rice_crop",
+        "task_363447": "IoT_Agriculture_2024",
+        "task_363448": "coffee_distribution_across_94_counties",
+        "task_363452": "sleep-deprivation-and-cognitive-performance",
+        "task_363453": "social-media-impact-on-suicide-rates",
+    }
+    
     # Get all algorithms and datasets
     algorithms = sorted(algorithm_dataset_results.keys())
     datasets = set()
     for alg_data in algorithm_dataset_results.values():
         datasets.update(alg_data.keys())
     datasets = sorted(list(datasets))
+    
+    # Convert task IDs to friendly names for display
+    dataset_display_names = []
+    for dataset in datasets:
+        friendly_name = task_to_name_mapping.get(dataset, dataset)
+        dataset_display_names.append(friendly_name)
     
     # Create matrix
     matrix = np.zeros((len(algorithms), len(datasets)))
@@ -359,8 +462,8 @@ def create_performance_matrix_plot(algorithm_dataset_results: Dict[str, Dict[str
     
     im = plt.imshow(masked_matrix, cmap='RdYlGn', aspect='auto', vmin=0, vmax=1)
     
-    # Set ticks
-    plt.xticks(range(len(datasets)), datasets, rotation=90, ha='right')
+    # Set ticks with friendly dataset names
+    plt.xticks(range(len(datasets)), dataset_display_names, rotation=90, ha='right')
     plt.yticks(range(len(algorithms)), algorithms)
     
     # Add colorbar
@@ -393,14 +496,19 @@ def analyze_all_results(results: List[Dict]):
     algorithm_dataset_coverage = defaultdict(set)
     algorithm_task_split_results = defaultdict(list)  # For subset analysis
     
-    # First pass: collect all results
+    # First pass: collect all results and count total datasets
     all_dataset_results = defaultdict(lambda: defaultdict(list))
+    all_datasets_encountered = set()
     
     for result in results:
         algorithm = result['algorithm']
         r2_score = result['r2_score']
         dataset = result['dataset_name']
         task_id = result.get('task_id', 'unknown')
+        
+        # Track all datasets encountered
+        if dataset != 'unknown':
+            all_datasets_encountered.add(dataset)
         
         if dataset != 'unknown' and r2_score is not None:
             # Apply minimum of 0
@@ -430,38 +538,60 @@ def analyze_all_results(results: List[Dict]):
             filtered_dataset_count += 1
             print(f"  Filtering out '{dataset}' - max average R² = {max_avg_score:.6f}")
     
-    print(f"\n  Total datasets filtered out: {filtered_dataset_count}")
+    print(f"\n  Total datasets encountered: {len(all_datasets_encountered)}")
+    print(f"  Total datasets filtered out: {filtered_dataset_count}")
     print(f"  Remaining valid datasets: {len(valid_datasets)}")
     
-    # Second pass: only include results from valid datasets
+    # Second pass: collect all results and group by dataset, averaging across splits
+    dataset_split_results = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))  # dataset -> algorithm -> split -> [scores]
+    
     for result in results:
         algorithm = result['algorithm']
         r2_score = result['r2_score']
         dataset = result['dataset_name']
         task_id = result.get('task_id', 'unknown')
+        split_id = result.get('split_id', 'split_0')
         
         # Only process if dataset is valid
         if dataset not in valid_datasets:
             continue
             
-        # Track dataset coverage
-        if dataset != 'unknown':
-            algorithm_dataset_coverage[algorithm].add(dataset)
-        
         if r2_score is not None:
             # Apply minimum of 0
             if r2_score < 0:
                 r2_score = 0.0
             
-            algorithm_results[algorithm].append(r2_score)
-            algorithm_dataset_results[algorithm][dataset].append(r2_score)
-            
-            # Store with task/dataset info for subset analysis
-            algorithm_task_split_results[algorithm].append({
-                'r2_score': r2_score,
-                'dataset': dataset,
-                'task_id': task_id
-            })
+            # Store by dataset/algorithm/split
+            dataset_split_results[dataset][algorithm][split_id].append(r2_score)
+    
+    # Now average across splits for each dataset/algorithm combination
+    for dataset in dataset_split_results:
+        if dataset != 'unknown':
+            for algorithm in dataset_split_results[dataset]:
+                algorithm_dataset_coverage[algorithm].add(dataset)
+                
+                # Average across all splits for this dataset/algorithm
+                all_split_scores = []
+                for split_id in dataset_split_results[dataset][algorithm]:
+                    split_scores = dataset_split_results[dataset][algorithm][split_id]
+                    if split_scores:
+                        # Average within split (in case there are multiple results per split)
+                        avg_split_score = sum(split_scores) / len(split_scores)
+                        all_split_scores.append(avg_split_score)
+                
+                if all_split_scores:
+                    # Average across splits for this dataset
+                    avg_dataset_score = sum(all_split_scores) / len(all_split_scores)
+                    algorithm_results[algorithm].append(avg_dataset_score)
+                    algorithm_dataset_results[algorithm][dataset].append(avg_dataset_score)
+                    
+                    # Store with task/dataset info for subset analysis
+                    algorithm_task_split_results[algorithm].append({
+                        'r2_score': avg_dataset_score,
+                        'dataset': dataset,
+                        'task_id': task_id,
+                        'num_splits': len(all_split_scores)
+                    })
     
     # Print overall comparison
     print("\n" + "="*80)
@@ -571,205 +701,6 @@ def analyze_all_results(results: List[Dict]):
         coverage_percent = (num_datasets / len(valid_datasets)) * 100
         print(f"  {algorithm:25s}: {num_datasets:2d} datasets ({coverage_percent:5.1f}%)")
     
-    # Find datasets not covered by any algorithm
-    if len(all_covered_datasets) < 43:
-        print(f"\n⚠️  {43 - len(all_covered_datasets)} datasets were not successfully evaluated by any algorithm")
-    
-    # Subset analysis: Compare only on datasets where TabPFN v2 ran successfully
-    print("\n" + "="*80)
-    print("📊 SUBSET ANALYSIS: Comparison on TabPFN v2 Successful Datasets Only")
-    print("="*80)
-    
-    if 'tabpfn_v2' not in algorithm_task_split_results:
-        print("TabPFN v2 results not found for subset analysis")
-        return
-    
-    # Get datasets where TabPFN v2 ran successfully
-    tabpfn_datasets = set()
-    for entry in algorithm_task_split_results['tabpfn_v2']:
-        tabpfn_datasets.add(entry['dataset'])
-    
-    print(f"TabPFN v2 ran successfully on {len(tabpfn_datasets)} datasets")
-    print(f"This represents {len(algorithm_task_split_results['tabpfn_v2'])} dataset splits")
-    
-    # Filter results to only include TabPFN datasets
-    subset_algorithm_results = defaultdict(list)
-    subset_algorithm_coverage = defaultdict(set)
-    
-    for algorithm, entries in algorithm_task_split_results.items():
-        for entry in entries:
-            if entry['dataset'] in tabpfn_datasets:
-                subset_algorithm_results[algorithm].append(entry['r2_score'])
-                subset_algorithm_coverage[algorithm].add(entry['dataset'])
-    
-    print(f"\n📈 SUBSET PERFORMANCE COMPARISON (TabPFN datasets only)")
-    print("="*60)
-    
-    subset_stats = []
-    for algorithm in sorted(subset_algorithm_results.keys()):
-        scores = subset_algorithm_results[algorithm]
-        if scores:
-            avg_r2 = statistics.mean(scores)
-            median_r2 = statistics.median(scores)
-            n_samples = len(scores)
-            n_datasets = len(subset_algorithm_coverage[algorithm])
-            
-            subset_stats.append((avg_r2, algorithm))
-            
-            print(f"\n{algorithm:20s}")
-            print(f"  Samples:       {n_samples}")
-            print(f"  Datasets:      {n_datasets}")
-            print(f"  Average R²:    {avg_r2:.6f}")
-            print(f"  Median R²:     {median_r2:.6f}")
-    
-    # Subset ranking
-    print(f"\n🏆 SUBSET RANKING BY AVERAGE R² (TabPFN datasets only)")
-    print("="*60)
-    
-    subset_stats.sort(reverse=True)
-    for rank, (avg_r2, algorithm) in enumerate(subset_stats, 1):
-        # Calculate coverage on TabPFN datasets
-        coverage = len(subset_algorithm_coverage[algorithm])
-        coverage_pct = (coverage / len(tabpfn_datasets)) * 100
-        print(f"{rank}. {algorithm:20s}: {avg_r2:.6f} ({coverage}/{len(tabpfn_datasets)} datasets, {coverage_pct:.1f}%)")
-    
-    # Performance distribution for subset
-    print(f"\n📊 SUBSET PERFORMANCE DISTRIBUTION")
-    print("="*60)
-    
-    for algorithm in sorted(subset_algorithm_results.keys()):
-        scores = subset_algorithm_results[algorithm]
-        if scores:
-            excellent = sum(1 for r2 in scores if r2 >= 0.9)
-            good = sum(1 for r2 in scores if 0.7 <= r2 < 0.9)
-            fair = sum(1 for r2 in scores if 0.5 <= r2 < 0.7)
-            poor = sum(1 for r2 in scores if 0.0 <= r2 < 0.5)
-            
-            total = len(scores)
-            
-            print(f"\n{algorithm}:")
-            print(f"  Excellent (R² ≥ 0.9):  {excellent:3d} ({excellent/total*100:5.1f}%)")
-            print(f"  Good (0.7 ≤ R² < 0.9): {good:3d} ({good/total*100:5.1f}%)")
-            print(f"  Fair (0.5 ≤ R² < 0.7): {fair:3d} ({fair/total*100:5.1f}%)")
-            print(f"  Poor (0.0 ≤ R² < 0.5): {poor:3d} ({poor/total*100:5.1f}%)")
-    
-    # Win rate analysis
-    print("\n" + "="*80)
-    print("🏆 WIN RATE ANALYSIS")
-    print("="*80)
-    
-    # Calculate per-dataset wins
-    dataset_wins = defaultdict(lambda: defaultdict(int))  # dataset -> algorithm -> wins
-    dataset_algorithm_results = defaultdict(lambda: defaultdict(list))  # dataset -> algorithm -> [scores]
-    
-    # Group all results by dataset and algorithm
-    for result in results:
-        algorithm = result['algorithm']
-        dataset = result['dataset_name']
-        r2_score = result['r2_score']
-        
-        if r2_score is not None and dataset != 'unknown':
-            # Apply minimum of 0
-            if r2_score < 0:
-                r2_score = 0.0
-            dataset_algorithm_results[dataset][algorithm].append(r2_score)
-    
-    # For each dataset, find the best average performer
-    total_datasets_evaluated = 0
-    algorithm_wins = defaultdict(int)
-    algorithm_dataset_participation = defaultdict(int)
-    
-    for dataset in sorted(dataset_algorithm_results.keys()):
-        # Only process valid datasets
-        if dataset not in valid_datasets:
-            continue
-            
-        # Calculate average performance for each algorithm on this dataset
-        dataset_avg_scores = {}
-        for algorithm, scores in dataset_algorithm_results[dataset].items():
-            if scores:  # Only consider algorithms that have results
-                avg_score = statistics.mean(scores)
-                dataset_avg_scores[algorithm] = avg_score
-                algorithm_dataset_participation[algorithm] += 1
-        
-        if dataset_avg_scores:
-            total_datasets_evaluated += 1
-            # Find the winner (highest average R²)
-            winner = max(dataset_avg_scores.items(), key=lambda x: x[1])
-            winner_algorithm = winner[0]
-            winner_score = winner[1]
-            
-            algorithm_wins[winner_algorithm] += 1
-            
-            # Show dataset result
-            print(f"\n{dataset}:")
-            print(f"  Winner: {winner_algorithm} (R² = {winner_score:.6f})")
-            
-            # Show top 3 performers
-            sorted_performers = sorted(dataset_avg_scores.items(), key=lambda x: x[1], reverse=True)
-            for rank, (alg, score) in enumerate(sorted_performers[:3], 1):
-                print(f"  {rank}. {alg:20s}: {score:.6f}")
-    
-    # Calculate win rates
-    print(f"\n🏆 OVERALL WIN RATES (out of {total_datasets_evaluated} datasets)")
-    print("="*60)
-    
-    win_rate_stats = []
-    for algorithm in sorted(algorithm_wins.keys()):
-        wins = algorithm_wins[algorithm]
-        participation = algorithm_dataset_participation[algorithm]
-        win_rate = (wins / total_datasets_evaluated) * 100
-        participation_rate = (participation / total_datasets_evaluated) * 100
-        
-        win_rate_stats.append((wins, win_rate, algorithm))
-        
-        print(f"{algorithm:25s}: {wins:2d} wins ({win_rate:5.1f}%) | Participated in {participation} datasets ({participation_rate:5.1f}%)")
-    
-    # Sort by wins
-    win_rate_stats.sort(reverse=True)
-    
-    print(f"\n🥇 WIN RATE RANKING")
-    print("="*40)
-    for rank, (wins, win_rate, algorithm) in enumerate(win_rate_stats, 1):
-        print(f"{rank}. {algorithm:20s}: {wins:2d} wins ({win_rate:5.1f}%)")
-    
-    # Success rate analysis (R² ≥ 0.5 threshold)
-    print(f"\n📈 SUCCESS RATE ANALYSIS (R² ≥ 0.5 per dataset)")
-    print("="*60)
-    
-    algorithm_success_stats = defaultdict(lambda: {'successes': 0, 'total_datasets': 0})
-    
-    for dataset in dataset_algorithm_results:
-        # Only process valid datasets
-        if dataset not in valid_datasets:
-            continue
-            
-        for algorithm, scores in dataset_algorithm_results[dataset].items():
-            if scores:  # Algorithm participated in this dataset
-                avg_score = statistics.mean(scores)
-                algorithm_success_stats[algorithm]['total_datasets'] += 1
-                if avg_score >= 0.5:
-                    algorithm_success_stats[algorithm]['successes'] += 1
-    
-    success_rate_stats = []
-    for algorithm in sorted(algorithm_success_stats.keys()):
-        stats = algorithm_success_stats[algorithm]
-        successes = stats['successes']
-        total = stats['total_datasets']
-        success_rate = (successes / total) * 100 if total > 0 else 0
-        
-        success_rate_stats.append((success_rate, successes, total, algorithm))
-        
-        print(f"{algorithm:25s}: {successes:2d}/{total:2d} datasets successful ({success_rate:5.1f}%)")
-    
-    # Sort by success rate
-    success_rate_stats.sort(reverse=True)
-    
-    print(f"\n📊 SUCCESS RATE RANKING (R² ≥ 0.5)")
-    print("="*50)
-    for rank, (success_rate, successes, total, algorithm) in enumerate(success_rate_stats, 1):
-        print(f"{rank}. {algorithm:20s}: {successes:2d}/{total:2d} ({success_rate:5.1f}%)")
-    
     # Generate plots
     print("\n" + "="*80)
     print("📊 GENERATING STATISTICAL PLOTS")
@@ -784,15 +715,14 @@ def analyze_all_results(results: List[Dict]):
     algorithm_scores_matrix = {}
     for algorithm in algorithm_dataset_results:
         algorithm_scores_matrix[algorithm] = {}
-        for dataset in dataset_algorithm_results:
+        for dataset in algorithm_dataset_results[algorithm]:
             # Only include valid datasets
             if dataset not in valid_datasets:
                 continue
-            if algorithm in dataset_algorithm_results[dataset]:
-                scores = dataset_algorithm_results[dataset][algorithm]
-                if scores:
-                    avg_score = statistics.mean(scores)
-                    algorithm_scores_matrix[algorithm][dataset] = avg_score
+            scores = algorithm_dataset_results[algorithm][dataset]
+            if scores:
+                avg_score = statistics.mean(scores)
+                algorithm_scores_matrix[algorithm][dataset] = avg_score
     
     # Create critical difference plot
     cd_plot_path = plots_dir / "critical_difference_r2.png"
@@ -811,30 +741,63 @@ def analyze_all_results(results: List[Dict]):
         metric_name="R²"
     )
     
-    # Create separate CD plot for success rates (binary: success or not)
-    algorithm_success_matrix = {}
-    for algorithm in algorithm_dataset_results:
-        algorithm_success_matrix[algorithm] = {}
-        for dataset in dataset_algorithm_results:
-            # Only include valid datasets
-            if dataset not in valid_datasets:
-                continue
-            if algorithm in dataset_algorithm_results[dataset]:
-                scores = dataset_algorithm_results[dataset][algorithm]
-                if scores:
-                    avg_score = statistics.mean(scores)
-                    # Binary success: 1 if R² >= 0.5, 0 otherwise
-                    algorithm_success_matrix[algorithm][dataset] = 1.0 if avg_score >= 0.5 else 0.0
-    
-    cd_success_plot_path = plots_dir / "critical_difference_success_rate.png"
-    create_critical_difference_plot(
-        algorithm_success_matrix,
-        str(cd_success_plot_path),
-        title="Critical Difference Diagram - Success Rate (R² ≥ 0.5)",
-        alpha=0.05
-    )
-    
     print(f"\n✅ All plots saved to: {plots_dir}")
+
+def load_tabpfnv2_supplemental_results(supplemental_path: str) -> Dict[str, Dict]:
+    """Load TabPFNv2 supplemental results from separate JSON file. Returns dict for replacement."""
+    supplemental_results = {}
+    
+    if not Path(supplemental_path).exists():
+        print(f"⚠️  TabPFNv2 supplemental results not found: {supplemental_path}")
+        return supplemental_results
+    
+    # Mapping from friendly names to task IDs (corrected based on semantic files)
+    name_to_task_mapping = {
+        'Crime_Data_from_2010': 'task_363432',  # Fixed - was task_363442 
+        'SGEMM_GPU_kernel_performance': 'task_361104',
+        'convai2_inferred': 'task_363387',  # Fixed - was task_363389
+        'jigsaw-unintended-bias-in-toxicity': 'task_363391',
+        'light_inferred': 'task_363388',
+        'medical_charges': 'task_361086',  # Fixed - was task_363375 (ae_price_prediction)
+        'mercari_price_suggestion100K': 'task_363377',
+        'methane_emissions_rice_crop': 'task_363444',
+        'opensubtitles_inferred': 'task_363389',  # Fixed - was task_363387 (convai2_inferred)
+        'particulate-matter-ukair-2017': 'task_361103',  # Fixed - was task_363373 (jc_penney_products)
+        'world_food_wealth_bank': 'task_363442'  # Fixed - was task_363372 (bookprice_prediction)
+    }
+    
+    try:
+        with open(supplemental_path, 'r') as f:
+            data = json.load(f)
+        
+        print(f"📦 Processing TabPFNv2 supplemental results from {supplemental_path}")
+        print(f"  Found {len(data)} supplemental TabPFNv2 results")
+        
+        for entry in data:
+            if entry.get('model_name') == 'tabpfn_v2' and entry.get('task_type') == 'regression':
+                dataset_name = entry.get('dataset_name', 'unknown')
+                r2_score = entry.get('r2', None)
+                
+                # Map to task_id if available
+                task_id = name_to_task_mapping.get(dataset_name)
+                if task_id and r2_score is not None:
+                    supplemental_results[task_id] = {
+                        'algorithm': 'tabpfn_v2',
+                        'dataset_name': task_id,  # Use task_id consistently
+                        'task_id': task_id,
+                        'split_id': 'split_0',  # Supplemental results as single split
+                        'r2_score': r2_score,
+                        'mae': entry.get('mae', None),
+                        'rmse': entry.get('rmse', None)
+                    }
+                    print(f"    Mapped {dataset_name} -> {task_id}")
+        
+        print(f"    Loaded {len(supplemental_results)} TabPFNv2 replacement results")
+        
+    except Exception as e:
+        print(f"⚠️  Error loading TabPFNv2 supplemental results: {e}")
+    
+    return supplemental_results
 
 def main():
     """Main function."""
@@ -851,7 +814,7 @@ def main():
     
     all_results = []
     
-    # Process each tar file
+    # Process each tar file for per-dataset results
     for source, tar_path in tar_files.items():
         if not tar_path.exists():
             print(f"⚠️  Skipping {source}: {tar_path} not found")
@@ -860,50 +823,50 @@ def main():
         print(f"\n📦 Processing {source} from {tar_path}")
         
         with tempfile.TemporaryDirectory() as temp_dir:
-            # Extract and find result files
-            result_files = extract_tar_and_find_results(str(tar_path), temp_dir)
-            print(f"  Found {len(result_files)} result files")
+            # Extract and find per-dataset result files
+            per_dataset_files = extract_tar_and_find_per_dataset_results(str(tar_path), temp_dir)
+            print(f"  Found {len(per_dataset_files)} per-dataset result files")
             
-            # Process each JSON file
-            for json_file in result_files:
-                print(f"  Processing: {Path(json_file).name}")
-                results = process_json_file(json_file, source)
+            # Process each per-dataset JSON file
+            for file_path, task_id, split_id, file_source in per_dataset_files:
+                results = process_per_dataset_json_file(file_path, task_id, split_id, file_source)
                 all_results.extend(results)
-                print(f"    Extracted {len(results)} results")
+                if results:
+                    print(f"    {task_id}/{split_id}: {len(results)} results")
     
-    # Process supplemental TabPFN v2 results
-    supplemental_file = results_dir / "all_evaluation_results_20250626_133915.json"
-    if supplemental_file.exists():
-        print(f"\n📦 Processing supplemental TabPFN v2 results from {supplemental_file.name}")
-        
-        # Get new TabPFN v2 results
-        supplemental_results = process_json_file(str(supplemental_file), 'baselines')
-        new_tabpfn_results = [r for r in supplemental_results if r['algorithm'] == 'tabpfn_v2']
-        
-        # Create a set of dataset names from the new results
-        new_dataset_names = {r['dataset_name'] for r in new_tabpfn_results}
-        
-        # Remove existing TabPFN v2 results ONLY for datasets that have new results
-        original_count = len(all_results)
-        all_results = [r for r in all_results if not (r['algorithm'] == 'tabpfn_v2' and r['dataset_name'] in new_dataset_names)]
-        removed_count = original_count - len(all_results)
-        
-        if removed_count > 0:
-            print(f"  Replaced {removed_count} existing TabPFN v2 results for datasets: {sorted(new_dataset_names)}")
-        
-        # Add new TabPFN v2 results
-        all_results.extend(new_tabpfn_results)
-        print(f"  Added {len(new_tabpfn_results)} new TabPFN v2 results")
-        
-        # Count total TabPFN v2 results after merge
-        total_tabpfn = len([r for r in all_results if r['algorithm'] == 'tabpfn_v2'])
-        print(f"  Total TabPFN v2 results after merge: {total_tabpfn}")
-    else:
-        print(f"\n⚠️  Supplemental file not found: {supplemental_file}")
+    # Load TabPFNv2 supplemental results (these replace existing TabPFNv2 results)
+    supplemental_path = results_dir / "all_evaluation_results_20250626_133915.json"
+    tabpfnv2_replacements = load_tabpfnv2_supplemental_results(str(supplemental_path))
+    
+    # Replace TabPFNv2 results with supplemental results where available
+    # Remove all existing TabPFNv2 results for tasks that have supplemental data
+    tasks_to_replace = set(tabpfnv2_replacements.keys())
+    original_count = len(all_results)
+    
+    # Remove existing TabPFNv2 results for tasks that have replacements
+    all_results = [result for result in all_results 
+                   if not (result['algorithm'] == 'tabpfn_v2' and result['task_id'] in tasks_to_replace)]
+    
+    removed_count = original_count - len(all_results)
+    
+    # Add the supplemental TabPFNv2 results
+    for task_id, replacement_result in tabpfnv2_replacements.items():
+        # Add the replacement for all 3 splits to match other algorithms
+        for split_id in ['split_0', 'split_1', 'split_2']:
+            replacement_copy = replacement_result.copy()
+            replacement_copy['split_id'] = split_id
+            all_results.append(replacement_copy)
+    
+    added_count = len(tabpfnv2_replacements) * 3  # 3 splits per task
+    
+    print(f"\n📦 Removed {removed_count} existing TabPFNv2 results for {len(tasks_to_replace)} tasks")
+    print(f"📦 Added {added_count} TabPFNv2 supplemental results ({len(tasks_to_replace)} tasks × 3 splits)")
+    print(f"📦 Tasks replaced: {sorted(tasks_to_replace)}")
     
     # Analyze all results
     if all_results:
         print(f"\n📊 Total results collected: {len(all_results)}")
+        print(f"📊 Loading from per-dataset results - latest updates included")
         analyze_all_results(all_results)
     else:
         print("\n❌ No results found to analyze!")

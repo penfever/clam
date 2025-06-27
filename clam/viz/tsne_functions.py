@@ -1355,7 +1355,9 @@ def create_tsne_plot_with_knn(
         highlight_test_idx=highlight_test_idx,
         semantic_axes_labels=semantic_axes_labels,
         class_names=class_names,
-        use_semantic_names=use_semantic_names
+        use_semantic_names=use_semantic_names,
+        train_embeddings=train_embeddings,
+        test_embeddings=test_embeddings
     )
     
     # Note: KNN visualization is now handled internally by the TSNEVisualizer

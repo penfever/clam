@@ -1,0 +1,282 @@
+{
+  "timestamp": "2025-06-26T17:38:17.797986",
+  "dataset_info": {
+    "name": "**Author**: Dr. Hans Hofmann  \n**Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/statlog+(german+credit+data)) - 1994    \n**Please cite**: [UCI](https://archive.ics.uci.edu/ml/citation_policy.html)\n\n**German Credit dataset**  \nThis dataset classifies people described by a set of attributes as good or bad credit risks.\n\nThis dataset comes with a cost matrix: \n``` \nGood  Bad (predicted)  \nGood   0    1   (actual)  \nBad    5    0  \n```\n\nIt is worse to class a customer as good when they are bad (5), than it is to class a customer as bad when they are good (1).  \n\n### Attribute description  \n\n1. Status of existing checking account, in Deutsche Mark.  \n2. Duration in months  \n3. Credit history (credits taken, paid back duly, delays, critical accounts)  \n4. Purpose of the credit (car, television,...)  \n5. Credit amount  \n6. Status of savings account/bonds, in Deutsche Mark.  \n7. Present employment, in number of years.  \n8. Installment rate in percentage of disposable income  \n9. Personal status (married, single,...) and sex  \n10. Other debtors / guarantors  \n11. Present residence since X years  \n12. Property (e.g. real estate)  \n13. Age in years  \n14. Other installment plans (banks, stores)  \n15. Housing (rent, own,...)  \n16. Number of existing credits at this bank  \n17. Job  \n18. Number of people being liable to provide maintenance for  \n19. Telephone (yes,no)  \n20. Foreign worker (yes,no)\n\nDownloaded from openml.org.",
+    "n_samples": 500,
+    "n_features": 20,
+    "n_classes": 2,
+    "task_id": 31,
+    "data_source": "openml",
+    "feature_names": [
+      "checking_status",
+      "duration",
+      "credit_history",
+      "purpose",
+      "credit_amount",
+      "savings_status",
+      "employment",
+      "installment_commitment",
+      "personal_status",
+      "other_parties",
+      "residence_since",
+      "property_magnitude",
+      "age",
+      "other_payment_plans",
+      "housing",
+      "existing_credits",
+      "job",
+      "num_dependents",
+      "own_telephone",
+      "foreign_worker"
+    ]
+  },
+  "vlm_model": "Qwen/Qwen2.5-VL-3B-Instruct",
+  "total_tests": 5,
+  "successful_tests": 5,
+  "failed_tests": 0,
+  "success_rate": 100.0,
+  "single_viz_tests": 2,
+  "multi_viz_tests": 3,
+  "visualization_method_counts": {
+    "pca": 3,
+    "tsne": 2,
+    "umap": 1,
+    "decision_regions": 1,
+    "isomap": 1
+  },
+  "average_prompt_length": 1275.0,
+  "total_test_samples": 100,
+  "output_directory": "/Users/benfeuer/Library/CloudStorage/GoogleDrive-penfever@gmail.com/My Drive/Current Projects/clam/test_vlm_outputs_31",
+  "validation_statistics": {
+    "vlm_outputs_valid_tests": 5,
+    "vlm_outputs_invalid_tests": 0,
+    "pipeline_failed_tests": 0,
+    "validation_failed_tests": 0,
+    "validation_success_rate": 100.0
+  },
+  "overall_metrics": {
+    "accuracy": {
+      "mean": 0.77,
+      "std": 0.024494897427831803,
+      "min": 0.75,
+      "max": 0.8,
+      "count": 5
+    },
+    "f1_macro": {
+      "mean": 0.5413095238095238,
+      "std": 0.13883402544518833,
+      "min": 0.42857142857142855,
+      "max": 0.7333333333333334,
+      "count": 5
+    },
+    "balanced_accuracy": {
+      "mean": 0.5800000000000001,
+      "std": 0.10022197585581942,
+      "min": 0.5,
+      "max": 0.7333333333333334,
+      "count": 5
+    }
+  },
+  "best_performing_configs": {
+    "accuracy": {
+      "config": "tsne_high_dpi",
+      "score": 0.8
+    },
+    "f1_macro": {
+      "config": "tsne_high_dpi",
+      "score": 0.7333333333333334
+    },
+    "balanced_accuracy": {
+      "config": "tsne_high_dpi",
+      "score": 0.7333333333333334
+    }
+  },
+  "single_vs_multi_viz_comparison": {
+    "accuracy": {
+      "single_viz_mean": 0.8,
+      "multi_viz_mean": 0.75,
+      "difference": -0.050000000000000044,
+      "single_viz_count": 2,
+      "multi_viz_count": 3
+    },
+    "f1_macro": {
+      "single_viz_mean": 0.7104166666666667,
+      "multi_viz_mean": 0.42857142857142855,
+      "difference": -0.28184523809523815,
+      "single_viz_count": 2,
+      "multi_viz_count": 3
+    },
+    "balanced_accuracy": {
+      "single_viz_mean": 0.7000000000000001,
+      "multi_viz_mean": 0.5,
+      "difference": -0.20000000000000007,
+      "single_viz_count": 2,
+      "multi_viz_count": 3
+    }
+  },
+  "config_performance": {
+    "multi_with_umap": {
+      "config_name": "multi_with_umap",
+      "task_type": "classification",
+      "accuracy": 0.75,
+      "balanced_accuracy": 0.5,
+      "precision_macro": 0.375,
+      "recall_macro": 0.5,
+      "f1_macro": 0.42857142857142855,
+      "precision_micro": 0.75,
+      "recall_micro": 0.75,
+      "f1_micro": 0.75,
+      "precision_weighted": 0.5625,
+      "recall_weighted": 0.75,
+      "f1_weighted": 0.6428571428571428,
+      "confusion_matrix": [
+        [
+          0,
+          5
+        ],
+        [
+          0,
+          15
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 20,
+      "num_classes": 2,
+      "support": []
+    },
+    "tsne_high_dpi": {
+      "config_name": "tsne_high_dpi",
+      "task_type": "classification",
+      "accuracy": 0.8,
+      "balanced_accuracy": 0.7333333333333334,
+      "precision_macro": 0.7333333333333334,
+      "recall_macro": 0.7333333333333334,
+      "f1_macro": 0.7333333333333334,
+      "precision_micro": 0.8,
+      "recall_micro": 0.8,
+      "f1_micro": 0.8,
+      "precision_weighted": 0.8,
+      "recall_weighted": 0.8,
+      "f1_weighted": 0.8,
+      "confusion_matrix": [
+        [
+          3,
+          2
+        ],
+        [
+          2,
+          13
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 20,
+      "num_classes": 2,
+      "support": []
+    },
+    "tsne_zoomed": {
+      "config_name": "tsne_zoomed",
+      "task_type": "classification",
+      "accuracy": 0.8,
+      "balanced_accuracy": 0.6666666666666667,
+      "precision_macro": 0.7450980392156863,
+      "recall_macro": 0.6666666666666667,
+      "f1_macro": 0.6875,
+      "precision_micro": 0.8,
+      "recall_micro": 0.8,
+      "f1_micro": 0.8,
+      "precision_weighted": 0.784313725490196,
+      "recall_weighted": 0.8,
+      "f1_weighted": 0.78125,
+      "confusion_matrix": [
+        [
+          2,
+          3
+        ],
+        [
+          1,
+          14
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 20,
+      "num_classes": 2,
+      "support": []
+    },
+    "decision_regions_svm": {
+      "config_name": "decision_regions_svm",
+      "task_type": "classification",
+      "accuracy": 0.75,
+      "balanced_accuracy": 0.5,
+      "precision_macro": 0.375,
+      "recall_macro": 0.5,
+      "f1_macro": 0.42857142857142855,
+      "precision_micro": 0.75,
+      "recall_micro": 0.75,
+      "f1_micro": 0.75,
+      "precision_weighted": 0.5625,
+      "recall_weighted": 0.75,
+      "f1_weighted": 0.6428571428571428,
+      "confusion_matrix": [
+        [
+          0,
+          5
+        ],
+        [
+          0,
+          15
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 20,
+      "num_classes": 2,
+      "support": []
+    },
+    "metadata_comprehensive": {
+      "config_name": "metadata_comprehensive",
+      "task_type": "classification",
+      "accuracy": 0.75,
+      "balanced_accuracy": 0.5,
+      "precision_macro": 0.375,
+      "recall_macro": 0.5,
+      "f1_macro": 0.42857142857142855,
+      "precision_micro": 0.75,
+      "recall_micro": 0.75,
+      "f1_micro": 0.75,
+      "precision_weighted": 0.5625,
+      "recall_weighted": 0.75,
+      "f1_weighted": 0.6428571428571428,
+      "confusion_matrix": [
+        [
+          0,
+          5
+        ],
+        [
+          0,
+          15
+        ]
+      ],
+      "completion_rate": 1.0,
+      "num_test_samples": 20,
+      "num_classes": 2,
+      "support": []
+    }
+  },
+  "insights": {
+    "best_overall_config": "tsne_high_dpi",
+    "multi_viz_advantage": {
+      "accuracy": false,
+      "f1_macro": false,
+      "balanced_accuracy": false
+    },
+    "most_tested_viz_method": "pca",
+    "configs_with_metrics": 5
+  },
+  "files_generated": {
+    "visualizations": 13,
+    "prompts": 13,
+    "responses": 13,
+    "configs": 13,
+    "ground_truth": 13,
+    "test_directories": 9
+  }
+}
