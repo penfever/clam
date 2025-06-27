@@ -29,10 +29,7 @@ from clam.viz.utils.common import (
     plot_to_image, save_visualization_with_metadata, create_output_directories,
     generate_visualization_filename, close_figure_safely
 )
-from clam.utils.platform_utils import (
-    get_optimal_device, get_platform_compatible_dtype, configure_model_kwargs_for_platform,
-    is_mac_platform, log_platform_info
-)
+from clam.utils.device_utils import detect_optimal_device, log_platform_info
 from clam.utils.json_utils import convert_for_json_serialization
 from clam.utils.audio_utils import (
     load_audio, create_spectrogram, plot_waveform, plot_spectrogram
@@ -130,7 +127,7 @@ class ClamAudioTsneClassifier:
         self.include_spectrogram = include_spectrogram
         self.audio_duration = audio_duration
         self.cache_dir = cache_dir
-        self.device = device or get_optimal_device()
+        self.device = device or detect_optimal_device()
         self.use_semantic_names = use_semantic_names
         self.num_few_shot_examples = num_few_shot_examples
         self.balanced_few_shot = balanced_few_shot

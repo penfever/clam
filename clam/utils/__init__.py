@@ -82,15 +82,8 @@ from .vlm_utils import (
 )
 # Visualization utilities moved to clam.viz.utils.common
 # from .visualization_utils import (...)  # Now in clam.viz.utils.common
-from .platform_utils import (
-    get_optimal_device,
-    get_platform_compatible_dtype,
-    configure_model_kwargs_for_platform,
-    is_mac_platform,
-    log_platform_info,
-    get_mac_compatible_dinov2_kwargs,
-    suppress_platform_warnings
-)
+# Platform utilities have been removed - use device_utils instead
+# from .device_utils import detect_optimal_device
 from .seeding import (
     set_seed,
     set_seed_with_args,
@@ -194,14 +187,7 @@ __all__ = [
     
     # Visualization utilities moved to clam.viz.utils.common
     
-    # Platform utilities
-    "get_optimal_device",
-    "get_platform_compatible_dtype",
-    "configure_model_kwargs_for_platform",
-    "is_mac_platform",
-    "log_platform_info",
-    "get_mac_compatible_dinov2_kwargs",
-    "suppress_platform_warnings",
+    # Platform utilities removed - use device_utils instead
     
     # Seeding utilities
     "set_seed",

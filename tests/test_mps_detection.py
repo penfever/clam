@@ -15,7 +15,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from clam.utils.platform_utils import get_optimal_device, log_platform_info
+from clam.utils.device_utils import detect_optimal_device, log_platform_info
 from clam.utils.model_loader import model_loader
 from clam.models.clam_tsne import ClamTsneClassifier
 

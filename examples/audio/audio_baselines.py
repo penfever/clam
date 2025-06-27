@@ -21,7 +21,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from clam.data.audio_embeddings import get_whisper_embeddings
-from clam.utils.platform_utils import get_optimal_device
+from clam.utils.device_utils import detect_optimal_device
 from clam.utils.class_name_utils import get_semantic_class_names_or_fallback
 
 logger = logging.getLogger(__name__)
@@ -64,7 +64,7 @@ class WhisperKNNClassifier:
         self.weights = weights
         self.standardize = standardize
         self.cache_dir = cache_dir
-        self.device = device or get_optimal_device()
+        self.device = device or detect_optimal_device()
         self.seed = seed
         
         # Initialize KNN classifier
@@ -272,7 +272,7 @@ class CLAPZeroShotClassifier:
             batch_size: Batch size for processing
         """
         self.version = version
-        self.device = get_optimal_device()
+        self.device = detect_optimal_device()
         self.use_cuda = use_cuda if use_cuda is not None else (self.device == "cuda")
         self.batch_size = batch_size
         

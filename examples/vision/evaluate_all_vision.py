@@ -50,7 +50,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 from clam.utils.evaluation_args import create_vision_evaluation_parser
 
 from clam.utils.json_utils import convert_for_json_serialization
-from clam.utils.platform_utils import log_platform_info
+from clam.utils.device_utils import log_platform_info
 from clam.utils import (
     init_wandb_with_gpu_monitoring, 
     cleanup_gpu_monitoring,

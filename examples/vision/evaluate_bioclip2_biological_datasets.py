@@ -50,7 +50,7 @@ except ImportError:
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from clam.utils.json_utils import convert_for_json_serialization
-from clam.utils.platform_utils import log_platform_info
+from clam.utils.device_utils import log_platform_info
 from clam.utils import (
     init_wandb_with_gpu_monitoring, 
     cleanup_gpu_monitoring,
@@ -911,7 +911,7 @@ def run_all_biological_tests(args):
     all_results = {}
     
     # Log platform information
-    from clam.utils.platform_utils import log_platform_info
+    from clam.utils.device_utils import log_platform_info
     platform_info = log_platform_info(logger)
     
     for dataset_name in args.dataset:

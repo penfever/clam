@@ -206,3 +206,39 @@ def setup_device_environment(device: str):
             torch.backends.cudnn.allow_tf32 = True
     
     logger.debug(f"Device environment configured for {device}")
+
+
+def log_platform_info(logger_instance: Optional[logging.Logger] = None) -> dict:
+    """
+    Log platform and device information.
+    
+    Args:
+        logger_instance: Logger to use (uses module logger if None)
+        
+    Returns:
+        Dictionary with platform information
+    """
+    if logger_instance is None:
+        logger_instance = logger
+    
+    device = detect_optimal_device()
+    device_info = get_device_info(device)
+    
+    platform_info = {
+        'platform': sys.platform,
+        'torch_version': torch.__version__,
+        'device': device,
+        'available_devices': device_info.get('available_devices', []),
+    }
+    
+    if device == 'cuda' and 'cuda_device_name' in device_info:
+        platform_info['cuda_device_name'] = device_info['cuda_device_name']
+        platform_info['cuda_device_count'] = device_info.get('cuda_device_count', 0)
+    
+    # Log concise platform info
+    log_msg = f"Platform: {platform_info['platform']}, PyTorch: {platform_info['torch_version']}, Device: {device}"
+    if device == 'cuda' and 'cuda_device_name' in device_info:
+        log_msg += f" ({device_info['cuda_device_name']})"
+    logger_instance.info(log_msg)
+    
+    return platform_info

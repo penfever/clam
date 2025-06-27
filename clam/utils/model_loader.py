@@ -457,13 +457,13 @@ class TransformersModelWrapper(BaseModelWrapper):
         }
         
         # Device and dtype configuration
-        # Import platform utilities for proper device detection
-        from .platform_utils import get_optimal_device
+        # Import device utilities for proper device detection
+        from clam.utils.device_utils import detect_optimal_device
         
         # Resolve device if set to auto
         actual_device = self.device
         if self.device == "auto":
-            actual_device = get_optimal_device(prefer_mps=True)
+            actual_device = detect_optimal_device(prefer_mps=True)
             logger.info(f"Auto-detected device: {actual_device}")
         
         # Configure based on device
@@ -624,13 +624,13 @@ class VisionLanguageModelWrapper(BaseModelWrapper):
         }
         
         # Device and dtype configuration
-        # Import platform utilities for proper device detection
-        from .platform_utils import get_optimal_device
+        # Import device utilities for proper device detection
+        from clam.utils.device_utils import detect_optimal_device
         
         # Resolve device if set to auto
         actual_device = self.device
         if self.device == "auto":
-            actual_device = get_optimal_device(prefer_mps=True)
+            actual_device = detect_optimal_device(prefer_mps=True)
             logger.info(f"Auto-detected device: {actual_device}")
         
         # Configure based on device

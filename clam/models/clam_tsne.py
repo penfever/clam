@@ -571,14 +571,16 @@ class ClamTsneClassifier:
             # Local model - configure hardware parameters
             self.logger.info("Using local VLM")
             vlm_kwargs = {}
-            # Import platform utilities for proper device detection
-            from clam.utils.platform_utils import get_optimal_device
+            # Import device utilities for proper device detection
+            from clam.utils.device_utils import detect_optimal_device
             
             # Resolve device if set to auto
             actual_device = self.device
             if self.device == "auto":
-                actual_device = get_optimal_device(prefer_mps=True)
+                actual_device = detect_optimal_device(prefer_mps=True)
                 self.logger.info(f"Auto-detected device for VLM: {actual_device}")
+                # Update self.device so it's not "auto" anymore
+                self.device = actual_device
             
             if actual_device == "cuda" and torch.cuda.is_available():
                 vlm_kwargs.update({
