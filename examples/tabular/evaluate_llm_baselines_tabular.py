@@ -71,7 +71,8 @@ project_root = os.path.abspath(os.path.join(current_dir, '..', '..'))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from clam.data import load_datasets
+from clam.data import load_datasets_for_evaluation, preprocess_datasets_for_evaluation
+from clam.data.evaluation_utils import validate_training_sample_args
 from sklearn.model_selection import train_test_split
 from clam.utils import setup_logging, timeout_context, MetricsLogger
 
@@ -608,16 +609,34 @@ def main():
             )
             logger.info(f"Initialized Weights & Biases run with GPU monitoring: {args.wandb_name}")
     
-    # Load datasets
-    datasets = load_datasets(args)
-    if not datasets:
+    # Legacy k_shot parameter conversion to unified parameters
+    if args.k_shot is not None:
+        logger.warning("--k_shot is deprecated. Use --num_few_shot_examples with --balanced_few_shot instead.")
+        # Convert k_shot to unified parameters if not already specified
+        if args.num_few_shot_examples is None and not args.balanced_few_shot:
+            args.num_few_shot_examples = args.k_shot
+            args.balanced_few_shot = True
+            logger.info(f"Converted --k_shot {args.k_shot} to --num_few_shot_examples {args.k_shot} --balanced_few_shot")
+    
+    # Validate training sample parameters early
+    try:
+        validate_training_sample_args(args)
+    except ValueError as e:
+        logger.error(f"Invalid training sample parameters: {e}")
+        return
+    
+    # Load datasets using standardized preprocessing
+    # This now handles unified training sample parameters automatically
+    raw_datasets = load_datasets_for_evaluation(args)
+    if not raw_datasets:
         logger.error("No datasets loaded successfully. Exiting.")
         return
     
-    # Apply k-shot splitting if requested
-    if args.k_shot is not None:
-        logger.info(f"Applying k-shot splitting: {args.k_shot} samples per class")
-        datasets = [apply_k_shot_split(dataset, args.k_shot, args.seed) for dataset in datasets]
+    # Preprocess datasets with standardized train/test split and sampling
+    datasets = preprocess_datasets_for_evaluation(raw_datasets, args)
+    if not datasets:
+        logger.error("No datasets preprocessed successfully. Exiting.")
+        return
     
     # Parse models to evaluate (already a list from nargs="+")
     models_to_evaluate = args.models

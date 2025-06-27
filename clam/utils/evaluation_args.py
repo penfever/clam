@@ -81,6 +81,18 @@ def add_data_processing_args(parser: argparse.ArgumentParser):
         default="balanced",
         help="Sampling strategy when limiting training data: 'balanced' (equal samples per class) or 'random'"
     )
+    # Unified few-shot parameters for consistency between evaluation scripts
+    parser.add_argument(
+        "--num_few_shot_examples",
+        type=int,
+        default=None,
+        help="Number of few-shot examples per class for balanced sampling. When specified with --balanced_few_shot, takes priority over --max_train_samples"
+    )
+    parser.add_argument(
+        "--balanced_few_shot",
+        action="store_true",
+        help="Use balanced sampling with num_few_shot_examples per class. Forces stratified sampling and activates per-class logic"
+    )
 
 
 def add_embedding_args(parser: argparse.ArgumentParser):

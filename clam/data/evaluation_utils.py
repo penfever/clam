@@ -318,6 +318,97 @@ def apply_sampling_strategy(X_train: np.ndarray, y_train: np.ndarray, max_sample
     return X_train_sampled, y_train_sampled
 
 
+def validate_training_sample_args(args) -> None:
+    """
+    Validate training sample arguments for early error detection.
+    
+    Args:
+        args: Command line arguments with sampling parameters
+        
+    Raises:
+        ValueError: If parameter combination is invalid
+    """
+    balanced_few_shot = getattr(args, 'balanced_few_shot', False)
+    num_few_shot_examples = getattr(args, 'num_few_shot_examples', None)
+    max_train_samples = getattr(args, 'max_train_samples', None)
+    
+    if balanced_few_shot and num_few_shot_examples is None:
+        raise ValueError("--balanced_few_shot requires --num_few_shot_examples to be specified")
+    
+    if num_few_shot_examples is not None and num_few_shot_examples <= 0:
+        raise ValueError(f"--num_few_shot_examples must be positive, got {num_few_shot_examples}")
+    
+    if max_train_samples is not None and max_train_samples <= 0:
+        raise ValueError(f"--max_train_samples must be positive, got {max_train_samples}")
+
+
+def standardize_training_samples(X_train: np.ndarray, y_train: np.ndarray, args, random_state: int = 42) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Standardize training sample selection across evaluation scripts.
+    
+    Handles both old-style (max_train_samples + sampling_strategy) and 
+    new-style (num_few_shot_examples + balanced_few_shot) parameters.
+    
+    Args:
+        X_train: Training features
+        y_train: Training labels  
+        args: Command line arguments with sampling parameters
+        random_state: Random seed for reproducible sampling
+        
+    Returns:
+        Tuple of (X_train_sampled, y_train_sampled)
+    """
+    # Check for new-style parameters (take priority)
+    balanced_few_shot = getattr(args, 'balanced_few_shot', False)
+    num_few_shot_examples = getattr(args, 'num_few_shot_examples', None)
+    
+    # Check for old-style parameters  
+    max_train_samples = getattr(args, 'max_train_samples', None)
+    sampling_strategy = getattr(args, 'sampling_strategy', 'balanced')
+    
+    # Parameter validation
+    if balanced_few_shot and num_few_shot_examples is None:
+        raise ValueError("--balanced_few_shot requires --num_few_shot_examples to be specified")
+    
+    if num_few_shot_examples is not None and num_few_shot_examples <= 0:
+        raise ValueError(f"--num_few_shot_examples must be positive, got {num_few_shot_examples}")
+    
+    if max_train_samples is not None and max_train_samples <= 0:
+        raise ValueError(f"--max_train_samples must be positive, got {max_train_samples}")
+    
+    # Warn about conflicting parameters
+    if balanced_few_shot and max_train_samples is not None:
+        logger.warning("Both --balanced_few_shot and --max_train_samples specified. Using --balanced_few_shot approach.")
+    
+    if num_few_shot_examples is not None and not balanced_few_shot:
+        logger.warning("--num_few_shot_examples specified without --balanced_few_shot. Parameter will be ignored. Use --balanced_few_shot to enable per-class sampling.")
+    
+    # Determine effective parameters
+    if balanced_few_shot and num_few_shot_examples is not None:
+        # New-style: per-class sampling
+        unique_classes = np.unique(y_train)
+        num_classes = len(unique_classes)
+        effective_max_samples = num_few_shot_examples * num_classes
+        effective_strategy = "balanced"
+        
+        logger.info(f"Using balanced few-shot: {num_few_shot_examples} examples per class ({num_classes} classes) = {effective_max_samples} total samples")
+        
+    elif max_train_samples is not None:
+        # Old-style: total sample count
+        effective_max_samples = max_train_samples
+        effective_strategy = sampling_strategy
+        
+        logger.info(f"Using max_train_samples: {effective_max_samples} total samples with {effective_strategy} strategy")
+        
+    else:
+        # No sampling limits specified
+        logger.info("No training sample limits specified, using all available training data")
+        return X_train, y_train
+    
+    # Apply sampling using existing function
+    return apply_sampling_strategy(X_train, y_train, effective_max_samples, effective_strategy, random_state)
+
+
 def preprocess_dataset_for_evaluation(dataset: Dict[str, Any], args) -> Dict[str, Any]:
     """
     Preprocess a single dataset for evaluation including train/test split and sampling.
@@ -378,12 +469,8 @@ def preprocess_dataset_for_evaluation(dataset: Dict[str, Any], args) -> Dict[str
     
     logger.info(f"Dataset {dataset['name']} shapes - Train: {X_train.shape}, Val: {X_val.shape}, Test: {X_test.shape}")
     
-    # Apply training data sampling if specified
-    if args.max_train_samples and args.max_train_samples < len(X_train):
-        X_train, y_train = apply_sampling_strategy(
-            X_train, y_train, args.max_train_samples, 
-            strategy=args.sampling_strategy, random_state=args.seed
-        )
+    # Apply training data sampling using standardized function
+    X_train, y_train = standardize_training_samples(X_train, y_train, args, random_state=args.seed)
     
     # Limit test samples if specified
     if args.max_test_samples and args.max_test_samples < len(X_test):

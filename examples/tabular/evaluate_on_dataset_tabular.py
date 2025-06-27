@@ -84,7 +84,7 @@ from clam.utils import init_wandb_with_gpu_monitoring, cleanup_gpu_monitoring, G
 from clam.utils.evaluation_args import create_dataset_evaluation_parser
 
 # Import new dataset processing utilities
-from clam.data.evaluation_utils import load_datasets_for_evaluation, preprocess_datasets_for_evaluation
+from clam.data.evaluation_utils import load_datasets_for_evaluation, preprocess_datasets_for_evaluation, validate_training_sample_args
 
 def parse_args():
     """Parse command line arguments using the abstracted argument parser."""
@@ -1745,6 +1745,12 @@ def main():
     
     if hasattr(args, 'model_id') and args.model_id:
         raise ValueError("--model_id is deprecated. Use --models with the model identifier instead (e.g., --models Qwen/Qwen2.5-7B-Instruct).")
+    
+    # Validate training sample parameters early
+    try:
+        validate_training_sample_args(args)
+    except ValueError as e:
+        raise ValueError(f"Invalid training sample parameters: {e}")
     
     # Set random seed for reproducibility across all sources
     from clam.utils import set_seed
