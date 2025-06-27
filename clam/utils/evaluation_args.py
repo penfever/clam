@@ -300,17 +300,19 @@ def add_evaluation_control_args(parser: argparse.ArgumentParser):
         help="Only consider classes that appear in the ground truth test data (default: True)"
     )
     
-    # Add unified models argument for tabular evaluation
+    # Add unified models argument for all modalities
     parser.add_argument(
         "--models",
         nargs="+",
         default=["clam_tsne"],
         help="List of models to evaluate. Can include: "
-             "CLAM models (from --model_path or HuggingFace model IDs), "
-             "baseline models (catboost, tabpfn_v2, random_forest, gradient_boosting, logistic_regression), "
+             "CLAM models (clam_tsne, clam_simple), "
+             "vision models (dinov2_linear, qwen_vl, openai_vlm, gemini_vlm, api_vlm), "
+             "audio models (whisper_knn, clap_zero_shot), "
+             "tabular baseline models (catboost, tabpfn_v2, random_forest, gradient_boosting, logistic_regression), "
              "LLM baselines (tabllm, tabula_8b, jolt, openai_llm, gemini_llm, api_llm), "
              "or 'all_baselines' to run all baseline models. "
-             "Examples: --models catboost random_forest, --models all_baselines, --models /path/to/model tabpfn_v2"
+             "Examples: --models catboost random_forest, --models clam_tsne dinov2_linear, --models all_baselines"
     )
     
     # Keep deprecated arguments for backwards compatibility but raise errors
@@ -411,13 +413,6 @@ def add_audio_args(parser: argparse.ArgumentParser):
         action="store_false",
         help="Disable saving visualizations and VLM responses"
     )
-    parser.add_argument(
-        "--models",
-        nargs="+",
-        default=["clam_tsne"],
-        choices=["clam_tsne", "whisper_knn", "clap_zero_shot"],
-        help="List of models to evaluate (default: clam_tsne)"
-    )
 
 
 def add_vision_args(parser: argparse.ArgumentParser):
@@ -506,13 +501,6 @@ def add_vision_args(parser: argparse.ArgumentParser):
         dest="enable_thinking",
         action="store_false",
         help="Disable thinking mode for API models"
-    )
-    parser.add_argument(
-        "--models",
-        nargs="+",
-        default=["clam_tsne", "dinov2_linear"],
-        choices=["clam_tsne", "clam_simple", "dinov2_linear", "qwen_vl", "openai_vlm", "gemini_vlm", "api_vlm"],
-        help="List of models to evaluate (default: clam_tsne and dinov2_linear)"
     )
 
 

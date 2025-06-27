@@ -400,14 +400,16 @@ def analyze_correlation_regression(input_dir: str, output_dir: str):
     
     if not common_datasets:
         print("No common datasets found for regression!")
-        return
+        return None
     
-    # Create correlation plot
-    create_correlation_plot(
+    # Create correlation plot and return summary
+    summary = create_correlation_plot(
         marvis_scores, tabpfn_scores, common_datasets,
         "MARVIS", "TabPFN v2", "R² Score", 
         "Regression", output_dir
     )
+    
+    return summary
 
 def analyze_correlation_classification(input_dir: str, output_dir: str):
     """Analyze correlation for classification tasks."""
@@ -426,7 +428,7 @@ def analyze_correlation_classification(input_dir: str, output_dir: str):
     
     if not tar_files:
         print("⚠️  No classification tar files found!")
-        return
+        return None
     
     all_results = []
     
@@ -452,14 +454,16 @@ def analyze_correlation_classification(input_dir: str, output_dir: str):
     
     if not common_datasets:
         print("No common datasets found for classification!")
-        return
+        return None
     
-    # Create correlation plot
-    create_correlation_plot(
+    # Create correlation plot and return summary
+    summary = create_correlation_plot(
         marvis_scores, tabpfn_scores, common_datasets,
         "MARVIS", "TabPFN v2", "Balanced Accuracy", 
         "Classification", output_dir
     )
+    
+    return summary
 
 def create_correlation_plot(algo1_scores: Dict[str, float], algo2_scores: Dict[str, float], 
                           common_datasets: set, algo1_name: str, algo2_name: str, 
@@ -525,39 +529,109 @@ def create_correlation_plot(algo1_scores: Dict[str, float], algo2_scores: Dict[s
     for name, score1, score2, diff in sorted(algo2_better, key=lambda x: x[3], reverse=True)[:5]:
         print(f"  {name:40s} {algo1_name}: {score1:.4f}, {algo2_name}: {score2:.4f} (diff: {diff:.4f})")
     
-    # Create scatter plot
-    plt.figure(figsize=(10, 8))
-    plt.scatter(algo1_array, algo2_array, alpha=0.6, s=50)
+    # Create stylized scatter plot
+    plt.style.use('seaborn-v0_8')
+    fig, ax = plt.subplots(figsize=(12, 10))
     
-    # Add diagonal line
+    # Define color scheme based on task type
+    if task_type.lower() == 'regression':
+        main_color = '#9B59B6'  # Purple for regression
+        accent_color = '#8E44AD'
+    else:
+        main_color = '#3498DB'  # Blue for classification
+        accent_color = '#2980B9'
+    
+    # Create scatter plot with black dots
+    scatter = ax.scatter(algo1_array, algo2_array, 
+                        c='black', alpha=0.7, s=80, 
+                        edgecolors='white', linewidth=1.5)
+    
+    # Add diagonal line (y=x)
     min_val = min(min(algo1_array), min(algo2_array))
     max_val = max(max(algo1_array), max(algo2_array))
-    plt.plot([min_val, max_val], [min_val, max_val], 'r--', alpha=0.5, label='y=x')
+    ax.plot([min_val, max_val], [min_val, max_val], 
+           'k--', alpha=0.5, linewidth=2, label='Perfect Agreement (y=x)')
     
-    # Add regression line
+    # Add actual gradient regions showing where each algorithm is better
+    # Create coordinate arrays for the plot area
+    plot_min = min(min_val, min_val) * 0.95
+    plot_max = max(max_val, max_val) * 1.05
+    
+    # Create gradient effect using imshow
+    x_range = np.linspace(plot_min, plot_max, 100)
+    y_range = np.linspace(plot_min, plot_max, 100)
+    X, Y = np.meshgrid(x_range, y_range)
+    
+    # Create gradient based on distance from diagonal
+    # Positive values = MARVIS better (above diagonal), Negative = TabPFN better (below diagonal)
+    gradient_data = Y - X
+    
+    # Create custom colormap: green (TabPFN better) to white (diagonal) to blue (MARVIS better)
+    from matplotlib.colors import LinearSegmentedColormap
+    colors = ['#27AE60', '#FFFFFF', '#3498DB']  # Green -> White -> Blue
+    n_bins = 256
+    cmap = LinearSegmentedColormap.from_list('performance', colors, N=n_bins)
+    
+    # Plot the gradient as background
+    im = ax.imshow(gradient_data, extent=[plot_min, plot_max, plot_min, plot_max], 
+                   cmap=cmap, alpha=0.3, aspect='auto', origin='lower')
+    
+    # Add legend entries for the gradient regions
+    import matplotlib.patches as mpatches
+    marvis_patch = mpatches.Patch(color='#27AE60', alpha=0.3, label=f'{algo1_name} performs better')
+    tabpfn_patch = mpatches.Patch(color='#3498DB', alpha=0.3, label=f'{algo2_name} performs better')
+    gradient_legend_handles = [marvis_patch, tabpfn_patch]
+    
+    # Add regression line (orange for both task types)
     z = np.polyfit(algo1_array, algo2_array, 1)
     p = np.poly1d(z)
-    plt.plot(algo1_array, p(algo1_array), "b-", alpha=0.8, 
-             label=f'Regression: y={z[0]:.3f}x+{z[1]:.3f}')
+    x_smooth = np.linspace(min_val, max_val, 100)
+    ax.plot(x_smooth, p(x_smooth), color='#FF8C00', linewidth=3, alpha=0.9,
+           label=f'Best Fit: y={z[0]:.3f}x+{z[1]:.3f}')
     
-    plt.xlabel(f'{algo1_name} {metric_name}', fontsize=12)
-    plt.ylabel(f'{algo2_name} {metric_name}', fontsize=12)
-    plt.title(f'{algo1_name} vs {algo2_name} Performance ({task_type})\nPearson r={correlation:.3f}, Spearman ρ={spearman_corr:.3f}', 
-              fontsize=14)
-    plt.grid(True, alpha=0.3)
-    plt.legend()
+    # Styling
+    ax.set_xlabel(f'{algo1_name} {metric_name}', fontsize=14, fontweight='bold')
+    ax.set_ylabel(f'{algo2_name} {metric_name}', fontsize=14, fontweight='bold')
+    ax.set_title(f'{algo1_name} vs {algo2_name}: {task_type} Performance Correlation\n' +
+                f'Pearson r = {correlation:.3f} (p = {p_value:.4f}), Spearman ρ = {spearman_corr:.3f}', 
+                fontsize=16, fontweight='bold', pad=20)
     
-    # Add some interesting points annotations
-    for name, score1, score2 in both_good[:3]:
-        if score1 > 0.95 and score2 > 0.95:
-            plt.annotate(name, (score1, score2), fontsize=8, alpha=0.7)
+    # Grid and styling
+    ax.grid(True, alpha=0.3, linestyle='-', linewidth=0.5)
+    ax.set_facecolor('#FAFAFA')
+    
+    # Create combined legend handles
+    import matplotlib.lines as mlines
+    
+    # Standard legend handles
+    diagonal_line = mlines.Line2D([0], [0], color='black', linestyle='--', alpha=0.5, 
+                                 linewidth=2, label='Perfect Agreement (y=x)')
+    regression_line = mlines.Line2D([0], [0], color='#FF8C00', linewidth=3, alpha=0.9,
+                                   label=f'Best Fit: y={z[0]:.3f}x+{z[1]:.3f}')
+    
+    # Combine all legend handles
+    all_handles = [diagonal_line, regression_line] + gradient_legend_handles
+    
+    # Legend with better positioning
+    legend = ax.legend(handles=all_handles, loc='lower right', fontsize=12, frameon=True, 
+                      fancybox=True, shadow=True)
+    legend.get_frame().set_facecolor('white')
+    legend.get_frame().set_alpha(0.9)
+    
+    # Add correlation info box
+    textstr = f'Datasets: {len(common_datasets)}\nMean |Δ|: {np.mean(np.abs(algo1_array - algo2_array)):.3f}'
+    props = dict(boxstyle='round', facecolor='white', alpha=0.8)
+    ax.text(0.02, 0.98, textstr, transform=ax.transAxes, fontsize=11,
+           verticalalignment='top', bbox=props)
+    
+    # Don't add dataset name annotations for either task type to avoid clutter
     
     plt.tight_layout()
     
     # Create output directory and save plot
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     output_file = Path(output_dir) / f'marvis_tabpfn_correlation_{task_type.lower()}.png'
-    plt.savefig(output_file, dpi=150, bbox_inches='tight')
+    plt.savefig(output_file, dpi=300, bbox_inches='tight', facecolor='white')
     print(f"\n📈 {task_type} scatter plot saved to '{output_file}'")
     
     plt.close()
@@ -567,13 +641,109 @@ def create_correlation_plot(algo1_scores: Dict[str, float], algo2_scores: Dict[s
     print(f"  Average |{algo1_name} - {algo2_name}|: {np.mean(np.abs(algo1_array - algo2_array)):.4f}")
     
     if task_type.lower() == 'regression':
-        print(f"  Both > 0.5: {sum((algo1_array > 0.5) & (algo2_array > 0.5))} datasets")
-        print(f"  Both < 0.5: {sum((algo1_array < 0.5) & (algo2_array < 0.5))} datasets")
-        print(f"  Opposite performance (one >0.7, other <0.3): {sum(((algo1_array > 0.7) & (algo2_array < 0.3)) | ((algo1_array < 0.3) & (algo2_array > 0.7)))} datasets")
+        both_high = sum((algo1_array > 0.5) & (algo2_array > 0.5))
+        both_low = sum((algo1_array < 0.5) & (algo2_array < 0.5))
+        opposite = sum(((algo1_array > 0.7) & (algo2_array < 0.3)) | ((algo1_array < 0.3) & (algo2_array > 0.7)))
+        print(f"  Both > 0.5: {both_high} datasets")
+        print(f"  Both < 0.5: {both_low} datasets")
+        print(f"  Opposite performance (one >0.7, other <0.3): {opposite} datasets")
     else:  # classification
-        print(f"  Both > 0.8: {sum((algo1_array > 0.8) & (algo2_array > 0.8))} datasets")
-        print(f"  Both < 0.7: {sum((algo1_array < 0.7) & (algo2_array < 0.7))} datasets")
-        print(f"  Opposite performance (one >0.9, other <0.6): {sum(((algo1_array > 0.9) & (algo2_array < 0.6)) | ((algo1_array < 0.6) & (algo2_array > 0.9)))} datasets")
+        both_high = sum((algo1_array > 0.8) & (algo2_array > 0.8))
+        both_low = sum((algo1_array < 0.7) & (algo2_array < 0.7))
+        opposite = sum(((algo1_array > 0.9) & (algo2_array < 0.6)) | ((algo1_array < 0.6) & (algo2_array > 0.9)))
+        print(f"  Both > 0.8: {both_high} datasets")
+        print(f"  Both < 0.7: {both_low} datasets")
+        print(f"  Opposite performance (one >0.9, other <0.6): {opposite} datasets")
+    
+    # Create summary dictionary
+    summary = {
+        'task_type': task_type,
+        'metric_name': metric_name,
+        'num_datasets': len(common_datasets),
+        'pearson_correlation': correlation,
+        'pearson_p_value': p_value,
+        'spearman_correlation': spearman_corr,
+        'spearman_p_value': spearman_p,
+        'mean_absolute_difference': np.mean(np.abs(algo1_array - algo2_array)),
+        'algorithm_scores': {
+            algo1_name: {dataset: score for dataset, score in zip(dataset_names, algo1_values)},
+            algo2_name: {dataset: score for dataset, score in zip(dataset_names, algo2_values)}
+        },
+        'performance_analysis': {
+            'both_performed_well': {
+                'count': len(both_good),
+                'threshold': high_threshold,
+                'datasets': [{'name': name, algo1_name: score1, algo2_name: score2} 
+                           for name, score1, score2 in both_good]
+            },
+            'both_performed_poorly': {
+                'count': len(both_poor),
+                'threshold': low_threshold,
+                'datasets': [{'name': name, algo1_name: score1, algo2_name: score2} 
+                           for name, score1, score2 in both_poor]
+            },
+            f'{algo1_name}_better': {
+                'count': len(algo1_better),
+                'datasets': [{'name': name, algo1_name: score1, algo2_name: score2, 'difference': diff} 
+                           for name, score1, score2, diff in algo1_better]
+            },
+            f'{algo2_name}_better': {
+                'count': len(algo2_better),
+                'datasets': [{'name': name, algo1_name: score1, algo2_name: score2, 'difference': diff} 
+                           for name, score1, score2, diff in algo2_better]
+            }
+        }
+    }
+    
+    if task_type.lower() == 'regression':
+        summary['distribution_analysis'] = {
+            'both_above_05': both_high,
+            'both_below_05': both_low,
+            'opposite_performance': opposite
+        }
+    else:
+        summary['distribution_analysis'] = {
+            'both_above_08': both_high,
+            'both_below_07': both_low,
+            'opposite_performance': opposite
+        }
+    
+    return summary
+
+def save_analysis_summary(summaries: Dict, output_dir: str):
+    """Save comprehensive analysis summary to JSON file."""
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    
+    # Create comprehensive summary
+    full_summary = {
+        'analysis_metadata': {
+            'timestamp': pd.Timestamp.now().isoformat(),
+            'analysis_type': 'MARVIS vs TabPFN v2 Correlation Analysis',
+            'algorithms_compared': ['MARVIS', 'TabPFN v2']
+        },
+        'task_analyses': summaries
+    }
+    
+    # Add overall comparison if both task types were analyzed
+    if 'regression' in summaries and 'classification' in summaries:
+        reg_corr = summaries['regression']['pearson_correlation']
+        cls_corr = summaries['classification']['pearson_correlation']
+        
+        full_summary['cross_task_comparison'] = {
+            'stronger_correlation_task': 'regression' if abs(reg_corr) > abs(cls_corr) else 'classification',
+            'correlation_difference': abs(abs(reg_corr) - abs(cls_corr)),
+            'both_correlations_positive': reg_corr > 0 and cls_corr > 0,
+            'regression_pearson': reg_corr,
+            'classification_pearson': cls_corr
+        }
+    
+    # Save to JSON
+    summary_file = Path(output_dir) / 'correlation_analysis_summary.json'
+    with open(summary_file, 'w') as f:
+        json.dump(full_summary, f, indent=2, default=str)
+    
+    print(f"\n💾 Analysis summary saved to '{summary_file}'")
+    return summary_file
 
 def main():
     """Main function."""
@@ -625,11 +795,22 @@ def main():
     print(f"📁 Output directory: {args.output_dir}")
     print(f"📋 Task type: {args.task_type}")
     
+    # Collect summaries
+    summaries = {}
+    
     if args.task_type in ["regression", "both"]:
-        analyze_correlation_regression(input_dir, args.output_dir)
+        reg_summary = analyze_correlation_regression(input_dir, args.output_dir)
+        if reg_summary:
+            summaries['regression'] = reg_summary
     
     if args.task_type in ["classification", "both"]:
-        analyze_correlation_classification(input_dir, args.output_dir)
+        cls_summary = analyze_correlation_classification(input_dir, args.output_dir)
+        if cls_summary:
+            summaries['classification'] = cls_summary
+    
+    # Save comprehensive summary
+    if summaries:
+        save_analysis_summary(summaries, args.output_dir)
     
     print(f"\n✅ Correlation analysis complete! Results saved to {args.output_dir}")
 

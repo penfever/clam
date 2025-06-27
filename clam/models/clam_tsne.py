@@ -96,27 +96,66 @@ class BioClip2EmbeddingExtractor:
         except Exception as e:
             raise RuntimeError(f"Failed to load BioCLIP model: {e}")
     
-    def extract_embeddings(self, image_paths: list) -> np.ndarray:
-        """Extract embeddings from images."""
+    def extract_embeddings(self, image_paths: list, batch_size: int = 32) -> np.ndarray:
+        """Extract embeddings from images with efficient batching."""
         if self.model is None:
             self.load_model()
         
         embeddings = []
-        self.logger.info(f"Extracting BioClip2 embeddings for {len(image_paths)} images")
+        self.logger.info(f"Extracting BioClip2 embeddings for {len(image_paths)} images with batch_size={batch_size}")
         
-        for i, image_path in enumerate(image_paths):
-            if i % 100 == 0:
-                self.logger.info(f"Processing image {i+1}/{len(image_paths)}")
+        # Process images in batches for efficiency
+        for batch_start in range(0, len(image_paths), batch_size):
+            batch_end = min(batch_start + batch_size, len(image_paths))
+            batch_paths = image_paths[batch_start:batch_end]
+            
+            if batch_start % (batch_size * 10) == 0:  # Log every 10 batches
+                self.logger.info(f"Processing batch {batch_start//batch_size + 1}/{(len(image_paths) + batch_size - 1)//batch_size}")
             
             try:
-                embedding = self._extract_single_embedding(image_path)
-                embeddings.append(embedding)
+                batch_embeddings = self._extract_batch_embeddings(batch_paths)
+                embeddings.extend(batch_embeddings)
                 
             except Exception as e:
-                self.logger.error(f"Error processing image {image_path}: {e}")
-                raise RuntimeError(f"Failed to extract embedding for {image_path}: {e}")
+                self.logger.error(f"Error processing batch {batch_start}-{batch_end}: {e}")
+                # Fallback to individual processing for this batch
+                for image_path in batch_paths:
+                    try:
+                        embedding = self._extract_single_embedding(image_path)
+                        embeddings.append(embedding)
+                    except Exception as individual_e:
+                        self.logger.error(f"Error processing image {image_path}: {individual_e}")
+                        raise RuntimeError(f"Failed to extract embedding for {image_path}: {individual_e}")
         
         return np.array(embeddings)
+    
+    def _extract_batch_embeddings(self, image_paths: list) -> list:
+        """Extract embeddings from a batch of images efficiently."""
+        from PIL import Image
+        
+        batch_images = []
+        for image_path in image_paths:
+            # Load and preprocess image
+            image = Image.open(image_path).convert('RGB')
+            image_tensor = self.preprocess(image)
+            batch_images.append(image_tensor)
+        
+        # Stack into batch tensor
+        batch_tensor = torch.stack(batch_images).to(self.device)
+        
+        # Extract features in batch
+        with torch.no_grad():
+            batch_features = self.model.encode_image(batch_tensor)
+            # Normalize features (standard for CLIP models)
+            batch_features = batch_features / batch_features.norm(dim=-1, keepdim=True)
+        
+        # Convert to list of numpy arrays
+        embeddings = []
+        for i in range(batch_features.shape[0]):
+            embedding = batch_features[i].cpu().numpy().flatten()
+            embeddings.append(embedding)
+        
+        return embeddings
     
     def _extract_single_embedding(self, image_path: str) -> np.ndarray:
         """Extract embedding from single image."""
@@ -143,11 +182,12 @@ def get_bioclip2_embeddings(
     image_paths: list,
     model_name: str = "hf-hub:imageomics/bioclip-2", 
     cache_dir: Optional[str] = None,
-    device: str = "auto"
+    device: str = "auto",
+    batch_size: int = 128
 ) -> np.ndarray:
-    """Get BioCLIP2 embeddings for a list of images."""
+    """Get BioCLIP2 embeddings for a list of images with efficient batching."""
     extractor = BioClip2EmbeddingExtractor(model_name=model_name, device=device)
-    return extractor.extract_embeddings(image_paths)
+    return extractor.extract_embeddings(image_paths, batch_size=batch_size)
 
 
 class ClamTsneClassifier:
@@ -208,6 +248,7 @@ class ClamTsneClassifier:
         dinov2_model: str = "dinov2_vitb14",
         embedding_backend: str = "dinov2",  # For vision: "dinov2" or "bioclip2"
         bioclip2_model: str = "hf-hub:imageomics/bioclip-2",
+        bioclip2_batch_size: int = 128,  # Batch size for BioCLIP2 embedding extraction
         use_pca_backend: bool = False,
         max_train_plot_samples: int = 1000,
         # Metadata parameters
@@ -270,6 +311,7 @@ class ClamTsneClassifier:
                 dinov2_model: DINOV2 model variant (if embedding_backend="dinov2")
                 embedding_backend: Vision embedding backend ("dinov2" or "bioclip2")
                 bioclip2_model: BioCLIP2 model variant (if embedding_backend="bioclip2")
+                bioclip2_batch_size: Batch size for BioCLIP2 embedding extraction (default: 128)
                 use_pca_backend: Use PCA instead of t-SNE
                 max_train_plot_samples: Maximum training samples to plot
                 
@@ -360,6 +402,7 @@ class ClamTsneClassifier:
                 'dinov2_model': dinov2_model,
                 'embedding_backend': embedding_backend,
                 'bioclip2_model': bioclip2_model,
+                'bioclip2_batch_size': bioclip2_batch_size,
                 'use_pca_backend': use_pca_backend,
                 'max_train_plot_samples': max_train_plot_samples
             })
@@ -1053,20 +1096,26 @@ class ClamTsneClassifier:
             embedding_backend = self.modality_kwargs.get('embedding_backend', 'dinov2')
             self.logger.info(f"Generating {embedding_backend.upper()} embeddings for images...")
             
-            # Prepare test data
+            # Prepare test data with hard cap for BioCLIP2 efficiency
             if X_test is not None:
                 X_test_for_embedding = X_test
+                # Apply hard cap of 50 test samples for BioCLIP2 to prevent excessive processing time
+                if embedding_backend == 'bioclip2' and len(X_test_for_embedding) > 50:
+                    self.logger.warning(f"BioCLIP2: Limiting test samples from {len(X_test_for_embedding)} to 50 for efficiency")
+                    X_test_for_embedding = X_test_for_embedding[:50]
             else:
                 X_test_for_embedding = X_train_fit[:5]
             
             # Get embeddings based on backend
             if embedding_backend == 'bioclip2':
-                # Use BioCLIP2 embeddings
+                # Use BioCLIP2 embeddings with efficient batching
+                batch_size = self.modality_kwargs.get('bioclip2_batch_size', 128)
                 train_embeddings = embedding_method(
                     X_train_fit,  # image files
                     model_name=self.modality_kwargs.get('bioclip2_model', 'hf-hub:imageomics/bioclip-2'),
                     cache_dir=self.cache_dir,
-                    device=self.device
+                    device=self.device,
+                    batch_size=batch_size
                 )
                 
                 # Get test embeddings if available
@@ -1075,7 +1124,8 @@ class ClamTsneClassifier:
                         X_test_for_embedding,
                         model_name=self.modality_kwargs.get('bioclip2_model', 'hf-hub:imageomics/bioclip-2'),
                         cache_dir=self.cache_dir,
-                        device=self.device
+                        device=self.device,
+                        batch_size=batch_size
                     )
                 else:
                     self.test_embeddings = None
