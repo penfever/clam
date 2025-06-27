@@ -3,17 +3,18 @@
 Analyze regression results from per-dataset results instead of overall aggregated files.
 
 This script reads regression results from:
-- results/clam-reg.tar (CLAM results)  
-- results/jolt_reg.tar (JOLT results)
-- results/tabular_baselines_reg.tar (Tabular baseline results)
+- clam-reg.tar (MARVIS results)  
+- jolt_reg.tar (JOLT results)
+- tabular_baselines_reg.tar (Tabular baseline results)
 
 It loads individual per-dataset results from task_*/split_*/*/aggregated_results.json files
 and provides a unified comparison.
 
 Usage:
-    python scripts/analyze_all_regression_results.py
+    python scripts/analyze_all_regression_results.py --input_dir /path/to/results --output_dir /path/to/output
 """
 
+import argparse
 import json
 import os
 import sys
@@ -94,10 +95,10 @@ def extract_tar_and_find_per_dataset_results(tar_path: str, temp_dir: str) -> Li
     return result_files
 
 def parse_clam_per_dataset_format(data: Dict, task_id: str, split_id: str) -> List[Dict]:
-    """Parse CLAM per-dataset format results."""
+    """Parse MARVIS per-dataset format results."""
     results = []
     
-    # CLAM results format - metrics are directly in the JSON
+    # MARVIS results format - metrics are directly in the JSON
     if isinstance(data, dict):
         # Use task_id as the consistent dataset identifier
         dataset_name = task_id
@@ -109,7 +110,7 @@ def parse_clam_per_dataset_format(data: Dict, task_id: str, split_id: str) -> Li
         
         if r2_score is not None:
             results.append({
-                'algorithm': 'CLAM',
+                'algorithm': 'MARVIS',
                 'dataset_name': dataset_name,
                 'task_id': task_id,
                 'split_id': split_id,
@@ -378,7 +379,7 @@ def create_performance_matrix_plot(algorithm_dataset_results: Dict[str, Dict[str
                                  output_path: str,
                                  metric_name: str = "R²"):
     """
-    Create a heatmap showing algorithm performance across datasets.
+    Create a heatmap showing algorithm performance across datasets with mean/median summary.
     
     Args:
         algorithm_dataset_results: Dict mapping algorithm -> dataset -> [scores]
@@ -407,6 +408,7 @@ def create_performance_matrix_plot(algorithm_dataset_results: Dict[str, Dict[str
         "task_363389": "opensubtitles_inferred",
         "task_363391": "jigsaw-unintended-bias-in-toxicity",
         "task_363394": "UCC (Unhealthy Comments Corpus)",
+        "task_363396": "Wheat",
         "task_363397": "Phenotype_202",
         "task_363399": "QSAR_Bioconcentration_regression",
         "task_363417": "heart_failure_clinical_records",
@@ -431,63 +433,135 @@ def create_performance_matrix_plot(algorithm_dataset_results: Dict[str, Dict[str
     }
     
     # Get all algorithms and datasets
-    algorithms = sorted(algorithm_dataset_results.keys())
+    algorithms = list(algorithm_dataset_results.keys())
     datasets = set()
     for alg_data in algorithm_dataset_results.values():
         datasets.update(alg_data.keys())
-    datasets = sorted(list(datasets))
     
     # Convert task IDs to friendly names for display
     dataset_display_names = []
-    for dataset in datasets:
+    datasets_sorted = sorted(list(datasets))
+    for dataset in datasets_sorted:
         friendly_name = task_to_name_mapping.get(dataset, dataset)
         dataset_display_names.append(friendly_name)
     
-    # Create matrix
-    matrix = np.zeros((len(algorithms), len(datasets)))
+    # Calculate mean scores for each algorithm to sort by
+    algorithm_mean_scores = {}
     
-    for i, algorithm in enumerate(algorithms):
-        for j, dataset in enumerate(datasets):
+    for algorithm in algorithms:
+        scores_across_datasets = []
+        for dataset in datasets_sorted:
+            if dataset in algorithm_dataset_results[algorithm]:
+                scores = algorithm_dataset_results[algorithm][dataset]
+                if scores:
+                    scores_across_datasets.append(statistics.mean(scores))
+        
+        if scores_across_datasets:
+            algorithm_mean_scores[algorithm] = statistics.mean(scores_across_datasets)
+        else:
+            algorithm_mean_scores[algorithm] = 0
+    
+    # Sort algorithms by mean score (descending)
+    algorithms_sorted = sorted(algorithms, key=lambda x: algorithm_mean_scores[x], reverse=True)
+    
+    # Create matrix with extra columns for mean and median
+    matrix = np.zeros((len(algorithms_sorted), len(datasets_sorted) + 2))  # +2 for mean and median columns
+    
+    for i, algorithm in enumerate(algorithms_sorted):
+        # Fill dataset scores
+        for j, dataset in enumerate(datasets_sorted):
             if dataset in algorithm_dataset_results[algorithm]:
                 scores = algorithm_dataset_results[algorithm][dataset]
                 matrix[i, j] = statistics.mean(scores) if scores else 0
             else:
                 matrix[i, j] = np.nan
+        
+        # Calculate mean and median across datasets for this algorithm
+        dataset_scores = []
+        for dataset in datasets_sorted:
+            if dataset in algorithm_dataset_results[algorithm]:
+                scores = algorithm_dataset_results[algorithm][dataset]
+                if scores:
+                    dataset_scores.append(statistics.mean(scores))
+        
+        if dataset_scores:
+            matrix[i, -2] = statistics.mean(dataset_scores)  # Mean
+            matrix[i, -1] = statistics.median(dataset_scores)  # Median
+        else:
+            matrix[i, -2] = 0
+            matrix[i, -1] = 0
     
-    # Create heatmap
-    plt.figure(figsize=(20, 8))
+    # Create figure with adjusted size
+    fig, ax = plt.subplots(figsize=(22, 8))
     
-    # Use masked array to handle NaN values
-    masked_matrix = np.ma.masked_invalid(matrix)
+    # Create masked arrays for main data and summary columns
+    main_matrix = matrix[:, :-2]
+    summary_matrix = matrix[:, -2:]
     
-    im = plt.imshow(masked_matrix, cmap='RdYlGn', aspect='auto', vmin=0, vmax=1)
+    masked_main = np.ma.masked_invalid(main_matrix)
     
-    # Set ticks with friendly dataset names
-    plt.xticks(range(len(datasets)), dataset_display_names, rotation=90, ha='right')
-    plt.yticks(range(len(algorithms)), algorithms)
+    # Plot main heatmap
+    im1 = ax.imshow(masked_main, cmap='RdYlGn', aspect='auto', vmin=0, vmax=1, 
+                    extent=[-0.5, len(datasets_sorted)-0.5, len(algorithms_sorted)-0.5, -0.5])
+    
+    # Add thick black separator line
+    separator_x = len(datasets_sorted) - 0.5
+    ax.axvline(x=separator_x, color='black', linewidth=3, linestyle='-')
+    
+    # Plot summary columns with same colormap
+    summary_extent = [len(datasets_sorted)+0.5, len(datasets_sorted)+2.5, len(algorithms_sorted)-0.5, -0.5]
+    im2 = ax.imshow(summary_matrix, cmap='RdYlGn', aspect='auto', vmin=0, vmax=1,
+                    extent=summary_extent)
+    
+    # Set x-axis ticks and labels
+    dataset_labels = dataset_display_names + ['Mean', 'Median']
+    tick_positions = list(range(len(datasets_sorted))) + [len(datasets_sorted)+1, len(datasets_sorted)+2]
+    ax.set_xticks(tick_positions)
+    ax.set_xticklabels(dataset_labels, rotation=90, ha='right')
+    
+    # Set y-axis ticks and labels
+    ax.set_yticks(range(len(algorithms_sorted)))
+    ax.set_yticklabels(algorithms_sorted)
     
     # Add colorbar
-    cbar = plt.colorbar(im)
-    cbar.set_label(f'Average {metric_name}', rotation=270, labelpad=20)
+    cbar = plt.colorbar(im1, ax=ax)
+    cbar.set_label(f'{metric_name}', rotation=270, labelpad=20)
     
-    # Add text annotations for values
-    for i in range(len(algorithms)):
-        for j in range(len(datasets)):
+    # Add text annotations for all values
+    for i in range(len(algorithms_sorted)):
+        # Dataset values
+        for j in range(len(datasets_sorted)):
             if not np.isnan(matrix[i, j]):
-                text = plt.text(j, i, f'{matrix[i, j]:.2f}',
-                               ha="center", va="center", color="black", fontsize=6)
+                text = ax.text(j, i, f'{matrix[i, j]:.2f}',
+                             ha="center", va="center", color="black", fontsize=6)
+        
+        # Mean value
+        ax.text(len(datasets_sorted)+1, i, f'{matrix[i, -2]:.2f}',
+                ha="center", va="center", color="black", fontsize=6)
+        
+        # Median value
+        ax.text(len(datasets_sorted)+2, i, f'{matrix[i, -1]:.2f}',
+                ha="center", va="center", color="black", fontsize=6)
     
-    plt.title(f'Algorithm Performance Matrix ({metric_name})', fontsize=14, pad=20)
-    plt.xlabel('Dataset', fontsize=12)
-    plt.ylabel('Algorithm', fontsize=12)
+    # Style the mean/median columns differently
+    ax.axvspan(len(datasets_sorted)+0.5, len(datasets_sorted)+2.5, facecolor='lightgray', alpha=0.3, zorder=0)
+    
+    # Add title and labels
+    ax.set_title(f'Algorithm Performance Matrix ({metric_name}) - Sorted by Mean Score', 
+                 fontsize=14, pad=20)
+    ax.set_xlabel('Dataset', fontsize=12)
+    ax.set_ylabel('Algorithm', fontsize=12)
+    
+    # Adjust layout
     plt.tight_layout()
     
+    # Save figure
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close()
     
     print(f"📊 Performance matrix plot saved to: {output_path}")
 
-def analyze_all_results(results: List[Dict]):
+def analyze_all_results(results: List[Dict], output_dir: str = "./regression_analysis_output"):
     """Analyze combined results from all sources."""
     
     # Group by algorithm
@@ -707,9 +781,8 @@ def analyze_all_results(results: List[Dict]):
     print("="*80)
     
     # Create output directory for plots
-    script_dir = Path(__file__).parent
-    plots_dir = script_dir / "regression_analysis_plots"
-    plots_dir.mkdir(exist_ok=True)
+    plots_dir = Path(output_dir) / "plots"
+    plots_dir.mkdir(parents=True, exist_ok=True)
     
     # Prepare data for critical difference plot
     algorithm_scores_matrix = {}
@@ -799,12 +872,139 @@ def load_tabpfnv2_supplemental_results(supplemental_path: str) -> Dict[str, Dict
     
     return supplemental_results
 
+def save_analysis_summary(results: List[Dict], output_dir: str):
+    """Save comprehensive analysis summary to JSON."""
+    import json
+    
+    # Organize results by algorithm for summary
+    algorithm_results = defaultdict(list)
+    algorithm_dataset_results = defaultdict(lambda: defaultdict(list))
+    
+    for result in results:
+        algorithm = result['algorithm']
+        r2_score = result['r2_score']
+        dataset = result['dataset_name']
+        
+        if r2_score is not None and dataset != 'unknown':
+            # Apply minimum of 0
+            if r2_score < 0:
+                r2_score = 0.0
+            algorithm_results[algorithm].append(r2_score)
+            algorithm_dataset_results[algorithm][dataset].append(r2_score)
+    
+    # Calculate comprehensive statistics
+    comprehensive_model_performance = []
+    for algorithm in algorithm_results:
+        scores = algorithm_results[algorithm]
+        if scores:
+            model_data = {
+                'algorithm': algorithm,
+                'r2_mean': statistics.mean(scores),
+                'r2_median': statistics.median(scores),
+                'r2_std': statistics.stdev(scores) if len(scores) > 1 else 0,
+                'r2_min': min(scores),
+                'r2_max': max(scores),
+                'n_datasets': len(algorithm_dataset_results[algorithm]),
+                'n_results': len(scores)
+            }
+            
+            # Calculate additional metrics if available
+            mae_scores = []
+            rmse_scores = []
+            for result in results:
+                if result['algorithm'] == algorithm:
+                    if result.get('mae') is not None:
+                        mae_scores.append(result['mae'])
+                    if result.get('rmse') is not None:
+                        rmse_scores.append(result['rmse'])
+            
+            if mae_scores:
+                model_data.update({
+                    'mae_mean': statistics.mean(mae_scores),
+                    'mae_median': statistics.median(mae_scores),
+                    'mae_std': statistics.stdev(mae_scores) if len(mae_scores) > 1 else 0
+                })
+            
+            if rmse_scores:
+                model_data.update({
+                    'rmse_mean': statistics.mean(rmse_scores),
+                    'rmse_median': statistics.median(rmse_scores),
+                    'rmse_std': statistics.stdev(rmse_scores) if len(rmse_scores) > 1 else 0
+                })
+            
+            comprehensive_model_performance.append(model_data)
+    
+    # Create analysis summary
+    analysis_summary = {
+        "timestamp": pd.Timestamp.now().isoformat(),
+        "total_algorithms": len(algorithm_results),
+        "total_datasets": len(set(result['dataset_name'] for result in results if result['dataset_name'] != 'unknown')),
+        "metrics_included": {
+            "performance": ["r2_score", "mae", "rmse"],
+            "timing": []  # No timing metrics in regression analysis currently
+        },
+        "algorithm_performance": {
+            "comprehensive_results": comprehensive_model_performance,
+            "ranking_by_r2_mean": sorted(comprehensive_model_performance, key=lambda x: x['r2_mean'], reverse=True),
+            "ranking_by_r2_median": sorted(comprehensive_model_performance, key=lambda x: x['r2_median'], reverse=True)
+        }
+    }
+    
+    # Save to JSON
+    os.makedirs(output_dir, exist_ok=True)
+    summary_path = Path(output_dir) / "regression_analysis_summary.json"
+    with open(summary_path, 'w') as f:
+        json.dump(analysis_summary, f, indent=2)
+    
+    print(f"📊 Analysis summary saved to: {summary_path}")
+
 def main():
     """Main function."""
+    parser = argparse.ArgumentParser(description="Analyze regression results from tar archives")
+    parser.add_argument(
+        "--input_dir",
+        type=str,
+        help="Directory containing tar archives with results"
+    )
+    parser.add_argument(
+        "--results_dir", 
+        type=str, 
+        help="Directory containing tar archives with results (deprecated, use --input_dir)"
+    )
+    parser.add_argument(
+        "--output_dir", 
+        type=str, 
+        default="./regression_analysis_output",
+        help="Directory to save analysis outputs"
+    )
+    parser.add_argument(
+        "--log_level", 
+        type=str, 
+        default="INFO",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        help="Logging level"
+    )
     
-    script_dir = Path(__file__).parent
-    project_root = script_dir.parent
-    results_dir = project_root / "results"
+    args = parser.parse_args()
+    
+    # Handle input_dir vs results_dir - prefer input_dir if provided
+    if args.input_dir and args.results_dir:
+        print("⚠️  Both --input_dir and --results_dir provided. Using --input_dir.")
+        input_dir = args.input_dir
+    elif args.input_dir:
+        input_dir = args.input_dir
+    elif args.results_dir:
+        print("⚠️  --results_dir is deprecated. Please use --input_dir instead.")
+        input_dir = args.results_dir
+    else:
+        # Default fallback
+        script_dir = Path(__file__).parent
+        project_root = script_dir.parent
+        input_dir = str(project_root / "results")
+        print(f"📁 Using default input directory: {input_dir}")
+    
+    results_dir = Path(input_dir)
+    output_dir = args.output_dir
     
     tar_files = {
         'clam': results_dir / "clam-reg.tar",
@@ -867,7 +1067,12 @@ def main():
     if all_results:
         print(f"\n📊 Total results collected: {len(all_results)}")
         print(f"📊 Loading from per-dataset results - latest updates included")
-        analyze_all_results(all_results)
+        
+        # Save comprehensive analysis summary
+        save_analysis_summary(all_results, output_dir)
+        
+        # Run analysis with updated output directory
+        analyze_all_results(all_results, output_dir)
     else:
         print("\n❌ No results found to analyze!")
 

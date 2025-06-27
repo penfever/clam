@@ -11,7 +11,7 @@ This script:
 4. Rounds all values to 3 significant digits
 
 Usage:
-    python parse_openml_cc18_results.py --results_dir /path/to/results --output_dir /path/to/output
+    python parse_openml_cc18_results.py --input_dir /path/to/results --output_dir /path/to/output
 """
 
 import argparse
@@ -178,7 +178,7 @@ def process_tabular_baseline_results(data: List[Dict[str, Any]], file_name: str,
     processed_results = []
     
     # Extract task information from file path
-    # Format: clam/tabular_baselines/task_XXXXX/split_X/baselines/all_evaluation_results_TIMESTAMP.json
+    # Format: project/tabular_baselines/task_XXXXX/split_X/baselines/all_evaluation_results_TIMESTAMP.json
     # For retry results, task_id and split_id will be extracted from individual results
     path_parts = file_name.split('/')
     task_id = None
@@ -350,9 +350,9 @@ def create_unique_model_identifier(model_name: str, archive_source: str, model_u
             # Fall back to archive-based suffix
             return f'tabllm_{archive_lower.replace("_", "").replace("-", "")}'
     
-    # Map clam_tsne to CLAM for display
+    # Map clam_tsne to MARVIS for display
     if normalized_name == 'clam_tsne':
-        return 'CLAM'
+        return 'MARVIS'
     
     return normalized_name
 
@@ -456,7 +456,7 @@ def process_results(all_results: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, pd
     dataset_info = {}  # Store dataset metadata
     
     # Define datasets to exclude
-    excluded_datasets = {'CIFAR_10', 'Devnagari-Script'}
+    excluded_datasets = {'CIFAR_10', 'Devnagari-Script', 'jungle_chess_2pcs_raw_endgame_complete'}
     
     for result in merged_results:
         original_model_name = result.get('model_name', 'unknown')
@@ -766,7 +766,7 @@ def create_performance_matrix_plot(algorithm_dataset_results: Dict[str, Dict[str
                                  output_path: str,
                                  metric_name: str = "Accuracy"):
     """
-    Create a heatmap showing algorithm performance across datasets.
+    Create a heatmap showing algorithm performance across datasets with mean/median summary.
     
     Args:
         algorithm_dataset_results: Dict mapping algorithm -> dataset -> [scores]
@@ -776,51 +776,115 @@ def create_performance_matrix_plot(algorithm_dataset_results: Dict[str, Dict[str
     logger = logging.getLogger(__name__)
     
     # Get all algorithms and datasets
-    algorithms = sorted(algorithm_dataset_results.keys())
+    algorithms = list(algorithm_dataset_results.keys())
     datasets = set()
     for alg_data in algorithm_dataset_results.values():
         datasets.update(alg_data.keys())
     datasets = sorted(list(datasets))
     
-    # Create matrix
-    matrix = np.zeros((len(algorithms), len(datasets)))
+    # Calculate median scores for each algorithm to sort by
+    algorithm_median_scores = {}
+    algorithm_mean_scores = {}
     
-    for i, algorithm in enumerate(algorithms):
+    for algorithm in algorithms:
+        scores_across_datasets = []
+        for dataset in datasets:
+            if dataset in algorithm_dataset_results[algorithm]:
+                scores = algorithm_dataset_results[algorithm][dataset]
+                if scores:
+                    scores_across_datasets.append(statistics.mean(scores))
+        
+        if scores_across_datasets:
+            algorithm_median_scores[algorithm] = statistics.median(scores_across_datasets)
+            algorithm_mean_scores[algorithm] = statistics.mean(scores_across_datasets)
+        else:
+            algorithm_median_scores[algorithm] = 0
+            algorithm_mean_scores[algorithm] = 0
+    
+    # Sort algorithms by mean score (descending)
+    algorithms_sorted = sorted(algorithms, key=lambda x: algorithm_mean_scores[x], reverse=True)
+    
+    # Create matrix with extra columns for mean and median
+    matrix = np.zeros((len(algorithms_sorted), len(datasets) + 2))  # +2 for mean and median columns
+    
+    for i, algorithm in enumerate(algorithms_sorted):
+        # Fill dataset scores
         for j, dataset in enumerate(datasets):
             if dataset in algorithm_dataset_results[algorithm]:
                 scores = algorithm_dataset_results[algorithm][dataset]
                 matrix[i, j] = statistics.mean(scores) if scores else 0
             else:
                 matrix[i, j] = np.nan
+        
+        # Add mean and median to the last two columns
+        matrix[i, -2] = algorithm_mean_scores[algorithm]
+        matrix[i, -1] = algorithm_median_scores[algorithm]
     
-    # Create heatmap
-    plt.figure(figsize=(20, 8))
+    # Create figure with adjusted size
+    fig, ax = plt.subplots(figsize=(22, 8))
     
-    # Use masked array to handle NaN values
-    masked_matrix = np.ma.masked_invalid(matrix)
+    # Create masked arrays for main data and summary columns
+    main_matrix = matrix[:, :-2]
+    summary_matrix = matrix[:, -2:]
     
-    im = plt.imshow(masked_matrix, cmap='RdYlGn', aspect='auto', vmin=0, vmax=1)
+    masked_main = np.ma.masked_invalid(main_matrix)
     
-    # Set ticks
-    plt.xticks(range(len(datasets)), datasets, rotation=90, ha='right')
-    plt.yticks(range(len(algorithms)), algorithms)
+    # Plot main heatmap
+    im1 = ax.imshow(masked_main, cmap='RdYlGn', aspect='auto', vmin=0, vmax=1, 
+                    extent=[-0.5, len(datasets)-0.5, len(algorithms_sorted)-0.5, -0.5])
+    
+    # Add thick black separator line
+    separator_x = len(datasets) - 0.5
+    ax.axvline(x=separator_x, color='black', linewidth=3, linestyle='-')
+    
+    # Plot summary columns with same colormap
+    summary_extent = [len(datasets)+0.5, len(datasets)+2.5, len(algorithms_sorted)-0.5, -0.5]
+    im2 = ax.imshow(summary_matrix, cmap='RdYlGn', aspect='auto', vmin=0, vmax=1,
+                    extent=summary_extent)
+    
+    # Set x-axis ticks and labels
+    dataset_labels = list(datasets) + ['Mean', 'Median']
+    tick_positions = list(range(len(datasets))) + [len(datasets)+1, len(datasets)+2]
+    ax.set_xticks(tick_positions)
+    ax.set_xticklabels(dataset_labels, rotation=90, ha='right')
+    
+    # Set y-axis ticks and labels
+    ax.set_yticks(range(len(algorithms_sorted)))
+    ax.set_yticklabels(algorithms_sorted)
     
     # Add colorbar
-    cbar = plt.colorbar(im)
-    cbar.set_label(f'Average {metric_name}', rotation=270, labelpad=20)
+    cbar = plt.colorbar(im1, ax=ax)
+    cbar.set_label(f'{metric_name}', rotation=270, labelpad=20)
     
-    # Add text annotations for values
-    for i in range(len(algorithms)):
+    # Add text annotations for all values
+    for i in range(len(algorithms_sorted)):
+        # Dataset values
         for j in range(len(datasets)):
             if not np.isnan(matrix[i, j]):
-                text = plt.text(j, i, f'{matrix[i, j]:.2f}',
-                               ha="center", va="center", color="black", fontsize=6)
+                text = ax.text(j, i, f'{matrix[i, j]:.2f}',
+                             ha="center", va="center", color="black", fontsize=6)
+        
+        # Mean value
+        ax.text(len(datasets)+1, i, f'{matrix[i, -2]:.2f}',
+                ha="center", va="center", color="black", fontsize=6)
+        
+        # Median value
+        ax.text(len(datasets)+2, i, f'{matrix[i, -1]:.2f}',
+                ha="center", va="center", color="black", fontsize=6)
     
-    plt.title(f'Algorithm Performance Matrix ({metric_name})', fontsize=14, pad=20)
-    plt.xlabel('Dataset', fontsize=12)
-    plt.ylabel('Algorithm', fontsize=12)
+    # Style the mean/median columns differently
+    ax.axvspan(len(datasets)+0.5, len(datasets)+2.5, facecolor='lightgray', alpha=0.3, zorder=0)
+    
+    # Add title and labels
+    ax.set_title(f'Algorithm Performance Matrix ({metric_name}) - Sorted by Mean Score', 
+                 fontsize=14, pad=20)
+    ax.set_xlabel('Dataset', fontsize=12)
+    ax.set_ylabel('Algorithm', fontsize=12)
+    
+    # Adjust layout
     plt.tight_layout()
     
+    # Save figure
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close()
     
@@ -839,20 +903,17 @@ def generate_analysis_report(aggregated_df: pd.DataFrame, per_dataset_df: pd.Dat
     algorithm_dataset_results = defaultdict(lambda: defaultdict(list))
     algorithm_scores_matrix = defaultdict(dict)
     
-    # Extract data from per-dataset results
+    # Extract data from per-dataset results - now using balanced_accuracy for performance matrix
     balanced_accuracy_scores_matrix = defaultdict(dict)
     for _, row in per_dataset_df.iterrows():
         model = row['model']
         dataset = row['dataset_name']
         task_id = str(row['task_id'])
         
-        # Use accuracy for performance matrix
-        if not pd.isna(row['accuracy_mean']):
-            algorithm_dataset_results[model][dataset].append(row['accuracy_mean'])
-            algorithm_scores_matrix[model][dataset] = row['accuracy_mean']
-        
-        # Use balanced accuracy for critical difference plot
+        # Use balanced accuracy for both performance matrix and critical difference plot
         if not pd.isna(row['balanced_accuracy_mean']):
+            algorithm_dataset_results[model][dataset].append(row['balanced_accuracy_mean'])
+            algorithm_scores_matrix[model][dataset] = row['balanced_accuracy_mean']
             balanced_accuracy_scores_matrix[model][dataset] = row['balanced_accuracy_mean']
     
     # Create critical difference plot for balanced accuracy
@@ -865,25 +926,67 @@ def generate_analysis_report(aggregated_df: pd.DataFrame, per_dataset_df: pd.Dat
             alpha=0.05
         )
         
-        # Create performance matrix heatmap
+        # Create performance matrix heatmap with balanced accuracy
         matrix_plot_path = plots_dir / "performance_matrix_heatmap.png"
         create_performance_matrix_plot(
             dict(algorithm_dataset_results),
             str(matrix_plot_path),
-            metric_name="Accuracy"
+            metric_name="Balanced Accuracy"
         )
     
     # Calculate win rates and additional statistics
     win_rates = calculate_win_rates(per_dataset_df)
     performance_distribution = calculate_performance_distribution(aggregated_df)
     
-    # Create comprehensive JSON summary
+    # Extract all available metrics for comprehensive summary
+    all_metrics = ['accuracy', 'balanced_accuracy', 'f1_macro', 'f1_micro', 'f1_weighted', 
+                   'precision_macro', 'recall_macro', 'roc_auc']
+    timing_metrics = ['training_time', 'prediction_time', 'total_time']
+    
+    # Create comprehensive model performance data including all metrics and timing
+    comprehensive_model_performance = []
+    for _, row in aggregated_df.iterrows():
+        model_data = {
+            'model': row['model'],
+            'original_model_name': row.get('original_model_name', row['model']),
+            'archive_source': row.get('archive_source', 'unknown'),
+            'model_used': row.get('model_used', None)
+        }
+        
+        # Add all performance metrics
+        for metric in all_metrics:
+            for stat in ['mean', 'median', 'ci_lower', 'ci_upper', 'std', 'n_datasets', 'n_runs']:
+                key = f'{metric}_{stat}'
+                if key in row:
+                    model_data[key] = row[key]
+        
+        # Add timing metrics from per-dataset results if available
+        model_timing = per_dataset_df[per_dataset_df['model'] == row['model']]
+        for timing_metric in timing_metrics:
+            if f'{timing_metric}_mean' in model_timing.columns:
+                timing_values = model_timing[f'{timing_metric}_mean'].dropna()
+                if len(timing_values) > 0:
+                    model_data[f'{timing_metric}_mean'] = timing_values.mean()
+                    model_data[f'{timing_metric}_median'] = timing_values.median()
+                    model_data[f'{timing_metric}_std'] = timing_values.std()
+                    model_data[f'{timing_metric}_min'] = timing_values.min()
+                    model_data[f'{timing_metric}_max'] = timing_values.max()
+        
+        comprehensive_model_performance.append(model_data)
+    
+    # Create comprehensive JSON summary with all metrics
     analysis_summary = {
         "timestamp": pd.Timestamp.now().isoformat(),
         "total_models": len(aggregated_df),
         "total_datasets": len(per_dataset_df['task_id'].unique()),
+        "metrics_included": {
+            "performance": all_metrics,
+            "timing": timing_metrics
+        },
         "model_performance": {
-            "ranking": aggregated_df[['model', 'accuracy_mean']].sort_values('accuracy_mean', ascending=False).to_dict('records'),
+            "comprehensive_results": comprehensive_model_performance,
+            "ranking_by_balanced_accuracy": aggregated_df[['model', 'balanced_accuracy_mean', 'balanced_accuracy_median']].sort_values('balanced_accuracy_mean', ascending=False).to_dict('records'),
+            "ranking_by_accuracy": aggregated_df[['model', 'accuracy_mean', 'accuracy_median']].sort_values('accuracy_mean', ascending=False).to_dict('records'),
             "win_rates": win_rates,
             "performance_distribution": performance_distribution
         },
@@ -902,7 +1005,7 @@ def generate_analysis_report(aggregated_df: pd.DataFrame, per_dataset_df: pd.Dat
 
 
 def calculate_win_rates(per_dataset_df: pd.DataFrame) -> Dict[str, Dict]:
-    """Calculate win rates for each model across datasets."""
+    """Calculate win rates for each model across datasets using balanced accuracy."""
     win_rates = {}
     
     # Group by dataset and find winner for each
@@ -910,10 +1013,10 @@ def calculate_win_rates(per_dataset_df: pd.DataFrame) -> Dict[str, Dict]:
     for task_id in per_dataset_df['task_id'].unique():
         dataset_data = per_dataset_df[per_dataset_df['task_id'] == task_id]
         if not dataset_data.empty:
-            # Filter out rows with NaN accuracy values
-            valid_data = dataset_data.dropna(subset=['accuracy_mean'])
+            # Filter out rows with NaN balanced_accuracy values
+            valid_data = dataset_data.dropna(subset=['balanced_accuracy_mean'])
             if not valid_data.empty:
-                winner_row = valid_data.loc[valid_data['accuracy_mean'].idxmax()]
+                winner_row = valid_data.loc[valid_data['balanced_accuracy_mean'].idxmax()]
                 dataset_winners[task_id] = winner_row['model']
     
     # Count wins for each model
@@ -962,10 +1065,14 @@ def calculate_performance_distribution(aggregated_df: pd.DataFrame) -> Dict[str,
 def main():
     parser = argparse.ArgumentParser(description="Parse OpenML CC18 results from tar archives")
     parser.add_argument(
+        "--input_dir",
+        type=str,
+        help="Directory containing tar archives with results (alias for --results_dir)"
+    )
+    parser.add_argument(
         "--results_dir", 
         type=str, 
-        default="../results",
-        help="Directory containing tar archives with results"
+        help="Directory containing tar archives with results (deprecated, use --input_dir)"
     )
     parser.add_argument(
         "--output_dir", 
@@ -984,14 +1091,28 @@ def main():
         "--retry_dir", 
         type=str, 
         default=None,
-        help="Path to retry results directory (defaults to results_dir/tabular_baselines_retry)"
+        help="Path to retry results directory (defaults to input_dir/tabular_baselines_retry)"
     )
     
     args = parser.parse_args()
     logger = setup_logging(args.log_level)
     
+    # Handle input_dir vs results_dir - prefer input_dir if provided
+    if args.input_dir and args.results_dir:
+        logger.warning("Both --input_dir and --results_dir provided. Using --input_dir.")
+        input_dir = args.input_dir
+    elif args.input_dir:
+        input_dir = args.input_dir
+    elif args.results_dir:
+        logger.warning("--results_dir is deprecated. Please use --input_dir instead.")
+        input_dir = args.results_dir
+    else:
+        logger.error("Either --input_dir or --results_dir must be specified")
+        parser.print_help()
+        return
+    
     # Convert paths to absolute
-    results_dir = os.path.abspath(args.results_dir)
+    results_dir = os.path.abspath(input_dir)
     output_dir = os.path.abspath(args.output_dir)
     
     logger.info(f"Processing results from: {results_dir}")

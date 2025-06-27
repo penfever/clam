@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Create a comprehensive radar plot from core_results.csv showing CLAM's performance
+Create a comprehensive radar plot from core_results.csv showing MARVIS's performance
 across modalities compared to traditional ML and LLM/VLM approaches.
 
-The radar plot visualizes CLAM as a bridge between fast conventional ML and 
+The radar plot visualizes MARVIS as a bridge between fast conventional ML and 
 flexible but slower LLM/VLM approaches across multiple modalities.
 """
 
@@ -40,7 +40,7 @@ def load_and_preprocess_data():
         backend = row['Backend']
         
         if method == 'CLAMS':
-            return 'CLAM'
+            return 'MARVIS'
         elif method == 'Conventional' and backend in ['TabPFNv2', 'Random Forest', 'CatBoost', 'Logistic Regression', 'Linear Model']:
             return 'Conventional ML'
         elif method == 'KNN':
@@ -64,9 +64,9 @@ def aggregate_results(df):
     """Aggregate results by method category and benchmark."""
     # Group similar methods together - now with only 3 total lines
     aggregated_groups = {
-        'CLAMS': ['CLAM'],
-        'LLM/VLM Combined': ['VLM/Gemini', 'VLM/Qwen', 'LLM/Serialization'], 
-        'Traditional Baselines': ['Conventional ML', 'KNN Baseline', 'Contrastive']
+        'MARVIS': ['MARVIS'],
+        'LLM/VLM': ['VLM/Gemini', 'VLM/Qwen', 'LLM/Serialization'], 
+        'KNN/Contrastive/Classical': ['Conventional ML', 'KNN Baseline', 'Contrastive']
     }
     
     results = {}
@@ -115,8 +115,7 @@ def setup_radar_plot(num_vars):
     angles = np.linspace(0, 2 * np.pi, num_vars, endpoint=False).tolist()
     angles += angles[:1]  # Complete the circle
     
-    # Create figure and polar subplot
-    fig, ax = plt.subplots(figsize=(16, 16), subplot_kw=dict(projection='polar'))
+    fig, ax = plt.subplots(figsize=(18, 18), subplot_kw=dict(projection='polar'))
     
     return fig, ax, angles
 
@@ -125,7 +124,7 @@ def plot_radar_rings(ax, radar_df, angles):
     
     # Define colors and styles for each method group (only 3 now)
     plot_configs = {
-        'CLAMS': {
+        'MARVIS': {
             'linewidth': 5, 
             'alpha': 0.9, 
             'linestyle': '-',
@@ -135,28 +134,28 @@ def plot_radar_rings(ax, radar_df, angles):
             'use_rainbow': True,  # Special flag for rainbow coloring
             'use_pattern_fill': True  # Use pattern instead of solid fill
         },
-        'LLM/VLM Combined': {
+        'LLM/VLM': {
             'color': 'black', 
-            'linewidth': 3, 
-            'alpha': 0.8, 
+            'linewidth': 4,  # Make thicker for visibility
+            'alpha': 1.0,    # Full opacity
             'linestyle': ':',  # Dotted line
             'marker': 's',
-            'markersize': 10,
+            'markersize': 12,  # Larger markers
             'fill_alpha': 0.1
         },
-        'Traditional Baselines': {
+        'KNN/Contrastive/Classical': {
             'color': 'black', 
-            'linewidth': 3, 
-            'alpha': 0.7, 
+            'linewidth': 4,  # Make thicker for visibility
+            'alpha': 1.0,    # Full opacity
             'linestyle': '--',  # Dashed line
             'marker': 'D',
-            'markersize': 9,
+            'markersize': 11,  # Larger markers
             'fill_alpha': 0.08
         }
     }
     
-    # Plot order (CLAMS last to appear on top)
-    plot_order = ['Traditional Baselines', 'LLM/VLM Combined', 'CLAMS']
+    # Plot order (MARVIS last to appear on top)
+    plot_order = ['KNN/Contrastive/Classical', 'LLM/VLM', 'MARVIS']
     
     plotted_methods = []
     
@@ -172,9 +171,9 @@ def plot_radar_rings(ax, radar_df, angles):
         
         config = plot_configs[method]
         
-        # Special handling for CLAMS rainbow coloring
+        # Special handling for MARVIS rainbow coloring
         if config.get('use_rainbow', False):
-            # Create modality-based colors for CLAMS
+            # Create modality-based colors for MARVIS
             import matplotlib.colors as mcolors
             import matplotlib.cm as cm
             
@@ -201,7 +200,8 @@ def plot_radar_rings(ax, radar_df, angles):
                        color=segment_color,
                        linewidth=config['linewidth'],
                        alpha=config['alpha'],
-                       linestyle=config['linestyle'])
+                       linestyle=config['linestyle'],
+                       zorder=12)  # Even higher zorder for MARVIS rainbow segments
             
             # Plot markers with modality colors
             for i in range(num_segments):
@@ -215,7 +215,8 @@ def plot_radar_rings(ax, radar_df, angles):
                        color=segment_color,
                        markerfacecolor=segment_color,
                        markeredgecolor='white',
-                       markeredgewidth=2)
+                       markeredgewidth=2,
+                       zorder=13)  # Highest zorder for MARVIS markers
             
             # Fill with pattern instead of solid color
             if config.get('use_pattern_fill', False):
@@ -234,7 +235,7 @@ def plot_radar_rings(ax, radar_df, angles):
                    markersize=config['markersize'], label=method)
                    
         else:
-            # Standard single-color plotting
+            # Standard single-color plotting - bring black lines to front with high zorder
             line = ax.plot(plot_angles, plot_values, 
                           color=config['color'],
                           linewidth=config['linewidth'],
@@ -245,10 +246,11 @@ def plot_radar_rings(ax, radar_df, angles):
                           label=method,
                           markerfacecolor=config['color'],
                           markeredgecolor='white',
-                          markeredgewidth=1.5)
+                          markeredgewidth=1.5,
+                          zorder=15)  # Very high zorder to bring black lines to front
             
-            # Fill the area for main methods
-            if method in ['CLAMS', 'LLM/VLM Combined'] and len(plot_values) > 2:
+            # Fill the area only for MARVIS (not LLM/VLM Combined)
+            if method == 'MARVIS' and len(plot_values) > 2:
                 ax.fill(plot_angles, plot_values, 
                        color=config['color'], 
                        alpha=config['fill_alpha'])
@@ -261,18 +263,18 @@ def style_radar_plot(ax, angles, benchmarks, radar_df):
     """Apply styling to the radar plot."""
     
     # Set the angle of the first spoke
-    ax.set_theta_offset(np.pi / 2)
+    ax.set_theta_offset((np.pi / 2))
     ax.set_theta_direction(-1)
     
     # Set spoke labels
     ax.set_xticks(angles[:-1])
     
-    # Create clean benchmark labels with CLAMS scores
+    # Create clean benchmark labels with MARVIS scores
     clean_labels = []
-    clams_values = radar_df['CLAMS'].tolist() if 'CLAMS' in radar_df.columns else [0] * len(benchmarks)
+    marvis_values = radar_df['MARVIS'].tolist() if 'MARVIS' in radar_df.columns else [0] * len(benchmarks)
     
     for i, benchmark in enumerate(benchmarks):
-        clams_score = clams_values[i] if i < len(clams_values) else 0
+        marvis_score = marvis_values[i] if i < len(marvis_values) else 0
         
         # Shorten long labels
         if len(benchmark) > 25:
@@ -282,12 +284,12 @@ def style_radar_plot(ax, angles, benchmarks, radar_df):
                 name = parts[1]
                 if len(name) > 15:
                     name = name[:12] + '...'
-                label_text = f"{domain}:\n{name}\n({clams_score:.1f}%)"
+                label_text = f"{domain}:\n{name}\n({marvis_score:.1f}%)"
             else:
-                label_text = f"{benchmark[:22]}...\n({clams_score:.1f}%)"
+                label_text = f"{benchmark[:22]}...\n({marvis_score:.1f}%)"
         else:
             benchmark_clean = benchmark.replace(': ', ':\n')
-            label_text = f"{benchmark_clean}\n({clams_score:.1f}%)"
+            label_text = f"{benchmark_clean}\n({marvis_score:.1f}%)"
             
         clean_labels.append(label_text)
     
@@ -306,10 +308,11 @@ def add_legend_and_title(fig, ax, plotted_methods):
     """Add legend and title to the plot."""
     
     import matplotlib.patches as mpatches
+    import matplotlib.lines as mlines
     
     # Create a custom legend with method descriptions
     legend_labels = {
-        'CLAMS': 'CLAMS (Vision-Language Classification)',
+        'MARVIS': 'MARVIS (Vision-Language Classification)',
         'LLM/VLM Combined': 'LLM/VLM Combined (black dotted)', 
         'Traditional Baselines': 'Traditional Baselines (black dashed)'
     }
@@ -317,15 +320,33 @@ def add_legend_and_title(fig, ax, plotted_methods):
     # Filter to only plotted methods
     filtered_labels = [legend_labels.get(method, method) for method in plotted_methods if method in legend_labels]
     
-    # Create main legend
-    legend = ax.legend(loc='upper right', bbox_to_anchor=(1.3, 1.1), 
+    # Manually create legend handles for methods (since automatic detection may fail)
+    method_handles = []
+    
+    # MARVIS handle - use red color to represent the overall method
+    marvis_handle = mlines.Line2D([0], [0], color='red', linewidth=5, linestyle='-', 
+                                marker='o', markersize=14, label='MARVIS (Vision-Language Classification)')
+    method_handles.append(marvis_handle)
+    
+    # LLM/VLM Combined handle
+    llm_vlm_handle = mlines.Line2D([0], [0], color='black', linewidth=3, linestyle=':', 
+                                  marker='s', markersize=10, label='LLM/VLM Combined (black dotted)')
+    method_handles.append(llm_vlm_handle)
+    
+    # Traditional Baselines handle
+    traditional_handle = mlines.Line2D([0], [0], color='black', linewidth=3, linestyle='--', 
+                                      marker='D', markersize=9, label='Traditional Baselines (black dashed)')
+    method_handles.append(traditional_handle)
+    
+    # Create main methods legend - move it left and down
+    legend = ax.legend(handles=method_handles, loc='upper right', bbox_to_anchor=(0.135, 0.94), 
                       fontsize=12, frameon=True, fancybox=True, shadow=True,
-                      title='Methods\n(Numbers show CLAM-3B scores)')
+                      title='Methods\n(Numbers show MARVIS-3B scores)')
     legend.get_frame().set_facecolor('white')
     legend.get_frame().set_alpha(0.9)
     legend.get_title().set_fontweight('bold')
     
-    # Add modality color legend for CLAMS
+    # Add modality color legend for MARVIS
     modality_colors = {
         'Vision': '#E74C3C',    # Red
         'Audio': '#F39C12',     # Orange  
@@ -342,59 +363,76 @@ def add_legend_and_title(fig, ax, plotted_methods):
     modality_legend = ax.legend(handles=modality_patches, 
                                loc='upper left', bbox_to_anchor=(-0.2, 1.1),
                                fontsize=10, frameon=True, fancybox=True, shadow=True,
-                               title='CLAMS Modality Colors')
+                               title='MARVIS Modality Colors')
     modality_legend.get_frame().set_facecolor('white')
     modality_legend.get_frame().set_alpha(0.9)
     
     # Add the main legend back (matplotlib only shows one legend by default)
     ax.add_artist(legend)
     
-    # Add main title with shell symbol
-    title_text = '🚀 CLAMS: Bridging Conventional ML and Modern LLM/VLM Approaches\nPerformance Across Modalities and Benchmarks'
-    plt.suptitle(title_text, fontsize=18, fontweight='bold', y=0.95)
+    # Add main title with rainbow CLAMS text
+    fig.suptitle('', fontsize=18, fontweight='bold', y=0.95)  # Clear any existing title
+    
+    # Create rainbow MARVIS text letter by letter
+    marvis_colors = ['#E74C3C', '#F39C12', '#27AE60', '#3498DB', '#9B59B6', '#E74C3C']  # Red, Orange, Green, Blue, Purple, Red
+    marvis_letters = ['M', 'A', 'R', 'V', 'I', 'S']
+    
+    # Add the rainbow MARVIS text - center the entire title
+    title_text = ': Bridging Conventional ML and Modern LLM/VLM Approaches\nPerformance Across Modalities and Benchmarks'
+    
+    # Calculate center position for the entire title
+    # MARVIS takes about 6 characters, title_text starts with ': '
+    title_center_x = 0.35
+    marvis_start_x = title_center_x - 0.15  # Shift left to center the entire title
+    
+    # Add individual colored letters for MARVIS
+    fig.text(marvis_start_x, 0.95, 'M', fontsize=18, fontweight='bold', ha='center', va='top', 
+             color='#E74C3C', transform=fig.transFigure)
+    fig.text(marvis_start_x + 0.015, 0.95, 'A', fontsize=18, fontweight='bold', ha='center', va='top', 
+             color='#F39C12', transform=fig.transFigure)
+    fig.text(marvis_start_x + 0.03, 0.95, 'R', fontsize=18, fontweight='bold', ha='center', va='top', 
+             color='#27AE60', transform=fig.transFigure)
+    fig.text(marvis_start_x + 0.045, 0.95, 'V', fontsize=18, fontweight='bold', ha='center', va='top', 
+             color='#3498DB', transform=fig.transFigure)
+    fig.text(marvis_start_x + 0.06, 0.95, 'I', fontsize=18, fontweight='bold', ha='center', va='top', 
+             color='#9B59B6', transform=fig.transFigure)
+    fig.text(marvis_start_x + 0.075, 0.95, 'S', fontsize=18, fontweight='bold', ha='center', va='top', 
+             color='#E74C3C', transform=fig.transFigure)
+    
+    # Add the rest of the title
+    fig.text(marvis_start_x + 0.095, 0.95, title_text, fontsize=18, fontweight='bold', ha='left', va='top', 
+             color='black', transform=fig.transFigure)
 
 # Removed add_annotations function since scores are now in spoke labels
 
 def create_modality_sections(ax, angles, benchmarks):
-    """Add visual sections for different modalities."""
+    """Add visual sections for different modalities with pale fills."""
     
-    # Group benchmarks by modality
-    modality_ranges = {}
-    current_modality = None
-    start_idx = 0
+    # Define modality colors (same as MARVIS colors)
+    modality_colors = {
+        'Vision': '#E74C3C',    # Red
+        'Audio': '#F39C12',     # Orange  
+        'Biological': '#27AE60', # Green
+        'Tabular Classification': '#3498DB', # Blue
+        'Tabular Regression': '#9B59B6'  # Purple
+    }
     
+    # Fill each spoke section with pale modality color
     for i, benchmark in enumerate(benchmarks):
         modality = benchmark.split(':')[0]
         
-        if modality != current_modality:
-            if current_modality is not None:
-                modality_ranges[current_modality] = (start_idx, i-1)
-            current_modality = modality
-            start_idx = i
-    
-    # Add the last modality
-    if current_modality is not None:
-        modality_ranges[current_modality] = (start_idx, len(benchmarks)-1)
-    
-    # Add colored arcs for each modality
-    modality_colors = {
-        'Vision': '#3498DB',
-        'Audio': '#E74C3C', 
-        'Biological': '#27AE60',
-        'Tabular Classification': '#9B59B6',
-        'Tabular Regression': '#F39C12'
-    }
-    
-    for modality, (start, end) in modality_ranges.items():
-        if end >= start and modality in modality_colors:
-            start_angle = angles[start]
-            end_angle = angles[end + 1] if end + 1 < len(angles) else angles[end]
+        if modality in modality_colors:
+            # Create wedge for this spoke
+            start_angle = angles[i] - (angles[1] - angles[0]) / 2 if i > 0 else angles[i] - np.pi / len(benchmarks)
+            end_angle = angles[i] + (angles[1] - angles[0]) / 2 if i < len(angles) - 1 else angles[i] + np.pi / len(benchmarks)
             
-            # Create arc
-            arc_angles = np.linspace(start_angle, end_angle, 100)
-            ax.fill_between(arc_angles, 105, 110, 
+            # Create wedge angles
+            wedge_angles = np.linspace(start_angle, end_angle, 50)
+            
+            # Fill the entire spoke section from center to edge
+            ax.fill_between(wedge_angles, 0, 100, 
                            color=modality_colors[modality], 
-                           alpha=0.6, label=f'{modality} Domain')
+                           alpha=0.1, zorder=0)  # Very pale, behind everything else
 
 def main():
     """Main function to create the radar plot."""
@@ -433,12 +471,12 @@ def main():
     plt.tight_layout()
     
     # Save the plot
-    output_path = Path(OUTPUT_DIR) / "clam_radar_plot.png"
+    output_path = Path(OUTPUT_DIR) / "marvis_radar_plot.png"
     plt.savefig(output_path, dpi=300, bbox_inches='tight', 
                 facecolor='white', edgecolor='none')
     
     # Also save as PDF for publication
-    output_path_pdf = Path(OUTPUT_DIR) / "clam_radar_plot.pdf"
+    output_path_pdf = Path(OUTPUT_DIR) / "marvis_radar_plot.pdf"
     plt.savefig(output_path_pdf, bbox_inches='tight',
                 facecolor='white', edgecolor='none')
     
