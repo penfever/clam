@@ -250,8 +250,6 @@ class ClamTsneClassifier:
         bioclip2_model: str = "hf-hub:imageomics/bioclip-2",
         bioclip2_batch_size: int = 128,  # Batch size for BioCLIP2 embedding extraction
         use_pca_backend: bool = False,
-        max_train_plot_samples: int = 1000,
-        max_test_plot_samples: int = 50,
         # Metadata parameters
         dataset_metadata: Optional[Union[str, Dict[str, Any], Path]] = None,
         auto_load_metadata: bool = True,
@@ -314,8 +312,6 @@ class ClamTsneClassifier:
                 bioclip2_model: BioCLIP2 model variant (if embedding_backend="bioclip2")
                 bioclip2_batch_size: Batch size for BioCLIP2 embedding extraction (default: 128)
                 use_pca_backend: Use PCA instead of t-SNE
-                max_train_plot_samples: Maximum training samples to plot
-                max_test_plot_samples: Maximum test samples to show in plots (default: 50)
                 
             Metadata and enhancement parameters:
                 dataset_metadata: Path or dict with dataset metadata
@@ -406,8 +402,6 @@ class ClamTsneClassifier:
                 'bioclip2_model': bioclip2_model,
                 'bioclip2_batch_size': bioclip2_batch_size,
                 'use_pca_backend': use_pca_backend,
-                'max_train_plot_samples': max_train_plot_samples,
-                'max_test_plot_samples': max_test_plot_samples
             })
         
         # Initialize logger
@@ -1173,15 +1167,8 @@ class ClamTsneClassifier:
             'random_state': self.seed
         }
         
-        # Limit test samples for visualization (separate from prediction)
+        # Use all test embeddings for both visualization and prediction
         test_embeddings_for_viz = self.test_embeddings
-        if (self.test_embeddings is not None and 
-            hasattr(self, 'modality_kwargs') and 
-            'max_test_plot_samples' in self.modality_kwargs):
-            max_test_plot_samples = self.modality_kwargs['max_test_plot_samples']
-            if max_test_plot_samples and len(self.test_embeddings) > max_test_plot_samples:
-                self.logger.info(f"Limiting test samples in visualization from {len(self.test_embeddings)} to {max_test_plot_samples}")
-                test_embeddings_for_viz = self.test_embeddings[:max_test_plot_samples]
         
         # Create t-SNE visualization based on task type
         viz_methods = self._get_tsne_visualization_methods()
@@ -1284,12 +1271,6 @@ class ClamTsneClassifier:
         if self.enable_multi_viz:
             # Limit test samples for multi-visualization as well
             X_test_for_multi_viz = X_test_for_embedding
-            if (X_test_for_embedding is not None and 
-                hasattr(self, 'modality_kwargs') and 
-                'max_test_plot_samples' in self.modality_kwargs):
-                max_test_plot_samples = self.modality_kwargs['max_test_plot_samples']
-                if max_test_plot_samples and len(X_test_for_embedding) > max_test_plot_samples:
-                    X_test_for_multi_viz = X_test_for_embedding[:max_test_plot_samples]
             
             # Use the reduced training data for multi-visualization
             self._initialize_multi_viz_composer(
@@ -1554,7 +1535,6 @@ class ClamTsneClassifier:
             'embedding_backend': self.modality_kwargs.get('embedding_backend') if self.modality == 'vision' else None,
             'bioclip2_model': self.modality_kwargs.get('bioclip2_model') if self.modality == 'vision' else None,
             'use_pca_backend': self.modality_kwargs.get('use_pca_backend') if self.modality == 'vision' else None,
-            'max_train_plot_samples': self.modality_kwargs.get('max_train_plot_samples') if self.modality == 'vision' else None
         }
 
 

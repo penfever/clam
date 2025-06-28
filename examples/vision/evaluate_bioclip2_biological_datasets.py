@@ -867,7 +867,6 @@ def test_single_dataset(dataset_name: str, args):
                 max_vlm_image_size=1024,
                 zoom_factor=args.zoom_factor,
                 use_pca_backend=args.use_pca_backend,
-                max_train_plot_samples=args.max_train_plot_samples,
                 cache_dir=args.cache_dir,
                 device=args.device,
                 use_semantic_names=args.use_semantic_names,
@@ -1176,12 +1175,6 @@ def parse_args():
         "--use_pca_backend",
         action="store_true",
         help="Use PCA instead of t-SNE for dimensionality reduction"
-    )
-    parser.add_argument(
-        "--max_train_plot_samples",
-        type=int,
-        default=1000,
-        help="Maximum number of training samples to include in plots (default: 1000)"
     )
     parser.add_argument(
         "--save_outputs",
