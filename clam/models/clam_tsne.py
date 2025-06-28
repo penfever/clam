@@ -613,14 +613,14 @@ class ClamTsneClassifier:
         
         # Load VLM using centralized model loader
         try:
-            self.logger.info(f"Loading VLM with parameters: model={model_to_load}, backend={backend}, device={self.device if not self.is_api_model else None}")
+            self.logger.info(f"Loading VLM with parameters: model={model_to_load}, backend={backend}, device={actual_device}")
             
             self.vlm_wrapper = model_loader.load_vlm(
                 model_to_load,
                 backend=backend,
-                device=actual_device if not self.is_api_model else None,
-                tensor_parallel_size=self.tensor_parallel_size if not self.is_api_model else None,
-                gpu_memory_utilization=self.gpu_memory_utilization if not self.is_api_model else None,
+                device=actual_device,
+                tensor_parallel_size=self.tensor_parallel_size,
+                gpu_memory_utilization=self.gpu_memory_utilization,
                 **vlm_kwargs
             )
             
