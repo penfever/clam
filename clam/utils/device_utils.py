@@ -107,7 +107,7 @@ def configure_device_for_model(model_type: str, device: Optional[str] = None,
     Returns:
         Tuple of (device, batch_size)
     """
-    if device is None:
+    if device is None or device == "auto":
         device = detect_optimal_device()
     
     # Model-specific configurations
