@@ -15,6 +15,7 @@ __all__ = [
     'get_distinct_colors',
     'create_distinct_color_map', 
     'get_class_color_name_map',
+    'get_color_to_class_map',
     'create_class_legend',
     'format_class_label',
     'create_regression_color_map',
@@ -132,6 +133,21 @@ def get_class_color_name_map(unique_classes: np.ndarray) -> Dict:
         class_name_map[class_label] = color_name
     
     return class_name_map
+
+
+def get_color_to_class_map(unique_classes: np.ndarray) -> Dict:
+    """
+    Create a reverse mapping from color names to class labels for VLM response parsing.
+    
+    Args:
+        unique_classes: Array of unique class labels
+        
+    Returns:
+        Dictionary mapping color names to class labels (e.g., {"Blue": 0, "Color_111": 5})
+    """
+    class_to_color_map = get_class_color_name_map(unique_classes)
+    color_to_class_map = {color_name: class_label for class_label, color_name in class_to_color_map.items()}
+    return color_to_class_map
 
 
 def format_class_label(class_label, class_names: Optional[List[str]] = None, use_semantic_names: bool = False, prefix: str = "Class") -> str:

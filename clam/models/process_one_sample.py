@@ -89,7 +89,8 @@ def _parse_prediction(response, classifier_instance, all_classes):
             unique_classes=all_class_names,
             logger_instance=classifier_instance.logger, 
             use_semantic_names=classifier_instance.use_semantic_names,
-            task_type='classification'
+            task_type='classification',
+            color_to_class_map=getattr(classifier_instance, 'color_to_class_map', None)
         )
         
         # Map back to numeric label if needed

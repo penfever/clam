@@ -666,7 +666,7 @@ def find_best_class_match(class_part: str, unique_classes: List, logger_instance
     return None
 
 
-def parse_vlm_response(response: str, unique_classes: List = None, logger_instance: Optional[logging.Logger] = None, use_semantic_names: bool = False, task_type: str = "classification", target_stats: Optional[Dict] = None) -> Any:
+def parse_vlm_response(response: str, unique_classes: List = None, logger_instance: Optional[logging.Logger] = None, use_semantic_names: bool = False, task_type: str = "classification", target_stats: Optional[Dict] = None, color_to_class_map: Optional[Dict] = None) -> Any:
     """
     Parse VLM response to extract the predicted class or value.
     
@@ -677,6 +677,7 @@ def parse_vlm_response(response: str, unique_classes: List = None, logger_instan
         use_semantic_names: Whether semantic names were used in the prompt
         task_type: "classification" or "regression"
         target_stats: Statistics about target variable (for regression)
+        color_to_class_map: Optional mapping from color names to class labels (e.g., {"Blue": 0, "Color_111": 5})
         
     Returns:
         Predicted class (for classification) or numerical value (for regression)
@@ -774,7 +775,14 @@ def parse_vlm_response(response: str, unique_classes: List = None, logger_instan
                 # Remove quotes if present
                 class_part = class_part.strip('"\'').strip()
                 
-                # First, try direct exact matching (handles cases like "Class_562")
+                # First, try color name matching if color mapping is provided
+                if color_to_class_map:
+                    for color_name, class_label in color_to_class_map.items():
+                        if class_part.lower() == color_name.lower():
+                            logger_instance.debug(f"Color name match found: {class_part} -> {class_label}")
+                            return class_label
+                
+                # Then, try direct exact matching (handles cases like "Class_562")
                 for unique_class in unique_classes:
                     if class_part.strip().lower() == str(unique_class).strip().lower():
                         logger_instance.debug(f"Direct match found: {class_part} -> {unique_class}")
@@ -823,37 +831,6 @@ def parse_vlm_response(response: str, unique_classes: List = None, logger_instan
                         return unique_classes[class_num]
                 except (ValueError, IndexError):
                     continue
-    
-    # Fallback: Look for any class name in the response using improved fuzzy matching
-    if use_semantic_names:
-        # Try to find any class name mentioned anywhere in the response
-        response_norm = normalize_class_name(response)
-        logger_instance.debug(f"Searching for class names in full response (normalized: '{response_norm}')")
-        
-        # First try whole word matches
-        import re
-        for cls in unique_classes:
-            cls_str = str(cls).lower()
-            # Check if it's a whole word match (not part of another word)
-            if re.search(r'\b' + re.escape(cls_str) + r'\b', response_lower):
-                logger_instance.debug(f"Found class in response (whole word): '{cls_str}' -> {cls}")
-                return cls
-        
-        # Then try normalized substring matching
-        for cls in unique_classes:
-            cls_norm = normalize_class_name(str(cls))
-            if cls_norm and cls_norm in response_norm and len(cls_norm) > 2:  # Avoid very short matches
-                logger_instance.debug(f"Found class in response (normalized): '{cls_norm}' -> {cls}")
-                return cls
-        
-        # Finally try flexible pattern matching
-        for cls in unique_classes:
-            cls_str = str(cls).lower()
-            # Create flexible pattern that handles common variations
-            flexible_pattern = re.escape(cls_str).replace(r'\ ', r'[\s_\-]*').replace(r'\-', r'[\s_\-]*')
-            if re.search(flexible_pattern, response_lower):
-                logger_instance.debug(f"Found class in response (flexible): '{cls_str}' -> {cls}")
-                return cls
     
     # Final fallback: Return appropriate default based on naming convention
     if use_semantic_names:

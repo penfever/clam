@@ -423,6 +423,8 @@ class ClamTsneClassifier:
         self.unique_classes = None
         self.class_to_semantic = None
         self.semantic_axes_labels = None
+        self.class_color_name_map = None  # Maps class labels to color names (e.g., {0: "Blue", 5: "Color_111"})
+        self.color_to_class_map = None    # Maps color names to class labels (e.g., {"Blue": 0, "Color_111": 5})
         
         # Multi-visualization context composer
         self.context_composer = None
@@ -1246,6 +1248,21 @@ class ClamTsneClassifier:
             self.unique_classes = None
             self.class_to_semantic = None
             self.class_names = None
+        
+        # Generate color mappings for VLM parsing (classification only)
+        if self.task_type == 'classification' and self.unique_classes is not None:
+            try:
+                from clam.viz.utils.styling import get_class_color_name_map, get_color_to_class_map
+                self.class_color_name_map = get_class_color_name_map(self.unique_classes)
+                self.color_to_class_map = get_color_to_class_map(self.unique_classes)
+                self.logger.debug(f"Generated color mappings for {len(self.unique_classes)} classes")
+            except ImportError as e:
+                self.logger.warning(f"Could not import color mapping functions: {e}")
+                self.class_color_name_map = None
+                self.color_to_class_map = None
+        else:
+            self.class_color_name_map = None
+            self.color_to_class_map = None
         
         # Compute semantic axes labels if enabled
         if self.semantic_axes and self.train_embeddings is not None and self.train_tsne is not None:
