@@ -732,7 +732,7 @@ def test_single_dataset(dataset_name: str, args):
                 n_neighbors=args.knn_neighbors,
                 metric="cosine",
                 standardize=True,
-                device=args.device if args.device != "auto" else None
+                device=args.device
             )
             
             start_time = time.time()
@@ -869,7 +869,7 @@ def test_single_dataset(dataset_name: str, args):
                 use_pca_backend=args.use_pca_backend,
                 max_train_plot_samples=args.max_train_plot_samples,
                 cache_dir=args.cache_dir,
-                device=args.device if args.device != "auto" else None,
+                device=args.device,
                 use_semantic_names=args.use_semantic_names,
                 seed=getattr(args, 'seed', 42)
             )

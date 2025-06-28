@@ -330,7 +330,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
                 use_semantic_names=args.use_semantic_names,
                 num_few_shot_examples=args.num_few_shot_examples,
                 balanced_few_shot=args.balanced_few_shot,
-                device='cpu' if sys.platform == "darwin" else None,
+                device='cpu' if sys.platform == "darwin" else args.device,
                 seed=42
             )
             

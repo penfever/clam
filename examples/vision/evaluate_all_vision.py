@@ -499,7 +499,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
                 use_pca_backend=args.use_pca_backend,
                 max_train_plot_samples=args.max_train_plot_samples,
                 cache_dir=args.cache_dir,
-                device='cpu' if sys.platform == "darwin" or args.device == "cpu" else (args.device if args.device != "auto" else None),
+                device='cpu' if sys.platform == "darwin" or args.device == "cpu" else args.device,
                 use_semantic_names=args.use_semantic_names,
                 seed=42
             )
@@ -545,7 +545,7 @@ def run_models_on_dataset(dataset_name: str, train_paths, train_labels, test_pat
                 pca_components=50,
                 knn_neighbors=5,
                 cache_dir=args.cache_dir,
-                device='cpu' if sys.platform == "darwin" or args.device == "cpu" else (args.device if args.device != "auto" else None)
+                device='cpu' if sys.platform == "darwin" or args.device == "cpu" else args.device
             )
             
             start_time = time.time()
