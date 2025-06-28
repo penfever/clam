@@ -774,6 +774,8 @@ class OpenAIModelWrapper(BaseModelWrapper):
     def __init__(self, model_name: str, device: str = "auto", **kwargs):
         super().__init__(model_name, device, **kwargs)
         self._client = None
+        # Handle max_model_len for API models - store for use in generation config
+        self.max_model_len = kwargs.get('max_model_len', None)
         
     def load(self) -> None:
         """Load OpenAI API client."""
@@ -807,6 +809,17 @@ class OpenAIModelWrapper(BaseModelWrapper):
             single_input = False
         
         results = []
+        # Override max_new_tokens with max_model_len if provided
+        if self.max_model_len is not None:
+            config = GenerationConfig(
+                max_new_tokens=self.max_model_len,
+                temperature=config.temperature,
+                top_p=config.top_p,
+                top_k=config.top_k,
+                do_sample=config.do_sample,
+                repetition_penalty=config.repetition_penalty,
+                stop_tokens=config.stop_tokens
+            )
         generation_kwargs = config.to_openai_kwargs()
         
         for text_input in inputs:
@@ -863,6 +876,8 @@ class OpenAIVisionModelWrapper(BaseModelWrapper):
     def __init__(self, model_name: str, device: str = "auto", **kwargs):
         super().__init__(model_name, device, **kwargs)
         self._client = None
+        # Handle max_model_len for API models - store for use in generation config
+        self.max_model_len = kwargs.get('max_model_len', None)
         
     def load(self) -> None:
         """Load OpenAI API client."""
@@ -931,6 +946,17 @@ class OpenAIVisionModelWrapper(BaseModelWrapper):
                         "content": message.get('content', '')
                     })
             
+            # Override max_new_tokens with max_model_len if provided
+            if self.max_model_len is not None:
+                config = GenerationConfig(
+                    max_new_tokens=self.max_model_len,
+                    temperature=config.temperature,
+                    top_p=config.top_p,
+                    top_k=config.top_k,
+                    do_sample=config.do_sample,
+                    repetition_penalty=config.repetition_penalty,
+                    stop_tokens=config.stop_tokens
+                )
             generation_kwargs = config.to_openai_kwargs()
             
             # Retry logic for rate limits
@@ -1002,6 +1028,8 @@ class GeminiModelWrapper(BaseModelWrapper):
         super().__init__(model_name, device, **kwargs)
         self._client = None
         self._model = None
+        # Handle max_model_len for API models - store for use in generation config
+        self.max_model_len = kwargs.get('max_model_len', None)
         
     def load(self) -> None:
         """Load Gemini API client."""
@@ -1036,6 +1064,17 @@ class GeminiModelWrapper(BaseModelWrapper):
             single_input = False
         
         results = []
+        # Override max_new_tokens with max_model_len if provided
+        if self.max_model_len is not None:
+            config = GenerationConfig(
+                max_new_tokens=self.max_model_len,
+                temperature=config.temperature,
+                top_p=config.top_p,
+                top_k=config.top_k,
+                do_sample=config.do_sample,
+                repetition_penalty=config.repetition_penalty,
+                stop_tokens=config.stop_tokens
+            )
         generation_kwargs = config.to_gemini_kwargs()
         
         for text_input in inputs:
@@ -1070,6 +1109,8 @@ class GeminiVisionModelWrapper(BaseModelWrapper):
     def __init__(self, model_name: str, device: str = "auto", **kwargs):
         super().__init__(model_name, device, **kwargs)
         self._model = None
+        # Handle max_model_len for API models - store for use in generation config
+        self.max_model_len = kwargs.get('max_model_len', None)
         
     def load(self) -> None:
         """Load Gemini API client."""
@@ -1120,6 +1161,17 @@ class GeminiVisionModelWrapper(BaseModelWrapper):
                     # Text-only content
                     content_parts.append(message.get('content', ''))
             
+            # Override max_new_tokens with max_model_len if provided
+            if self.max_model_len is not None:
+                config = GenerationConfig(
+                    max_new_tokens=self.max_model_len,
+                    temperature=config.temperature,
+                    top_p=config.top_p,
+                    top_k=config.top_k,
+                    do_sample=config.do_sample,
+                    repetition_penalty=config.repetition_penalty,
+                    stop_tokens=config.stop_tokens
+                )
             generation_kwargs = config.to_gemini_kwargs()
             
             response = self._model.generate_content(

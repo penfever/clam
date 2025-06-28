@@ -347,7 +347,7 @@ class ClamTsneClassifier:
         self.max_tabpfn_samples = max_tabpfn_samples
         self.cache_dir = cache_dir
         self.use_semantic_names = use_semantic_names
-        self.device = device
+        self.device = device if device is not None else "auto"
         # Handle vlm_backend alias for backward compatibility
         if vlm_backend is not None:
             backend = vlm_backend
@@ -578,12 +578,15 @@ class ClamTsneClassifier:
             from clam.utils.device_utils import detect_optimal_device
             
             # Resolve device if set to auto
+            self.logger.info(f"Initial VLM device value: {self.device}")
             actual_device = self.device
             if self.device == "auto":
                 actual_device = detect_optimal_device(prefer_mps=True)
                 self.logger.info(f"Auto-detected device for VLM: {actual_device}")
                 # Update self.device so it's not "auto" anymore
                 self.device = actual_device
+            else:
+                self.logger.info(f"Using configured device for VLM: {actual_device}")
             
             if actual_device == "cuda" and torch.cuda.is_available():
                 vlm_kwargs.update({
@@ -607,8 +610,8 @@ class ClamTsneClassifier:
             
             backend = self.backend
         
-        # Add max_model_len if specified and not using API model
-        if self.max_model_len is not None and not self.is_api_model:
+        # Add max_model_len if specified
+        if self.max_model_len is not None:
             vlm_kwargs['max_model_len'] = self.max_model_len
         
         # Load VLM using centralized model loader
