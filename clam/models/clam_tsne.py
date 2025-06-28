@@ -251,6 +251,7 @@ class ClamTsneClassifier:
         bioclip2_batch_size: int = 128,  # Batch size for BioCLIP2 embedding extraction
         use_pca_backend: bool = False,
         max_train_plot_samples: int = 1000,
+        max_test_plot_samples: int = 50,
         # Metadata parameters
         dataset_metadata: Optional[Union[str, Dict[str, Any], Path]] = None,
         auto_load_metadata: bool = True,
@@ -314,6 +315,7 @@ class ClamTsneClassifier:
                 bioclip2_batch_size: Batch size for BioCLIP2 embedding extraction (default: 128)
                 use_pca_backend: Use PCA instead of t-SNE
                 max_train_plot_samples: Maximum training samples to plot
+                max_test_plot_samples: Maximum test samples to show in plots (default: 50)
                 
             Metadata and enhancement parameters:
                 dataset_metadata: Path or dict with dataset metadata
@@ -404,7 +406,8 @@ class ClamTsneClassifier:
                 'bioclip2_model': bioclip2_model,
                 'bioclip2_batch_size': bioclip2_batch_size,
                 'use_pca_backend': use_pca_backend,
-                'max_train_plot_samples': max_train_plot_samples
+                'max_train_plot_samples': max_train_plot_samples,
+                'max_test_plot_samples': max_test_plot_samples
             })
         
         # Initialize logger
@@ -1100,13 +1103,9 @@ class ClamTsneClassifier:
             embedding_backend = self.modality_kwargs.get('embedding_backend', 'dinov2')
             self.logger.info(f"Generating {embedding_backend.upper()} embeddings for images...")
             
-            # Prepare test data with hard cap for BioCLIP2 efficiency
+            # Prepare test data
             if X_test is not None:
                 X_test_for_embedding = X_test
-                # Apply hard cap of 50 test samples for BioCLIP2 to prevent excessive processing time
-                if embedding_backend == 'bioclip2' and len(X_test_for_embedding) > 50:
-                    self.logger.warning(f"BioCLIP2: Limiting test samples from {len(X_test_for_embedding)} to 50 for efficiency")
-                    X_test_for_embedding = X_test_for_embedding[:50]
             else:
                 X_test_for_embedding = X_train_fit[:5]
             
@@ -1171,6 +1170,16 @@ class ClamTsneClassifier:
             'random_state': self.seed
         }
         
+        # Limit test samples for visualization (separate from prediction)
+        test_embeddings_for_viz = self.test_embeddings
+        if (self.test_embeddings is not None and 
+            hasattr(self, 'modality_kwargs') and 
+            'max_test_plot_samples' in self.modality_kwargs):
+            max_test_plot_samples = self.modality_kwargs['max_test_plot_samples']
+            if max_test_plot_samples and len(self.test_embeddings) > max_test_plot_samples:
+                self.logger.info(f"Limiting test samples in visualization from {len(self.test_embeddings)} to {max_test_plot_samples}")
+                test_embeddings_for_viz = self.test_embeddings[:max_test_plot_samples]
+        
         # Create t-SNE visualization based on task type
         viz_methods = self._get_tsne_visualization_methods()
         
@@ -1179,7 +1188,7 @@ class ClamTsneClassifier:
             if self.use_3d:
                 self.logger.info("Creating 3D regression t-SNE visualization...")
                 self.train_tsne, self.test_tsne, base_fig = viz_methods['create_regression_tsne_3d_visualization'](
-                    self.train_embeddings, self.y_train_sample, self.test_embeddings,
+                    self.train_embeddings, self.y_train_sample, test_embeddings_for_viz,
                     perplexity=self.tsne_perplexity,
                     max_iter=self.tsne_max_iter,
                     random_state=self.seed
@@ -1188,7 +1197,7 @@ class ClamTsneClassifier:
                 dimension_str = "3D" if self.use_3d else "2D"
                 self.logger.info(f"Creating {dimension_str} regression t-SNE visualization...")
                 self.train_tsne, self.test_tsne, base_fig = viz_methods['create_regression_tsne_visualization'](
-                    self.train_embeddings, self.y_train_sample, self.test_embeddings,
+                    self.train_embeddings, self.y_train_sample, test_embeddings_for_viz,
                     perplexity=self.tsne_perplexity,
                     max_iter=self.tsne_max_iter,
                     random_state=self.seed,
@@ -1199,7 +1208,7 @@ class ClamTsneClassifier:
             if self.use_3d:
                 self.logger.info("Creating 3D classification t-SNE visualization...")
                 self.train_tsne, self.test_tsne, base_fig = viz_methods['create_tsne_3d_visualization'](
-                    self.train_embeddings, self.y_train_sample, self.test_embeddings,
+                    self.train_embeddings, self.y_train_sample, test_embeddings_for_viz,
                     perplexity=self.tsne_perplexity,
                     max_iter=self.tsne_max_iter,
                     random_state=self.seed
@@ -1207,7 +1216,7 @@ class ClamTsneClassifier:
             else:
                 self.logger.info("Creating 2D classification t-SNE visualization...")
                 self.train_tsne, self.test_tsne, base_fig = viz_methods['create_tsne_visualization'](
-                    self.train_embeddings, self.y_train_sample, self.test_embeddings,
+                    self.train_embeddings, self.y_train_sample, test_embeddings_for_viz,
                     perplexity=self.tsne_perplexity,
                     max_iter=self.tsne_max_iter,
                     random_state=self.seed
@@ -1270,11 +1279,20 @@ class ClamTsneClassifier:
         
         # Initialize multi-visualization framework if enabled
         if self.enable_multi_viz:
+            # Limit test samples for multi-visualization as well
+            X_test_for_multi_viz = X_test_for_embedding
+            if (X_test_for_embedding is not None and 
+                hasattr(self, 'modality_kwargs') and 
+                'max_test_plot_samples' in self.modality_kwargs):
+                max_test_plot_samples = self.modality_kwargs['max_test_plot_samples']
+                if max_test_plot_samples and len(X_test_for_embedding) > max_test_plot_samples:
+                    X_test_for_multi_viz = X_test_for_embedding[:max_test_plot_samples]
+            
             # Use the reduced training data for multi-visualization
             self._initialize_multi_viz_composer(
                 X_train_fit, 
                 y_train_fit, 
-                X_test_for_embedding if X_test is not None else None
+                X_test_for_multi_viz
             )
             
         self.logger.info(f"CLAM t-SNE {self.task_type} model fitted successfully")

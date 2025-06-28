@@ -451,6 +451,12 @@ def add_vision_args(parser: argparse.ArgumentParser):
         help="Maximum number of training samples to show in t-SNE plots"
     )
     parser.add_argument(
+        "--max_test_plot_samples",
+        type=int,
+        default=50,
+        help="Maximum number of test samples to show in t-SNE plots (separate from prediction limit)"
+    )
+    parser.add_argument(
         "--knn_neighbors",
         type=int,
         default=5,
