@@ -1183,7 +1183,8 @@ class ClamTsneClassifier:
                     self.train_embeddings, self.y_train_sample, test_embeddings_for_viz,
                     perplexity=self.tsne_perplexity,
                     max_iter=self.tsne_max_iter,
-                    random_state=self.seed
+                    random_state=self.seed,
+                    cached_color_mapping={'class_to_color': self.class_color_name_map, 'color_to_class': self.color_to_class_map}
                 )
             else:
                 dimension_str = "3D" if self.use_3d else "2D"
@@ -1193,7 +1194,8 @@ class ClamTsneClassifier:
                     perplexity=self.tsne_perplexity,
                     max_iter=self.tsne_max_iter,
                     random_state=self.seed,
-                    use_3d=self.use_3d
+                    use_3d=self.use_3d,
+                    cached_color_mapping={'class_to_color': self.class_color_name_map, 'color_to_class': self.color_to_class_map}
                 )
         else:
             # Use classification visualization methods
@@ -1203,7 +1205,8 @@ class ClamTsneClassifier:
                     self.train_embeddings, self.y_train_sample, test_embeddings_for_viz,
                     perplexity=self.tsne_perplexity,
                     max_iter=self.tsne_max_iter,
-                    random_state=self.seed
+                    random_state=self.seed,
+                    cached_color_mapping={'class_to_color': self.class_color_name_map, 'color_to_class': self.color_to_class_map}
                 )
             else:
                 self.logger.info("Creating 2D classification t-SNE visualization...")
@@ -1211,7 +1214,8 @@ class ClamTsneClassifier:
                     self.train_embeddings, self.y_train_sample, test_embeddings_for_viz,
                     perplexity=self.tsne_perplexity,
                     max_iter=self.tsne_max_iter,
-                    random_state=self.seed
+                    random_state=self.seed,
+                    cached_color_mapping={'class_to_color': self.class_color_name_map, 'color_to_class': self.color_to_class_map}
                 )
         
         # Close base figure to save memory
@@ -1249,15 +1253,38 @@ class ClamTsneClassifier:
             self.class_to_semantic = None
             self.class_names = None
         
-        # Generate color mappings for VLM parsing (classification only)
+        # Get cached color mappings for VLM parsing (classification only)
         if self.task_type == 'classification' and self.unique_classes is not None:
             try:
-                from clam.viz.utils.styling import get_class_color_name_map, get_color_to_class_map
-                self.class_color_name_map = get_class_color_name_map(self.unique_classes)
-                self.color_to_class_map = get_color_to_class_map(self.unique_classes)
-                self.logger.debug(f"Generated color mappings for {len(self.unique_classes)} classes")
-            except ImportError as e:
-                self.logger.warning(f"Could not import color mapping functions: {e}")
+                from clam.utils.resource_manager import get_resource_manager
+                
+                # Determine dataset identifier for caching
+                dataset_id = kwargs.get('dataset_name', '')
+                if 'dataset_info' in kwargs and kwargs['dataset_info']:
+                    # Prefer task_id if available
+                    dataset_id = kwargs['dataset_info'].get('task_id', dataset_id)
+                
+                if not dataset_id:
+                    # Fallback to a generic identifier based on number of classes
+                    dataset_id = f"unknown_{len(self.unique_classes)}classes"
+                
+                # Get cached color mapping from resource manager
+                resource_manager = get_resource_manager()
+                color_mappings = resource_manager.dataset_preparer.get_cached_color_mapping(
+                    dataset_id=dataset_id,
+                    unique_classes=self.unique_classes.tolist()
+                )
+                
+                self.class_color_name_map = color_mappings.get('class_to_color', {})
+                self.color_to_class_map = color_mappings.get('color_to_class', {})
+                
+                if self.class_color_name_map and self.color_to_class_map:
+                    self.logger.info(f"Using cached color mappings for dataset {dataset_id} with {len(self.unique_classes)} classes")
+                else:
+                    self.logger.warning(f"Failed to get valid color mappings for dataset {dataset_id}")
+                    
+            except Exception as e:
+                self.logger.warning(f"Could not get cached color mappings: {e}")
                 self.class_color_name_map = None
                 self.color_to_class_map = None
         else:

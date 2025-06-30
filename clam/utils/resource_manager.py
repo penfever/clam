@@ -806,7 +806,7 @@ class ClamResourceManager:
         self.dataset_registry = DatasetRegistry(self.path_resolver)
         self.config_manager = ConfigManager(self.path_resolver)
         self.cache_manager = CacheManager(self.path_resolver)
-        self.dataset_preparer = DatasetPreparer(self.path_resolver, self.dataset_registry)
+        self.dataset_preparer = DatasetPreparer(self.path_resolver, self.dataset_registry, self.cache_manager)
         
         logger.debug(f"Initialized CLAM resource manager with base dir: {self.path_resolver.get_base_dir()}")
     
@@ -1118,9 +1118,10 @@ class ClamResourceManager:
 class DatasetPreparer:
     """Unified dataset preparation with intelligent caching and checking."""
     
-    def __init__(self, path_resolver: PathResolver, dataset_registry: Optional['DatasetRegistry'] = None):
+    def __init__(self, path_resolver: PathResolver, dataset_registry: Optional['DatasetRegistry'] = None, cache_manager: Optional['CacheManager'] = None):
         self.path_resolver = path_resolver
         self.dataset_registry = dataset_registry
+        self.cache_manager = cache_manager
     
     def prepare_dataset(
         self,
@@ -1397,6 +1398,137 @@ class DatasetPreparer:
         
         dataset_dir = self.path_resolver.get_dataset_dir(dataset_type)
         return load_existing_cifar(dataset_dir / "images", class_names)
+    
+    def get_cached_color_mapping(self, dataset_id: str, unique_classes: list) -> dict:
+        """
+        Get cached color mapping for a dataset, generating and caching if needed.
+        
+        Args:
+            dataset_id: Dataset identifier (e.g., task_id or dataset name)
+            unique_classes: List of unique class labels
+            
+        Returns:
+            Dictionary with:
+                - class_to_color: Maps class labels to color names
+                - color_to_class: Maps color names to class labels
+        """
+        # Create stable cache key based on dataset and sorted classes
+        cache_key_data = {
+            'dataset_id': str(dataset_id),
+            'unique_classes': sorted([str(c) for c in unique_classes])
+        }
+        
+        # Check if cache_manager is available
+        if self.cache_manager is None:
+            logger.warning("No cache manager available, generating color mapping without caching")
+            # Generate mappings directly without caching
+            try:
+                from clam.viz.utils.styling import get_class_color_name_map, get_color_to_class_map
+                import numpy as np
+                unique_classes_array = np.array(unique_classes)
+                class_to_color = get_class_color_name_map(unique_classes_array)
+                color_to_class = get_color_to_class_map(unique_classes_array)
+                return {
+                    'class_to_color': class_to_color,
+                    'color_to_class': color_to_class
+                }
+            except Exception as e:
+                logger.error(f"Error generating color mapping: {e}")
+                return {'class_to_color': {}, 'color_to_class': {}}
+        
+        cache_key = self.cache_manager.get_cache_key(**cache_key_data)
+        
+        # Try to load from cache
+        cached_mapping = self.cache_manager.load_from_cache(
+            cache_type='color_mappings',
+            cache_key=cache_key,
+            extension='.json'
+        )
+        
+        if cached_mapping is not None:
+            logger.debug(f"Loaded color mapping from cache for dataset {dataset_id}")
+            # Convert keys back to original types if needed
+            return self._restore_color_mapping_types(cached_mapping, unique_classes)
+        
+        # Generate new mapping if not cached
+        logger.info(f"Generating new color mapping for dataset {dataset_id} with {len(unique_classes)} classes")
+        
+        try:
+            from clam.viz.utils.styling import get_class_color_name_map, get_color_to_class_map
+            
+            # Convert to numpy array for consistent handling
+            import numpy as np
+            unique_classes_array = np.array(unique_classes)
+            
+            # Generate mappings
+            class_to_color = get_class_color_name_map(unique_classes_array)
+            color_to_class = get_color_to_class_map(unique_classes_array)
+            
+            # Convert to serializable format
+            mapping_data = {
+                'class_to_color': {str(k): v for k, v in class_to_color.items()},
+                'color_to_class': {k: str(v) for k, v in color_to_class.items()},
+                'dataset_id': str(dataset_id),
+                'num_classes': len(unique_classes)
+            }
+            
+            # Save to cache
+            success = self.cache_manager.save_to_cache(
+                cache_type='color_mappings',
+                cache_key=cache_key,
+                data=mapping_data,
+                extension='.json'
+            )
+            
+            if success:
+                logger.info(f"Cached color mapping for dataset {dataset_id}")
+            else:
+                logger.warning(f"Failed to cache color mapping for dataset {dataset_id}")
+            
+            # Return mapping in original format
+            return {
+                'class_to_color': class_to_color,
+                'color_to_class': color_to_class
+            }
+            
+        except Exception as e:
+            logger.error(f"Error generating color mapping for dataset {dataset_id}: {e}")
+            # Return empty mappings as fallback
+            return {
+                'class_to_color': {},
+                'color_to_class': {}
+            }
+    
+    def _restore_color_mapping_types(self, cached_mapping: dict, unique_classes: list) -> dict:
+        """
+        Restore proper types for cached color mapping based on original class types.
+        
+        Args:
+            cached_mapping: Cached mapping with string keys
+            unique_classes: Original unique classes with proper types
+            
+        Returns:
+            Mapping with restored types
+        """
+        # Create mapping from string to original type
+        str_to_original = {str(c): c for c in unique_classes}
+        
+        # Restore class_to_color mapping
+        class_to_color = {}
+        for str_class, color in cached_mapping.get('class_to_color', {}).items():
+            if str_class in str_to_original:
+                class_to_color[str_to_original[str_class]] = color
+        
+        # Restore color_to_class mapping
+        color_to_class = {}
+        for color, str_class in cached_mapping.get('color_to_class', {}).items():
+            if str_class in str_to_original:
+                color_to_class[color] = str_to_original[str_class]
+        
+        return {
+            'class_to_color': class_to_color,
+            'color_to_class': color_to_class
+        }
 
 
 # Global resource manager instance

@@ -473,7 +473,8 @@ class ClassificationTSNEPlotter(BaseTSNEPlotter):
             use_3d=self.use_3d,
             class_names=class_names,
             use_semantic_names=use_semantic_names,
-            all_classes=np.unique(train_labels)
+            all_classes=np.unique(train_labels),
+            cached_color_mapping=getattr(self, 'cached_color_mapping', None)
         )
         
         return plot_result
@@ -1008,7 +1009,8 @@ class TSNEVisualizer:
         max_iter: int = 1000,
         random_state: int = 42,
         figsize: Tuple[int, int] = (10, 8),
-        zoom_factor: float = 1.0
+        zoom_factor: float = 1.0,
+        cached_color_mapping: Optional[Dict] = None
     ):
         """
         Initialize unified t-SNE visualizer.
@@ -1023,6 +1025,7 @@ class TSNEVisualizer:
             random_state: Random seed for reproducibility
             figsize: Figure size (width, height)
             zoom_factor: Zoom level for highlighted points
+            cached_color_mapping: Optional pre-computed color mapping from resource manager
         """
         # Initialize coordinate generator
         self.generator = TSNEGenerator(
@@ -1036,6 +1039,7 @@ class TSNEVisualizer:
         self.task_type = task_type
         self.use_3d = use_3d
         self.use_knn = use_knn
+        self.cached_color_mapping = cached_color_mapping
         
     def _create_plotter(
         self,
@@ -1175,7 +1179,8 @@ def create_tsne_visualization(
     figsize: Tuple[int, int] = (12, 8),
     class_names: Optional[List[str]] = None,
     use_semantic_names: bool = False,
-    use_3d: bool = False
+    use_3d: bool = False,
+    cached_color_mapping: Optional[Dict] = None
 ) -> Tuple[np.ndarray, np.ndarray, plt.Figure]:
     """
     Create t-SNE visualization of train and test embeddings.
@@ -1191,7 +1196,8 @@ def create_tsne_visualization(
         perplexity=perplexity,
         max_iter=max_iter,
         random_state=random_state,
-        figsize=figsize
+        figsize=figsize,
+        cached_color_mapping=cached_color_mapping
     )
     
     return visualizer.create_simple_visualization(
@@ -1210,7 +1216,8 @@ def create_tsne_3d_visualization(
     random_state: int = 42,
     figsize: Tuple[int, int] = (15, 12),
     class_names: Optional[List[str]] = None,
-    use_semantic_names: bool = False
+    use_semantic_names: bool = False,
+    cached_color_mapping: Optional[Dict] = None
 ) -> Tuple[np.ndarray, np.ndarray, plt.Figure]:
     """
     Create 3D t-SNE visualization of train and test embeddings.
@@ -1220,7 +1227,8 @@ def create_tsne_3d_visualization(
     
     return create_tsne_visualization(
         train_embeddings, train_labels, test_embeddings, test_labels,
-        perplexity, max_iter, random_state, figsize, class_names, use_semantic_names, use_3d=True
+        perplexity, max_iter, random_state, figsize, class_names, use_semantic_names, use_3d=True,
+        cached_color_mapping=cached_color_mapping
     )
 
 
@@ -1292,7 +1300,8 @@ def create_regression_tsne_visualization(
     random_state: int = 42,
     figsize: Tuple[int, int] = (12, 8),
     colormap: str = 'viridis',
-    use_3d: bool = False
+    use_3d: bool = False,
+    cached_color_mapping: Optional[Dict] = None
 ) -> Tuple[np.ndarray, np.ndarray, plt.Figure]:
     """
     Create t-SNE visualization for regression data with continuous color mapping.
@@ -1307,7 +1316,8 @@ def create_regression_tsne_visualization(
         perplexity=perplexity,
         max_iter=max_iter,
         random_state=random_state,
-        figsize=figsize
+        figsize=figsize,
+        cached_color_mapping=cached_color_mapping
     )
     
     return visualizer.create_simple_visualization(
@@ -1402,7 +1412,8 @@ def create_regression_tsne_3d_visualization(
     max_iter: int = 1000,
     random_state: int = 42,
     figsize: Tuple[int, int] = (15, 12),
-    colormap: str = 'viridis'
+    colormap: str = 'viridis',
+    cached_color_mapping: Optional[Dict] = None
 ) -> Tuple[np.ndarray, np.ndarray, plt.Figure]:
     """
     Create 3D t-SNE visualization for regression data with continuous color mapping.
@@ -1412,7 +1423,8 @@ def create_regression_tsne_3d_visualization(
     
     return create_regression_tsne_visualization(
         train_embeddings, train_targets, test_embeddings, test_targets,
-        perplexity, max_iter, random_state, figsize, colormap, use_3d=True
+        perplexity, max_iter, random_state, figsize, colormap, use_3d=True,
+        cached_color_mapping=cached_color_mapping
     )
 
 

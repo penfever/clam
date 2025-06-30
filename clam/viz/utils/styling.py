@@ -95,16 +95,46 @@ def get_distinct_colors(n_classes: int) -> List[Tuple[np.ndarray, str]]:
     return colors_needed
 
 
-def create_distinct_color_map(unique_classes: np.ndarray) -> Dict:
+def create_distinct_color_map(unique_classes: np.ndarray, cached_color_mapping: Optional[Dict] = None) -> Dict:
     """
     Create a color mapping using distinct, semantically named colors.
     
     Args:
         unique_classes: Array of unique class labels
+        cached_color_mapping: Optional pre-computed color mapping from resource manager
         
     Returns:
         Dictionary mapping class labels to colors
     """
+    # If cached mapping is provided, use it to ensure consistency
+    if cached_color_mapping and 'class_to_color' in cached_color_mapping:
+        class_to_color_names = cached_color_mapping.get('class_to_color', {})
+        distinct_colors = get_distinct_colors(len(unique_classes))
+        class_color_map = {}
+        
+        # Map color names to RGB values
+        color_name_to_rgb = {color_name: color_array for color_array, color_name in distinct_colors}
+        
+        for class_label in unique_classes:
+            # Use cached color name if available
+            if class_label in class_to_color_names:
+                color_name = class_to_color_names[class_label]
+                # Find RGB value for this color name
+                for color_array, name in distinct_colors:
+                    if name == color_name:
+                        class_color_map[class_label] = color_array
+                        break
+                else:
+                    # Fallback if color name not found (shouldn't happen with proper caching)
+                    class_color_map[class_label] = distinct_colors[0][0]
+            else:
+                # Fallback for classes not in cache (shouldn't happen)
+                idx = len(class_color_map) % len(distinct_colors)
+                class_color_map[class_label] = distinct_colors[idx][0]
+        
+        return class_color_map
+    
+    # Original implementation when no cache provided
     distinct_colors = get_distinct_colors(len(unique_classes))
     class_color_map = {}
     
@@ -356,7 +386,8 @@ def apply_consistent_point_styling(
     use_3d: bool = False,
     class_names: Optional[List[str]] = None,
     use_semantic_names: bool = False,
-    all_classes: Optional[np.ndarray] = None
+    all_classes: Optional[np.ndarray] = None,
+    cached_color_mapping: Optional[Dict] = None
 ) -> Dict[str, Any]:
     """
     Apply consistent point styling across all visualization types.
@@ -391,7 +422,7 @@ def apply_consistent_point_styling(
         if all_classes is None:
             all_classes = unique_classes
         
-        class_color_map = create_distinct_color_map(all_classes)
+        class_color_map = create_distinct_color_map(all_classes, cached_color_mapping)
         
         for class_label in unique_classes:
             mask = y == class_label
