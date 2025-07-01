@@ -770,7 +770,7 @@ def main():
                     elif model_name.lower() == 'jolt':
                         result = evaluate_jolt(dataset, args)
                     elif model_name.lower() == 'clam_tsne':
-                        # Cap nn_k at 10% of training dataset size to avoid over-averaging
+                        # Cap nn_k based on number of classes and training dataset size to avoid over-averaging
                         # Get training dataset size
                         X_train = dataset.get('X_train', dataset.get('X', []))
                         if hasattr(X_train, 'shape'):
@@ -780,13 +780,29 @@ def main():
                         else:
                             train_size = 100  # fallback default
                         
-                        # Calculate 10% cap (minimum of 1, maximum of original nn_k)
-                        nn_k_cap = max(1, int(train_size * 0.1))
+                        # Get number of classes (use 1 for regression)
+                        y_train = dataset.get('y_train', dataset.get('y', []))
+                        if len(y_train) > 0:
+                            # Detect if this is regression or classification
+                            from clam.utils.task_detection import detect_task_type
+                            task_id = dataset.get('task_id') or dataset.get('id')
+                            task_type = detect_task_type(y_train, task_id=task_id)
+                            
+                            if task_type == 'regression':
+                                n_classes = 1
+                            else:
+                                unique_classes = np.unique(y_train)
+                                n_classes = len(unique_classes)
+                        else:
+                            n_classes = 1  # fallback for regression
+                        
+                        # Calculate cap: max(n_classes * 2, 10% of training size)
+                        nn_k_cap = max(n_classes * 2, int(train_size * 0.1))
                         original_nn_k = args.nn_k
                         effective_nn_k = min(original_nn_k, nn_k_cap)
                         
                         if effective_nn_k != original_nn_k:
-                            logger.info(f"Capping nn_k from {original_nn_k} to {effective_nn_k} (10% of {train_size} training samples)")
+                            logger.info(f"Capping nn_k from {original_nn_k} to {effective_nn_k} (max of {n_classes * 2} classes*2 or 10% of {train_size} training samples)")
                         
                         # Create modified args with capped nn_k
                         modified_args = argparse.Namespace(**vars(args))
