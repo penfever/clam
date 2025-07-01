@@ -57,6 +57,9 @@ class VisualizationConfig:
     use_knn_connections: bool = False
     nn_k: int = 5  # Number of nearest neighbors (unified parameter)
     
+    # Test point visualization
+    show_test_points: bool = False  # Whether to show all test points (gray squares)
+    
     # Additional options for specific visualizations
     extra_params: Dict[str, Any] = field(default_factory=dict)
 

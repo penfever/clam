@@ -199,7 +199,7 @@ def format_class_label(class_label, class_names: Optional[List[str]] = None, use
         return f"{prefix} {class_label}"
 
 
-def create_class_legend(unique_classes: np.ndarray, class_color_map: Dict, class_names: Optional[List[str]] = None, use_semantic_names: bool = False) -> str:
+def create_class_legend(unique_classes: np.ndarray, class_color_map: Dict, class_names: Optional[List[str]] = None, use_semantic_names: bool = False, show_test_points: bool = False) -> str:
     """
     Create a text legend describing class colors with both semantic names and RGB values.
     
@@ -208,6 +208,7 @@ def create_class_legend(unique_classes: np.ndarray, class_color_map: Dict, class
         class_color_map: Dictionary mapping class labels to colors
         class_names: Optional list of semantic class names
         use_semantic_names: Whether to show semantic names in legend
+        show_test_points: Whether test points are shown in the visualization
         
     Returns:
         legend_text: String description of the color legend
@@ -254,7 +255,9 @@ def create_class_legend(unique_classes: np.ndarray, class_color_map: Dict, class
             
         legend_lines.append(f"- {class_display}: {color_name} RGB{rgb}")
     
-    legend_lines.append("- Test points: Light Gray RGB(211, 211, 211)")
+    # Only add test points to legend if they are shown
+    if show_test_points:
+        legend_lines.append("- Test points: Light Gray RGB(211, 211, 211)")
     
     return "\n".join(legend_lines)
 
@@ -387,7 +390,8 @@ def apply_consistent_point_styling(
     class_names: Optional[List[str]] = None,
     use_semantic_names: bool = False,
     all_classes: Optional[np.ndarray] = None,
-    cached_color_mapping: Optional[Dict] = None
+    cached_color_mapping: Optional[Dict] = None,
+    show_test_points: bool = False
 ) -> Dict[str, Any]:
     """
     Apply consistent point styling across all visualization types.
@@ -403,6 +407,8 @@ def apply_consistent_point_styling(
         class_names: Optional semantic class names
         use_semantic_names: Whether to use semantic class names
         all_classes: Optional array of all possible class labels in the dataset
+        cached_color_mapping: Optional cached color mapping for consistency
+        show_test_points: Whether to show all test points (gray squares). If False, only highlighted test points are shown.
         
     Returns:
         Dictionary with metadata and legend information
@@ -456,7 +462,7 @@ def apply_consistent_point_styling(
         
         # Create legend text using unique_classes (numeric labels) for proper color mapping
         legend_text = create_class_legend(
-            unique_classes, class_color_map, class_names, use_semantic_names
+            unique_classes, class_color_map, class_names, use_semantic_names, show_test_points
         )
         
     else:
@@ -480,8 +486,8 @@ def apply_consistent_point_styling(
             )
         legend_text = "No class labels provided"
     
-    # 2. Plot test points (gray squares)
-    if test_data is not None:
+    # 2. Plot test points (gray squares) - only if show_test_points is True
+    if test_data is not None and show_test_points:
         test_style = get_standard_test_point_style()
         if use_3d:
             ax.scatter(

@@ -210,6 +210,7 @@ class ClamTsneClassifier:
         use_3d: bool = False,  # Unified 3D parameter (backward compatibility: use_3d_tsne is deprecated)
         use_knn_connections: bool = False,
         nn_k: int = 5,
+        show_test_points: bool = False,
         max_vlm_image_size: int = 2048,
         image_dpi: int = 100,
         force_rgb_mode: bool = True,
@@ -336,6 +337,7 @@ class ClamTsneClassifier:
         self.use_3d = use_3d
         self.use_knn_connections = use_knn_connections
         self.knn_k = nn_k
+        self.show_test_points = show_test_points
         self.max_vlm_image_size = max_vlm_image_size
         self.image_dpi = image_dpi
         self.force_rgb_mode = force_rgb_mode
@@ -666,7 +668,8 @@ class ClamTsneClassifier:
                 figsize=(8, 6),
                 point_size=50,
                 use_knn_connections=self.use_knn_connections,
-                nn_k=self.knn_k
+                nn_k=self.knn_k,
+                show_test_points=self.show_test_points
             )
             
             # Get method-specific configuration
@@ -1563,6 +1566,7 @@ class ClamTsneClassifier:
             'use_3d': self.use_3d,
             'use_knn_connections': self.use_knn_connections,
             'nn_k': self.knn_k,
+            'show_test_points': self.show_test_points,
             'max_vlm_image_size': self.max_vlm_image_size,
             'image_dpi': self.image_dpi,
             'force_rgb_mode': self.force_rgb_mode,
@@ -1640,6 +1644,7 @@ def evaluate_clam_tsne(dataset, args):
             use_3d=getattr(args, 'use_3d', False),
             use_knn_connections=getattr(args, 'use_knn_connections', False),
             nn_k=getattr(args, 'nn_k', 5),
+            show_test_points=getattr(args, 'show_test_points', False),
             max_vlm_image_size=getattr(args, 'max_vlm_image_size', 2048),
             image_dpi=getattr(args, 'image_dpi', 100),
             force_rgb_mode=getattr(args, 'force_rgb_mode', True),

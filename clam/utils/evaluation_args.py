@@ -597,6 +597,12 @@ def add_tsne_visualization_args(parser: argparse.ArgumentParser):
         type=str,
         help="Custom viewing angles for 3D t-SNE (format: 'elev1,azim1;elev2,azim2;...')"
     )
+    parser.add_argument(
+        "--show_test_points",
+        action="store_true",
+        default=False,
+        help="Show all test points (gray squares) in visualizations. By default, only the query point is shown."
+    )
 
 
 def add_llm_baseline_args(parser: argparse.ArgumentParser):

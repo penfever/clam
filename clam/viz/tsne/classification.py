@@ -119,6 +119,7 @@ class TSNEClassificationVisualization(BaseKNNVisualization, BaseTSNEVisualizatio
         class_color_map = create_distinct_color_map(unique_classes)
         
         # Apply consistent point styling
+        show_test_points = getattr(self.config, 'show_test_points', False)
         plot_result = apply_consistent_point_styling(
             ax=ax,
             transformed_data=transformed_data,
@@ -128,7 +129,8 @@ class TSNEClassificationVisualization(BaseKNNVisualization, BaseTSNEVisualizatio
             highlight_test_indices=highlight_test_indices,
             use_3d=use_3d,
             class_names=self._class_names,
-            use_semantic_names=self._use_semantic_names
+            use_semantic_names=self._use_semantic_names,
+            show_test_points=show_test_points
         )
         
         knn_info = None
@@ -269,6 +271,7 @@ class TSNEClassificationVisualization(BaseKNNVisualization, BaseTSNEVisualizatio
             ax = fig.add_subplot(rows, cols, i+1, projection='3d')
             
             # Apply consistent point styling
+            show_test_points = getattr(self.config, 'show_test_points', False)
             apply_consistent_point_styling(
                 ax=ax,
                 transformed_data=transformed_data,
@@ -278,7 +281,8 @@ class TSNEClassificationVisualization(BaseKNNVisualization, BaseTSNEVisualizatio
                 highlight_test_indices=highlight_test_indices,
                 use_3d=True,
                 class_names=self._class_names,
-                use_semantic_names=self._use_semantic_names
+                use_semantic_names=self._use_semantic_names,
+                show_test_points=show_test_points
             )
             
             # Add KNN connections if enabled (only for first view)
