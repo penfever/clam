@@ -240,6 +240,10 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
         "--device", args.device,
     ])
     
+    # Add balanced few-shot flag if specified
+    if args.balanced_few_shot:
+        cmd.append("--balanced_few_shot")
+    
     # Add optional parameters
     if args.max_test_samples:
         cmd.extend(["--max_test_samples", str(args.max_test_samples)])
