@@ -182,7 +182,8 @@ def _create_single_visualization(classifier_instance, i, viz_methods, viewing_an
                     zoom_factor=classifier_instance.zoom_factor,
                     class_names=classifier_instance.class_names,
                     use_semantic_names=classifier_instance.use_semantic_names,
-                    semantic_axes_labels=getattr(classifier_instance, 'semantic_axes_labels', None)
+                    semantic_axes_labels=getattr(classifier_instance, 'semantic_axes_labels', None),
+                    all_classes=classifier_instance.unique_classes
                 )
             else:
                 fig, legend_text, metadata = viz_methods['create_tsne_plot_with_knn'](
@@ -193,7 +194,8 @@ def _create_single_visualization(classifier_instance, i, viz_methods, viewing_an
                     figsize=(10, 8),
                     zoom_factor=classifier_instance.zoom_factor,
                     class_names=classifier_instance.class_names,
-                    use_semantic_names=classifier_instance.use_semantic_names
+                    use_semantic_names=classifier_instance.use_semantic_names,
+                    all_classes=classifier_instance.unique_classes
                 )
         else:
             # Create standard visualization
@@ -205,7 +207,8 @@ def _create_single_visualization(classifier_instance, i, viz_methods, viewing_an
                     zoom_factor=classifier_instance.zoom_factor,
                     class_names=classifier_instance.class_names,
                     use_semantic_names=classifier_instance.use_semantic_names,
-                    semantic_axes_labels=getattr(classifier_instance, 'semantic_axes_labels', None)
+                    semantic_axes_labels=getattr(classifier_instance, 'semantic_axes_labels', None),
+                    all_classes=classifier_instance.unique_classes
                 )
             else:
                 fig, legend_text, metadata = viz_methods['create_combined_tsne_plot'](
@@ -215,7 +218,8 @@ def _create_single_visualization(classifier_instance, i, viz_methods, viewing_an
                     zoom_factor=classifier_instance.zoom_factor,
                     class_names=classifier_instance.class_names,
                     use_semantic_names=classifier_instance.use_semantic_names,
-                    semantic_axes_labels=getattr(classifier_instance, 'semantic_axes_labels', None)
+                    semantic_axes_labels=getattr(classifier_instance, 'semantic_axes_labels', None),
+                    all_classes=classifier_instance.unique_classes
                 )
 
     # Convert plot to image

@@ -504,6 +504,7 @@ class ClassificationTSNEPlotter(BaseTSNEPlotter):
         class_names: Optional[List[str]] = None,
         use_semantic_names: bool = False,
         show_legend: bool = True,
+        all_classes: Optional[np.ndarray] = None,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -537,7 +538,7 @@ class ClassificationTSNEPlotter(BaseTSNEPlotter):
             use_3d=self.use_3d,
             class_names=class_names,
             use_semantic_names=use_semantic_names,
-            all_classes=np.unique(train_labels),
+            all_classes=all_classes,
             cached_color_mapping=getattr(self, 'cached_color_mapping', None)
         )
         
@@ -1319,7 +1320,8 @@ def create_combined_tsne_plot(
     class_names: Optional[List[str]] = None,
     use_semantic_names: bool = False,
     use_3d: bool = False,
-    semantic_axes_labels: Optional[Dict[str, str]] = None
+    semantic_axes_labels: Optional[Dict[str, str]] = None,
+    all_classes: Optional[np.ndarray] = None
 ) -> Tuple[plt.Figure, str, Dict]:
     """
     Create a t-SNE plot with optional highlighting of a specific test point.
@@ -1338,7 +1340,8 @@ def create_combined_tsne_plot(
         highlight_test_idx=highlight_test_idx,
         semantic_axes_labels=semantic_axes_labels,
         class_names=class_names,
-        use_semantic_names=use_semantic_names
+        use_semantic_names=use_semantic_names,
+        all_classes=all_classes
     )
     
     return fig, legend_text, metadata
@@ -1353,7 +1356,8 @@ def create_combined_tsne_3d_plot(
     zoom_factor: float = 2.0,
     class_names: Optional[List[str]] = None,
     use_semantic_names: bool = False,
-    semantic_axes_labels: Optional[Dict[str, str]] = None
+    semantic_axes_labels: Optional[Dict[str, str]] = None,
+    all_classes: Optional[np.ndarray] = None
 ) -> Tuple[plt.Figure, str, Dict]:
     """
     Create a 3D t-SNE plot with optional highlighting of a specific test point.
@@ -1363,7 +1367,8 @@ def create_combined_tsne_3d_plot(
     
     return create_combined_tsne_plot(
         train_tsne, test_tsne, train_labels, highlight_test_idx,
-        figsize, zoom_factor, class_names, use_semantic_names, use_3d=True, semantic_axes_labels=semantic_axes_labels
+        figsize, zoom_factor, class_names, use_semantic_names, use_3d=True, semantic_axes_labels=semantic_axes_labels,
+        all_classes=all_classes
     )
 
 
@@ -1417,7 +1422,8 @@ def create_tsne_plot_with_knn(
     class_names: Optional[List[str]] = None,
     use_semantic_names: bool = False,
     use_3d: bool = False,
-    semantic_axes_labels: Optional[Dict[str, str]] = None
+    semantic_axes_labels: Optional[Dict[str, str]] = None,
+    all_classes: Optional[np.ndarray] = None
 ) -> Tuple[plt.Figure, str, Dict]:
     """
     Create a t-SNE plot with KNN connections and analysis.
@@ -1446,7 +1452,8 @@ def create_tsne_plot_with_knn(
         class_names=class_names,
         use_semantic_names=use_semantic_names,
         train_embeddings=train_embeddings,
-        test_embeddings=test_embeddings
+        test_embeddings=test_embeddings,
+        all_classes=all_classes
     )
     
     # Note: KNN visualization is now handled internally by the TSNEVisualizer
@@ -1467,7 +1474,8 @@ def create_tsne_3d_plot_with_knn(
     knn_k: int = 5,
     class_names: Optional[List[str]] = None,
     use_semantic_names: bool = False,
-    semantic_axes_labels: Optional[Dict[str, str]] = None
+    semantic_axes_labels: Optional[Dict[str, str]] = None,
+    all_classes: Optional[np.ndarray] = None
 ) -> Tuple[plt.Figure, str, Dict]:
     """
     Create a 3D t-SNE plot with KNN connections and analysis.
@@ -1478,7 +1486,8 @@ def create_tsne_3d_plot_with_knn(
     return create_tsne_plot_with_knn(
         train_tsne, test_tsne, train_labels, train_embeddings, test_embeddings,
         highlight_test_idx, figsize, zoom_factor, knn_k, class_names, 
-        use_semantic_names, use_3d=True, semantic_axes_labels=semantic_axes_labels
+        use_semantic_names, use_3d=True, semantic_axes_labels=semantic_axes_labels,
+        all_classes=all_classes
     )
 
 
