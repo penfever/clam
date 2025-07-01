@@ -1,0 +1,13 @@
+{
+  "task_id": 3,
+  "dataset_id": 3,
+  "dataset_name": "kr-vs-kp",
+  "num_classes": 2,
+  "num_features": 37,
+  "version": "v20250701",
+  "timestamp": "2025-07-01_17-17-57",
+  "evaluation_type": "baselines_only",
+  "max_train_samples": null,
+  "max_test_samples": 200,
+  "num_splits": 3
+}

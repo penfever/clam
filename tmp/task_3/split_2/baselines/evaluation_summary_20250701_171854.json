@@ -1,0 +1,260 @@
+{
+  "timestamp": "20250701_171854",
+  "num_datasets": 1,
+  "num_models": 5,
+  "models": [
+    {
+      "type": "baseline",
+      "identifier": "catboost"
+    },
+    {
+      "type": "baseline",
+      "identifier": "tabpfn_v2"
+    },
+    {
+      "type": "baseline",
+      "identifier": "random_forest"
+    },
+    {
+      "type": "baseline",
+      "identifier": "gradient_boosting"
+    },
+    {
+      "type": "baseline",
+      "identifier": "logistic_regression"
+    }
+  ],
+  "datasets": [
+    {
+      "id": "3",
+      "name": "kr-vs-kp"
+    }
+  ],
+  "model_summaries": [
+    {
+      "model_type": "baseline",
+      "model_identifier": "catboost",
+      "average_accuracy": 0.98,
+      "num_valid_datasets": 1,
+      "dataset_accuracies": {
+        "kr-vs-kp": 0.98
+      },
+      "average_balanced_accuracy": 0.9797979797979798,
+      "dataset_balanced_accuracies": {
+        "kr-vs-kp": 0.9797979797979798
+      },
+      "average_roc_auc": 0.9989998999899989,
+      "dataset_roc_aucs": {
+        "kr-vs-kp": 0.9989998999899989
+      },
+      "frequency_distributions": [
+        {
+          "dataset_name": "kr-vs-kp",
+          "dataset_id": "3",
+          "prediction_distribution": {
+            "counts": {
+              "0": 105,
+              "1": 95
+            },
+            "frequencies": {
+              "0": 0.525,
+              "1": 0.475
+            },
+            "total_samples": 200
+          },
+          "ground_truth_distribution": {
+            "counts": {
+              "0": 101,
+              "1": 99
+            },
+            "frequencies": {
+              "0": 0.505,
+              "1": 0.495
+            },
+            "total_samples": 200
+          }
+        }
+      ]
+    },
+    {
+      "model_type": "baseline",
+      "model_identifier": "tabpfn_v2",
+      "average_accuracy": 0.98,
+      "num_valid_datasets": 1,
+      "dataset_accuracies": {
+        "kr-vs-kp": 0.98
+      },
+      "average_balanced_accuracy": 0.9798979897989799,
+      "dataset_balanced_accuracies": {
+        "kr-vs-kp": 0.9798979897989799
+      },
+      "average_roc_auc": 0.9985998599859987,
+      "dataset_roc_aucs": {
+        "kr-vs-kp": 0.9985998599859987
+      },
+      "frequency_distributions": [
+        {
+          "dataset_name": "kr-vs-kp",
+          "dataset_id": "3",
+          "prediction_distribution": {
+            "counts": {
+              "0": 103,
+              "1": 97
+            },
+            "frequencies": {
+              "0": 0.515,
+              "1": 0.485
+            },
+            "total_samples": 200
+          },
+          "ground_truth_distribution": {
+            "counts": {
+              "0": 101,
+              "1": 99
+            },
+            "frequencies": {
+              "0": 0.505,
+              "1": 0.495
+            },
+            "total_samples": 200
+          }
+        }
+      ]
+    },
+    {
+      "model_type": "baseline",
+      "model_identifier": "random_forest",
+      "average_accuracy": 0.99,
+      "num_valid_datasets": 1,
+      "dataset_accuracies": {
+        "kr-vs-kp": 0.99
+      },
+      "average_balanced_accuracy": 0.9898989898989898,
+      "dataset_balanced_accuracies": {
+        "kr-vs-kp": 0.9898989898989898
+      },
+      "average_roc_auc": 0.9985498549854986,
+      "dataset_roc_aucs": {
+        "kr-vs-kp": 0.9985498549854986
+      },
+      "frequency_distributions": [
+        {
+          "dataset_name": "kr-vs-kp",
+          "dataset_id": "3",
+          "prediction_distribution": {
+            "counts": {
+              "0": 103,
+              "1": 97
+            },
+            "frequencies": {
+              "0": 0.515,
+              "1": 0.485
+            },
+            "total_samples": 200
+          },
+          "ground_truth_distribution": {
+            "counts": {
+              "0": 101,
+              "1": 99
+            },
+            "frequencies": {
+              "0": 0.505,
+              "1": 0.495
+            },
+            "total_samples": 200
+          }
+        }
+      ]
+    },
+    {
+      "model_type": "baseline",
+      "model_identifier": "gradient_boosting",
+      "average_accuracy": 0.965,
+      "num_valid_datasets": 1,
+      "dataset_accuracies": {
+        "kr-vs-kp": 0.965
+      },
+      "average_balanced_accuracy": 0.9652465246524653,
+      "dataset_balanced_accuracies": {
+        "kr-vs-kp": 0.9652465246524653
+      },
+      "average_roc_auc": 0.9920992099209921,
+      "dataset_roc_aucs": {
+        "kr-vs-kp": 0.9920992099209921
+      },
+      "frequency_distributions": [
+        {
+          "dataset_name": "kr-vs-kp",
+          "dataset_id": "3",
+          "prediction_distribution": {
+            "counts": {
+              "0": 96,
+              "1": 104
+            },
+            "frequencies": {
+              "0": 0.48,
+              "1": 0.52
+            },
+            "total_samples": 200
+          },
+          "ground_truth_distribution": {
+            "counts": {
+              "0": 101,
+              "1": 99
+            },
+            "frequencies": {
+              "0": 0.505,
+              "1": 0.495
+            },
+            "total_samples": 200
+          }
+        }
+      ]
+    },
+    {
+      "model_type": "baseline",
+      "model_identifier": "logistic_regression",
+      "average_accuracy": 0.935,
+      "num_valid_datasets": 1,
+      "dataset_accuracies": {
+        "kr-vs-kp": 0.935
+      },
+      "average_balanced_accuracy": 0.935043504350435,
+      "dataset_balanced_accuracies": {
+        "kr-vs-kp": 0.935043504350435
+      },
+      "average_roc_auc": 0.985098509850985,
+      "dataset_roc_aucs": {
+        "kr-vs-kp": 0.985098509850985
+      },
+      "frequency_distributions": [
+        {
+          "dataset_name": "kr-vs-kp",
+          "dataset_id": "3",
+          "prediction_distribution": {
+            "counts": {
+              "0": 100,
+              "1": 100
+            },
+            "frequencies": {
+              "0": 0.5,
+              "1": 0.5
+            },
+            "total_samples": 200
+          },
+          "ground_truth_distribution": {
+            "counts": {
+              "0": 101,
+              "1": 99
+            },
+            "frequencies": {
+              "0": 0.505,
+              "1": 0.495
+            },
+            "total_samples": 200
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -266,6 +266,12 @@ def evaluate_baselines_on_task(task, split_idx, args):
     # Add feature selection parameter
     cmd.extend(["--feature_selection_threshold", str(args.feature_selection_threshold)])
     
+    # Add few-shot parameters if specified
+    if args.num_few_shot_examples:
+        cmd.extend(["--num_few_shot_examples", str(args.num_few_shot_examples)])
+    if args.balanced_few_shot:
+        cmd.append("--balanced_few_shot")
+    
     # Run evaluation command
     logger.info(f"Running command: {' '.join(cmd)}")
     try:
