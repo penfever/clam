@@ -1,6 +1,8 @@
-# CLAM: Classification using Language Model embeddings
+⚠️ **Note to Reviewers**: This project was originally named CLAM. We have not yet refactored all code references to the new name MARVIS.
 
-**CLAM** is a powerful framework for multi-modal classification that leverages Vision Language Models (VLMs) to perform classification on tabular, audio, and vision data through intelligent visualization and embedding techniques.
+# MARVIS: Modality Adaptive Reasoning over VISualizations
+
+**MARVIS** is a powerful framework for multi-modal classification that leverages Vision Language Models (VLMs) to perform classification on tabular, audio, and vision data through intelligent visualization and embedding techniques.
 
 ## 🚀 Quick Install
 
@@ -67,7 +69,7 @@ classifier = ClamTsneClassifier(
 
 ## 📚 Documentation
 
-**Full documentation**: https://clam.readthedocs.io (coming soon)
+**Full documentation**: [Documentation URL] (coming soon)
 
 * **Installation Guide**: Detailed setup instructions for all modalities
 * **User Guides**: Comprehensive guides for vision, audio, and tabular data
@@ -94,7 +96,7 @@ classifier = ClamTsneClassifier(
 
 ## 🖥️ Platform Support
 
-CLAM automatically detects and optimizes for your hardware:
+MARVIS automatically detects and optimizes for your hardware:
 
 ### Apple Silicon (M1/M2/M3/M4)
 * **Automatic MPS Detection**: Uses Metal Performance Shaders for GPU acceleration
@@ -135,10 +137,10 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🔗 Links
 
-* **Repository**: https://github.com/penfever/clam
-* **Issues**: https://github.com/penfever/clam/issues
+* **Repository**: [Repository URL]
+* **Issues**: [Issues URL]
 * **Documentation**: https://clam.readthedocs.io (coming soon)
 
 ---
 
-*CLAM enables researchers and practitioners to easily apply cutting-edge VLM capabilities to their classification tasks across any data modality.*
+*MARVIS enables researchers and practitioners to easily apply cutting-edge VLM capabilities to their classification tasks across any data modality.*
