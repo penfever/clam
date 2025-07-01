@@ -85,7 +85,6 @@ def generate_dataset_hash(X: np.ndarray, y: np.ndarray, embedding_size: int, dat
 def get_tabpfn_embeddings(
     X_train: np.ndarray,
     y_train: np.ndarray,
-    X_val: np.ndarray,
     X_test: np.ndarray,
     max_samples: int = 3000,
     embedding_size: int = 1000,
@@ -94,14 +93,13 @@ def get_tabpfn_embeddings(
     force_recompute: bool = False,
     task_type: str = "classification",
     seed: int = 42
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, Any, np.ndarray]:
+) -> Tuple[np.ndarray, Optional[np.ndarray], np.ndarray, Any, np.ndarray]:
     """
     Get TabPFN embeddings with improved class balance checking and caching.
 
     Args:
         X_train: Training features
         y_train: Training labels
-        X_val: Validation features
         X_test: Test features
         max_samples: Maximum number of samples to use from training set
         embedding_size: Size of the output embeddings
@@ -113,7 +111,7 @@ def get_tabpfn_embeddings(
 
     Returns:
         train_embeddings: TabPFN embeddings for training set
-        val_embeddings: TabPFN embeddings for validation set
+        val_embeddings: Always None (validation embeddings no longer generated)
         test_embeddings: TabPFN embeddings for test set
         tabpfn: Fitted TabPFN model
         y_train_sample: Labels for the sampled training set
@@ -136,7 +134,6 @@ def get_tabpfn_embeddings(
         "max_samples": max_samples,
         "task_type": task_type,
         "n_train": len(X_train),
-        "n_val": len(X_val),
         "n_test": len(X_test),
         "n_features": X_train.shape[1]
     }
@@ -285,7 +282,6 @@ def get_tabpfn_embeddings(
         rng = create_random_state(seed)
         selected_features = rng.choice(range(X_train.shape[1]), n_components, replace=False)
         X_train = X_train[:, selected_features]
-        X_val = X_val[:, selected_features]
         X_test = X_test[:, selected_features]
 
     # Sample if dataset is too large
@@ -350,12 +346,12 @@ def get_tabpfn_embeddings(
     )
     tabpfn.fit(X_train_sample, y_train_sample)
 
-    # Extract embeddings - Process X_train_sample normally, but use chunks for validation and test sets
+    # Extract embeddings - Process X_train_sample normally, use chunks for test set
     train_embeddings_raw = tabpfn.get_embeddings(X_train_sample)
-    val_embeddings_raw = get_embeddings_in_chunks(tabpfn, X_val, dataset_name="validation")
+    val_embeddings_raw = None  # No validation embeddings generated
     test_embeddings_raw = get_embeddings_in_chunks(tabpfn, X_test, dataset_name="test")
 
-    logger.info(f"Raw embedding shapes - Train: {train_embeddings_raw.shape}, Val: {val_embeddings_raw.shape}, Test: {test_embeddings_raw.shape}")
+    logger.info(f"Raw embedding shapes - Train: {train_embeddings_raw.shape}, Val: None, Test: {test_embeddings_raw.shape}")
 
     # Fix test embeddings shape if it's inconsistent (TabPFN single sample issue)
     if len(test_embeddings_raw.shape) == 2 and len(train_embeddings_raw.shape) == 3:
@@ -367,38 +363,36 @@ def get_tabpfn_embeddings(
     if len(train_embeddings_raw.shape) == 3 and train_embeddings_raw.shape[0] > 1:
         logger.info("Averaging embeddings across ensemble members")
         train_embeddings = np.mean(train_embeddings_raw, axis=0)
-        val_embeddings = np.mean(val_embeddings_raw, axis=0)
+        val_embeddings = None
         test_embeddings = np.mean(test_embeddings_raw, axis=0)
     else:
         # For backward compatibility, handle original format
         if len(train_embeddings_raw.shape) == 3:
             train_embeddings = train_embeddings_raw[0]
-            val_embeddings = val_embeddings_raw[0]
+            val_embeddings = None
             test_embeddings = test_embeddings_raw[0]
         else:
             train_embeddings = train_embeddings_raw
-            val_embeddings = val_embeddings_raw
+            val_embeddings = None
             test_embeddings = test_embeddings_raw
 
-    logger.info(f"Processed embedding shapes - Train: {train_embeddings.shape}, Val: {val_embeddings.shape}, Test: {test_embeddings.shape}")
+    logger.info(f"Processed embedding shapes - Train: {train_embeddings.shape}, Val: None, Test: {test_embeddings.shape}")
 
     # Standardize embeddings using RobustScaler (less sensitive to outliers)
     scaler = RobustScaler()
     # Reshape to 2D if needed for RobustScaler
     original_train_shape = train_embeddings.shape
-    original_val_shape = val_embeddings.shape
     original_test_shape = test_embeddings.shape
 
     # Check if we need to reshape for standardization
     if len(train_embeddings.shape) > 2:
         train_embeddings = train_embeddings.reshape(train_embeddings.shape[0], -1)
-        val_embeddings = val_embeddings.reshape(val_embeddings.shape[0], -1)
         test_embeddings = test_embeddings.reshape(test_embeddings.shape[0], -1)
 
     # Fit on train embeddings and transform all sets
     train_embeddings = scaler.fit_transform(train_embeddings)
-    val_embeddings = scaler.transform(val_embeddings)
     test_embeddings = scaler.transform(test_embeddings)
+    val_embeddings = None  # No validation embeddings to transform
     
     # Log scaling statistics
     logger.info(f"RobustScaler statistics - Center (median): {scaler.center_[:5]}... Scale (IQR): {scaler.scale_[:5]}...")
@@ -406,7 +400,6 @@ def get_tabpfn_embeddings(
     # Reshape back if needed
     if len(original_train_shape) > 2:
         train_embeddings = train_embeddings.reshape(original_train_shape)
-        val_embeddings = val_embeddings.reshape(original_val_shape)
         test_embeddings = test_embeddings.reshape(original_test_shape)
 
     # Get the embedding dimension (the last dimension)
@@ -462,7 +455,7 @@ def get_tabpfn_embeddings(
             except Exception as e:
                 logger.warning(f"Error saving embeddings to cache: {e}")
 
-    logger.info(f"Final embedding shapes - Train: {train_embeddings.shape}, Val: {val_embeddings.shape}, Test: {test_embeddings.shape}")
+    logger.info(f"Final embedding shapes - Train: {train_embeddings.shape}, Val: None, Test: {test_embeddings.shape}")
 
     return train_embeddings, val_embeddings, test_embeddings, tabpfn, y_train_sample
 
@@ -493,7 +486,7 @@ def get_embeddings_in_chunks(
     Example:
         ```python
         # Using default method (model.get_embeddings)
-        val_embeddings = get_embeddings_in_chunks(tabpfn, X_val, "validation", max_chunk_size=2000)
+        test_embeddings = get_embeddings_in_chunks(tabpfn, X_test, "test", max_chunk_size=2000)
         
         # Using custom embedding function
         def custom_embedder(model, data):

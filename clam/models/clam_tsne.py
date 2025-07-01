@@ -15,7 +15,6 @@ import logging
 import tempfile
 import json
 from pathlib import Path
-from sklearn.model_selection import train_test_split
 from typing import Dict, Any, Optional, List, Tuple, Union
 import matplotlib.pyplot as plt
 
@@ -986,10 +985,8 @@ class ClamTsneClassifier:
             if X_test is not None and self.selected_feature_indices is not None:
                 X_test = X_test_array
         
-        # Create validation split for TabPFN
-        X_train_fit, X_val, y_train_fit, y_val = train_test_split(
-            X_train_array, y_train_array, test_size=0.2, random_state=self.seed
-        )
+        # Use all training data (no internal validation split)
+        X_train_fit, y_train_fit = X_train_array, y_train_array
         
         # Store original features for semantic axes computation (before any transformation)
         if self.semantic_axes and self.modality == "tabular":
@@ -1007,7 +1004,7 @@ class ClamTsneClassifier:
                 X_test_for_embedding = X_train_fit[:5]
                 
             self.train_embeddings, self.val_embeddings, self.test_embeddings, self.tabpfn, self.y_train_sample = embedding_method(
-                X_train_fit, y_train_fit, X_val, X_test_for_embedding,
+                X_train_fit, y_train_fit, X_test_for_embedding,
                 max_samples=self.max_tabpfn_samples,
                 embedding_size=self.embedding_size,
                 cache_dir=self.cache_dir,
@@ -1619,20 +1616,23 @@ def evaluate_clam_tsne(dataset, args):
         )
         
         # Use preprocessed data if available, otherwise split data
-        if "X_train" in dataset and "X_test" in dataset and "y_train" in dataset and "y_test" in dataset:
-            # Use preprocessed data which respects balanced_few_shot sampling
-            X_train = dataset["X_train"]
-            X_test = dataset["X_test"]
-            y_train = dataset["y_train"]
-            y_test = dataset["y_test"]
-            logger.info(f"Using preprocessed data - Train: {X_train.shape}, Test: {X_test.shape}")
-        else:
-            # Fall back to splitting raw data
-            X, y = dataset["X"], dataset["y"]
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=0.2, random_state=args.seed
+        # Require pre-split data - no automatic splitting
+        required_keys = ["X_train", "X_test", "y_train", "y_test"]
+        missing_keys = [key for key in required_keys if key not in dataset]
+        
+        if missing_keys:
+            raise ValueError(
+                f"Dataset must contain pre-split data. Missing keys: {missing_keys}. "
+                f"Expected keys: {required_keys}. "
+                f"Please split your data before passing it to CLAM t-SNE."
             )
-            logger.info(f"Split raw data - Train: {X_train.shape}, Test: {X_test.shape}")
+        
+        # Use preprocessed data which respects balanced_few_shot sampling
+        X_train = dataset["X_train"]
+        X_test = dataset["X_test"]
+        y_train = dataset["y_train"]
+        y_test = dataset["y_test"]
+        logger.info(f"Using pre-split data - Train: {X_train.shape}, Test: {X_test.shape}")
         
         # Limit test samples if specified
         if args.max_test_samples and args.max_test_samples < len(X_test):
