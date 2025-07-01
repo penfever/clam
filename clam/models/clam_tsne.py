@@ -669,7 +669,8 @@ class ClamTsneClassifier:
                 point_size=50,
                 use_knn_connections=self.use_knn_connections,
                 nn_k=self.knn_k,
-                show_test_points=self.show_test_points
+                show_test_points=self.show_test_points,
+                zoom_factor=self.zoom_factor
             )
             
             # Get method-specific configuration
@@ -1187,6 +1188,7 @@ class ClamTsneClassifier:
                     perplexity=self.tsne_perplexity,
                     max_iter=self.tsne_max_iter,
                     random_state=self.seed,
+                    zoom_factor=self.zoom_factor,
                     cached_color_mapping={'class_to_color': self.class_color_name_map, 'color_to_class': self.color_to_class_map}
                 )
             else:
@@ -1198,6 +1200,7 @@ class ClamTsneClassifier:
                     max_iter=self.tsne_max_iter,
                     random_state=self.seed,
                     use_3d=self.use_3d,
+                    zoom_factor=self.zoom_factor,
                     cached_color_mapping={'class_to_color': self.class_color_name_map, 'color_to_class': self.color_to_class_map}
                 )
         else:
@@ -1209,6 +1212,7 @@ class ClamTsneClassifier:
                     perplexity=self.tsne_perplexity,
                     max_iter=self.tsne_max_iter,
                     random_state=self.seed,
+                    zoom_factor=self.zoom_factor,
                     cached_color_mapping={'class_to_color': self.class_color_name_map, 'color_to_class': self.color_to_class_map}
                 )
             else:
@@ -1218,6 +1222,7 @@ class ClamTsneClassifier:
                     perplexity=self.tsne_perplexity,
                     max_iter=self.tsne_max_iter,
                     random_state=self.seed,
+                    zoom_factor=self.zoom_factor,
                     cached_color_mapping={'class_to_color': self.class_color_name_map, 'color_to_class': self.color_to_class_map}
                 )
         

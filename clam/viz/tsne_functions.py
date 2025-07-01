@@ -1244,6 +1244,7 @@ def create_tsne_visualization(
     class_names: Optional[List[str]] = None,
     use_semantic_names: bool = False,
     use_3d: bool = False,
+    zoom_factor: float = 2.0,
     cached_color_mapping: Optional[Dict] = None
 ) -> Tuple[np.ndarray, np.ndarray, plt.Figure]:
     """
@@ -1261,6 +1262,7 @@ def create_tsne_visualization(
         max_iter=max_iter,
         random_state=random_state,
         figsize=figsize,
+        zoom_factor=zoom_factor,
         cached_color_mapping=cached_color_mapping
     )
     
@@ -1281,6 +1283,7 @@ def create_tsne_3d_visualization(
     figsize: Tuple[int, int] = (15, 12),
     class_names: Optional[List[str]] = None,
     use_semantic_names: bool = False,
+    zoom_factor: float = 2.0,
     cached_color_mapping: Optional[Dict] = None
 ) -> Tuple[np.ndarray, np.ndarray, plt.Figure]:
     """
@@ -1292,7 +1295,7 @@ def create_tsne_3d_visualization(
     return create_tsne_visualization(
         train_embeddings, train_labels, test_embeddings, test_labels,
         perplexity, max_iter, random_state, figsize, class_names, use_semantic_names, use_3d=True,
-        cached_color_mapping=cached_color_mapping
+        zoom_factor=zoom_factor, cached_color_mapping=cached_color_mapping
     )
 
 
@@ -1365,6 +1368,7 @@ def create_regression_tsne_visualization(
     figsize: Tuple[int, int] = (12, 8),
     colormap: str = 'viridis',
     use_3d: bool = False,
+    zoom_factor: float = 2.0,
     cached_color_mapping: Optional[Dict] = None
 ) -> Tuple[np.ndarray, np.ndarray, plt.Figure]:
     """
@@ -1381,6 +1385,7 @@ def create_regression_tsne_visualization(
         max_iter=max_iter,
         random_state=random_state,
         figsize=figsize,
+        zoom_factor=zoom_factor,
         cached_color_mapping=cached_color_mapping
     )
     
@@ -1477,6 +1482,7 @@ def create_regression_tsne_3d_visualization(
     random_state: int = 42,
     figsize: Tuple[int, int] = (15, 12),
     colormap: str = 'viridis',
+    zoom_factor: float = 2.0,
     cached_color_mapping: Optional[Dict] = None
 ) -> Tuple[np.ndarray, np.ndarray, plt.Figure]:
     """
@@ -1488,7 +1494,7 @@ def create_regression_tsne_3d_visualization(
     return create_regression_tsne_visualization(
         train_embeddings, train_targets, test_embeddings, test_targets,
         perplexity, max_iter, random_state, figsize, colormap, use_3d=True,
-        cached_color_mapping=cached_color_mapping
+        zoom_factor=zoom_factor, cached_color_mapping=cached_color_mapping
     )
 
 
