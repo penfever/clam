@@ -174,12 +174,12 @@ def get_tabpfn_embeddings(
                     if cache_data and isinstance(cache_data, dict):
                         # Extract embeddings and metadata
                         train_embeddings = cache_data["train_embeddings"]
-                        val_embeddings = cache_data["val_embeddings"]
+                        # val_embeddings removed - skip loading it
                         test_embeddings = cache_data["test_embeddings"]
                         y_train_sample = cache_data["y_train_sample"]
                         cache_metadata = cache_data.get("metadata", {})
 
-                        logger.info(f"Loaded embeddings from managed cache - Train: {train_embeddings.shape}, Val: {val_embeddings.shape}, Test: {test_embeddings.shape}")
+                        logger.info(f"Loaded embeddings from managed cache - Train: {train_embeddings.shape}, Val: None, Test: {test_embeddings.shape}")
                         logger.info(f"Cache metadata: {cache_metadata}")
 
                         # Create a dummy TabPFN model since we don't need to fit anymore
@@ -200,11 +200,11 @@ def get_tabpfn_embeddings(
                         if train_embeddings.shape[1] != embedding_size:
                             logger.warning(f"Cached embeddings size ({train_embeddings.shape[1]}) doesn't match requested size ({embedding_size}). Resizing...")
                             # Resize them (using the same resize code as below)
-                            train_embeddings, val_embeddings, test_embeddings = resize_embeddings(
-                                train_embeddings, val_embeddings, test_embeddings, embedding_size
+                            train_embeddings, test_embeddings = resize_embeddings(
+                                train_embeddings, test_embeddings, embedding_size
                             )
 
-                        return train_embeddings, val_embeddings, test_embeddings, tabpfn, y_train_sample
+                        return train_embeddings, None, test_embeddings, tabpfn, y_train_sample
 
                 except Exception as e:
                     logger.warning(f"Error loading cached embeddings from managed cache: {e}. Recomputing...")
@@ -223,12 +223,12 @@ def get_tabpfn_embeddings(
 
                     # Extract embeddings and metadata
                     train_embeddings = cache["train_embeddings"]
-                    val_embeddings = cache["val_embeddings"]
+                    # val_embeddings removed - skip loading it
                     test_embeddings = cache["test_embeddings"]
                     y_train_sample = cache["y_train_sample"]
                     cache_metadata = cache["metadata"].item() if "metadata" in cache else {}
 
-                    logger.info(f"Loaded embeddings from cache - Train: {train_embeddings.shape}, Val: {val_embeddings.shape}, Test: {test_embeddings.shape}")
+                    logger.info(f"Loaded embeddings from cache - Train: {train_embeddings.shape}, Val: None, Test: {test_embeddings.shape}")
                     logger.info(f"Cache metadata: {cache_metadata}")
 
                     # Create a dummy TabPFN model since we don't need to fit anymore
@@ -242,11 +242,11 @@ def get_tabpfn_embeddings(
                     if train_embeddings.shape[1] != embedding_size:
                         logger.warning(f"Cached embeddings size ({train_embeddings.shape[1]}) doesn't match requested size ({embedding_size}). Resizing...")
                         # Resize them (using the same resize code as below)
-                        train_embeddings, val_embeddings, test_embeddings = resize_embeddings(
-                            train_embeddings, val_embeddings, test_embeddings, embedding_size
+                        train_embeddings, test_embeddings = resize_embeddings(
+                            train_embeddings, test_embeddings, embedding_size
                         )
 
-                    return train_embeddings, val_embeddings, test_embeddings, tabpfn, y_train_sample
+                    return train_embeddings, None, test_embeddings, tabpfn, y_train_sample
 
                 except Exception as e:
                     logger.warning(f"Error loading cached embeddings: {e}. Recomputing...")
@@ -407,8 +407,8 @@ def get_tabpfn_embeddings(
 
     # Resize embeddings to target size if needed
     if embedding_dim != embedding_size:
-        train_embeddings, val_embeddings, test_embeddings = resize_embeddings(
-            train_embeddings, val_embeddings, test_embeddings, embedding_size
+        train_embeddings, test_embeddings = resize_embeddings(
+            train_embeddings, test_embeddings, embedding_size
         )
 
     # Cache the embeddings if cache_dir is provided
@@ -447,7 +447,6 @@ def get_tabpfn_embeddings(
                 np.savez(
                     cache_file,
                     train_embeddings=train_embeddings,
-                    val_embeddings=val_embeddings,
                     test_embeddings=test_embeddings,
                     y_train_sample=y_train_sample,
                     metadata=cache_metadata
@@ -457,7 +456,7 @@ def get_tabpfn_embeddings(
 
     logger.info(f"Final embedding shapes - Train: {train_embeddings.shape}, Val: None, Test: {test_embeddings.shape}")
 
-    return train_embeddings, val_embeddings, test_embeddings, tabpfn, y_train_sample
+    return train_embeddings, None, test_embeddings, tabpfn, y_train_sample
 
 def get_embeddings_in_chunks(
     model: Any, 
@@ -543,23 +542,21 @@ def get_embeddings_in_chunks(
     logger.info(f"Final concatenated {dataset_name} embeddings shape: {concatenated.shape}")
     return concatenated
 
-def resize_embeddings(train_embeddings, val_embeddings, test_embeddings, embedding_size):
+def resize_embeddings(train_embeddings, test_embeddings, embedding_size):
     """Helper function to resize embeddings to target size."""
     embedding_dim = train_embeddings.shape[-1]
     logger.info(f"Resizing embeddings from {embedding_dim} to {embedding_size}")
 
     # Create new arrays with target size
     train_embeddings_resized = np.zeros((train_embeddings.shape[0], embedding_size))
-    val_embeddings_resized = np.zeros((val_embeddings.shape[0], embedding_size))
     test_embeddings_resized = np.zeros((test_embeddings.shape[0], embedding_size))
 
     # Copy over the data (either truncate or zero-pad)
     copy_dim = min(embedding_dim, embedding_size)
     train_embeddings_resized[:, :copy_dim] = train_embeddings[:, :copy_dim]
-    val_embeddings_resized[:, :copy_dim] = val_embeddings[:, :copy_dim]
     test_embeddings_resized[:, :copy_dim] = test_embeddings[:, :copy_dim]
 
-    return train_embeddings_resized, val_embeddings_resized, test_embeddings_resized
+    return train_embeddings_resized, test_embeddings_resized
 
 
 def prepare_tabpfn_embeddings_for_prefix(
