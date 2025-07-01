@@ -1233,13 +1233,23 @@ class ClamTsneClassifier:
                 semantic_class_names = class_names
                 self.class_names = class_names
             else:
-                # Extract semantic class names with fallback
-                semantic_class_names, _ = extract_class_names_from_labels(
-                    labels=self.unique_classes.tolist() if self.unique_classes is not None else [],
-                    dataset_name=kwargs.get('dataset_name', None),
-                    semantic_data_dir=kwargs.get('semantic_data_dir', None),
-                    use_semantic=self.use_semantic_names
-                )
+                # Try to use class names from loaded metadata first
+                if (self.use_semantic_names and self._loaded_metadata and 
+                    hasattr(self._loaded_metadata, 'target_classes') and 
+                    self._loaded_metadata.target_classes and
+                    len(self._loaded_metadata.target_classes) == len(self.unique_classes)):
+                    # Extract class names from metadata
+                    semantic_class_names = [tc.name if hasattr(tc, 'name') else f'Class_{i}' 
+                                           for i, tc in enumerate(self._loaded_metadata.target_classes)]
+                    self.logger.info(f"Using semantic class names from metadata: {semantic_class_names}")
+                else:
+                    # Extract semantic class names with fallback
+                    semantic_class_names, _ = extract_class_names_from_labels(
+                        labels=self.unique_classes.tolist() if self.unique_classes is not None else [],
+                        dataset_name=kwargs.get('dataset_name', None),
+                        semantic_data_dir=kwargs.get('semantic_data_dir', None),
+                        use_semantic=self.use_semantic_names
+                    )
                 self.class_names = semantic_class_names
             
             # Create mapping from numeric labels to semantic names
@@ -1599,11 +1609,21 @@ def evaluate_clam_tsne(dataset, args):
             apply_feature_reduction
         )
         
-        # Split data
-        X, y = dataset["X"], dataset["y"]
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=args.seed
-        )
+        # Use preprocessed data if available, otherwise split data
+        if "X_train" in dataset and "X_test" in dataset and "y_train" in dataset and "y_test" in dataset:
+            # Use preprocessed data which respects balanced_few_shot sampling
+            X_train = dataset["X_train"]
+            X_test = dataset["X_test"]
+            y_train = dataset["y_train"]
+            y_test = dataset["y_test"]
+            logger.info(f"Using preprocessed data - Train: {X_train.shape}, Test: {X_test.shape}")
+        else:
+            # Fall back to splitting raw data
+            X, y = dataset["X"], dataset["y"]
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.2, random_state=args.seed
+            )
+            logger.info(f"Split raw data - Train: {X_train.shape}, Test: {X_test.shape}")
         
         # Limit test samples if specified
         if args.max_test_samples and args.max_test_samples < len(X_test):
@@ -1627,6 +1647,7 @@ def evaluate_clam_tsne(dataset, args):
             max_tabpfn_samples=getattr(args, 'max_tabpfn_samples', 3000),
             cache_dir=getattr(args, 'cache_dir', None),
             use_semantic_names=getattr(args, 'use_semantic_names', False),
+            use_metadata=getattr(args, 'use_metadata', False),
             device=args.device,
             backend=getattr(args, 'backend', 'auto'),
             tensor_parallel_size=getattr(args, 'tensor_parallel_size', 1),
