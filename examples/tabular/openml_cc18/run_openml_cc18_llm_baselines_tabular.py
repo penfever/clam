@@ -322,6 +322,9 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
     
     # Run evaluation command
     logger.info(f"Running command: {' '.join(cmd)}")
+    logger.info(f"Debug - args.use_metadata: {args.use_metadata}")
+    logger.info(f"Debug - args.balanced_few_shot: {args.balanced_few_shot}")
+    logger.info(f"Debug - args.use_semantic_names: {args.use_semantic_names}")
     try:
         subprocess.run(cmd, check=True)
         logger.info(f"LLM baseline evaluation completed for task {task_id}, split {split_idx+1}")
