@@ -475,10 +475,12 @@ def apply_consistent_point_styling(
         )
         
     else:
-        # No labels - use single color (regression case)
+        # Regression case or no labels provided
         metadata['plot_type'] = 'regression'
         metadata['visible_classes'] = []  # No classes in regression
         
+        # For regression, specialized classes like TSNERegressionVisualization handle colorbar creation
+        # This function is primarily for classification legends
         training_style = get_standard_training_point_style()
         if use_3d:
             ax.scatter(
@@ -493,7 +495,7 @@ def apply_consistent_point_styling(
                 transformed_data[:, 1],
                 **training_style
             )
-        legend_text = "No class labels provided"
+        legend_text = "No class labels provided (regression colorbars handled by specialized classes)"
     
     # 2. Plot test points (gray squares) - only if show_test_points is True
     if test_data is not None and show_test_points:
@@ -548,8 +550,11 @@ def apply_consistent_point_styling(
     
     # 5. Create the legend from all labeled artists (this will respect the filtered classes)
     # Only create legend if we have labeled plots (classification case)
-    if y is not None:
+    if y is not None and len(actually_plotted_classes) > 0:
         ax.legend()
+    elif y is not None and len(actually_plotted_classes) == 0:
+        # No visible classes - don't create a legend (matplotlib will warn if we try)
+        pass
     
     return {
         'legend_text': legend_text,
@@ -569,17 +574,17 @@ def apply_consistent_legend_formatting(ax, use_3d: bool = False) -> None:
         ax: Matplotlib axis object
         use_3d: Whether this is a 3D plot
         
-    Raises:
-        ValueError: If no legend exists on the axis (enforces proper separation of concerns)
+    Note:
+        If no legend exists (e.g., when no classes are visible in zoomed view), 
+        this function silently does nothing rather than raising an error.
     """
     # Check if legend already exists
     existing_legend = ax.get_legend()
     if existing_legend is None:
-        raise ValueError(
-            "apply_consistent_legend_formatting() called on axis without existing legend. "
-            "Legend creation should be handled by apply_consistent_point_styling() or other "
-            "content creation functions before calling this formatting function."
-        )
+        # No legend exists (e.g., no visible classes in zoomed view)
+        # This is valid - just add grid and return
+        ax.grid(True, alpha=0.3)
+        return
     
     # Update positioning of existing legend (same for 2D and 3D currently)
     existing_legend.set_bbox_to_anchor((1.05, 1))
