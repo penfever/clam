@@ -40,15 +40,31 @@ def load_datasets_for_evaluation(args) -> List[Dict[str, Any]]:
         try:
             preserve_regression = getattr(args, 'preserve_regression', False)
             X, y, categorical_indicator, attribute_names, dataset_name = load_dataset(args.dataset_name, bypass_size_check=True, preserve_regression=preserve_regression)
+            
+            # Resolve the dataset name to get proper OpenML identifiers
+            from clam.utils.resource_manager import get_resource_manager
+            rm = get_resource_manager()
+            
+            # Try to resolve identifiers using the dataset name
+            try:
+                identifiers = rm.resolve_openml_identifiers(dataset_name=dataset_name)
+                dataset_id = identifiers.get('dataset_id', args.dataset_name)
+                task_id = identifiers.get('task_id')
+            except Exception as resolve_error:
+                logger.warning(f"Could not resolve OpenML identifiers for {dataset_name}: {resolve_error}")
+                dataset_id = args.dataset_name
+                task_id = None
+            
             datasets.append({
-                "id": args.dataset_name,
+                "id": dataset_id,
                 "name": dataset_name,
+                "task_id": task_id,
                 "X": X,
                 "y": y,
                 "categorical_indicator": categorical_indicator,
                 "attribute_names": attribute_names
             })
-            logger.info(f"Successfully loaded dataset {dataset_name}")
+            logger.info(f"Successfully loaded dataset {dataset_name} (ID: {dataset_id}, task_id: {task_id})")
         except Exception as e:
             logger.error(f"Failed to load dataset {args.dataset_name}: {e}")
             raise ValueError(f"Failed to load dataset {args.dataset_name}: {e}")

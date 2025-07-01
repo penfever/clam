@@ -63,7 +63,13 @@ from clam.data import (
     is_csv_dataset,
     load_csv_dataset,
     load_dataset_with_metadata,
-    find_csv_with_fallbacks
+    find_csv_with_fallbacks,
+    preprocess_features,
+    compute_frequency_distribution,
+    compute_label_frequency_mapping,
+    apply_label_mapping,
+    compute_baseline_probabilities,
+    process_tabular_dataset_for_training
 )
 from clam.models import prepare_qwen_with_prefix_embedding, QwenWithPrefixEmbedding, load_pretrained_model
 from clam.models.vq import prepare_qwen_with_vq_prefix_embedding, QwenWithVQPrefixEmbedding, load_vq_pretrained_model
@@ -102,105 +108,102 @@ def load_datasets(args) -> List[Dict[str, Any]]:
     
     return processed_datasets
 
-def preprocess_features(X: np.ndarray, categorical_indicator: List[bool], preserve_categorical: bool = False) -> np.ndarray:
+
+def process_dataset(dataset: Dict[str, Any], args) -> Dict[str, Any]:
     """
-    Preprocess features, converting string features to numeric values 
-    and handling missing values.
+    Process a single dataset for final evaluation.
+    This handles embedding computation and other processing needed beyond basic preprocessing.
     
     Args:
-        X: Feature matrix
-        categorical_indicator: Boolean list indicating categorical features
-        preserve_categorical: If True, keep categorical features as strings for CatBoost
+        dataset: Dictionary with dataset information (may already be preprocessed)
+        args: Command line arguments
         
     Returns:
-        Processed feature matrix
+        Processed dataset with additional fields including embeddings if needed
     """
-    import pandas as pd
     import logging
+    import hashlib
     logger = logging.getLogger(__name__)
     
-    # Convert to DataFrame for easier handling
-    df = pd.DataFrame(X)
+    # Check if dataset processing is needed based on models
+    needs_embeddings = any('/' in model or model.startswith('.') or model.startswith('/') or model == 'clam_tsne' for model in args.models)
     
-    # Process each column
-    for col_idx in range(df.shape[1]):
-        col = df.iloc[:, col_idx]
-        is_categorical = categorical_indicator[col_idx] if col_idx < len(categorical_indicator) else False
+    # If dataset is already processed (has train/test splits), we just need to add embeddings
+    if 'X_train' in dataset and 'y_train' in dataset:
+        logger.info(f"Dataset {dataset['name']} already preprocessed, adding embeddings if needed")
         
-        # Check if column has object/string data
-        if col.dtype == 'object' or is_categorical:
-            if preserve_categorical:
-                # For CatBoost, keep categorical features as strings
-                logger.info(f"Preserving categorical feature at column {col_idx}")
-                # Just handle missing values
-                col_filled = col.fillna('missing')
-                # Ensure we can assign string values by converting the column dtype first
-                df.iloc[:, col_idx] = df.iloc[:, col_idx].astype(object)
-                df.iloc[:, col_idx] = col_filled.astype(str)
-                logger.info(f"  Preserved categorical feature with {col_filled.nunique()} unique values")
-            else:
-                logger.info(f"Converting feature at column {col_idx} to numeric")
+        if not needs_embeddings:
+            logger.info(f"No embeddings needed for dataset {dataset['name']}")
+            return dataset
+        
+        # Add embeddings to already-processed dataset
+        if 'train_embeddings' not in dataset:
+            logger.info(f"Computing TabPFN embeddings for dataset {dataset['name']} with size {args.embedding_size}")
+            
+            # Handle embedding cache directory
+            cache_dir = None
+            if args.embedding_cache_dir.lower() != 'none':
+                cache_dir = args.embedding_cache_dir
+                os.makedirs(cache_dir, exist_ok=True)
+            
+            # Use dataset ID or name as cache identifier
+            dataset_identifier = str(dataset["id"])
+            
+            # Create dataset-specific random seed
+            dataset_id_bytes = str(dataset["id"]).encode('utf-8')
+            dataset_id_hash = int(hashlib.md5(dataset_id_bytes).hexdigest()[:8], 16) % 10000
+            dataset_seed = args.seed + dataset_id_hash
+            
+            # Compute embeddings
+            try:
+                train_embeddings, val_embeddings, test_embeddings, tabpfn, y_train_sample = get_tabpfn_embeddings(
+                    dataset["X_train"], dataset["y_train"], dataset["X_val"], dataset["X_test"],
+                    embedding_size=args.embedding_size,
+                    cache_dir=cache_dir,
+                    dataset_name=dataset_identifier,
+                    force_recompute=args.force_recompute_embeddings,
+                    seed=dataset_seed
+                )
                 
-                # For categorical features, use label encoding
-                try:
-                    from sklearn.preprocessing import LabelEncoder
-                    # Explicitly call infer_objects to handle warnings
-                    col_filled = col.infer_objects(copy=False)
-                    
-                    # Use label encoder
-                    encoder = LabelEncoder()
-                    encoded_values = encoder.fit_transform(col_filled)
-                    
-                    # Ensure column can accept the encoded values
-                    # Convert to appropriate dtype that can hold the encoded values
-                    if encoded_values.max() <= 127 and encoded_values.min() >= -128:
-                        target_dtype = 'int8'
-                    elif encoded_values.max() <= 32767 and encoded_values.min() >= -32768:
-                        target_dtype = 'int16'
-                    else:
-                        target_dtype = 'int32'
-                    
-                    # Assign with compatible dtype
-                    df.iloc[:, col_idx] = df.iloc[:, col_idx].astype(target_dtype)
-                    df.iloc[:, col_idx] = pd.Series(encoded_values, index=df.index, dtype=target_dtype)
-                    logger.info(f"  Encoded {len(encoder.classes_)} unique categories for column {col_idx}")
-                except Exception as e:
-                    logger.warning(f"  Error encoding column {col_idx}: {e}")
-                    # If encoding fails, replace with zeros
-                    df.iloc[:, col_idx] = df.iloc[:, col_idx].astype('int32')
-                    df.iloc[:, col_idx] = pd.Series(np.zeros(len(df), dtype='int32'), index=df.index)
-        else:
-            # For numeric features
-            if preserve_categorical:
-                # For CatBoost, we can keep NaN values as it handles them natively
-                # Just ensure the column is numeric type
-                if col.dtype == 'object':
-                    # Try to convert to numeric
-                    df.iloc[:, col_idx] = pd.to_numeric(col, errors='coerce')
-                    logger.info(f"  Converted object column {col_idx} to numeric for CatBoost")
-                # CatBoost handles NaN values, so we don't fill them
-            else:
-                # For other models, fill NaN values
-                if col.isna().any():
-                    # If more than 75% of the values are NaN, fill with zeros
-                    if col.isna().mean() > 0.75:
-                        fill_value = 0
-                    # Otherwise, use the median
-                    else:
-                        fill_value = col.median() if not np.isnan(col.median()) else 0
-                    
-                    # Use Series constructor to ensure type compatibility
-                    filled_col = col.fillna(fill_value)
-                    # Ensure compatible dtype before assignment
-                    if df.iloc[:, col_idx].dtype != filled_col.dtype:
-                        df.iloc[:, col_idx] = df.iloc[:, col_idx].astype(filled_col.dtype)
-                    df.iloc[:, col_idx] = pd.Series(filled_col, index=df.index)
-                    logger.info(f"  Filled {col.isna().sum()} missing values in column {col_idx}")
+                # Add embeddings to dataset
+                dataset.update({
+                    "train_embeddings": train_embeddings,
+                    "val_embeddings": val_embeddings,
+                    "test_embeddings": test_embeddings,
+                    "y_train_sample": y_train_sample,
+                    "tabpfn_model": tabpfn
+                })
+                
+                logger.info(f"Computed embeddings - Train: {train_embeddings.shape}, Val: {val_embeddings.shape}, Test: {test_embeddings.shape}")
+                
+            except Exception as e:
+                logger.error(f"Failed to compute TabPFN embeddings for dataset {dataset['name']}: {e}")
+                raise
+        
+        return dataset
     
-    # Convert back to numpy array
-    X_processed = df.values
-    
-    return X_processed
+    else:
+        # Dataset needs full processing from scratch
+        logger.info(f"Dataset {dataset['name']} needs full processing")
+        
+        processed_dataset = process_tabular_dataset_for_training(
+            dataset=dataset,
+            embedding_size=args.embedding_size,
+            max_train_samples=args.max_train_samples,
+            max_test_samples=args.max_test_samples,
+            sampling_strategy=args.sampling_strategy,
+            test_size=0.2,
+            val_size=0.5,
+            preserve_regression=getattr(args, 'preserve_regression', False),
+            task_type=getattr(args, 'task_type', None),
+            seed=args.seed,
+            force_recompute_embeddings=args.force_recompute_embeddings,
+            embedding_cache_dir=args.embedding_cache_dir,
+            compute_embeddings=needs_embeddings
+        )
+        
+        return processed_dataset
+
 
 def get_token_ids_from_model(tokenizer):
     """Extract special token IDs from tokenizer."""
@@ -318,508 +321,6 @@ def load_embeddings_with_limit(cache_file, max_test_samples=None):
     logger.info(f"Loaded embeddings with limits - Val: {val_to_load}/{val_count}, Test: {test_to_load}/{test_count}")
     
     return train_embeddings, val_embeddings, test_embeddings, y_train_sample
-
-def process_dataset(dataset: Dict[str, Any], args) -> Dict[str, Any]:
-    """
-    Process a single dataset: split into train/val/test, compute embeddings, and create LLM datasets.
-    
-    Args:
-        dataset: Dictionary with dataset information
-        args: Command line arguments
-        
-    Returns:
-        Processed dataset with additional fields
-    """
-    import logging
-    logger = logging.getLogger(__name__)
-    
-    # Get the dataset attributes
-    X = dataset["X"]
-    y = dataset["y"]
-    categorical_indicator = dataset.get("categorical_indicator", [False] * X.shape[1])
-    
-    # Store the categorical indicator for CatBoost preprocessing later
-    dataset["categorical_indicator_raw"] = categorical_indicator.copy() if hasattr(categorical_indicator, 'copy') else list(categorical_indicator)
-    
-    # Preprocess features to convert strings to numeric
-    X = preprocess_features(X, categorical_indicator)
-    
-    # Determine if this is a classification or regression task
-    from clam.utils.task_detection import detect_task_type
-    
-    # Check for manual task type override in args
-    manual_task_type = getattr(args, 'task_type', None)
-    preserve_regression = getattr(args, 'preserve_regression', False)
-    
-    # Use task detection to determine task type
-    try:
-        # Get task_id from dataset if available
-        task_id = dataset.get('task_id')
-        if task_id is None and 'id' in dataset:
-            try:
-                task_id = int(dataset['id'])
-            except (ValueError, TypeError):
-                task_id = None
-        
-        task_type, detection_method = detect_task_type(
-            dataset=dataset,
-            y=y,
-            manual_override=manual_task_type,
-            task_id=task_id
-        )
-        
-        is_classification = (task_type == 'classification')
-        logger.info(f"Dataset {dataset['name']}: Detected {task_type} task using {detection_method}")
-        
-    except Exception as e:
-        # Fallback to heuristic detection if task detection fails
-        logger.warning(f"Task detection failed for dataset {dataset['name']}: {e}")
-        logger.info("Falling back to heuristic task type detection")
-        
-        if preserve_regression:
-            # Try to preserve regression tasks when flag is set
-            is_classification = False
-            unique_vals = np.unique(y) if isinstance(y, np.ndarray) else np.unique(np.array(y))
-            
-            # Override to classification only if clearly discrete
-            if len(unique_vals) <= 10 and (
-                y.dtype.kind == 'O' or  # String labels
-                (y.dtype.kind in ('i', 'u')) or  # Integer with few values
-                (y.dtype.kind == 'f' and all(float(val).is_integer() for val in unique_vals))  # Integer-like floats
-            ):
-                is_classification = True
-                logger.info(f"Overriding to classification due to {len(unique_vals)} discrete values")
-            else:
-                logger.info(f"Preserving as regression task with {len(unique_vals)} unique values")
-        else:
-            # Default to classification (legacy behavior)
-            is_classification = True
-            logger.info("Defaulting to classification task (legacy behavior)")
-    
-    # Process labels based on task type
-    if isinstance(y, np.ndarray):
-        if is_classification:
-            # Classification task processing
-            if y.dtype.kind == 'O':
-                logger.info(f"Dataset {dataset['name']} has string labels. Encoding to integers.")
-                from sklearn.preprocessing import LabelEncoder
-                encoder = LabelEncoder()
-                y = encoder.fit_transform(y)
-                logger.info(f"Encoded {len(encoder.classes_)} unique classes")
-            elif y.dtype.kind == 'f':  # Float type for classification
-                unique_vals = np.unique(y)
-                if len(unique_vals) <= 10 and all(float(val).is_integer() for val in unique_vals):
-                    # Convert to integers for classification
-                    logger.info(f"Dataset {dataset['name']} has {len(unique_vals)} discrete float values. Converting to integers.")
-                    y = y.astype(int)
-                else:
-                    # Bin continuous values for classification
-                    logger.info(f"Dataset {dataset['name']} has continuous target. Converting to classification by binning.")
-                    from sklearn.preprocessing import KBinsDiscretizer
-                    n_bins = min(10, len(np.unique(y)))
-                    discretizer = KBinsDiscretizer(n_bins=n_bins, encode='ordinal', strategy='quantile')
-                    y = discretizer.fit_transform(y.reshape(-1, 1)).flatten().astype(int)
-                    logger.info(f"Binned continuous target into {n_bins} classes")
-                    dataset["target_discretizer"] = discretizer
-            else:
-                # Integer classification - keep as is
-                unique_vals = np.unique(y)
-                logger.info(f"Dataset {dataset['name']} has {len(unique_vals)} unique integer values for classification")
-        else:
-            # Regression task processing
-            if y.dtype.kind == 'O':
-                # String labels for regression - try to convert to numeric
-                logger.warning(f"Dataset {dataset['name']} has string labels but is detected as regression. Attempting conversion.")
-                try:
-                    import pandas as pd
-                    y = pd.to_numeric(y, errors='coerce')
-                    if np.isnan(y).any():
-                        logger.error(f"Cannot convert string labels to numeric for regression. Falling back to classification.")
-                        from sklearn.preprocessing import LabelEncoder
-                        encoder = LabelEncoder()
-                        y = encoder.fit_transform(y)
-                        is_classification = True
-                except Exception:
-                    logger.error(f"Failed to convert string labels for regression. Falling back to classification.")
-                    from sklearn.preprocessing import LabelEncoder
-                    encoder = LabelEncoder()
-                    y = encoder.fit_transform(y)
-                    is_classification = True
-            else:
-                # Numeric regression - keep as is
-                unique_vals = np.unique(y)
-                logger.info(f"Dataset {dataset['name']} has {len(unique_vals)} unique values for regression (range: {y.min():.3f} to {y.max():.3f})")
-    
-    # Use args.seed and dataset ID to create a dataset-specific but reproducible random state
-    # This ensures different datasets get different splits, but the same dataset always gets the same split
-    # Use hashlib for stable hashing across Python sessions
-    import hashlib
-    dataset_id_bytes = str(dataset["id"]).encode('utf-8')
-    dataset_id_hash = int(hashlib.md5(dataset_id_bytes).hexdigest()[:8], 16) % 10000
-    dataset_specific_seed = args.seed + dataset_id_hash
-    
-    # Split into train, validation, and test
-    X_train, X_temp, y_train, y_temp = train_test_split(
-        X, y, test_size=0.3, random_state=dataset_specific_seed
-    )
-    X_val, X_test, y_val, y_test = train_test_split(
-        X_temp, y_temp, test_size=0.5, random_state=dataset_specific_seed
-    )
-    
-    logger.info(f"Dataset {dataset['name']} shapes - Train: {X_train.shape}, Val: {X_val.shape}, Test: {X_test.shape}")
-    
-    # Apply max_train_samples limit if specified
-    if args.max_train_samples and args.max_train_samples < len(X_train):
-        logger.info(f"Limiting training data to {args.max_train_samples} samples (from {len(X_train)} available) using {args.sampling_strategy} sampling")
-        
-        # Use deterministic sampling based on the dataset-specific seed
-        np.random.seed(dataset_specific_seed)
-        
-        if args.sampling_strategy == "balanced":
-            # Balanced sampling: equal samples per class
-            unique_classes = np.unique(y_train)
-            num_classes = len(unique_classes)
-            
-            # Calculate how many examples to take from each class
-            target_samples = args.max_train_samples
-            examples_per_class = target_samples // num_classes
-            remainder = target_samples % num_classes
-            
-            # Initialize list to hold selected indices
-            selected_indices = []
-            
-            for i, class_label in enumerate(unique_classes):
-                # Get indices for this class
-                class_indices = np.where(y_train == class_label)[0]
-                
-                # Determine how many samples to take from this class
-                samples_from_class = examples_per_class + (1 if i < remainder else 0)
-                samples_from_class = min(samples_from_class, len(class_indices))
-                
-                # Randomly sample from this class
-                if samples_from_class > 0:
-                    chosen_indices = np.random.choice(class_indices, samples_from_class, replace=False)
-                    selected_indices.extend(chosen_indices)
-                    
-                logger.info(f"  Class {class_label}: selected {samples_from_class} out of {len(class_indices)} samples")
-            
-            # Convert to numpy array and sort for consistency
-            indices = np.array(selected_indices)
-            indices.sort()
-        else:
-            # Random sampling: simple random selection
-            indices = np.random.choice(len(X_train), args.max_train_samples, replace=False)
-            indices.sort()  # Sort to maintain some consistency
-        
-        # Apply the selected indices
-        X_train = X_train.iloc[indices] if hasattr(X_train, 'iloc') else X_train[indices]
-        y_train = y_train.iloc[indices] if hasattr(y_train, 'iloc') else y_train[indices]
-        logger.info(f"Training data limited to {len(X_train)} samples")
-    
-    # Skip embeddings if only running baseline models (no CLAM models needed)
-    needs_embeddings = any('/' in model or model.startswith('.') or model.startswith('/') or model == 'clam_tsne' for model in args.models)
-    if not needs_embeddings:
-        logger.info(f"Skipping TabPFN embeddings for dataset {dataset['name']} (no CLAM models specified)")
-        
-        # Add processed data to the dataset dictionary without embeddings
-        dataset.update({
-            "X_train": X_train,
-            "y_train": y_train,
-            "X_val": X_val,
-            "y_val": y_val,
-            "X_test": X_test,
-            "y_test": y_test,
-            "is_classification": is_classification
-        })
-    else:
-        # Get TabPFN embeddings
-        logger.info(f"Computing TabPFN embeddings for dataset {dataset['name']} with size {args.embedding_size}")
-        
-        # Handle embedding cache directory
-        cache_dir = None
-        if args.embedding_cache_dir.lower() != 'none':
-            cache_dir = args.embedding_cache_dir
-            # Create the directory if it doesn't exist
-            os.makedirs(cache_dir, exist_ok=True)
-            
-        # Use dataset ID or name as cache identifier
-        dataset_identifier = str(dataset["id"])
-        
-        # Check if we have cached embeddings and whether they need subsetting based on max_test_samples
-        cache_file = None
-        if cache_dir and not args.force_recompute_embeddings:
-            from clam.data.embeddings import generate_dataset_hash
-            dataset_hash = generate_dataset_hash(X_train, y_train, args.embedding_size, dataset_identifier)
-            prefix = f"{dataset_identifier}_"
-            cache_file = os.path.join(cache_dir, f"{prefix}tabpfn_embeddings_{dataset_hash}.npz")
-            
-            if os.path.exists(cache_file):
-                logger.info(f"Found cached embeddings at {cache_file}")
-                try:
-                    # Use the utility function to load embeddings with limit
-                    train_embeddings, val_embeddings, test_embeddings, y_train_sample = load_embeddings_with_limit(
-                        cache_file, args.max_test_samples
-                    )
-                    
-                    # Create dummy TabPFN model since we loaded from cache
-                    from tabpfn import TabPFNClassifier
-                    tabpfn = TabPFNClassifier(
-                        device='cuda' if torch.cuda.is_available() else 'cpu',
-                        n_estimators=8,
-                        ignore_pretraining_limits=True
-                    )
-                    
-                    logger.info(f"Loaded cached embeddings - Train: {train_embeddings.shape}, Val: {val_embeddings.shape}, Test: {test_embeddings.shape}")
-                    
-                except Exception as e:
-                    logger.warning(f"Failed to load cached embeddings: {e}. Falling back to regular loading.")
-                    # If cache loading fails, fall back to regular computation
-                    train_embeddings, val_embeddings, test_embeddings, tabpfn, y_train_sample = get_tabpfn_embeddings(
-                        X_train, y_train, X_val, X_test,
-                        embedding_size=args.embedding_size,
-                        cache_dir=cache_dir,
-                        dataset_name=dataset_identifier,
-                        force_recompute=args.force_recompute_embeddings,
-                        seed=dataset_specific_seed
-                    )
-            else:
-                # No cache file exists, compute embeddings
-                train_embeddings, val_embeddings, test_embeddings, tabpfn, y_train_sample = get_tabpfn_embeddings(
-                    X_train, y_train, X_val, X_test,
-                    embedding_size=args.embedding_size,
-                    cache_dir=cache_dir,
-                    dataset_name=dataset_identifier,
-                    force_recompute=args.force_recompute_embeddings,
-                    seed=dataset_specific_seed
-                )
-        else:
-            # No cache dir or force recompute
-            train_embeddings, val_embeddings, test_embeddings, tabpfn, y_train_sample = get_tabpfn_embeddings(
-                X_train, y_train, X_val, X_test,
-                embedding_size=args.embedding_size,
-                cache_dir=cache_dir,
-                dataset_name=dataset_identifier,
-                force_recompute=args.force_recompute_embeddings,
-                seed=dataset_specific_seed
-            )
-
-        # Add processed data to the dataset dictionary with embeddings
-        dataset.update({
-            "X_train": X_train,
-            "y_train": y_train,
-            "X_val": X_val,
-            "y_val": y_val,
-            "X_test": X_test,
-            "y_test": y_test,
-            "train_embeddings": train_embeddings,
-            "val_embeddings": val_embeddings,
-            "test_embeddings": test_embeddings,
-            "y_train_sample": y_train_sample,
-            "is_classification": is_classification
-        })
-    
-    return dataset
-
-def compute_label_frequency_mapping(true_labels: np.ndarray, predicted_labels: np.ndarray, threshold: float = 0.05) -> Optional[Dict[int, int]]:
-    """
-    Compute the optimal label mapping from predicted labels to true labels based on frequency matching.
-    Uses the Hungarian algorithm to find the optimal permutation that minimizes total frequency difference.
-    
-    Args:
-        true_labels: Ground truth labels
-        predicted_labels: Model predictions  
-        threshold: Minimum frequency difference threshold to trigger label remapping
-        
-    Returns:
-        Dictionary mapping predicted label to true label, or None if no remapping needed
-    """
-    import logging
-    logger = logging.getLogger(__name__)
-    
-    # Get unique labels and their frequencies
-    true_unique, true_counts = np.unique(true_labels, return_counts=True)
-    pred_unique, pred_counts = np.unique(predicted_labels, return_counts=True)
-    
-    # Compute frequencies
-    true_freq = true_counts / len(true_labels)
-    pred_freq = pred_counts / len(predicted_labels)
-    
-    # Handle case where predicted labels don't include all true labels
-    n_classes = max(len(true_unique), len(pred_unique))
-    
-    # Create frequency arrays with zeros for missing labels
-    true_freq_full = np.zeros(n_classes)
-    pred_freq_full = np.zeros(n_classes)
-    
-    for i, label in enumerate(true_unique):
-        if label < n_classes:
-            true_freq_full[label] = true_freq[i]
-    
-    for i, label in enumerate(pred_unique):
-        if label < n_classes:
-            pred_freq_full[label] = pred_freq[i]
-    
-    # Create cost matrix (frequency differences)
-    cost_matrix = np.abs(true_freq_full[:, np.newaxis] - pred_freq_full[np.newaxis, :])
-    
-    # Find optimal assignment using Hungarian algorithm
-    row_indices, col_indices = linear_sum_assignment(cost_matrix)
-    
-    # Create mapping
-    label_mapping = dict(zip(col_indices, row_indices))
-    
-    # Check if remapping is needed (any frequency difference exceeds threshold)
-    max_diff = np.max(cost_matrix[row_indices, col_indices])
-    
-    logger.info(f"Label frequency analysis:")
-    logger.info(f"True label frequencies: {dict(zip(true_unique, true_freq))}")
-    logger.info(f"Predicted label frequencies: {dict(zip(pred_unique, pred_freq))}")
-    logger.info(f"Maximum frequency difference after optimal mapping: {max_diff:.4f}")
-    
-    if max_diff > threshold:
-        logger.info(f"Label remapping triggered (max diff {max_diff:.4f} > threshold {threshold})")
-        logger.info(f"Label mapping: {label_mapping}")
-        return label_mapping
-    else:
-        logger.info(f"No label remapping needed (max diff {max_diff:.4f} <= threshold {threshold})")
-        return None
-
-def apply_label_mapping(predictions: np.ndarray, label_mapping: Dict[int, int]) -> np.ndarray:
-    """
-    Apply label mapping to predictions.
-    
-    Args:
-        predictions: Array of predicted labels
-        label_mapping: Dictionary mapping from predicted to true labels
-        
-    Returns:
-        Remapped predictions
-    """
-    # Ensure predictions is a numpy array
-    predictions = np.array(predictions)
-    remapped = predictions.copy()
-    
-    for pred_label, true_label in label_mapping.items():
-        mask = predictions == pred_label
-        remapped[mask] = true_label
-    
-    return remapped
-
-def compute_frequency_distribution(labels: np.ndarray, label_names: Optional[List[str]] = None) -> Dict[str, Any]:
-    """
-    Compute frequency distribution of labels.
-    
-    Args:
-        labels: Array of labels
-        label_names: Optional list of label names, if available
-        
-    Returns:
-        Dictionary with frequency distribution information
-    """
-    unique_labels, counts = np.unique(labels, return_counts=True)
-    frequencies = counts / len(labels)
-    
-    # Create label name mapping
-    if label_names is not None:
-        label_map = {i: name for i, name in enumerate(label_names)}
-    else:
-        label_map = {label: str(label) for label in unique_labels}
-    
-    distribution = {
-        'counts': {label_map.get(label, str(label)): int(count) for label, count in zip(unique_labels, counts)},
-        'frequencies': {label_map.get(label, str(label)): float(freq) for label, freq in zip(unique_labels, frequencies)},
-        'total_samples': len(labels)
-    }
-    
-    return distribution
-
-def compute_baseline_probabilities(
-    model: torch.nn.Module,
-    tokenizer: Any,
-    dataset: Dict[str, Any],
-    class_token_ids: List[int],
-    prefix_start_id: int,
-    prefix_end_id: int,
-    prefix_data_file: str,
-    sample_ratio: float = 0.1,
-    max_samples: int = 1000
-) -> np.ndarray:
-    """
-    Compute baseline probabilities for each class token from a sample of training data.
-    
-    Args:
-        model: The model to evaluate
-        tokenizer: The tokenizer
-        dataset: Dataset containing training data
-        class_token_ids: List of token IDs for classes
-        prefix_start_id: Token ID for prefix start
-        prefix_end_id: Token ID for prefix end
-        prefix_data_file: Path to prefix data file
-        sample_ratio: Ratio of training data to sample
-        max_samples: Maximum number of samples to use
-        
-    Returns:
-        Array of baseline probabilities for each class
-    """
-    import logging
-    from clam.data import create_llm_dataset
-    from clam.train import evaluate_llm_on_test_set
-    
-    logger = logging.getLogger(__name__)
-    logger.info(f"Computing baseline probabilities from training sample")
-    
-    # Sample from training data
-    # Note: embeddings may have fewer rows than X_train, so we need to sample from embedding indices
-    n_embeddings = len(dataset["train_embeddings"])
-    n_samples = min(int(n_embeddings * sample_ratio), max_samples, n_embeddings)
-    
-    # Create a deterministic RNG for this sampling to ensure reproducibility
-    rng = np.random.RandomState(seed=42)  # Use fixed seed for consistent baseline calibration
-    sample_indices = rng.choice(n_embeddings, size=n_samples, replace=False)
-    
-    # Use the same indices for X, y, and embeddings
-    X_sample = dataset["X_train"][:n_embeddings][sample_indices]
-    y_sample = dataset["y_train"][:n_embeddings][sample_indices]
-    embeddings_sample = dataset["train_embeddings"][sample_indices]
-    
-    # Create temporary dataset for baseline computation - use arrays with proper shape but zero rows
-    empty_X = np.empty((0, X_sample.shape[1]))
-    empty_y = np.array([])
-    empty_embeddings = np.empty((0, embeddings_sample.shape[1]))
-    
-    baseline_dataset, _, _, label_encoder, _ = create_llm_dataset(
-        X_sample, y_sample,
-        empty_X, empty_y,  # Empty validation set
-        empty_X, empty_y,  # Empty test set
-        embeddings_sample, empty_embeddings, empty_embeddings,
-        tokenizer, prefix_start_id, prefix_end_id, class_token_ids,
-        output_dir="/tmp/baseline_calibration",
-        num_few_shot_examples=10  # Use fewer examples for faster computation during calibration
-    )
-    
-    # Get probabilities for each sample
-    logger.info(f"Getting probabilities for {len(baseline_dataset)} samples")
-    
-    # Evaluate and extract raw probabilities
-    results = evaluate_llm_on_test_set(
-        model, tokenizer, baseline_dataset,
-        label_encoder, prefix_start_id, prefix_end_id,
-        class_token_ids, prefix_data_file,
-        max_test_samples=len(baseline_dataset),
-        return_raw_probabilities=True  # We'll need to add this parameter
-    )
-    
-    # Extract raw probabilities matrix if available
-    if 'raw_probabilities' in results:
-        # raw_probabilities should be shape (n_samples, n_classes)
-        prob_matrix = np.array(results['raw_probabilities'])
-        baseline_probs = np.mean(prob_matrix, axis=0)
-        
-        logger.info(f"Baseline probabilities: {baseline_probs}")
-        return baseline_probs
-    else:
-        logger.warning("Raw probabilities not available, using uniform baseline")
-        return np.ones(len(class_token_ids)) / len(class_token_ids)
 
 def evaluate_dataset(dataset: Dict[str, Any], model, tokenizer, prefix_start_id, prefix_end_id, class_token_ids, args):
     """
@@ -1029,12 +530,14 @@ def evaluate_dataset(dataset: Dict[str, Any], model, tokenizer, prefix_start_id,
             label_names = [str(cls) for cls in label_encoder.classes_]
         
         # Compute distributions
-        prediction_distribution = compute_frequency_distribution(predictions, label_names)
-        ground_truth_distribution = compute_frequency_distribution(y_test, label_names)
+        prediction_distribution = None
+        ground_truth_distribution = None
         
-        # Log the distributions
-        logger.info(f"Prediction frequency distribution: {prediction_distribution['frequencies']}")
-        logger.info(f"Ground truth frequency distribution: {ground_truth_distribution['frequencies']}")
+        # Log basic distribution info
+        unique_pred, pred_counts = np.unique(predictions, return_counts=True)
+        unique_true, true_counts = np.unique(y_test, return_counts=True)
+        logger.info(f"Prediction distribution: {dict(zip(unique_pred, pred_counts))}")
+        logger.info(f"Ground truth distribution: {dict(zip(unique_true, true_counts))}")
     
     # Log results
     logger.info(f"Test accuracy on {dataset['name']}: {results['accuracy']:.4f}")
@@ -1526,12 +1029,14 @@ def create_and_evaluate_baseline_model(model_name, dataset, args):
             cm = None
         
         # Compute frequency distributions for classification
-        prediction_distribution = compute_frequency_distribution(y_pred)
-        ground_truth_distribution = compute_frequency_distribution(y_test_for_eval)
+        prediction_distribution = None
+        ground_truth_distribution = None
         
-        # Log the distributions
-        logger.info(f"Prediction frequency distribution: {prediction_distribution['frequencies']}")
-        logger.info(f"Ground truth frequency distribution: {ground_truth_distribution['frequencies']}")
+        # Log basic distribution info
+        unique_pred, pred_counts = np.unique(y_pred, return_counts=True)
+        unique_true, true_counts = np.unique(y_test_for_eval, return_counts=True)
+        logger.info(f"Prediction distribution: {dict(zip(unique_pred, pred_counts))}")
+        logger.info(f"Ground truth distribution: {dict(zip(unique_true, true_counts))}")
         
         # Store classification-specific metrics
         mse = None
@@ -1688,12 +1193,14 @@ def create_and_evaluate_llm_model(model_id, dataset, args, cached_model=None):
     
     # Compute frequency distributions
     if len(predictions) > 0:
-        prediction_distribution = compute_frequency_distribution(predictions)
-        ground_truth_distribution = compute_frequency_distribution(y_test)
+        prediction_distribution = None
+        ground_truth_distribution = None
         
-        # Log the distributions
-        logger.info(f"Prediction frequency distribution: {prediction_distribution['frequencies']}")
-        logger.info(f"Ground truth frequency distribution: {ground_truth_distribution['frequencies']}")
+        # Log basic distribution info
+        unique_pred, pred_counts = np.unique(predictions, return_counts=True)
+        unique_true, true_counts = np.unique(y_test, return_counts=True)
+        logger.info(f"Prediction distribution: {dict(zip(unique_pred, pred_counts))}")
+        logger.info(f"Ground truth distribution: {dict(zip(unique_true, true_counts))}")
     else:
         prediction_distribution = None
         ground_truth_distribution = None
@@ -1991,33 +1498,18 @@ def main():
                     metrics_logger.log_all_metrics(metrics_dict)
                     
                     # Log frequency distributions
-                    if 'prediction_distribution' in results and 'ground_truth_distribution' in results:
+                    if 'prediction_distribution' in results and 'ground_truth_distribution' in results and results['prediction_distribution'] is not None:
                         pred_dist = results['prediction_distribution']
                         gt_dist = results['ground_truth_distribution']
                         
                         # Log frequency distributions to console
                         logger.info(f"\\n{'='*20} FREQUENCY DISTRIBUTION SUMMARY {'='*20}")
                         logger.info(f"Dataset: {dataset['name']}, Model: {model_name}")
-                        logger.info(f"Prediction Distribution: {pred_dist['frequencies']}")
-                        logger.info(f"Ground Truth Distribution: {gt_dist['frequencies']}")
+                        logger.info(f"Prediction Distribution: {pred_dist}")
+                        logger.info(f"Ground Truth Distribution: {gt_dist}")
                         logger.info(f"{'='*66}")
                         
-                        # Log to W&B - both counts and frequencies using unified metric keys
-                        freq_log_dict = {}
-                        for label, freq in pred_dist['frequencies'].items():
-                            key = metrics_logger._get_metric_key(f"pred_freq/{label}")
-                            freq_log_dict[key] = freq
-                        for label, freq in gt_dist['frequencies'].items():
-                            key = metrics_logger._get_metric_key(f"gt_freq/{label}")
-                            freq_log_dict[key] = freq
-                        for label, count in pred_dist['counts'].items():
-                            key = metrics_logger._get_metric_key(f"pred_count/{label}")
-                            freq_log_dict[key] = count
-                        for label, count in gt_dist['counts'].items():
-                            key = metrics_logger._get_metric_key(f"gt_count/{label}")
-                            freq_log_dict[key] = count
-                        
-                        wandb.log(freq_log_dict)
+                        # Note: Detailed W&B frequency logging disabled since frequency distributions are simplified
                     
                     # Confusion matrix is already handled by the unified metrics system
                     # The log_all_metrics call above will handle it automatically
@@ -2210,28 +1702,16 @@ def main():
         
         # Process each dataset result for this model
         for result in model_results:
-            if 'prediction_distribution' in result and 'ground_truth_distribution' in result:
+            if 'prediction_distribution' in result and 'ground_truth_distribution' in result and result['prediction_distribution'] is not None:
                 dataset_name = result['dataset_name']
-                pred_dist = result['prediction_distribution']['frequencies']
-                gt_dist = result['ground_truth_distribution']['frequencies']
+                pred_dist = result['prediction_distribution']
+                gt_dist = result['ground_truth_distribution']
                 
                 logger.info(f"\nDataset: {dataset_name}")
                 logger.info(f"  Ground Truth Distribution: {gt_dist}")
                 logger.info(f"  Prediction Distribution:   {pred_dist}")
                 
-                # Calculate distribution difference
-                all_labels = set(pred_dist.keys()) | set(gt_dist.keys())
-                max_diff = 0
-                diffs = {}
-                for label in all_labels:
-                    pred_freq = pred_dist.get(label, 0.0)
-                    gt_freq = gt_dist.get(label, 0.0)
-                    diff = abs(pred_freq - gt_freq)
-                    diffs[label] = diff
-                    max_diff = max(max_diff, diff)
-                
-                logger.info(f"  Max frequency difference: {max_diff:.4f}")
-                logger.info(f"  Per-class differences: {diffs}")
+                # Note: Detailed frequency difference calculation disabled since distributions are simplified
     
     logger.info("\n=== End of Frequency Distribution Summary ===\n")
     

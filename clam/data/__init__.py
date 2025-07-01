@@ -30,6 +30,15 @@ from .evaluation_utils import (
     validate_dataset_for_evaluation
 )
 
+from .dataset_tabular import (
+    preprocess_features,
+    process_tabular_dataset_for_training,
+    compute_frequency_distribution,
+    compute_label_frequency_mapping,
+    apply_label_mapping,
+    compute_baseline_probabilities
+)
+
 __all__ = [
     "load_dataset",
     "load_datasets",
@@ -46,5 +55,11 @@ __all__ = [
     "find_csv_with_fallbacks",
     "load_datasets_for_evaluation",
     "preprocess_datasets_for_evaluation",
-    "validate_dataset_for_evaluation"
+    "validate_dataset_for_evaluation",
+    "preprocess_features",
+    "process_tabular_dataset_for_training",
+    "compute_frequency_distribution",
+    "compute_label_frequency_mapping",
+    "apply_label_mapping",
+    "compute_baseline_probabilities"
 ]
