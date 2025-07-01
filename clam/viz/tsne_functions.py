@@ -719,7 +719,9 @@ class KNNMixin:
         knn_labels: np.ndarray,
         knn_distances: np.ndarray,
         class_names: Optional[List[str]] = None,
-        use_semantic_names: bool = False
+        use_semantic_names: bool = False,
+        all_classes: Optional[np.ndarray] = None,
+        cached_color_mapping: Optional[Dict] = None
     ) -> str:
         """
         Create KNN pie chart showing class distribution with distance information.
@@ -730,6 +732,8 @@ class KNNMixin:
             knn_distances: Distances to KNN points [k]
             class_names: Optional class names
             use_semantic_names: Whether to use semantic names
+            all_classes: All possible classes for consistent color mapping
+            cached_color_mapping: Pre-computed color mapping for consistency
             
         Returns:
             Description text for the KNN analysis
@@ -740,9 +744,11 @@ class KNNMixin:
         # Count class occurrences
         label_counts = Counter(knn_labels)
         
-        # Create consistent colors
-        all_classes = np.unique(knn_labels)
-        color_map = create_distinct_color_map(all_classes)
+        # Create consistent colors using all possible classes for color mapping consistency
+        if all_classes is None:
+            all_classes = np.unique(knn_labels)
+        
+        color_map = create_distinct_color_map(all_classes, cached_color_mapping)
         
         # Calculate average distance for each class
         class_avg_distances = {}
@@ -918,7 +924,9 @@ class KNNMixin:
                 else:
                     knn_description = self._create_knn_pie_chart(
                         ax_pie, knn_info['labels'], knn_info['distances'],
-                        kwargs.get('class_names'), kwargs.get('use_semantic_names', False)
+                        kwargs.get('class_names'), kwargs.get('use_semantic_names', False),
+                        all_classes=np.unique(train_data),
+                        cached_color_mapping=getattr(self, 'cached_color_mapping', None)
                     )
                 
                 # Apply consistent legend formatting
@@ -1021,7 +1029,9 @@ class KNNMixin:
                 else:
                     knn_description = self._create_knn_pie_chart(
                         ax_pie, knn_info['labels'], knn_info['distances'],
-                        kwargs.get('class_names'), kwargs.get('use_semantic_names', False)
+                        kwargs.get('class_names'), kwargs.get('use_semantic_names', False),
+                        all_classes=np.unique(train_data),
+                        cached_color_mapping=getattr(self, 'cached_color_mapping', None)
                     )
                 
                 # Use the first plot result for overall metadata
