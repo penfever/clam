@@ -537,7 +537,7 @@ def add_tsne_visualization_args(parser: argparse.ArgumentParser):
     parser.add_argument(
         "--zoom_factor",
         type=float,
-        default=4.0,
+        default=2.0,
         help="Zoom factor for all visualizations"
     )
     parser.add_argument(

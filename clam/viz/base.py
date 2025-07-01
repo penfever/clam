@@ -36,7 +36,7 @@ class VisualizationConfig:
     viewing_angles: Optional[List[Tuple[float, float]]] = None
     
     # Zoom and layout
-    zoom_factor: float = 1.0
+    zoom_factor: float = 2.0
     tight_layout: bool = True
     
     # Text and labels

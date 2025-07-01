@@ -84,12 +84,14 @@ class TSNEGenerator:
         combined_embeddings = np.vstack([train_embeddings, test_embeddings])
         n_train = len(train_embeddings)
         
-        # Step 2: Adjust perplexity based on data size (shared logic)
-        effective_perplexity = min(self.perplexity, (len(combined_embeddings) - 1) // 3)
+        # Step 2: Enhanced perplexity auto-adjustment based on dataset characteristics
+        effective_perplexity = self._calculate_optimal_perplexity(
+            combined_embeddings, train_embeddings, test_embeddings
+        )
         if effective_perplexity != self.perplexity:
             self.logger.warning(
-                f"Adjusting perplexity from {self.perplexity} to {effective_perplexity} "
-                f"due to small dataset size"
+                f"Auto-adjusting perplexity from {self.perplexity} to {effective_perplexity} "
+                f"based on dataset size and characteristics"
             )
         
         # Step 3: Apply t-SNE (shared initialization logic)
@@ -111,6 +113,68 @@ class TSNEGenerator:
         
         self.logger.info(f"t-SNE completed successfully")
         return train_coords, test_coords
+    
+    def _calculate_optimal_perplexity(
+        self, 
+        combined_embeddings: np.ndarray, 
+        train_embeddings: np.ndarray, 
+        test_embeddings: np.ndarray
+    ) -> int:
+        """
+        Calculate optimal perplexity based on dataset characteristics.
+        
+        Enhanced logic that considers:
+        - Total dataset size (original constraint)
+        - Training vs test split balance
+        - Sparsity characteristics for few-shot scenarios
+        
+        Args:
+            combined_embeddings: Combined train+test embeddings
+            train_embeddings: Training embeddings only
+            test_embeddings: Test embeddings only
+            
+        Returns:
+            Optimal perplexity value
+        """
+        total_samples = len(combined_embeddings)
+        train_samples = len(train_embeddings)
+        test_samples = len(test_embeddings)
+        
+        # Original constraint: perplexity must be < n_samples/3
+        max_perplexity_by_size = (total_samples - 1) // 3
+        
+        # For very small datasets (few-shot learning scenarios)
+        if total_samples <= 20:
+            # Very aggressive reduction for tiny datasets
+            suggested_perplexity = max(5, total_samples // 4)
+            self.logger.info(f"Few-shot scenario detected ({total_samples} samples) - using conservative perplexity")
+        elif total_samples <= 50:
+            # Moderate reduction for small datasets  
+            suggested_perplexity = max(10, total_samples // 3)
+            self.logger.info(f"Small dataset detected ({total_samples} samples) - reducing perplexity for better local structure")
+        elif train_samples < 10:
+            # Very few training samples - prioritize local structure
+            suggested_perplexity = max(5, min(15, self.perplexity))
+            self.logger.info(f"Very few training samples ({train_samples}) - using low perplexity for local detail")
+        else:
+            # Use original perplexity for larger datasets
+            suggested_perplexity = self.perplexity
+            
+        # Apply the size constraint
+        effective_perplexity = min(suggested_perplexity, max_perplexity_by_size)
+        
+        # Ensure minimum perplexity
+        effective_perplexity = max(1, effective_perplexity)
+        
+        # Log detailed adjustment reasoning if changed
+        if effective_perplexity != self.perplexity:
+            self.logger.info(
+                f"Perplexity adjustment details: total={total_samples}, train={train_samples}, "
+                f"test={test_samples}, max_by_size={max_perplexity_by_size}, "
+                f"suggested={suggested_perplexity}, final={effective_perplexity}"
+            )
+        
+        return effective_perplexity
 
 
 class BaseTSNEPlotter(ABC):
@@ -124,7 +188,7 @@ class BaseTSNEPlotter(ABC):
     def __init__(
         self, 
         figsize: Tuple[int, int] = (10, 8),
-        zoom_factor: float = 1.0,
+        zoom_factor: float = 2.0,
         use_3d: bool = False
     ):
         """
@@ -1009,7 +1073,7 @@ class TSNEVisualizer:
         max_iter: int = 1000,
         random_state: int = 42,
         figsize: Tuple[int, int] = (10, 8),
-        zoom_factor: float = 1.0,
+        zoom_factor: float = 2.0,
         cached_color_mapping: Optional[Dict] = None
     ):
         """

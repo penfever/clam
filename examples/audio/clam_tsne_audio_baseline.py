@@ -69,7 +69,7 @@ class ClamAudioTsneClassifier:
         nn_k: int = 5,
         max_vlm_image_size: int = 1024,
         image_dpi: int = 100,
-        zoom_factor: float = 4.0,
+        zoom_factor: float = 2.0,
         use_pca_backend: bool = False,
         include_spectrogram: bool = True,
         audio_duration: Optional[float] = None,
