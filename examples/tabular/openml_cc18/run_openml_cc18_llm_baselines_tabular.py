@@ -266,6 +266,7 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
         "--tsne_max_iter", str(getattr(args, 'tsne_max_iter', getattr(args, 'tsne_n_iter', 1000))),
         "--max_tabpfn_samples", str(args.max_tabpfn_samples),
         "--nn_k", str(args.nn_k),
+        "--zoom_factor", str(args.zoom_factor),
         "--max_vlm_image_size", str(args.max_vlm_image_size),
         "--image_dpi", str(args.image_dpi),
     ])
@@ -287,6 +288,8 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
         cmd.append("--use_semantic_names")
     if args.use_metadata:
         cmd.append("--use_metadata")
+    if args.show_test_points:
+        cmd.append("--show_test_points")
     
     # Add visualization save cadence
     cmd.extend(["--visualization_save_cadence", str(args.visualization_save_cadence)])
