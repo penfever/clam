@@ -281,6 +281,8 @@ def evaluate_llm_baselines_on_task(task, split_idx, args):
         cmd.append("--no-save_sample_visualizations")
     if args.use_semantic_names:
         cmd.append("--use_semantic_names")
+    if args.use_metadata:
+        cmd.append("--use_metadata")
     
     # Add visualization save cadence
     cmd.extend(["--visualization_save_cadence", str(args.visualization_save_cadence)])
