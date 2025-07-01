@@ -431,7 +431,13 @@ def apply_consistent_point_styling(
             # Fallback to unique classes if all_classes not provided (for backward compatibility)
             class_color_map = create_distinct_color_map(unique_classes, cached_color_mapping)
         
-        for class_label in unique_classes:
+        # Get classes that actually have plotted points (addresses legend issue)
+        from clam.utils.class_name_utils import get_actually_plotted_classes
+        actually_plotted_classes = get_actually_plotted_classes(y, transformed_data, ax)
+        
+        # Only create scatter plots for classes that are actually visible
+        # This ensures the legend only shows classes that have visible points
+        for class_label in actually_plotted_classes:
             mask = y == class_label
             color = class_color_map.get(class_label, (0.5, 0.5, 0.5))  # Default to gray if not in map
             training_style = get_standard_training_point_style()
@@ -455,15 +461,17 @@ def apply_consistent_point_styling(
             
             metadata['classes'].append(class_label)
         
-        # Extract visible classes from the legend
+        # Extract visible classes from the legend using actually plotted classes
         visible_classes = extract_visible_classes_from_legend(
-            unique_classes, class_names, use_semantic_names
+            actually_plotted_classes, class_names, use_semantic_names
         )
         metadata['visible_classes'] = visible_classes
         
-        # Create legend text using unique_classes (numeric labels) for proper color mapping
+        # Create legend text using only actually plotted classes
+        # This ensures legend only shows classes that are actually visible in the visualization
+        visible_class_color_map = {cls: class_color_map[cls] for cls in actually_plotted_classes if cls in class_color_map}
         legend_text = create_class_legend(
-            unique_classes, class_color_map, class_names, use_semantic_names, show_test_points
+            actually_plotted_classes, visible_class_color_map, class_names, use_semantic_names, show_test_points
         )
         
     else:
@@ -538,6 +546,11 @@ def apply_consistent_point_styling(
                 **target_style
             )
     
+    # 5. Create the legend from all labeled artists (this will respect the filtered classes)
+    # Only create legend if we have labeled plots (classification case)
+    if y is not None:
+        ax.legend()
+    
     return {
         'legend_text': legend_text,
         'metadata': metadata
@@ -546,19 +559,31 @@ def apply_consistent_point_styling(
 
 def apply_consistent_legend_formatting(ax, use_3d: bool = False) -> None:
     """
-    Apply consistent legend formatting and positioning.
+    Apply consistent legend formatting and positioning to an existing legend.
+    
+    This function enforces separation of concerns by only formatting existing legends,
+    not creating new ones. Legend creation should be handled by apply_consistent_point_styling()
+    or other content creation functions.
     
     Args:
         ax: Matplotlib axis object
         use_3d: Whether this is a 3D plot
+        
+    Raises:
+        ValueError: If no legend exists on the axis (enforces proper separation of concerns)
     """
-    # Standard legend positioning
-    if use_3d:
-        # For 3D plots, position legend outside the plot area
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-    else:
-        # For 2D plots, use same positioning as tsne_functions
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    # Check if legend already exists
+    existing_legend = ax.get_legend()
+    if existing_legend is None:
+        raise ValueError(
+            "apply_consistent_legend_formatting() called on axis without existing legend. "
+            "Legend creation should be handled by apply_consistent_point_styling() or other "
+            "content creation functions before calling this formatting function."
+        )
+    
+    # Update positioning of existing legend (same for 2D and 3D currently)
+    existing_legend.set_bbox_to_anchor((1.05, 1))
+    existing_legend.set_loc('upper left')
     
     # Add grid for better readability
     ax.grid(True, alpha=0.3)

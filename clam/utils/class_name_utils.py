@@ -8,6 +8,7 @@ handling across different modalities (audio, vision, tabular) for all examples.
 import json
 import logging
 import os
+import numpy as np
 from pathlib import Path
 from typing import List, Optional, Dict, Any, Union, Tuple
 
@@ -341,3 +342,84 @@ def get_semantic_class_names_or_fallback(
         dataset_name=dataset_name,
         semantic_file=semantic_file
     )
+
+
+def get_actually_plotted_classes(labels: Union[List, np.ndarray], data_coords: Union[List, np.ndarray], ax=None) -> np.ndarray:
+    """
+    Determine which classes actually have data points that would be plotted and visible.
+    
+    This function checks which classes from the label array have corresponding
+    data points in the coordinate array that are within the current axis limits.
+    This is useful for legend generation to only show classes that are actually 
+    visible in the current visualization view.
+    
+    Args:
+        labels: Array of class labels [n_samples]
+        data_coords: Array of coordinates [n_samples, n_dims]
+        ax: Optional matplotlib axis to check visibility within current limits
+        
+    Returns:
+        Array of unique class labels that have corresponding visible data points
+    """
+    import numpy as np
+    
+    # Convert to numpy arrays if needed
+    labels = np.asarray(labels)
+    data_coords = np.asarray(data_coords)
+    
+    # Check that we have the same number of labels and coordinates
+    if len(labels) != len(data_coords):
+        raise ValueError(f"Mismatch between labels ({len(labels)}) and coordinates ({len(data_coords)})")
+    
+    # If no data, return empty array
+    if len(labels) == 0:
+        return np.array([])
+    
+    # Get axis limits if axis is provided
+    if ax is not None:
+        xlim = ax.get_xlim()
+        ylim = ax.get_ylim()
+        
+        # For 3D plots, also get z limits
+        if hasattr(ax, 'get_zlim'):
+            zlim = ax.get_zlim()
+        else:
+            zlim = None
+    else:
+        xlim = ylim = zlim = None
+    
+    # Get unique classes that actually have visible data points
+    unique_classes = []
+    for class_label in np.unique(labels):
+        mask = labels == class_label
+        if not np.any(mask):  # No points for this class
+            continue
+            
+        class_coords = data_coords[mask]
+        
+        # If no axis limits provided, just check if class has any points
+        if xlim is None:
+            unique_classes.append(class_label)
+            continue
+        
+        # Check if any points of this class are within the visible area
+        x_coords = class_coords[:, 0]
+        y_coords = class_coords[:, 1]
+        
+        # Check X and Y bounds
+        x_visible = (x_coords >= xlim[0]) & (x_coords <= xlim[1])
+        y_visible = (y_coords >= ylim[0]) & (y_coords <= ylim[1])
+        
+        # For 3D, also check Z bounds
+        if zlim is not None and class_coords.shape[1] >= 3:
+            z_coords = class_coords[:, 2]
+            z_visible = (z_coords >= zlim[0]) & (z_coords <= zlim[1])
+            visible_mask = x_visible & y_visible & z_visible
+        else:
+            visible_mask = x_visible & y_visible
+        
+        # If any points of this class are visible, include it
+        if np.any(visible_mask):
+            unique_classes.append(class_label)
+    
+    return np.array(unique_classes)
