@@ -1,0 +1,5 @@
+{
+  "model_name": "CLAM-t-SNE",
+  "dataset_name": "letter",
+  "error": "Number of classes 26 exceeds the maximal number of classes supported by TabPFN. Consider using a strategy to reduce the number of classes. For code see https://github.com/PriorLabs/tabpfn-extensions/blob/main/src/tabpfn_extensions/many_class/many_class_classifier.py"
+}

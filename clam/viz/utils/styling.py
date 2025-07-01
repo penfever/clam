@@ -424,11 +424,9 @@ def apply_consistent_point_styling(
     if y is not None:
         unique_classes = np.unique(y)
         
-        # Use all_classes for a consistent color map across different plots
-        if all_classes is None:
-            all_classes = unique_classes
-        
-        class_color_map = create_distinct_color_map(all_classes, cached_color_mapping)
+        # Create color map for visible classes only to avoid huge legends
+        # Note: This ensures legends only show classes actually present in the visualization
+        class_color_map = create_distinct_color_map(unique_classes, cached_color_mapping)
         
         for class_label in unique_classes:
             mask = y == class_label

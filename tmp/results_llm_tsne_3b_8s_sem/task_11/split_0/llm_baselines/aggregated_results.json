@@ -1,0 +1,2320 @@
+[
+  {
+    "model_name": "CLAM-t-SNE-tabular",
+    "accuracy": 0.44,
+    "balanced_accuracy": 0.48362573099415207,
+    "prediction_time": 424.13620686531067,
+    "total_time": 424.13620686531067,
+    "num_test_samples": 125,
+    "completed_samples": 125,
+    "completion_rate": 1.0,
+    "num_classes": 3,
+    "predictions": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      2,
+      0,
+      2,
+      2,
+      1,
+      2,
+      2,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      0,
+      1,
+      0,
+      2,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      2,
+      2,
+      0,
+      0,
+      2,
+      0,
+      0,
+      1,
+      2,
+      2,
+      0,
+      0,
+      0,
+      2,
+      0,
+      1,
+      0,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      0,
+      2,
+      1,
+      1,
+      2,
+      2,
+      0,
+      1,
+      2,
+      0,
+      1,
+      0,
+      2,
+      0,
+      1,
+      1,
+      2,
+      1,
+      2,
+      0,
+      1,
+      0,
+      2,
+      2,
+      1,
+      0,
+      2,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      2,
+      2,
+      0,
+      2,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      2,
+      0,
+      0
+    ],
+    "ground_truth": [
+      2,
+      2,
+      2,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      2,
+      2,
+      0,
+      1,
+      0,
+      2,
+      0,
+      1,
+      2,
+      2,
+      1,
+      2,
+      1,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      2,
+      2,
+      0,
+      2,
+      2,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      2,
+      2,
+      2,
+      1,
+      2,
+      2,
+      2,
+      0,
+      2,
+      1,
+      0,
+      2,
+      0,
+      0,
+      2,
+      0,
+      2,
+      2,
+      0,
+      0,
+      1,
+      2,
+      0,
+      2,
+      2,
+      2,
+      0,
+      2,
+      2,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      2,
+      0,
+      2,
+      0,
+      2,
+      0,
+      2,
+      2,
+      0,
+      2,
+      0,
+      2,
+      0,
+      2,
+      0,
+      2,
+      1,
+      2,
+      0,
+      2,
+      0,
+      0,
+      2,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      2,
+      2,
+      2,
+      2,
+      0,
+      2,
+      0,
+      1,
+      2,
+      2,
+      2
+    ],
+    "roc_auc": null,
+    "f1_macro": 0.40429677787461693,
+    "f1_micro": 0.44,
+    "f1_weighted": 0.47224221295707414,
+    "precision_macro": 0.4481782945736434,
+    "recall_macro": 0.48362573099415207,
+    "r2_score": null,
+    "mae": null,
+    "mse": null,
+    "rmse": null,
+    "task_type": "classification",
+    "config": {
+      "modality": "tabular",
+      "vlm_model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+      "embedding_size": 1000,
+      "tsne_perplexity": 30,
+      "tsne_max_iter": 1000,
+      "use_3d": false,
+      "use_knn_connections": true,
+      "nn_k": 2,
+      "show_test_points": false,
+      "max_vlm_image_size": 768,
+      "image_dpi": 72,
+      "force_rgb_mode": false,
+      "zoom_factor": 1.0,
+      "max_tabpfn_samples": 3000,
+      "use_semantic_names": true,
+      "device": "cuda",
+      "backend": "transformers",
+      "enable_thinking": true,
+      "openai_model": null,
+      "gemini_model": null,
+      "api_model": null,
+      "effective_model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+      "is_api_model": false,
+      "seed": 42,
+      "enable_multi_viz": false,
+      "visualization_methods": [
+        "tsne"
+      ],
+      "layout_strategy": "adaptive_grid",
+      "reasoning_focus": "classification",
+      "multi_viz_config": {},
+      "dinov2_model": null,
+      "embedding_backend": null,
+      "bioclip2_model": null,
+      "use_pca_backend": null
+    },
+    "prediction_details": [
+      {
+        "test_point_idx": 0,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue class (L) in the t-SNE visualization, and its nearest neighbors are also predominantly from the L class, as indicated by the pie chart. The average distance to the nearest neighbors is 11.23, which is relatively close, suggesting a high similarity to the L class.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          5.974494934082031,
+          4.712223529815674
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 1,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a 50% probability of being the nearest neighbor, which is higher than the 50% probability for the R class. Additionally, the B class neighbors have a slightly lower average distance (9.93) compared to the R class neighbors (11.08), indicating a higher similarity.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          -0.598115086555481,
+          1.8361631631851196
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 2,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the \"L\" class neighbors (17.57 vs. 16.33) and the spatial clustering pattern shows that the \"L\" class is more concentrated in the lower left quadrant of the t-SNE visualization. The pie chart indicates that the nearest neighbors to the query point are both from the \"L\" class, suggesting that the query point is likely to belong to the \"L\" class.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          -9.893731117248535,
+          -3.552908182144165
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 3,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the \"L\" class neighbors (17.87 vs. 16.51) and the pie chart shows that the \"L\" class has a 50% count, which is higher than the \"R\" class's 50% count. The spatial clustering pattern also suggests that the query point is more aligned with the \"L\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -8.966329574584961,
+          -6.53635311126709
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 4,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green class (R) than to the blue (L) or orange (B) classes. The pie chart shows that the nearest neighbors to the query point are both from the R class, with an average distance of 13.76, indicating a higher similarity to the R class.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -5.107540607452393,
+          -3.4313831329345703
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 5,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue L class cluster in the t-SNE visualization, and its nearest neighbors (connected by red lines) are also L class points. The pie chart shows that the L class has the highest percentage (100%) among the nearest neighbors, indicating that the query point is most similar to the L class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          4.833009719848633,
+          1.6445392370224
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 6,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue L class cluster in the t-SNE visualization. The pie chart shows that the nearest neighbors to the query point are both L classes, with no other classes represented. This suggests that the query point is more similar to the L class than to the B or R classes.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          5.585502624511719,
+          2.013428211212158
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 7,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the cluster of points labeled \"L\" in the t-SNE visualization. Additionally, both of its nearest neighbors are also labeled \"L,\" as indicated by the pie chart, which shows that the query point is equally close to both \"L\" and \"R\" neighbors.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -8.496485710144043,
+          -8.235864639282227
+        ],
+        "image_size": "666x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 8,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the \"L\" class neighbors (11.50 average distance) compared to the \"R\" class neighbors (10.45 average distance). Additionally, the spatial clustering in the t-SNE visualization shows that the \"L\" class is more concentrated in the lower right quadrant, while the \"R\" class is more spread out. The query point is positioned closer to the \"L\" class cluster, indicating a higher likelihood of belonging to the \"L\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          0.043888527899980545,
+          4.272254943847656
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 9,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green (R) class neighbors in the t-SNE visualization, and the pie chart shows that both nearest neighbors are of the R class, with an average distance of 15.32, indicating a high similarity to the R class.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -7.356626033782959,
+          1.5911729335784912
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 10,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue class (L) than to the orange class (B) in the t-SNE visualization. Additionally, the nearest neighbors of the query point are both from the L class, as indicated by the pie chart, which shows that both neighbors are L and have a smaller average distance compared to the R class.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          5.36945915222168,
+          7.078006744384766
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 11,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue class (L) in the t-SNE visualization, and its nearest neighbors are also from the L class, as indicated by the pie chart. The average distance to the nearest neighbors is 10.57, which is relatively close, suggesting a high similarity to the L class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          5.28530216217041,
+          2.9567453861236572
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 12,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the \"R\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are all from the \"R\" class, with an average distance of 8.73. This indicates that the query point is more similar to the \"R\" class neighbors than to the \"L\" or \"B\" class neighbors.",
+        "parsed_prediction": 2,
+        "true_label": 1,
+        "tsne_coords": [
+          -4.41341495513916,
+          5.972385406494141
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 13,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue L class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are also from the L class, with a smaller average distance (13.04) compared to the R class (13.14). This suggests that the query point is more similar to the L class than the R class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -2.449528455734253,
+          -6.1787896156311035
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 14,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the \"R\" class neighbors in the t-SNE visualization, and the pie chart shows that the \"R\" class has the highest percentage of neighbors (100%). Additionally, the average distance to the \"R\" class neighbors is lower than to the other classes, indicating higher similarity.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -9.428033828735352,
+          2.631592035293579
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 15,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green points (R) in the t-SNE visualization, indicating a higher similarity to the R class. The pie chart shows that both nearest neighbors are of class R, with an average distance of 13.18, suggesting that the query point is likely to belong to the R class.",
+        "parsed_prediction": 2,
+        "true_label": 0,
+        "tsne_coords": [
+          -4.558590412139893,
+          0.43109357357025146
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 16,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a 50% count and a 50% percentage, indicating that the query point is equally likely to belong to either class. However, the spatial clustering pattern in the t-SNE visualization shows that the query point is more aligned with the B class neighbors, suggesting that the query point is more likely to belong to the B class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -4.1722493171691895,
+          -1.0958412885665894
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 17,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the \"R\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are both \"R\" class points, indicating a higher similarity to the \"R\" class.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -7.6681976318359375,
+          3.02677583694458
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 18,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green (R) class neighbors in the t-SNE visualization, and the pie chart shows that both nearest neighbors are of the R class, with an average distance of 9.30. This suggests that the query point is more similar to the R class than the other classes.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -5.9253435134887695,
+          -1.561428427696228
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 19,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a 50% probability of being the nearest neighbor, which is higher than the 50% probability for the R class. Additionally, the spatial clustering in the t-SNE visualization suggests that the B class is more concentrated around the query point, indicating a higher likelihood of the query point belonging to the B class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -3.5906174182891846,
+          8.534906387329102
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 20,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a 50% probability of being the nearest neighbor, with an average distance of 8.94, which is slightly higher than the R class's 8.50. This suggests that the query point is more likely to belong to the B class based on both the spatial proximity and the neighbor analysis.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          -2.6637256145477295,
+          7.064172744750977
+        ],
+        "image_size": "651x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 21,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue class (L) than to the orange class (B) in the t-SNE visualization. Additionally, the pie chart shows that the nearest neighbors of the query point are both from the L class, with an average distance of 8.94, which is slightly higher than the average distance of the B class's nearest neighbors (8.47). This suggests that the query point is more similar to the L class based on both spatial clustering and nearest neighbor analysis.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          1.5837955474853516,
+          0.611984133720398
+        ],
+        "image_size": "651x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 22,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) in the t-SNE visualization, and the pie chart shows that the B class has the highest percentage (100%) among the nearest neighbors. The spatial proximity and the explicit connection to the B class neighbors support this classification.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -1.1929779052734375,
+          -0.5022684931755066
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 23,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a 50% count and a 50% percentage, indicating that the nearest neighbors are evenly distributed between B and R classes. The spatial clustering in the t-SNE visualization also suggests that the B class is more concentrated around the query point, while the R class is more spread out.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -2.009751796722412,
+          4.78812837600708
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 24,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the L class neighbors (blue) in the t-SNE visualization. Additionally, the pie chart shows that the B class neighbors are the closest to the query point, with an average distance of 10.36, indicating higher similarity.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -1.4221123456954956,
+          -1.0473629236221313
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 25,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue points (L) in the t-SNE visualization, which are the nearest neighbors. The pie chart shows that the nearest neighbors are both from the L class, with an average distance of 10.23, indicating a higher similarity to the L class.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          3.2117950916290283,
+          -1.6835006475448608
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 26,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a 50% probability of being the nearest neighbor, which is higher than the 50% probability for the R class. Additionally, the B class neighbors have a smaller average distance (11.69) compared to the R class neighbors (8.75), indicating higher similarity.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          7.34435510635376,
+          -1.9512314796447754
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 27,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue class (L) than to the orange class (B) in the t-SNE visualization. Additionally, the nearest neighbors of the query point are both from the L class, as indicated by the pie chart, which shows a 50% distribution for both L and R classes. The average distance to the nearest neighbors is slightly higher for the R class (15.67) compared to the L class (14.36), suggesting that the L class is more similar to the query point.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -3.0612552165985107,
+          -6.317691326141357
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 28,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (13.12 vs. 8.24) and the pie chart shows a 50% distribution of B neighbors, indicating that the query point is more likely to belong to the B class.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          7.6780877113342285,
+          -2.720276117324829
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 29,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green (R) class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors (R) are the most frequent class among the two neighbors. Additionally, the average distance to the nearest neighbors is lower for the R class, indicating higher similarity.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -1.3912019729614258,
+          -3.989323139190674
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 30,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has 50% of the nearest neighbors, which is higher than the R class's 50%. Additionally, the average distance to the B class neighbors (13.09) is slightly lower than to the R class neighbors (13.08), indicating higher similarity to the B class.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -1.5938950777053833,
+          -6.539708137512207
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 31,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (average distance of 9.34) compared to the R class neighbors (average distance of 7.23). Additionally, the B class neighbors are more densely clustered around the query point in the t-SNE visualization, indicating a higher similarity to the query point.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          1.2331182956695557,
+          5.883489608764648
+        ],
+        "image_size": "651x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 32,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a 50% probability of being the nearest neighbor, with an average distance of 17.24, which is slightly higher than the R class's 15.82. This suggests that the query point is more likely to belong to the B class based on both the spatial proximity and the nearest neighbor analysis.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          -8.401939392089844,
+          -3.534184455871582
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 33,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a 50% probability of being the nearest neighbor, with an average distance of 13.97, which is slightly lower than the R class's average distance of 14.82. This suggests that the query point is more likely to belong to the B class based on both the spatial proximity and the nearest neighbor analysis.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -2.4117274284362793,
+          -0.4903873801231384
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 34,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green points (R) in the t-SNE visualization, indicating a higher similarity to the R class. The pie chart shows that both nearest neighbors are of class R, with an average distance of 9.90, suggesting that the query point is likely to belong to the R class.",
+        "parsed_prediction": 2,
+        "true_label": 0,
+        "tsne_coords": [
+          -4.314634323120117,
+          5.583540439605713
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 35,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the L class neighbors (9.85 vs. 9.39) and the L class neighbors are more evenly distributed around the query point, indicating a higher similarity to the L class.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          4.646125793457031,
+          5.95327615737915
+        ],
+        "image_size": "651x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 36,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (average distance of 12.77) compared to the L class neighbors (average distance of 10.44). Additionally, the spatial clustering in the t-SNE visualization shows that the B class is more concentrated around the query point, indicating a higher similarity to the query point.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          0.6691774725914001,
+          -5.618641376495361
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 37,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue class (L) than to the orange class (B) in the t-SNE visualization. Additionally, the nearest neighbors of the query point are both from the L class, as indicated by the pie chart, which shows that both neighbors are L and have a similar average distance to the query point.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -4.741571426391602,
+          -6.324355125427246
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 38,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green R class neighbors in the t-SNE visualization, and the pie chart shows that both nearest neighbors are from the R class, indicating a higher similarity to R.",
+        "parsed_prediction": 2,
+        "true_label": 0,
+        "tsne_coords": [
+          -5.161851406097412,
+          -5.464430809020996
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 39,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the L class neighbors (1 neighbor with an average distance of 7.91) compared to the R class neighbors (1 neighbor with an average distance of 8.77). Additionally, the spatial clustering in the t-SNE visualization shows that the L class is more concentrated in the lower left quadrant, while the R class is more spread out. The query point is closer to the L class cluster, indicating it is more likely to belong to the L class.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          2.728759765625,
+          6.110345363616943
+        ],
+        "image_size": "651x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 40,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a 50% probability of being the nearest neighbor, which is higher than the 50% probability for the R class. Additionally, the B class neighbors have a slightly lower average distance (12.69) compared to the R class neighbors (13.15), indicating higher similarity.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          -2.474395275115967,
+          -0.652452826499939
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 41,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a 50% probability of being the nearest neighbor, which is higher than the 50% probability for the R class. Additionally, the spatial clustering in the t-SNE visualization suggests that the B class is more concentrated around the query point, indicating a higher likelihood of the query point belonging to the B class.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          -3.716797113418579,
+          7.065799236297607
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 42,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a 50% probability of being the nearest neighbor, which is higher than the 50% probability for the R class. Additionally, the spatial clustering in the t-SNE visualization suggests that the B class is more concentrated around the query point, indicating a higher likelihood of the query point belonging to the B class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -5.545860767364502,
+          1.4746872186660767
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 43,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) in the t-SNE visualization, and the pie chart shows that the B class has the highest percentage (100%) among the nearest neighbors. The spatial proximity and the explicit connection to the B class neighbors support this classification.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          -0.18354474008083344,
+          -2.1378371715545654
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 44,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue class (L) than to the orange class (B) in the t-SNE visualization. Additionally, the nearest neighbors of the query point are both from the L class, as indicated by the pie chart, which shows a 50% distribution for both L and R classes. The average distance to the nearest neighbors for the L class (15.09) is slightly higher than for the R class (12.23), but the spatial proximity and the majority of the nearest neighbors support classifying the query point as L.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          -7.003971099853516,
+          -2.3058547973632812
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 45,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the L class neighbors (blue) in the t-SNE visualization. Additionally, the pie chart shows that the B class neighbors are closer to the query point than the L class neighbors, indicating higher similarity.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          1.4221733808517456,
+          -3.184415578842163
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 46,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue L class cluster in the t-SNE visualization. The pie chart shows that the nearest neighbors to the query point are both L classes, with an average distance of 10.33, indicating high similarity. This suggests that the query point is likely to belong to the L class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          1.6762655973434448,
+          -5.254434585571289
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 47,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the cluster of points labeled \"L\" in the t-SNE visualization, which is indicated by the thicker red lines connecting the query point to the \"L\" neighbors. Additionally, the pie chart shows that the query point has an equal number of neighbors from both \"L\" and \"R\" classes, but the average distance to \"L\" neighbors (12.41) is slightly lower than to \"R\" neighbors (13.15). This suggests that the query point is more similar to the \"L\" class, despite the slight difference in average distance.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          1.544752597808838,
+          -3.755591630935669
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 48,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) in the t-SNE visualization, and the pie chart shows that the B class has the highest percentage (100%) among the nearest neighbors. Additionally, the B class neighbors have the smallest average distance (9.26), indicating higher similarity to the query point.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          4.154682159423828,
+          -1.3620558977127075
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 49,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the cluster of points labeled \"L\" in the t-SNE visualization. Additionally, the nearest neighbors of the query point are both labeled \"L\", with a smaller average distance (17.21) compared to the nearest neighbors of the query point, which are labeled \"B\" (average distance 20.71). This suggests that the query point is more similar to the \"L\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -7.19837760925293,
+          -9.07097339630127
+        ],
+        "image_size": "666x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 50,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (average distance of 8.81) compared to the L class neighbors (average distance of 9.61). Additionally, the B class neighbors are more densely clustered around the query point in the t-SNE visualization, indicating a higher similarity to the query point.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          3.5606017112731934,
+          -2.6283860206604004
+        ],
+        "image_size": "651x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 51,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue class (L) in the t-SNE visualization, and its nearest neighbors are also from the L class, with a smaller average distance (19.22) compared to the R class (19.95).",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -7.3854899406433105,
+          -6.313007354736328
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 52,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a 50% probability of being the nearest neighbor, which is higher than the 50% probability for the R class. Additionally, the spatial clustering in the t-SNE visualization suggests that the B class is more concentrated around the query point, indicating a higher likelihood of the query point belonging to the B class.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          6.520561695098877,
+          -2.344346761703491
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 53,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue class (L) than to the orange class (B) in the t-SNE visualization. Additionally, the nearest neighbor of the query point is also of the L class, as indicated by the pie chart, which shows that the L class has a 50% count and an average distance of 18.21, which is slightly lower than the R class's average distance of 18.84. This suggests that the query point is more similar to the L class.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          -9.451133728027344,
+          -4.029409885406494
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 54,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green) in the t-SNE visualization. Additionally, the pie chart shows that the B class has a higher percentage of neighbors (50%) compared to the R class (50%), indicating that the query point is more similar to the B class neighbors.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -6.623118877410889,
+          -3.490666151046753
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 55,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green points (R) in the t-SNE visualization, indicating a higher similarity to the R class. Additionally, the pie chart shows that both nearest neighbors are of class R, with an average distance of 12.14, suggesting that the query point is likely to belong to the R class.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -4.492376327514648,
+          0.891092836856842
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 56,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green points (R) in the t-SNE visualization, indicating a higher similarity to the R class. Additionally, the pie chart shows that the nearest neighbors (R) are the most frequent class among the two neighbors, suggesting that the query point is more likely to belong to the R class.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -9.474077224731445,
+          -2.8217010498046875
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 57,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the L class neighbors (50%) and has a smaller average distance (6.69) compared to the B class neighbors (7.62). The spatial clustering in the t-SNE visualization also suggests that the L class is more concentrated around the query point, indicating a higher similarity to the query point.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          1.8804806470870972,
+          1.4794120788574219
+        ],
+        "image_size": "651x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 58,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the L class neighbors (16.07 vs. 15.76) and the L class has a higher percentage of neighbors (50%) compared to the R class (50%). The spatial clustering in the t-SNE visualization also suggests that the L class is more concentrated around the query point, indicating a higher similarity to the query point.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -7.25815486907959,
+          -5.099678039550781
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 59,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green (R) class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors (R) are the most frequent class among the two neighbors. The spatial clustering and the pie chart analysis both indicate that the query point is more likely to belong to the \"R\" class.",
+        "parsed_prediction": 2,
+        "true_label": 1,
+        "tsne_coords": [
+          -5.608036994934082,
+          -4.549368858337402
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 60,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the cluster of points labeled \"L\" in the t-SNE visualization. Additionally, the nearest neighbors of the query point are also labeled \"L\", with a smaller average distance (13.84) compared to the nearest neighbors of the query point labeled \"R\" (14.20). This suggests that the query point is more similar to the \"L\" class based on both spatial clustering and nearest neighbor analysis.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          -7.3480916023254395,
+          2.7026140689849854
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 61,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue class (L) than to the orange class (B) in the t-SNE visualization. The pie chart shows that the nearest neighbors to the query point are both from the L class, with an average distance of 17.13, which is slightly higher than the average distance of 15.03 for the B class. This suggests that the query point is more similar to the L class than to the B class, despite the slight difference in average distance.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -5.8315253257751465,
+          -8.813755989074707
+        ],
+        "image_size": "666x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 62,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (average distance of 8.51) compared to the R class neighbors (average distance of 9.60). Additionally, the spatial clustering in the t-SNE visualization shows that the B class is more concentrated around the query point, indicating a higher similarity to the query point.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          -0.2780347764492035,
+          2.2967419624328613
+        ],
+        "image_size": "651x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 63,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green points (R) in the t-SNE visualization, indicating a higher similarity to the R class. Additionally, the pie chart shows that the query point has two nearest neighbors, both belonging to the R class, with an average distance of 15.56, suggesting that the R class is the most likely classification for this point.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -7.912418842315674,
+          -1.9337611198425293
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 64,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green class (R) than to the blue (L) or orange (B) classes. The pie chart shows that the nearest neighbors to the query point are both from the R class, with an average distance of 8.73, indicating a higher similarity to the R class.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -3.09423828125,
+          5.5253496170043945
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 65,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the \"L\" class neighbors (50%) and has a smaller average distance (17.19) compared to the \"R\" class neighbors (50%) with an average distance of 15.80. The spatial clustering in the t-SNE visualization also suggests that the query point is more aligned with the \"L\" class cluster.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -3.409972906112671,
+          -7.995851516723633
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 66,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the \"L\" class neighbors in the t-SNE visualization, and the pie chart shows that the \"L\" class has a higher percentage of neighbors (50%) compared to the \"R\" class (50%). Additionally, the average distance to the \"L\" class neighbors (23.59) is slightly lower than to the \"R\" class neighbors (22.05), indicating higher similarity to the \"L\" class.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          -10.989448547363281,
+          -4.784372806549072
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 67,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the \"L\" class neighbors (17.33 vs. 15.02) and the spatial clustering pattern shows that the \"L\" class is more concentrated in the lower left quadrant of the t-SNE visualization. The pie chart indicates that the \"L\" class has a higher percentage of neighbors (50%) compared to the \"R\" class (50%).",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          -9.19987964630127,
+          -4.558316230773926
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 68,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green R class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are all from the R class, with an average distance of 8.98. This suggests that the query point is more similar to the R class than the other classes.",
+        "parsed_prediction": 2,
+        "true_label": 1,
+        "tsne_coords": [
+          -2.882267475128174,
+          6.195046424865723
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 69,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue points (L) in the t-SNE visualization, indicating a higher similarity to the L class. Additionally, the pie chart shows that the nearest neighbors to the query point are both from the L class, with an average distance of 13.07, which is higher than the average distance of the B class neighbors (12.55). This suggests that the query point is more likely to belong to the L class based on both spatial clustering and the explicit nearest neighbor analysis.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          4.866760730743408,
+          0.039402950555086136
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 70,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a 50% probability of being the nearest neighbor, which is higher than the 50% probability for the R class. Additionally, the B class neighbors have a slightly lower average distance (13.28) compared to the R class neighbors (12.27), indicating higher similarity.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -2.049254894256592,
+          1.7681822776794434
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 71,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the \"L\" class neighbors (50%) and has a smaller average distance (12.51) compared to the \"R\" class neighbors (11.62). The spatial clustering pattern also suggests that the query point is more aligned with the \"L\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          6.079709529876709,
+          2.7777931690216064
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 72,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green (R) class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are both from the R class, with an average distance of 15.04, indicating high similarity.",
+        "parsed_prediction": 2,
+        "true_label": 0,
+        "tsne_coords": [
+          -3.442861318588257,
+          2.9796628952026367
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 73,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (average distance of 8.48) than to the R class neighbors (average distance of 9.46). Additionally, the B class neighbors are more densely clustered around the query point compared to the R class neighbors, indicating a higher similarity to the B class.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          1.5186158418655396,
+          3.9050369262695312
+        ],
+        "image_size": "651x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 74,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a higher percentage of neighbors (50%) compared to the R class (50%). Additionally, the average distance to the B class neighbors (10.01) is slightly lower than to the R class neighbors (9.22), indicating higher similarity to the B class.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          2.4284427165985107,
+          -1.1611806154251099
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 75,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green) in the t-SNE visualization. Additionally, the pie chart shows that the B class has a higher percentage of neighbors (50%) compared to the R class (50%). The average distance to the B class neighbors (11.66) is slightly lower than to the R class neighbors (10.90), indicating a higher similarity to the B class.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          -0.08473806828260422,
+          -3.7519757747650146
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 76,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) in the t-SNE visualization, and the pie chart shows that the B class has the highest percentage (100%) among the nearest neighbors. The spatial clustering of the B class points is distinct from the L and R classes, indicating that the query point is more similar to the B class.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          0.6234790682792664,
+          -0.8168726563453674
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 77,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green (R) class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are all from the R class, with an average distance of 9.73, indicating high similarity.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -5.558588981628418,
+          -1.4455372095108032
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 78,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue class (L) than to the orange class (B) in the t-SNE visualization. Additionally, the pie chart shows that the nearest neighbors of the query point are both from the L class, with an average distance of 14.21, which is slightly lower than the average distance to the nearest neighbors of the R class (14.40). This suggests that the query point is more similar to the L class than to the R class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -4.584050178527832,
+          -7.2154340744018555
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 79,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green class (R) in the t-SNE visualization, and its nearest neighbors are also from the R class, as indicated by the pie chart. The spatial clustering and the proximity to the nearest neighbors support the classification of the query point as R.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -5.447225093841553,
+          -1.9599090814590454
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 80,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (11.11 average distance) than to the R class neighbors (11.92 average distance). Additionally, the B class neighbors are more densely clustered around the query point compared to the R class neighbors, indicating a higher similarity to the B class.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -3.2767515182495117,
+          4.209013938903809
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 81,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (13.12) than to the R class neighbors (13.32), and the B class neighbors are more evenly distributed around the query point compared to the R class neighbors. Additionally, the B class neighbors are connected by thicker red lines, indicating stronger similarity, which further supports the classification of the query point as B.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          -5.86135196685791,
+          2.2291414737701416
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 82,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green class (R) in the t-SNE visualization, and its nearest neighbors are also from the R class, as indicated by the pie chart. The spatial clustering and the proximity to the nearest neighbors support this classification.",
+        "parsed_prediction": 2,
+        "true_label": 0,
+        "tsne_coords": [
+          -4.3813252449035645,
+          -4.2844157218933105
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 83,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green (R) class neighbors in the t-SNE visualization, and the pie chart shows that both nearest neighbors are of the R class, with an average distance of 11.28, indicating high similarity.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -8.196640968322754,
+          0.7008485794067383
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 84,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the L class neighbors (50%) and has a smaller average distance (23.01) compared to the R class neighbors (19.99). The spatial clustering in the t-SNE visualization also suggests that the L class is more concentrated around the query point, indicating a higher likelihood of the query point belonging to the L class.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          -11.289976119995117,
+          -2.8353593349456787
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 85,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a 50% probability of being the nearest neighbor, which is higher than the 50% probability for the R class. Additionally, the spatial clustering in the t-SNE visualization suggests that the B class is more concentrated around the query point, indicating a higher likelihood of the query point belonging to the B class.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -4.165530681610107,
+          -2.965766668319702
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 86,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green points (R) in the t-SNE visualization, indicating a higher similarity to the R class. Additionally, the pie chart shows that the R class has two neighbors, both of which are also R, with an average distance of 13.69, suggesting that the R class is well-represented in the nearest neighbors.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -9.284515380859375,
+          2.6385488510131836
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 87,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue L class cluster in the t-SNE visualization, and its nearest neighbors are also L class points, with a smaller average distance (15.38) compared to the R class neighbors (14.23).",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -1.994147777557373,
+          -8.172462463378906
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 88,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class neighbors are closer to the query point than the R class neighbors, indicating higher similarity. Additionally, the spatial clustering in the t-SNE visualization suggests that the B class is more concentrated around the query point, further supporting the classification.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          -2.987060546875,
+          -3.1611039638519287
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 89,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue L class cluster in the t-SNE visualization, and its nearest neighbors are also from the L class, with a smaller average distance (10.52) compared to the B class (11.12).",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          1.8524856567382812,
+          -2.048142910003662
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 90,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green class (R) in the t-SNE visualization, and its nearest neighbors are also from the R class, as indicated by the pie chart. The average distance to the nearest neighbors is 11.47, which is relatively close, suggesting a high similarity to the R class.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -5.225683689117432,
+          2.8783509731292725
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 91,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue L class neighbors (16.11 vs. 15.81) and the pie chart shows that the L class has 50% of the nearest neighbors, indicating it is the most likely class for the query point.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -8.437176704406738,
+          -6.514450550079346
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 92,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (11.65 vs. 11.08) and the pie chart shows a 50% distribution of B neighbors, indicating a higher similarity to the B class.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          -1.0113698244094849,
+          3.9059832096099854
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 93,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (average distance of 9.33) compared to the R class neighbors (average distance of 7.82). Additionally, the B class neighbors are more densely clustered around the query point, indicating a higher similarity to the query point.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          0.5201607346534729,
+          5.450708389282227
+        ],
+        "image_size": "651x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 94,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the \"R\" class neighbors in the t-SNE visualization, and the pie chart shows that the \"R\" class has the highest percentage (100%) among the nearest neighbors, indicating that the query point is most similar to the \"R\" class.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -8.496281623840332,
+          1.5093282461166382
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 95,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the L class neighbors (blue) in the t-SNE visualization. Additionally, the pie chart shows that the B class neighbors are closer to the query point than the L class neighbors, indicating higher similarity.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -4.513387203216553,
+          -5.921633720397949
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 96,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green (R) class neighbors in the t-SNE visualization, and the pie chart shows that both nearest neighbors are of the R class, with an average distance of 9.40, indicating they are highly similar.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -5.081969261169434,
+          3.611786127090454
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 97,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue L class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are also from the L class, with a smaller average distance (10.86) compared to the R class (12.71). This suggests that the query point is more similar to the L class neighbors.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          4.332812309265137,
+          7.303393840789795
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 98,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the L class neighbors (blue) in the t-SNE visualization. Additionally, the pie chart shows that the B class neighbors have a higher percentage (50%) and a slightly lower average distance (10.06) compared to the L class neighbors (50% and 9.90). This suggests that the query point is more similar to the B class neighbors, indicating that it should be classified as B.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          2.7833657264709473,
+          -4.116128921508789
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 99,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue class (L) than to the orange class (B) in the t-SNE visualization. Additionally, the pie chart shows that the nearest neighbors of the query point are both from the L class, with an average distance of 10.16, which is slightly higher than the average distance of the B class's nearest neighbors (8.93). This suggests that the query point is more similar to the L class than the B class.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          3.971548557281494,
+          2.9904797077178955
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 100,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the \"R\" class neighbors in the t-SNE visualization, and the pie chart shows that the \"R\" class has the highest percentage of neighbors (100%) with an average distance of 15.10, indicating higher similarity to the query point.",
+        "parsed_prediction": 2,
+        "true_label": 0,
+        "tsne_coords": [
+          -10.307682037353516,
+          0.8320320248603821
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 101,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green R class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are both from the R class, with an average distance of 9.37. This suggests that the query point is more similar to the R class than the other classes.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -3.3834228515625,
+          7.743080139160156
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 102,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the L class neighbors (blue) in the t-SNE visualization. Additionally, the pie chart shows that the B class neighbors have a higher percentage (50%) and a slightly lower average distance (10.36) compared to the L class neighbors (50% and 9.67). This suggests that the query point is more similar to the B class neighbors, indicating it should be classified as B.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          5.177842140197754,
+          4.052606582641602
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 103,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue class (L) than to the orange class (B) in the t-SNE visualization. Additionally, the pie chart shows that the nearest neighbors of the query point are both from the L class, with an average distance of 9.86, which is slightly lower than the average distance to the nearest neighbors of the R class (9.78). This suggests that the query point is more similar to the L class than to the R class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          6.296644687652588,
+          -1.0009558200836182
+        ],
+        "image_size": "651x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 104,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green R class neighbors in the t-SNE visualization, and the pie chart shows that the R class has the highest percentage (100%) among the nearest neighbors, indicating that the query point is most similar to the R class.",
+        "parsed_prediction": 2,
+        "true_label": 0,
+        "tsne_coords": [
+          -4.44949197769165,
+          -2.2302582263946533
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 105,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class neighbors are closer to the query point than the R class neighbors, indicating higher similarity. Additionally, the spatial clustering in the t-SNE visualization suggests that the B class is more concentrated around the query point, further supporting the classification of the query point as B.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -3.226468801498413,
+          -3.698296546936035
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 106,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue L class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are also from the L class, with a smaller average distance (11.75) compared to the R class (12.44). This suggests that the query point is more similar to the L class neighbors.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          3.7375104427337646,
+          4.9441704750061035
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 107,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue class (L) than to the orange class (B) in the t-SNE visualization. Additionally, the nearest neighbor of the query point is also of the L class, as indicated by the pie chart, which shows that the L class has a 50% count and an average distance of 15.24, which is closer to the query point than the R class's average distance of 19.51.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -8.169671058654785,
+          -7.0713348388671875
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 108,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue class (L) than to the orange class (B) and the green class (R). The pie chart shows that the nearest neighbors of the query point are both from the L class, with an average distance of 9.75, which is slightly lower than the average distance to the nearest neighbors of the R class (10.85). This suggests that the query point is more similar to the L class than to the R class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          6.389111518859863,
+          -0.6577699184417725
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 109,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the cluster of points labeled \"L\" in the t-SNE visualization, and its nearest neighbors are also labeled \"L\", with a smaller average distance compared to the other classes.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          4.613272666931152,
+          3.926041841506958
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 110,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class neighbors are closer to the query point than the R class neighbors, indicating higher similarity. Additionally, the spatial clustering in the t-SNE visualization suggests that the B class is more concentrated around the query point, further supporting the classification.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -1.9479291439056396,
+          -5.811519145965576
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 111,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue (L) class cluster in the t-SNE visualization, and its nearest neighbors are also from the L class, as indicated by the pie chart. The average distance to the L class neighbors (14.71) is slightly higher than to the B class neighbors (13.50), suggesting that the query point is more similar to the L class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -5.742328643798828,
+          -8.865141868591309
+        ],
+        "image_size": "666x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 112,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green points (R) in the t-SNE visualization, indicating a higher similarity to the R class. The pie chart shows that both nearest neighbors are of class R, with an average distance of 10.87, suggesting that the query point is likely to belong to the R class.",
+        "parsed_prediction": 2,
+        "true_label": 0,
+        "tsne_coords": [
+          -3.8324925899505615,
+          5.2364068031311035
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 113,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the \"R\" class neighbors (green) in the t-SNE visualization, and the pie chart shows that the \"R\" class has a higher percentage of neighbors (50%) compared to the \"L\" class (50%). Additionally, the average distance to the \"R\" class neighbors (21.37) is slightly higher than to the \"L\" class neighbors (16.85), indicating that the query point is more similar to the \"R\" class.",
+        "parsed_prediction": 2,
+        "true_label": 0,
+        "tsne_coords": [
+          -7.459284782409668,
+          -8.715136528015137
+        ],
+        "image_size": "666x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 114,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the L class neighbors (50%) and has a smaller average distance (25.99) compared to the R class neighbors (50%) with a larger average distance (25.62). The spatial clustering in the t-SNE visualization also suggests that the L class is more concentrated around the query point, indicating a higher likelihood of the query point belonging to the L class.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          -11.256616592407227,
+          -4.471380233764648
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 115,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green (R) class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are both from the R class, with an average distance of 7.97. This suggests that the query point is more similar to the R class than the other classes.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -0.8795782923698425,
+          6.232935905456543
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 116,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a 50% probability of being the nearest neighbor, which is higher than the 50% probability for the R class. Additionally, the spatial clustering in the t-SNE visualization suggests that the B class is more concentrated around the query point, indicating a higher likelihood of the query point belonging to the B class.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          7.689026832580566,
+          -1.1978148221969604
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 117,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the R class neighbors (green). The pie chart shows that the B class has a 50% probability of being the nearest neighbor, which is higher than the 50% probability for the R class. Additionally, the B class neighbors have a slightly lower average distance (9.13) compared to the R class neighbors (9.93), indicating a higher similarity to the query point.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          4.646533489227295,
+          -2.8979415893554688
+        ],
+        "image_size": "651x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 118,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the L class neighbors (12.93 vs. 12.68) and the pie chart shows that the L class has a higher percentage (50%) of the nearest neighbors compared to the B class (50%). The spatial clustering in the t-SNE visualization also suggests that the L class is more concentrated around the query point, indicating a higher similarity to the L class neighbors.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          6.228618144989014,
+          3.2783312797546387
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 119,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the blue class (L) neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are also from the L class, with a smaller average distance (9.96) compared to the B class (5.73). This suggests that the query point is more similar to the L class neighbors.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          4.11589241027832,
+          -1.7413842678070068
+        ],
+        "image_size": "651x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 120,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the \"L\" class neighbors (12.09 average distance) compared to the \"B\" class neighbors (11.95 average distance). Additionally, the spatial clustering in the t-SNE visualization shows that the \"L\" class is more concentrated in the lower right quadrant, which aligns with the query point's position.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          5.57581090927124,
+          5.108107566833496
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 121,
+        "vlm_response": "Class: B | Reasoning: The query point is closer to the B class neighbors (orange) than to the L class neighbors (blue). The pie chart shows that the B class neighbors are closer to the query point than the L class neighbors, indicating higher similarity. Additionally, the spatial clustering in the t-SNE visualization suggests that the B class is more concentrated around the query point, further supporting the classification.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          6.1650824546813965,
+          -4.497241020202637
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 122,
+        "vlm_response": "Class: R | Reasoning: The query point is closer to the green R class neighbors in the t-SNE visualization, and the pie chart shows that the R class has the highest percentage (100%) among the nearest neighbors, indicating that the query point is most similar to the R class.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -2.3695504665374756,
+          3.2448596954345703
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 123,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the L class neighbors (19.24 vs. 16.39) and the pie chart shows that the L class has a 50% distribution among the nearest neighbors, indicating a higher similarity to the L class.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          -10.275364875793457,
+          -3.0336410999298096
+        ],
+        "image_size": "656x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      },
+      {
+        "test_point_idx": 124,
+        "vlm_response": "Class: L | Reasoning: The query point is closer to the L class neighbors (50%) and has a smaller average distance (9.06) compared to the R class neighbors (50% and 9.22). The spatial clustering in the t-SNE visualization also suggests that the L class is more concentrated around the query point, indicating a higher similarity to the query point.",
+        "parsed_prediction": 0,
+        "true_label": 2,
+        "tsne_coords": [
+          3.2786693572998047,
+          5.093998432159424
+        ],
+        "image_size": "651x488",
+        "visible_classes": [
+          "L",
+          "B",
+          "R"
+        ]
+      }
+    ],
+    "dataset_name": "balance-scale",
+    "dataset_id": "11",
+    "task_id": "11"
+  }
+]

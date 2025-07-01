@@ -1,0 +1,3470 @@
+[
+  {
+    "model_name": "CLAM-t-SNE-tabular",
+    "accuracy": 0.745,
+    "balanced_accuracy": 0.7427971188475391,
+    "prediction_time": 632.6914932727814,
+    "total_time": 632.6914932727814,
+    "num_test_samples": 200,
+    "completed_samples": 200,
+    "completion_rate": 1.0,
+    "num_classes": 2,
+    "predictions": [
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    "ground_truth": [
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    "roc_auc": 0.742797118847539,
+    "f1_macro": 0.7409523809523809,
+    "f1_micro": 0.745,
+    "f1_weighted": 0.7415999999999999,
+    "precision_macro": 0.7562559391827685,
+    "recall_macro": 0.7427971188475391,
+    "r2_score": null,
+    "mae": null,
+    "mse": null,
+    "rmse": null,
+    "task_type": "classification",
+    "config": {
+      "modality": "tabular",
+      "vlm_model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+      "embedding_size": 1000,
+      "tsne_perplexity": 30,
+      "tsne_max_iter": 1000,
+      "use_3d": false,
+      "use_knn_connections": true,
+      "nn_k": 1,
+      "show_test_points": false,
+      "max_vlm_image_size": 768,
+      "image_dpi": 72,
+      "force_rgb_mode": false,
+      "zoom_factor": 1.0,
+      "max_tabpfn_samples": 3000,
+      "use_semantic_names": true,
+      "device": "cuda",
+      "backend": "transformers",
+      "enable_thinking": true,
+      "openai_model": null,
+      "gemini_model": null,
+      "api_model": null,
+      "effective_model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+      "is_api_model": false,
+      "seed": 42,
+      "enable_multi_viz": false,
+      "visualization_methods": [
+        "tsne"
+      ],
+      "layout_strategy": "adaptive_grid",
+      "reasoning_focus": "classification",
+      "multi_viz_config": {},
+      "dinov2_model": null,
+      "embedding_backend": null,
+      "bioclip2_model": null,
+      "use_pca_backend": null
+    },
+    "prediction_details": [
+      {
+        "test_point_idx": 0,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and a smaller average distance (55.96). This indicates a higher similarity to the \"won\" class, supporting the classification of the query point as \"won\".",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          13.506111145019531,
+          6.672448635101318
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 1,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% nowin neighbors with an average distance of 8.06) than to the \"won\" class neighbors. The pie chart shows that the nearest neighbors are all from the \"nowin\" class, indicating that the query point is more similar to the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -16.670011520385742,
+          -0.9702132344245911
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 2,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 12.57, which is the smallest among all classes. This indicates that the query point is most similar to the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -8.618707656860352,
+          4.891324996948242
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 3,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is 17.05, which is relatively small, suggesting high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -7.337117671966553,
+          -1.6169432401657104
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 4,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance (13.08). This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          11.021808624267578,
+          -7.002965450286865
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 5,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbors are also predominantly from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbors is 11.40, which is relatively close, suggesting that the query point is highly similar to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -2.6311440467834473,
+          -3.69718337059021
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 6,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors, as indicated by the pie chart showing 100% of the nearest neighbors belong to the \"nowin\" class. Additionally, the spatial clustering in the t-SNE visualization shows that the \"nowin\" class points are more concentrated around the query point, suggesting that the query point is more similar to the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -17.094919204711914,
+          -2.404585123062134
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 7,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is from the \"nowin\" class, with a 100% count and an average distance of 20.46. This indicates that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          3.2379050254821777,
+          1.8344972133636475
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 8,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also \"won,\" indicating a higher similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          4.3123064041137695,
+          -2.8000614643096924
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 9,
+        "vlm_response": "Class: nowin | Reasoning: The query point is surrounded by neighbors that are also classified as \"nowin\". The pie chart shows that all 1 nearest neighbors are classified as \"nowin\", with an average distance of 14.36. This indicates that the query point is very similar to its nearest neighbors, which are also classified as \"nowin\".",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -10.980446815490723,
+          1.481149435043335
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 10,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbors are also predominantly from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbors is 16.54, which is relatively close, suggesting that the query point is highly similar to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          7.427493095397949,
+          -6.742498397827148
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 11,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is relatively small, suggesting a high degree of similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          1.927230715751648,
+          -6.653176784515381
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 12,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and a smaller average distance (26.98). This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          10.78972339630127,
+          -1.7857491970062256
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 13,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors, as indicated by the pie chart showing 100% of the nearest neighbors belong to the \"nowin\" class. Additionally, the spatial clustering in the t-SNE visualization shows that the \"nowin\" class is more concentrated around the query point, suggesting that the query point is more likely to belong to the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -9.397006034851074,
+          -3.5382797718048096
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 14,
+        "vlm_response": "Class: nowin | Reasoning: The query point is surrounded by neighbors that are also classified as \"nowin\". The pie chart shows that all 1 nearest neighbors are classified as \"nowin\", with an average distance of 6.65. This suggests that the query point is likely to be classified as \"nowin\" based on its spatial clustering and the explicit nearest neighbor connections.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -17.040197372436523,
+          -0.7788599729537964
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 15,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance (18.60). This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          -6.0313215255737305,
+          -2.8577029705047607
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 16,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 23.13, which is lower than the average distance to the \"won\" class neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that the \"nowin\" class is more concentrated around the query point, indicating a higher likelihood of the query point belonging to this class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          2.6404993534088135,
+          7.189521789550781
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 17,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and a smaller average distance (17.44). This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          7.516905307769775,
+          -0.14086872339248657
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 18,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are all from the \"won\" class, with an average distance of 11.58, indicating high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -3.811713218688965,
+          -6.756211280822754
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 19,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and a very small average distance of 19.37. This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -6.251296520233154,
+          -1.7274246215820312
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 20,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is from the \"nowin\" class with a 100% count and an average distance of 15.21, indicating a strong similarity to the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -13.331583976745605,
+          -0.32788988947868347
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 21,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance. This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          1.4192014932632446,
+          -5.637073993682861
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 22,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 23.40. This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          7.339975357055664,
+          3.972012996673584
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 23,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and a smaller average distance of 33.55. This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          9.208475112915039,
+          4.559241771697998
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 24,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the \"won\" class has 100% of the nearest neighbors, indicating a higher similarity to the query point.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          4.523586273193359,
+          9.153547286987305
+        ],
+        "image_size": "617x492",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 25,
+        "vlm_response": "Class: nowin | Reasoning: The query point is surrounded by neighbors that are also classified as \"nowin\". The pie chart shows that the nearest neighbors are all from the \"nowin\" class, with a 100% count and an average distance of 13.26. This indicates that the query point is very similar to its nearest neighbors, which are all classified as \"nowin\".",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -9.790694236755371,
+          -0.6613318920135498
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 26,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 20.03, indicating high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          9.572153091430664,
+          -3.6556801795959473
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 27,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is relatively small, suggesting a high similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          2.5850601196289062,
+          4.326900005340576
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 28,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance. This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          -7.7961812019348145,
+          3.547353506088257
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 29,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbors are also predominantly from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbors is relatively low, suggesting a high similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          9.691474914550781,
+          -5.906399726867676
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 30,
+        "vlm_response": "Class: nowin | Reasoning: The query point is surrounded by neighbors that are also classified as \"nowin\". The pie chart shows that all 1 nearest neighbors are classified as \"nowin\", with an average distance of 13.97. This indicates that the query point is very similar to its nearest neighbors, which are all classified as \"nowin\".",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -1.8890352249145508,
+          7.018683910369873
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 31,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance (10.88). This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -2.837209463119507,
+          -6.684018135070801
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 32,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also a \"won\" class point, with a smaller average distance (8.87). This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -2.4091973304748535,
+          -5.379202842712402
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 33,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and a very small average distance (41.59). This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          11.495442390441895,
+          6.197446346282959
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 34,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also classified as \"won\" with a smaller average distance, indicating higher similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          14.47500228881836,
+          -7.592645645141602
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 35,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 14.67. This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -10.703381538391113,
+          -1.3061950206756592
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 36,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 24.26, indicating high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          12.688570976257324,
+          -2.385021686553955
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 37,
+        "vlm_response": "Class: won | Reasoning: The query point is surrounded by neighbors that are also classified as \"won\". The pie chart shows that all 1 nearest neighbors are classified as \"won\", indicating a high similarity to this class. Additionally, the spatial clustering in the t-SNE visualization suggests that the \"won\" class is more concentrated in the region around the query point, further supporting its classification as \"won\".",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          11.741151809692383,
+          5.811830520629883
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 38,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"nowin\" class. The average distance to the nearest neighbor is 17.50, which is relatively close, indicating a high similarity.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          3.8679749965667725,
+          6.674247741699219
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 39,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbors are also predominantly from the \"won\" class, as indicated by the pie chart. The average distance to neighbors is relatively low, suggesting high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          15.406660079956055,
+          -5.058779239654541
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 40,
+        "vlm_response": "Class: nowin | Reasoning: The query point is surrounded by neighbors that are also classified as \"nowin\". The pie chart shows that all 1 nearest neighbors are classified as \"nowin\", with an average distance of 24.02. This suggests that the query point is very similar to its nearest neighbors, which are also classified as \"nowin\".",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          2.7517778873443604,
+          7.460805416107178
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 41,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are all from the \"won\" class, with an average distance of 10.77. This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -4.5808234214782715,
+          -4.687056064605713
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 42,
+        "vlm_response": "Class: nowin | Reasoning: The query point is surrounded by neighbors that are also classified as \"nowin\" (100% of the nearest neighbors). The pie chart shows that all 1 nearest neighbors are classified as \"nowin,\" indicating a high similarity to this class. Additionally, the spatial clustering in the t-SNE visualization suggests that the \"nowin\" class is more concentrated in the lower right quadrant, which aligns with the position of the query point.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          4.043598175048828,
+          4.11416482925415
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 43,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors (100% of the nearest neighbors are \"won\") and the average distance to these neighbors is lower (14.92) compared to the \"nowin\" class neighbors. This indicates that the query point is more similar to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -9.768855094909668,
+          5.533359050750732
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 44,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 15.09, indicating high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -0.1385480910539627,
+          5.880937576293945
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 45,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 15.81, indicating high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          -0.9259462952613831,
+          3.262638807296753
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 46,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors, as indicated by the pie chart showing 100% of the nearest neighbors belong to the \"nowin\" class. Additionally, the spatial clustering in the t-SNE visualization shows that the \"nowin\" class is more concentrated around the query point, suggesting that the query point is more likely to belong to the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -9.870970726013184,
+          2.0592703819274902
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 47,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also classified as \"won\" with a smaller average distance, indicating higher similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          11.117615699768066,
+          -6.448203086853027
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 48,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbors are also predominantly from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbors is relatively low, suggesting a high degree of similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          15.01333236694336,
+          -5.349243640899658
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 49,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 14.58, indicating high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -8.228596687316895,
+          -4.4341535568237305
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 50,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is relatively small, suggesting high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          7.225542068481445,
+          -6.812466144561768
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 51,
+        "vlm_response": "Class: nowin | Reasoning: The query point is surrounded by neighbors that are also classified as \"nowin\". The pie chart shows that all 1 nearest neighbors are classified as \"nowin\", with an average distance of 13.74. This indicates that the query point is very similar to its nearest neighbors, which are all classified as \"nowin\".",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          3.150350570678711,
+          -0.255808025598526
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 52,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance. This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          -1.3866605758666992,
+          -2.9597582817077637
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 53,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is relatively small, suggesting a high similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          -6.642875671386719,
+          -3.3758442401885986
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 54,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are all from the \"won\" class, with an average distance of 11.13, indicating high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -0.8636806607246399,
+          -7.350693702697754
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 55,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors, as indicated by the pie chart showing 100% of the nearest neighbors belong to the \"nowin\" class. Additionally, the spatial clustering in the t-SNE visualization suggests that the \"nowin\" class is more concentrated around the query point, while the \"won\" class is more spread out.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          0.7621233463287354,
+          4.548576831817627
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 56,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance. This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          18.100717544555664,
+          -5.217449188232422
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 57,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 17.62. This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          10.714828491210938,
+          -5.765687465667725
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 58,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and a smaller average distance (17.75). This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          9.310389518737793,
+          -3.45515775680542
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 59,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is relatively low, suggesting a high degree of similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          18.05592918395996,
+          -5.612454891204834
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 60,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance. This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          6.209434509277344,
+          0.8523849844932556
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 61,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 15.85, which is relatively small compared to other distances. This suggests that the query point is more similar to the \"nowin\" class than to the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -4.695724964141846,
+          1.712294101715088
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 62,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance (15.10). This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -5.5904741287231445,
+          -2.455796957015991
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 63,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance. This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          -1.7464278936386108,
+          0.024910764768719673
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 64,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and a smaller average distance (21.71). This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          16.5407772064209,
+          -5.191123008728027
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 65,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 19.38, which is lower than the average distance to the \"won\" class neighbors. This suggests that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          1.3854024410247803,
+          5.564884185791016
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 66,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and a smaller average distance (20.22). This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          3.0776495933532715,
+          2.3785126209259033
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 67,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 13.23, which is lower than the average distance to the \"won\" class neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that the query point is more aligned with the \"nowin\" class, as it is closer to the cluster of \"nowin\" points.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -8.8870267868042,
+          2.299032211303711
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 68,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is relatively small, suggesting a high similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          7.182985305786133,
+          1.8677314519882202
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 69,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors, as indicated by the pie chart showing 100% of the nearest neighbors belong to the \"nowin\" class. Additionally, the spatial clustering in the t-SNE visualization shows that the \"nowin\" class points are more concentrated around the query point, suggesting that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          4.560757637023926,
+          6.881509304046631
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 70,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are all from the \"won\" class, with an average distance of 11.88, indicating high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -10.44346809387207,
+          4.623755931854248
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 71,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors (100% of the nearest neighbors are \"won\") and the average distance to these neighbors is lower (21.96) compared to the \"nowin\" class neighbors. This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          -3.282014846801758,
+          7.989791393280029
+        ],
+        "image_size": "617x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 72,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (1 neighbor, 100% probability) and the pie chart shows that the \"nowin\" class is the most frequent among the nearest neighbors. The spatial clustering in the t-SNE visualization also suggests that the query point is more aligned with the \"nowin\" class distribution.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -8.95661449432373,
+          -4.549108028411865
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 73,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance. This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -9.27165412902832,
+          -1.4155898094177246
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 74,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is relatively small, suggesting a high degree of similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -5.2955827713012695,
+          -3.1192781925201416
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 75,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance (9.72). This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -0.34835222363471985,
+          -8.122645378112793
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 76,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is 18.36, which is relatively close, suggesting a high similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          11.89301872253418,
+          -5.087351322174072
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 77,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and a very small average distance (19.18). This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -4.6579790115356445,
+          7.001855373382568
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 78,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that all 1 nearest neighbors are from the \"won\" class, with a smaller average distance (12.24) compared to the \"nowin\" class neighbors. This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -10.889042854309082,
+          6.281489372253418
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 79,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 14.14, which is relatively close. The spatial clustering in the t-SNE visualization also suggests that the query point is more aligned with the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -11.28939437866211,
+          1.9560025930404663
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 80,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"nowin\" class. The average distance to the nearest neighbor is 12.91, which is relatively close, indicating a high similarity.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -6.883649826049805,
+          1.9900048971176147
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 81,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and a smaller average distance (33.87). This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          9.626055717468262,
+          6.471136569976807
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 82,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance. This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          9.353090286254883,
+          -5.201591491699219
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 83,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance (9.84). This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -1.8168346881866455,
+          -6.095168590545654
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 84,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 11.71, which is the smallest among all classes. This suggests that the query point is more similar to the \"nowin\" class than to the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -10.167622566223145,
+          -2.804298162460327
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 85,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 15.18, indicating high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -9.584168434143066,
+          3.7258896827697754
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 86,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"nowin\" class. The average distance to the nearest neighbor is 14.41, which is relatively close, indicating a high similarity to the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -12.959918975830078,
+          -0.4570409059524536
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 87,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 15.59, which is relatively close. The spatial clustering in the t-SNE visualization also shows that the \"nowin\" class is more concentrated around the query point, indicating a higher likelihood of the query point belonging to this class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -1.4242439270019531,
+          7.148270130157471
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 88,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"nowin\" class with a 100% count and an average distance of 10.00. This suggests that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -6.516708850860596,
+          1.2331140041351318
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 89,
+        "vlm_response": "Class: won | Reasoning: The query point is surrounded by neighbors that are also classified as \"won\". The pie chart shows that all 1 nearest neighbors are classified as \"won\", indicating a high similarity to this class. Additionally, the spatial clustering in the t-SNE visualization suggests that the \"won\" class is more concentrated in the region around the query point, further supporting its classification.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          12.5814790725708,
+          5.92098331451416
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 90,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors, as indicated by the pie chart showing 100% of the nearest neighbors belong to the \"nowin\" class. Additionally, the spatial clustering in the t-SNE visualization suggests that the query point is more aligned with the \"nowin\" class distribution.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          3.7735965251922607,
+          4.725952625274658
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 91,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also classified as \"won\" with a smaller average distance, indicating higher similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          9.722722053527832,
+          -6.949641704559326
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 92,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 12.97, which is lower than the average distance to the \"won\" class neighbors (1/1, which is not applicable as it's a single neighbor). This suggests that the query point is more similar to the \"nowin\" class, as indicated by the pie chart analysis.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -7.007405757904053,
+          2.328385591506958
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 93,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is relatively small, suggesting a high similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          15.894319534301758,
+          -6.489868640899658
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 94,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbors are also predominantly from the \"won\" class, as indicated by the pie chart. The average distance to neighbors is relatively low, suggesting a high degree of similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          14.833620071411133,
+          -5.044973373413086
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 95,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are all from the \"nowin\" class, with an average distance of 19.90. This suggests that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          3.748840093612671,
+          5.365965843200684
+        ],
+        "image_size": "608x491",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 96,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is from the \"nowin\" class with a 100% count and an average distance of 16.63. This suggests that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -12.66523265838623,
+          -1.649371862411499
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 97,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 11.80, which is relatively close. The spatial clustering in the t-SNE visualization also suggests that the query point is more aligned with the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          0.5777490139007568,
+          2.716503381729126
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 98,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 26.02, which is relatively close. The spatial clustering in the t-SNE visualization also suggests that the query point is more aligned with the \"nowin\" class, as it is not as far from the \"nowin\" cluster as it is from the \"won\" cluster.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          7.07466983795166,
+          6.710958003997803
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 99,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is relatively small, suggesting a high degree of similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          14.032330513000488,
+          -7.644179344177246
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 100,
+        "vlm_response": "Class: nowin | Reasoning: The query point is surrounded by neighbors that are also classified as \"nowin\". The pie chart shows that all 1 nearest neighbors are classified as \"nowin\", with an average distance of 13.63. This indicates that the query point is very similar to its nearest neighbors, which are also classified as \"nowin\".",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -5.649604797363281,
+          2.2487189769744873
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 101,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors (100% of the nearest neighbors are \"won\") and the average distance to these neighbors is lower (46.99) compared to the \"nowin\" class neighbors. This indicates that the query point is more similar to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          13.354230880737305,
+          5.125451564788818
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 102,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance. This suggests that the query point is more likely to belong to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          0.7891725301742554,
+          -0.5438007116317749
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 103,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"nowin\" class. The average distance to the nearest neighbor is 55.58, which is relatively close, indicating a high similarity.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          13.359366416931152,
+          7.104363918304443
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 104,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors, as indicated by the pie chart showing 100% of the nearest neighbors belong to the \"nowin\" class. Additionally, the spatial clustering in the t-SNE visualization suggests that the query point is more aligned with the \"nowin\" class distribution.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          1.2250900268554688,
+          2.0265963077545166
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 105,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"nowin\" class. The average distance to the nearest neighbor is 13.66, which is relatively close, indicating a high similarity to the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -8.129368782043457,
+          -4.132960796356201
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 106,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbors are also predominantly from the \"won\" class, as indicated by the pie chart. The average distance to neighbors is relatively low, suggesting high similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          11.815282821655273,
+          -5.74941349029541
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 107,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is relatively small, suggesting a high degree of similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          0.7813171744346619,
+          -6.56730318069458
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 108,
+        "vlm_response": "Class: nowin | Reasoning: The query point is surrounded by neighbors that are also classified as \"nowin\" (100% of the nearest neighbors). The pie chart shows that all 1 nearest neighbors are classified as \"nowin,\" indicating a high similarity to this class. Additionally, the spatial clustering in the t-SNE visualization suggests that the \"nowin\" class is more concentrated in the region around the query point, further supporting the classification.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          8.022722244262695,
+          6.511434555053711
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 109,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and a smaller average distance (19.24). This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          9.046366691589355,
+          -2.0643115043640137
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 110,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance. This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          -11.395034790039062,
+          5.554298400878906
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 111,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are all from the \"nowin\" class, with an average distance of 11.75. This suggests that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -10.377409934997559,
+          -5.894914150238037
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 112,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance (24.10). This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          7.068642616271973,
+          4.636298179626465
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 113,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are all from the \"won\" class, with an average distance of 17.46, indicating high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -6.087017059326172,
+          7.243487358093262
+        ],
+        "image_size": "608x492",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 114,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors (100% of the nearest neighbors are \"won\") and the average distance to these neighbors is lower (22.90) compared to the \"nowin\" class neighbors. This indicates that the query point is more similar to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          4.956071376800537,
+          8.05624008178711
+        ],
+        "image_size": "617x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 115,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is from the \"nowin\" class with a 100% count and an average distance of 22.92. This suggests that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          0.16661523282527924,
+          0.13698922097682953
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 116,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% nowin neighbors) and has a smaller average distance (17.80) compared to the \"won\" class neighbors. The pie chart shows that the \"nowin\" class has 100% of the nearest neighbors, indicating that the query point is more similar to the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          2.55110239982605,
+          2.78574800491333
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 117,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 15.45, which is relatively close. The spatial clustering in the t-SNE visualization also suggests that the query point is more aligned with the \"nowin\" class, as it is near the cluster of \"nowin\" points.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          3.208892583847046,
+          0.3298422396183014
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 118,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors, as indicated by the pie chart showing 100% of the nearest neighbors belong to the \"nowin\" class. Additionally, the spatial clustering in the t-SNE visualization suggests that the query point is more aligned with the \"nowin\" class distribution.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -10.019918441772461,
+          -3.0649046897888184
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 119,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and a smaller average distance (49.36). This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          13.090188980102539,
+          6.032643795013428
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 120,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"nowin\" class. The average distance to the nearest neighbor is 22.46, which is relatively close, indicating a high similarity.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          5.1299920082092285,
+          5.517666339874268
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 121,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance (11.83). This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          -0.0646405816078186,
+          -7.0810699462890625
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 122,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is relatively small, suggesting high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          15.62438678741455,
+          -7.726423740386963
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 123,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance (16.74). This indicates that the query point is more similar to the \"won\" class neighbors than to the \"nowin\" class neighbors.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          -4.771109580993652,
+          8.435704231262207
+        ],
+        "image_size": "617x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 124,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is from the \"nowin\" class with a 100% count and an average distance of 17.31. This indicates that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -1.4720549583435059,
+          -0.6862284541130066
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 125,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbors are also predominantly from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbors is relatively low, suggesting a high degree of similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -2.435272216796875,
+          -4.002570629119873
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 126,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is from the \"nowin\" class with a 100% count and an average distance of 16.34. This suggests that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          3.6335160732269287,
+          -2.115697145462036
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 127,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (14.38 average distance) than to the \"won\" class neighbors. Additionally, the pie chart shows that the \"nowin\" class has 100% of the nearest neighbors, indicating a higher similarity to the query point.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -12.279666900634766,
+          -1.5277655124664307
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 128,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% nowin neighbors) and has a smaller average distance (19.46) compared to the \"won\" class neighbors. The pie chart shows that the \"nowin\" class has 100% of the nearest neighbors, indicating that the query point is more similar to the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          3.209066390991211,
+          6.107146263122559
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 129,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 12.57, which is lower than the average distance to the \"won\" class neighbors (1/1, which is 0). This suggests that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -8.618707656860352,
+          4.891324996948242
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 130,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 12.90. This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -10.168251037597656,
+          4.632621765136719
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 131,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also classified as \"won\" with a smaller average distance. The pie chart shows that the nearest neighbor is from the \"won\" class, which further supports the classification of the query point as \"won.\"",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          17.158166885375977,
+          -4.97313928604126
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 132,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbors are also predominantly from the \"won\" class, as indicated by the pie chart. The average distance to neighbors is relatively low, suggesting high similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          15.546594619750977,
+          -4.264069557189941
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 133,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and a smaller average distance (28.35). This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          11.59035873413086,
+          -0.6982877254486084
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 134,
+        "vlm_response": "Class: nowin | Reasoning: The query point is connected to a neighbor in the nowin class, and the pie chart shows that the nearest neighbor is also in the nowin class. The spatial clustering in the t-SNE visualization does not show a clear separation between the two classes, but the explicit nearest neighbor analysis indicates that the query point is more similar to the nowin class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -16.66921615600586,
+          -2.2496302127838135
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 135,
+        "vlm_response": "Class: nowin | Reasoning: The query point is surrounded by neighbors that are also classified as \"nowin\". The pie chart shows that the nearest neighbors are all from the \"nowin\" class, with an average distance of 16.88. This suggests that the query point is likely to be classified as \"nowin\" based on its proximity to these neighbors.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -11.999619483947754,
+          -2.208861827850342
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 136,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors, as indicated by the pie chart showing 100% of the nearest neighbors belong to the \"nowin\" class. Additionally, the spatial clustering in the t-SNE visualization suggests that the query point is more aligned with the \"nowin\" class distribution.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -17.82578468322754,
+          -3.104468584060669
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 137,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is relatively small, suggesting high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          16.392236709594727,
+          -4.3641276359558105
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 138,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors, as indicated by the pie chart showing 100% of the nearest neighbors belong to the \"nowin\" class. Additionally, the spatial clustering in the t-SNE visualization suggests that the query point is more aligned with the \"nowin\" class distribution.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -0.6896854639053345,
+          4.2242913246154785
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 139,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 15.74, indicating high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -9.672623634338379,
+          1.2963389158248901
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 140,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% nowin neighbors with an average distance of 13.10) than to the \"won\" class neighbors. The pie chart shows that the nearest neighbors are all from the \"nowin\" class, indicating that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -8.097471237182617,
+          1.7307782173156738
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 141,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also classified as \"won\". The pie chart shows that the nearest neighbor is from the \"won\" class, which is the most frequent class among the neighbors.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          9.270626068115234,
+          0.5084754824638367
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 142,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is relatively small, suggesting a high degree of similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          15.023590087890625,
+          -6.818687438964844
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 143,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 23.25. This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          4.944456577301025,
+          -2.951619863510132
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 144,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbors are also predominantly from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbors is 10.88, which is relatively close, suggesting a high similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -2.836754083633423,
+          -6.684170722961426
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 145,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"nowin\" class. The average distance to the nearest neighbor is 7.48, which is relatively close, indicating a high similarity.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -16.628339767456055,
+          -0.07727912068367004
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 146,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance. This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          -4.771010398864746,
+          8.435807228088379
+        ],
+        "image_size": "617x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 147,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 20.42. This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          14.42898178100586,
+          -6.184178829193115
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 148,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and a smaller average distance (26.82). This indicates a higher similarity to the \"won\" class among the nearest neighbors.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          8.464254379272461,
+          1.6112265586853027
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 149,
+        "vlm_response": "Class: nowin | Reasoning: The query point is surrounded by neighbors that are also classified as \"nowin\". The pie chart shows that all 1 nearest neighbors are classified as \"nowin\", indicating a high similarity to this class. Additionally, the spatial clustering in the t-SNE visualization suggests that the \"nowin\" class is distinct from the \"won\" class, with the query point being closer to the \"nowin\" cluster.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -6.639007568359375,
+          5.972876071929932
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 150,
+        "vlm_response": "Class: nowin | Reasoning: The query point is surrounded by neighbors that are also classified as \"nowin\" (100% of the nearest neighbors are \"nowin\"). The pie chart shows that the nearest neighbors are all from the \"nowin\" class, indicating a high similarity to this class. Additionally, the spatial clustering in the t-SNE visualization suggests that the \"nowin\" class is distinct from the \"won\" class, further supporting the classification of the query point as \"nowin\".",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -3.792628288269043,
+          3.50958251953125
+        ],
+        "image_size": "608x489",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 151,
+        "vlm_response": "Class: nowin | Reasoning: The query point is surrounded by neighbors that are also classified as \"nowin\". The pie chart shows that all 1 nearest neighbors are classified as \"nowin\", with an average distance of 27.31. This suggests that the query point is likely to be classified as \"nowin\" based on its proximity to these neighbors.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          8.781509399414062,
+          6.31121826171875
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 152,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% nowin neighbors with an average distance of 53.11) than to the \"won\" class neighbors. The pie chart shows that the nearest neighbors are all from the \"nowin\" class, indicating that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          13.051572799682617,
+          7.6086106300354
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 153,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (14.17 average distance) than to the \"won\" class neighbors (not shown in the visualization). The pie chart shows that the nearest neighbors are all \"nowin,\" indicating that the query point is likely to belong to the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -11.622836112976074,
+          3.405405044555664
+        ],
+        "image_size": "608x492",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 154,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and a smaller average distance (20.32). This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          7.700065612792969,
+          0.643426775932312
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 155,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 12.64, indicating high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -5.496800422668457,
+          -5.6337809562683105
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 156,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance. This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          -10.05429458618164,
+          0.05010919272899628
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 157,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 12.69, indicating high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          1.1337623596191406,
+          -7.061655044555664
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 158,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance. This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          -3.2486908435821533,
+          -1.2479324340820312
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 159,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is relatively small, suggesting high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -8.108220100402832,
+          -1.6760711669921875
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 160,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 21.67, indicating high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          9.860065460205078,
+          -3.3326706886291504
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 161,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance. This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          9.188430786132812,
+          -6.064950942993164
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 162,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance (18.74). This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          0.8006407618522644,
+          -0.6558165550231934
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 163,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also classified as \"won\" with a smaller average distance, indicating higher similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          16.572834014892578,
+          -7.726467132568359
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 164,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is relatively low (9.78), suggesting a high degree of similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -2.5124363899230957,
+          -5.775343894958496
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 165,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 14.42. This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -11.843950271606445,
+          2.1258339881896973
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 166,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance. This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          -6.023797035217285,
+          6.912446022033691
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 167,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbors are also predominantly from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbors is relatively low, suggesting a high similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          16.233781814575195,
+          -6.099761486053467
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 168,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also classified as \"won\" with a smaller average distance, indicating higher similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          8.168135643005371,
+          0.9880926012992859
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 169,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbor is relatively small, suggesting a high similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          16.44806671142578,
+          -7.0976481437683105
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 170,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is from the \"nowin\" class with a 100% count and an average distance of 15.72. This suggests that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -10.54621696472168,
+          2.567204236984253
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 171,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is from the \"nowin\" class with a 100% count and an average distance of 15.37. This suggests that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          -11.39402961730957,
+          -1.3316028118133545
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 172,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"nowin\" class with a 100% count and an average distance of 13.18. This suggests that the query point is more likely to belong to the \"nowin\" class based on both spatial proximity and the explicit nearest neighbor analysis.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          3.077803134918213,
+          -0.9554204940795898
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 173,
+        "vlm_response": "Class: nowin | Reasoning: The query point is connected to only one neighbor, which is also in the \"nowin\" class. The pie chart shows that this neighbor is the only one in the \"nowin\" class, indicating a high similarity. Additionally, the spatial clustering in the t-SNE visualization suggests that the \"nowin\" class is more concentrated around the query point, further supporting the classification.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          12.256476402282715,
+          6.713062286376953
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 174,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance (13.49). This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -5.737574100494385,
+          -4.4761528968811035
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 175,
+        "vlm_response": "Class: nowin | Reasoning: The query point is surrounded by neighbors that are also classified as \"nowin\". The pie chart shows that all 1 nearest neighbors are classified as \"nowin\", indicating a high similarity to this class. Additionally, the spatial clustering in the t-SNE visualization suggests that the \"nowin\" class is more concentrated in the region around the query point, further supporting the classification.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          5.875138282775879,
+          7.171001434326172
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 176,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance (15.75). This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          7.387287616729736,
+          -6.8411993980407715
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 177,
+        "vlm_response": "Class: nowin | Reasoning: The query point is surrounded by neighbors that are also classified as \"nowin\". The pie chart shows that all 1 nearest neighbors are classified as \"nowin\", indicating a high similarity to this class. Additionally, the spatial clustering in the t-SNE visualization suggests that the \"nowin\" class is distinct from the \"won\" class, with the query point being closer to the \"nowin\" cluster.",
+        "parsed_prediction": 1,
+        "true_label": 0,
+        "tsne_coords": [
+          12.250715255737305,
+          7.488302230834961
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 178,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also in the \"nowin\" class with a 100% count and an average distance of 16.76. This suggests that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -2.229506254196167,
+          1.0065186023712158
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 179,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a 100% count and an average distance of 14.95, indicating high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          -10.75223445892334,
+          3.6993441581726074
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 180,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors, as indicated by the pie chart showing 100% of the nearest neighbors belong to the \"nowin\" class. Additionally, the spatial clustering in the t-SNE visualization shows that the \"nowin\" class points are more concentrated around the query point, suggesting that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          5.030447483062744,
+          -2.6058189868927
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 181,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors, as indicated by the pie chart showing 100% of the nearest neighbors belong to the \"nowin\" class. Additionally, the spatial clustering in the t-SNE visualization suggests that the query point is more aligned with the \"nowin\" class, as it is near the cluster of \"nowin\" points.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -12.245182991027832,
+          5.274252414703369
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 182,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance. This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          4.896720886230469,
+          4.263477802276611
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 183,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% nowin neighbors with an average distance of 9.68) than to the \"won\" class neighbors. The pie chart shows that the nearest neighbors are all from the \"nowin\" class, indicating that the query point is more similar to the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -7.500353813171387,
+          0.9206675291061401
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 184,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also a \"won\" class point, with a smaller average distance (13.11). This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -2.014846086502075,
+          -2.13413143157959
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 185,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance (18.14). This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          1.7683380842208862,
+          -3.3084359169006348
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 186,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors, as indicated by the pie chart showing 100% of the nearest neighbors belong to the \"nowin\" class. Additionally, the spatial clustering in the t-SNE visualization shows that the \"nowin\" class is more concentrated around the query point, suggesting that the query point is more likely to belong to the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          8.742009162902832,
+          5.738724231719971
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 187,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbors are also predominantly from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbors is 10.75, which is relatively close, suggesting a strong similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -6.067959308624268,
+          -5.890479564666748
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 188,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbor is also classified as \"won\" with a smaller average distance. The pie chart shows that the nearest neighbor is from the \"won\" class, which further supports the classification of the query point as \"won.\"",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          13.527462005615234,
+          -4.714020252227783
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 189,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbors are also predominantly from the \"won\" class, as indicated by the pie chart. The average distance to the nearest neighbors is 12.05, which is relatively close, suggesting that the query point is well-represented by the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -7.049293041229248,
+          -4.575757026672363
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 190,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class cluster in the t-SNE visualization, and its nearest neighbors are also predominantly from the \"won\" class, as indicated by the pie chart. The average distance to neighbors is relatively low, suggesting a high degree of similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          5.504495620727539,
+          5.600608825683594
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 191,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 14.73, which is lower than the average distance to the \"won\" class neighbors (1/1, which is 14.73). This indicates that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -3.2242848873138428,
+          3.160961866378784
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 192,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 14.63, which is relatively close. The spatial clustering in the t-SNE visualization also suggests that the query point is more aligned with the \"nowin\" class, as it is near the cluster of \"nowin\" points.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -1.75263512134552,
+          2.233032703399658
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 193,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is from the \"nowin\" class, with a 100% count and an average distance of 12.52. This indicates that the query point is more similar to the \"nowin\" class than the \"won\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -5.907230854034424,
+          3.2405409812927246
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 194,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also from the \"won\" class, with a smaller average distance (19.46). This suggests that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 1,
+        "tsne_coords": [
+          -3.6975488662719727,
+          8.560696601867676
+        ],
+        "image_size": "617x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 195,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbors are all from the \"won\" class, with an average distance of 10.39, indicating high similarity.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -1.6432509422302246,
+          -3.8850038051605225
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 196,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 14.21, which is relatively close. The spatial clustering in the t-SNE visualization also suggests that the query point is more aligned with the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          -1.2977485656738281,
+          6.91453742980957
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 197,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also a \"won\" class point, indicating a higher similarity to the \"won\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -12.126631736755371,
+          3.896026611328125
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 198,
+        "vlm_response": "Class: nowin | Reasoning: The query point is closer to the \"nowin\" class neighbors (100% of the nearest neighbors are \"nowin\") and the average distance to these neighbors is 13.64, which is the smallest among all classes. This indicates that the query point is most similar to the \"nowin\" class.",
+        "parsed_prediction": 1,
+        "true_label": 1,
+        "tsne_coords": [
+          1.1309926509857178,
+          2.855297327041626
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      },
+      {
+        "test_point_idx": 199,
+        "vlm_response": "Class: won | Reasoning: The query point is closer to the \"won\" class neighbors in the t-SNE visualization, and the pie chart shows that the nearest neighbor is also a \"won\" class point, with a 100% count and an average distance of 22.17. This indicates that the query point is more similar to the \"won\" class than the \"nowin\" class.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          10.705411911010742,
+          -1.4141730070114136
+        ],
+        "image_size": "608x488",
+        "visible_classes": [
+          "won",
+          "nowin"
+        ]
+      }
+    ],
+    "dataset_name": "kr-vs-kp",
+    "dataset_id": "3",
+    "task_id": "3"
+  }
+]

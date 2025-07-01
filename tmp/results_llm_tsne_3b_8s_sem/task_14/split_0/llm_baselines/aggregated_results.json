@@ -1,0 +1,5070 @@
+[
+  {
+    "model_name": "CLAM-t-SNE-tabular",
+    "accuracy": 0.36,
+    "balanced_accuracy": 0.34790967454869054,
+    "prediction_time": 585.1769707202911,
+    "total_time": 585.1769707202911,
+    "num_test_samples": 200,
+    "completed_samples": 200,
+    "completion_rate": 1.0,
+    "num_classes": 10,
+    "predictions": [
+      4,
+      6,
+      4,
+      2,
+      4,
+      2,
+      7,
+      4,
+      9,
+      4,
+      6,
+      7,
+      4,
+      7,
+      6,
+      7,
+      3,
+      4,
+      4,
+      0,
+      0,
+      7,
+      4,
+      4,
+      4,
+      6,
+      4,
+      6,
+      7,
+      6,
+      7,
+      7,
+      4,
+      9,
+      3,
+      6,
+      4,
+      3,
+      9,
+      4,
+      4,
+      7,
+      3,
+      4,
+      7,
+      2,
+      6,
+      7,
+      4,
+      5,
+      7,
+      4,
+      7,
+      6,
+      7,
+      6,
+      7,
+      4,
+      4,
+      6,
+      7,
+      7,
+      4,
+      4,
+      7,
+      4,
+      3,
+      4,
+      4,
+      3,
+      6,
+      5,
+      6,
+      6,
+      6,
+      6,
+      6,
+      7,
+      9,
+      4,
+      7,
+      4,
+      4,
+      4,
+      6,
+      6,
+      6,
+      4,
+      4,
+      6,
+      4,
+      4,
+      9,
+      4,
+      6,
+      4,
+      4,
+      3,
+      5,
+      4,
+      3,
+      4,
+      4,
+      4,
+      4,
+      3,
+      4,
+      3,
+      7,
+      4,
+      6,
+      3,
+      3,
+      4,
+      4,
+      6,
+      4,
+      2,
+      3,
+      4,
+      6,
+      7,
+      7,
+      4,
+      6,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      6,
+      6,
+      3,
+      4,
+      7,
+      3,
+      4,
+      4,
+      4,
+      6,
+      4,
+      3,
+      6,
+      4,
+      2,
+      7,
+      7,
+      7,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      6,
+      4,
+      4,
+      3,
+      4,
+      4,
+      4,
+      0,
+      6,
+      4,
+      4,
+      4,
+      7,
+      7,
+      4,
+      7,
+      6,
+      6,
+      1,
+      4,
+      4,
+      4,
+      4,
+      8,
+      3,
+      7,
+      3,
+      2,
+      4,
+      4,
+      7,
+      4,
+      4,
+      3,
+      4,
+      4,
+      3,
+      6,
+      9
+    ],
+    "ground_truth": [
+      7,
+      6,
+      1,
+      2,
+      5,
+      2,
+      4,
+      4,
+      5,
+      8,
+      9,
+      4,
+      4,
+      7,
+      9,
+      2,
+      3,
+      1,
+      3,
+      6,
+      0,
+      7,
+      4,
+      8,
+      5,
+      9,
+      0,
+      6,
+      7,
+      9,
+      7,
+      1,
+      5,
+      6,
+      3,
+      6,
+      3,
+      3,
+      6,
+      3,
+      4,
+      7,
+      3,
+      4,
+      4,
+      2,
+      9,
+      7,
+      0,
+      5,
+      2,
+      0,
+      4,
+      9,
+      2,
+      6,
+      7,
+      8,
+      9,
+      6,
+      4,
+      7,
+      2,
+      4,
+      1,
+      8,
+      5,
+      1,
+      8,
+      3,
+      6,
+      5,
+      9,
+      9,
+      6,
+      6,
+      5,
+      1,
+      6,
+      3,
+      7,
+      2,
+      8,
+      2,
+      6,
+      9,
+      6,
+      0,
+      0,
+      6,
+      5,
+      1,
+      9,
+      4,
+      6,
+      0,
+      0,
+      3,
+      5,
+      3,
+      8,
+      0,
+      5,
+      8,
+      1,
+      3,
+      0,
+      3,
+      7,
+      2,
+      4,
+      1,
+      3,
+      1,
+      8,
+      9,
+      8,
+      2,
+      3,
+      1,
+      6,
+      7,
+      7,
+      0,
+      8,
+      0,
+      0,
+      8,
+      3,
+      4,
+      4,
+      2,
+      5,
+      2,
+      0,
+      5,
+      9,
+      6,
+      3,
+      8,
+      7,
+      5,
+      1,
+      6,
+      2,
+      6,
+      8,
+      3,
+      6,
+      8,
+      2,
+      4,
+      7,
+      4,
+      3,
+      8,
+      8,
+      7,
+      0,
+      0,
+      2,
+      9,
+      3,
+      1,
+      5,
+      1,
+      1,
+      2,
+      9,
+      9,
+      4,
+      1,
+      5,
+      7,
+      7,
+      1,
+      1,
+      6,
+      9,
+      2,
+      4,
+      0,
+      2,
+      0,
+      8,
+      3,
+      4,
+      1,
+      2,
+      1,
+      0,
+      7,
+      8,
+      8,
+      3,
+      1,
+      0,
+      3,
+      9,
+      6
+    ],
+    "roc_auc": null,
+    "f1_macro": 0.3173976201998375,
+    "f1_micro": 0.36,
+    "f1_weighted": 0.3259355402350353,
+    "precision_macro": 0.5350815217391305,
+    "recall_macro": 0.34790967454869054,
+    "r2_score": null,
+    "mae": null,
+    "mse": null,
+    "rmse": null,
+    "task_type": "classification",
+    "config": {
+      "modality": "tabular",
+      "vlm_model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+      "embedding_size": 1000,
+      "tsne_perplexity": 30,
+      "tsne_max_iter": 1000,
+      "use_3d": false,
+      "use_knn_connections": true,
+      "nn_k": 4,
+      "show_test_points": false,
+      "max_vlm_image_size": 768,
+      "image_dpi": 72,
+      "force_rgb_mode": false,
+      "zoom_factor": 1.0,
+      "max_tabpfn_samples": 3000,
+      "use_semantic_names": true,
+      "device": "cuda",
+      "backend": "transformers",
+      "enable_thinking": true,
+      "openai_model": null,
+      "gemini_model": null,
+      "api_model": null,
+      "effective_model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+      "is_api_model": false,
+      "seed": 42,
+      "enable_multi_viz": false,
+      "visualization_methods": [
+        "tsne"
+      ],
+      "layout_strategy": "adaptive_grid",
+      "reasoning_focus": "classification",
+      "multi_viz_config": {},
+      "dinov2_model": null,
+      "embedding_backend": null,
+      "bioclip2_model": null,
+      "use_pca_backend": null
+    },
+    "prediction_details": [
+      {
+        "test_point_idx": 0,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 points in the t-SNE visualization, and its nearest neighbors (class 4) have the smallest average distance (6.50), indicating higher similarity.",
+        "parsed_prediction": 4,
+        "true_label": 7,
+        "tsne_coords": [
+          -3.4449374675750732,
+          -8.42699146270752
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 1,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 6, as indicated by the pie chart. The spatial clustering in the t-SNE visualization also suggests that class 6 is the most similar class to the query point.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          5.787568092346191,
+          14.972701072692871
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 2,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has two neighbors with an average distance of 11.86, which is slightly higher than the 50% threshold. This suggests that the query point is more likely to belong to class 4 based on its spatial proximity and the distribution of its nearest neighbors.",
+        "parsed_prediction": 4,
+        "true_label": 1,
+        "tsne_coords": [
+          1.296721339225769,
+          -1.530347228050232
+        ],
+        "image_size": "662x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 3,
+        "vlm_response": "Class: 2 | Reasoning: The query point is located near the cluster of points representing class 2 in the t-SNE visualization. The pie chart shows that the nearest neighbors (4 neighbors) are all from class 2, with an average distance of 5.68, indicating high similarity. This suggests that the query point is most likely from class 2.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -9.886631965637207,
+          -11.749177932739258
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 4,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is distinct from the other classes, which is further supported by the higher percentage of neighbors from class 4.",
+        "parsed_prediction": 4,
+        "true_label": 5,
+        "tsne_coords": [
+          9.76874828338623,
+          6.8646368980407715
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 5,
+        "vlm_response": "Class: 2 | Reasoning: The query point is located near the cluster of points representing class 2 in the t-SNE visualization. The pie chart shows that the nearest neighbors (4 neighbors) are all from class 2, with an average distance of 5.19, indicating high similarity. This suggests that the query point is most likely from class 2.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -9.349210739135742,
+          -9.897049903869629
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 6,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that class 7 has the highest percentage (50%) of neighbors. Additionally, the average distance to neighbors from class 7 is the lowest (6.70), indicating higher similarity.",
+        "parsed_prediction": 7,
+        "true_label": 4,
+        "tsne_coords": [
+          -0.9173280000686646,
+          -8.057706832885742
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 7,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the 4 nearest neighbors. The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 4,
+        "tsne_coords": [
+          4.073068618774414,
+          -2.6283645629882812
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 8,
+        "vlm_response": "Class: 9 | Reasoning: The query point is closer to the class 9 points in the t-SNE visualization, and the pie chart shows that class 9 has two neighbors with the smallest average distance (7.12), indicating higher similarity.",
+        "parsed_prediction": 9,
+        "true_label": 5,
+        "tsne_coords": [
+          5.398920059204102,
+          12.147623062133789
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 9,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the 4 nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is distinct from the other classes, which is further supported by the higher percentage of neighbors from class 4.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -8.26326847076416,
+          3.3471035957336426
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 10,
+        "vlm_response": "Class: 6 | Reasoning: The query point is closer to the class 6 points in the t-SNE visualization, and the pie chart shows that class 6 has two neighbors with the smallest average distance (5.76), indicating higher similarity.",
+        "parsed_prediction": 6,
+        "true_label": 9,
+        "tsne_coords": [
+          5.680826663970947,
+          13.74333381652832
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 11,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, which has the highest percentage (50%) in the pie chart. Additionally, the spatial clustering in the t-SNE visualization shows that class 7 is distinct from the other classes, with a higher average distance to neighbors compared to other classes.",
+        "parsed_prediction": 7,
+        "true_label": 4,
+        "tsne_coords": [
+          -1.5181270837783813,
+          -8.623750686645508
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 12,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is distinct from the other classes, which is further supported by the higher percentage of neighbors from class 4.",
+        "parsed_prediction": 4,
+        "true_label": 4,
+        "tsne_coords": [
+          3.3519413471221924,
+          -2.930405616760254
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 13,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that all 4 nearest neighbors are from class 7, with an average distance of 5.34. The spatial clustering in the t-SNE visualization also supports this, as class 7 appears to be a distinct cluster.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          -2.212399482727051,
+          -9.785130500793457
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 14,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 6, as indicated by the pie chart. The spatial clustering in the t-SNE visualization also suggests that class 6 is the most similar class to the query point.",
+        "parsed_prediction": 6,
+        "true_label": 9,
+        "tsne_coords": [
+          1.9940389394760132,
+          13.17574691772461
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 15,
+        "vlm_response": "Class: 7 | Reasoning: The query point is located near the gray square points, which are the test data points. The pie chart shows that the nearest neighbors to the query point are from class 7, with a 25% count and an average distance of 10.30. This suggests that the query point is most likely from class 7 based on its proximity to the test data and the distribution of its nearest neighbors.",
+        "parsed_prediction": 7,
+        "true_label": 2,
+        "tsne_coords": [
+          -6.940176963806152,
+          -10.872099876403809
+        ],
+        "image_size": "641x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 16,
+        "vlm_response": "Class: 3 | Reasoning: The query point is located near the red star, which is connected to four neighbors. The pie chart shows that three of these neighbors belong to class 3, with the fourth neighbor being from class 4. The spatial clustering in the t-SNE visualization also suggests that class 3 is the most likely class for the query point, as it is closer to the cluster of points representing class 3.",
+        "parsed_prediction": 3,
+        "true_label": 3,
+        "tsne_coords": [
+          8.665037155151367,
+          3.224330186843872
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 17,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. The spatial clustering in the t-SNE visualization also shows a clear separation between the classes, with class 4 being closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 1,
+        "tsne_coords": [
+          1.7030094861984253,
+          -1.8957139253616333
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 18,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (100%). The spatial clustering in the t-SNE visualization also indicates that class 4 is more densely populated in the region around the query point.",
+        "parsed_prediction": 4,
+        "true_label": 3,
+        "tsne_coords": [
+          4.859974384307861,
+          0.3542962670326233
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 19,
+        "vlm_response": "Class: 0 | Reasoning: The query point is located in the region of the t-SNE visualization that is predominantly occupied by class 0. The pie chart shows that the nearest neighbors to the query point are also predominantly from class 0, with two neighbors from class 6 and two neighbors from class 9. The average distance to neighbors from class 0 is 5.03, which is slightly lower than the average distance to neighbors from class 9 (5.47), indicating that the query point is more similar to neighbors from class 0.",
+        "parsed_prediction": 0,
+        "true_label": 6,
+        "tsne_coords": [
+          3.3240103721618652,
+          15.25637149810791
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 20,
+        "vlm_response": "Class: 0 | Reasoning: The query point is located near the blue-colored class points in the t-SNE visualization, which are the nearest neighbors. The pie chart shows that the nearest neighbors to the query point are both from class 0, with an average distance of 11.03, which is slightly lower than the average distance of the other class (8), which is 11.39. This suggests that the query point is more similar to the class 0 neighbors than to the class 8 neighbors.",
+        "parsed_prediction": 0,
+        "true_label": 0,
+        "tsne_coords": [
+          -20.482873916625977,
+          -4.869908332824707
+        ],
+        "image_size": "662x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 21,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 7, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 7 is the most similar class to the query point.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          -0.3635607361793518,
+          -9.840336799621582
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 22,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (100%). The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 4,
+        "tsne_coords": [
+          4.256993770599365,
+          -1.5851489305496216
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 23,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -6.459903240203857,
+          2.7709004878997803
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 24,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is distinct from the other classes, which is further supported by the higher percentage of neighbors from class 4.",
+        "parsed_prediction": 4,
+        "true_label": 5,
+        "tsne_coords": [
+          4.152032852172852,
+          -1.8356142044067383
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 25,
+        "vlm_response": "Class: 6 | Reasoning: The query point is closer to the cluster of points labeled as class 6 in the t-SNE visualization. The pie chart shows that the nearest neighbors to the query point are all from class 6, with three neighbors having a 75% probability and an average distance of 6.58. This indicates that the query point is highly similar to the class 6 points, supporting its classification as class 6.",
+        "parsed_prediction": 6,
+        "true_label": 9,
+        "tsne_coords": [
+          5.285825729370117,
+          13.013324737548828
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 26,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is distinct from the other classes, which is further supported by the higher percentage of neighbors from class 4.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -21.66946029663086,
+          -5.607537746429443
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 27,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by points from class 6 in the t-SNE visualization, and the pie chart shows that all 4 nearest neighbors are from class 6, with the smallest average distance (4.35). This indicates that the query point is most likely from class 6 based on both the spatial clustering and the nearest neighbor analysis.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          4.118825912475586,
+          14.3974609375
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 28,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that class 7 has the highest percentage of neighbors (75%) with the smallest average distance (5.39), indicating that the query point is most similar to class 7.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          0.4084476828575134,
+          -8.351954460144043
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 29,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors from class 6, and the pie chart shows that all 4 nearest neighbors are from class 6, with no other classes represented. The spatial clustering in the t-SNE visualization also supports this, as the query point is close to the cluster of class 6 points.",
+        "parsed_prediction": 6,
+        "true_label": 9,
+        "tsne_coords": [
+          4.587340831756592,
+          14.009194374084473
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 30,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that all 4 nearest neighbors are from class 7, with an average distance of 4.25. This indicates that the query point is most likely from class 7 based on both the spatial clustering and the explicit nearest neighbor analysis.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          -1.6862082481384277,
+          -10.271856307983398
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 31,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that all 4 nearest neighbors are from class 7. The spatial clustering in the t-SNE visualization also supports this, as class 7 appears to be a distinct cluster.",
+        "parsed_prediction": 7,
+        "true_label": 1,
+        "tsne_coords": [
+          -2.0265698432922363,
+          -11.202557563781738
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 32,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is a distinct cluster, which is consistent with the nearest neighbor analysis.",
+        "parsed_prediction": 4,
+        "true_label": 5,
+        "tsne_coords": [
+          9.755010604858398,
+          7.482405662536621
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 33,
+        "vlm_response": "Class: 9 | Reasoning: The query point is located near the cyan-colored points, which are the nearest neighbors. The pie chart shows that the 4 nearest neighbors are distributed as follows: 6 (50%) and 9 (50%). The cyan-colored points are closer to the query point, indicating higher similarity. Therefore, the query point is most likely to belong to class 9.",
+        "parsed_prediction": 9,
+        "true_label": 6,
+        "tsne_coords": [
+          4.606050491333008,
+          14.286486625671387
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 34,
+        "vlm_response": "Class: 3 | Reasoning: The query point is surrounded by neighbors that are also classified as class 3, and the pie chart shows that all 4 nearest neighbors are from class 3. The spatial clustering in the t-SNE visualization also supports this, as the query point is close to the cluster of class 3 points.",
+        "parsed_prediction": 3,
+        "true_label": 3,
+        "tsne_coords": [
+          7.289699554443359,
+          2.194148540496826
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 35,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors from class 6, and the pie chart shows that all 4 nearest neighbors are from class 6, with a 100% distribution. The spatial clustering in the t-SNE visualization also indicates that class 6 is a distinct cluster, which is consistent with the nearest neighbor analysis.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          3.085561513900757,
+          13.667941093444824
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 36,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (75%). The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 3,
+        "tsne_coords": [
+          2.76521635055542,
+          0.839730441570282
+        ],
+        "image_size": "641x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 37,
+        "vlm_response": "Class: 3 | Reasoning: The query point is surrounded by neighbors from class 3, and the pie chart shows that class 3 has the highest percentage of neighbors among the four nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that class 3 is distinct from the other classes, which is further supported by the high percentage of neighbors from class 3.",
+        "parsed_prediction": 3,
+        "true_label": 3,
+        "tsne_coords": [
+          6.73223876953125,
+          2.965541362762451
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 38,
+        "vlm_response": "Class: 9 | Reasoning: The query point is located near the cyan-colored points, which are the nearest neighbors. The pie chart shows that the 4 nearest neighbors are evenly distributed among classes 6 and 9, with a slight preference for class 9. The spatial clustering in the t-SNE visualization also suggests that class 9 is more closely clustered with the query point compared to other classes.",
+        "parsed_prediction": 9,
+        "true_label": 6,
+        "tsne_coords": [
+          2.309673309326172,
+          15.141959190368652
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 39,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 neighbors (purple) in the t-SNE visualization, and the pie chart shows that class 4 has the highest percentage of neighbors (75%) among the 4 nearest neighbors.",
+        "parsed_prediction": 4,
+        "true_label": 3,
+        "tsne_coords": [
+          3.269289255142212,
+          1.0870171785354614
+        ],
+        "image_size": "641x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 40,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 4,
+        "tsne_coords": [
+          1.8302727937698364,
+          16.35961151123047
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 41,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that all 4 nearest neighbors are from class 7. The spatial clustering in the t-SNE visualization also supports this, as class 7 appears to be a distinct cluster.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          -1.3710664510726929,
+          -11.369845390319824
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 42,
+        "vlm_response": "Class: 3 | Reasoning: The query point is located near the cluster of points labeled with class 3 in the t-SNE visualization. The pie chart shows that the nearest neighbors (connected by red lines) to the query point are all from class 3, with a 100% distribution. This indicates that the query point is highly similar to the neighbors in class 3, supporting its classification as class 3.",
+        "parsed_prediction": 3,
+        "true_label": 3,
+        "tsne_coords": [
+          8.774832725524902,
+          2.3380322456359863
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 43,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 4,
+        "tsne_coords": [
+          4.086889743804932,
+          -2.731358766555786
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 44,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that all 4 nearest neighbors are from class 7, with an average distance of 3.37. This indicates that the query point is most likely from class 7 based on both the spatial clustering and the explicit nearest neighbor analysis.",
+        "parsed_prediction": 7,
+        "true_label": 4,
+        "tsne_coords": [
+          -0.6818410754203796,
+          -10.714439392089844
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 45,
+        "vlm_response": "Class: 2 | Reasoning: The query point is located near the cluster of points representing class 2 in the t-SNE visualization. The pie chart shows that the nearest neighbors to the query point are all from class 2, with no other classes represented. The average distance to the nearest neighbors is 4.16, which is relatively small, indicating high similarity.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -9.656052589416504,
+          -10.085836410522461
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 46,
+        "vlm_response": "Class: 6 | Reasoning: The query point is closer to the class 6 points in the t-SNE visualization, and the pie chart shows that class 6 has two neighbors with the smallest average distance (8.37), indicating higher similarity.",
+        "parsed_prediction": 6,
+        "true_label": 9,
+        "tsne_coords": [
+          1.494766116142273,
+          15.584817886352539
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 47,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that all 4 nearest neighbors are from class 7, with an average distance of 2.11. The spatial clustering in the t-SNE visualization also supports this, as class 7 appears to be a distinct cluster.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          -0.0757828950881958,
+          -11.81385326385498
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 48,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is distinct from the other classes, which is further supported by the high percentage of neighbors from class 4.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -22.23088264465332,
+          -4.705239772796631
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 49,
+        "vlm_response": "Class: 5 | Reasoning: The query point is closer to the class 5 points in the t-SNE visualization, and the pie chart shows that class 5 has the highest percentage of neighbors (75%) among the 4 nearest neighbors.",
+        "parsed_prediction": 5,
+        "true_label": 5,
+        "tsne_coords": [
+          8.358525276184082,
+          9.093244552612305
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 50,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that class 7 has the highest percentage of neighbors (75%) with the smallest average distance (10.76), indicating that the query point is most similar to class 7.",
+        "parsed_prediction": 7,
+        "true_label": 2,
+        "tsne_coords": [
+          -6.625034809112549,
+          -10.811267852783203
+        ],
+        "image_size": "641x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 51,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 neighbors (purple points) in the t-SNE visualization, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -23.10453224182129,
+          -5.557313919067383
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 52,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that class 7 has the highest percentage (75%) of the nearest neighbors. The spatial clustering in the t-SNE visualization also indicates that class 7 is more densely populated in the area around the query point.",
+        "parsed_prediction": 7,
+        "true_label": 4,
+        "tsne_coords": [
+          -0.461448609828949,
+          -9.114173889160156
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 53,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 6, as indicated by the pie chart. The spatial clustering in the t-SNE visualization also suggests that class 6 is the most similar class to the query point.",
+        "parsed_prediction": 6,
+        "true_label": 9,
+        "tsne_coords": [
+          6.405514717102051,
+          12.07297420501709
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 54,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that class 7 has the highest percentage of neighbors (75%) with the smallest average distance (7.68), indicating that the query point is most similar to class 7.",
+        "parsed_prediction": 7,
+        "true_label": 2,
+        "tsne_coords": [
+          -3.644068479537964,
+          -9.461426734924316
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 55,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 6, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 6 is a distinct cluster, which is consistent with the nearest neighbor analysis showing a high percentage of neighbors from class 6.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          6.9856719970703125,
+          14.017472267150879
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 56,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that all 4 nearest neighbors are from class 7. The spatial clustering in the t-SNE visualization also indicates that class 7 is distinct from the other classes, with the query point being closer to the cluster of class 7 neighbors than to the other classes.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          -1.3395038843154907,
+          -10.482656478881836
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 57,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 neighbors (purple points) in the t-SNE visualization, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -7.742524147033691,
+          2.64870285987854
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 58,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the 4 nearest neighbors. The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 9,
+        "tsne_coords": [
+          1.233677625656128,
+          15.651399612426758
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 59,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 6, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 6 is a distinct cluster, which is consistent with the nearest neighbor analysis.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          2.3870956897735596,
+          12.663934707641602
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 60,
+        "vlm_response": "Class: 7 | Reasoning: The query point is close to the gray square points, which are the test data points. The pie chart shows that the nearest neighbors to the query point are from class 7, with two neighbors and an average distance of 7.76. This suggests that the query point is most likely from class 7 based on both the spatial proximity and the nearest neighbor analysis.",
+        "parsed_prediction": 7,
+        "true_label": 4,
+        "tsne_coords": [
+          -1.0196850299835205,
+          -7.453091621398926
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 61,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, with two neighbors having the smallest average distances (4.55). The pie chart shows that class 7 has the highest percentage (50%) among the nearest neighbors, indicating it is the most likely class for the query point.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          -0.5828419327735901,
+          -9.485956192016602
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 62,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (100%). The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 2,
+        "tsne_coords": [
+          -8.850266456604004,
+          -10.958998680114746
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 63,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. The spatial clustering in the t-SNE visualization also suggests that class 4 is the most similar class to the query point.",
+        "parsed_prediction": 4,
+        "true_label": 4,
+        "tsne_coords": [
+          3.9807162284851074,
+          -2.1079933643341064
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 64,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that class 7 has the highest percentage of neighbors (75%) with the smallest average distance (7.75). This suggests that the query point is most similar to class 7.",
+        "parsed_prediction": 7,
+        "true_label": 1,
+        "tsne_coords": [
+          -2.376333475112915,
+          -7.9523234367370605
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 65,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -9.03158187866211,
+          3.8066046237945557
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 66,
+        "vlm_response": "Class: 3 | Reasoning: The query point is closer to the red star, which is connected to three neighbors of class 3 (75%) and one neighbor of class 4 (25%). The spatial clustering in the t-SNE visualization also suggests that class 3 is more concentrated around the query point, indicating a higher similarity to the query point compared to other classes.",
+        "parsed_prediction": 3,
+        "true_label": 5,
+        "tsne_coords": [
+          6.045037269592285,
+          1.5116549730300903
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 67,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. The spatial clustering in the t-SNE visualization also suggests that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 1,
+        "tsne_coords": [
+          -0.3217341899871826,
+          -4.906793117523193
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 68,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (100%). The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -8.836094856262207,
+          3.0900990962982178
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 69,
+        "vlm_response": "Class: 3 | Reasoning: The query point is located near the red star, which is connected to four neighbors. The pie chart shows that three of these neighbors belong to class 3, with the fourth neighbor being class 4. The spatial clustering in the t-SNE visualization also suggests that class 3 is the most likely class for the query point, as it is closer to the cluster of points representing class 3.",
+        "parsed_prediction": 3,
+        "true_label": 3,
+        "tsne_coords": [
+          8.908059120178223,
+          2.0237457752227783
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 70,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by points from class 6 (pink) in the t-SNE visualization. The pie chart shows that the nearest neighbors (4 neighbors) are from class 6, with an average distance of 4.80, which is the smallest among the four neighbors. This indicates that the query point is most similar to class 6 based on both spatial clustering and the explicit nearest neighbor analysis.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          4.197054862976074,
+          14.883995056152344
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 71,
+        "vlm_response": "Class: 5 | Reasoning: The query point is closer to the class 5 points in the t-SNE visualization, and the pie chart shows that class 5 has the highest percentage of neighbors (25%) among the 4 nearest neighbors.",
+        "parsed_prediction": 5,
+        "true_label": 5,
+        "tsne_coords": [
+          5.971134185791016,
+          0.677920401096344
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 72,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by points from class 6 (pink) in the t-SNE visualization. The pie chart shows that the nearest neighbors to the query point are all from class 6, with the majority (75%) being within a smaller average distance (7.70) compared to the other classes. This suggests that the query point is most likely from class 6.",
+        "parsed_prediction": 6,
+        "true_label": 9,
+        "tsne_coords": [
+          2.5881783962249756,
+          13.948562622070312
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 73,
+        "vlm_response": "Class: 6 | Reasoning: The query point is located near the cluster of points labeled with class 6 in the t-SNE visualization. The pie chart shows that the nearest neighbors to the query point are all from class 6, with the majority (75%) being within a smaller average distance (6.01) compared to the other classes. This suggests that the query point is most likely from class 6.",
+        "parsed_prediction": 6,
+        "true_label": 9,
+        "tsne_coords": [
+          5.673123836517334,
+          13.942543983459473
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 74,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 6, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 6 is the most similar class to the query point.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          6.6649627685546875,
+          15.595954895019531
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 75,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 6, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 6 is a distinct cluster, which is consistent with the nearest neighbor analysis.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          3.844735860824585,
+          13.102766990661621
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 76,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by points labeled 6, which have the highest percentage (75%) of nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization shows that points labeled 6 are more densely packed around the query point compared to other classes.",
+        "parsed_prediction": 6,
+        "true_label": 5,
+        "tsne_coords": [
+          8.288473129272461,
+          9.344582557678223
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 77,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that class 7 has the highest percentage of neighbors (75%) with the smallest average distance (5.84), indicating that the query point is most similar to class 7.",
+        "parsed_prediction": 7,
+        "true_label": 1,
+        "tsne_coords": [
+          -1.3641676902770996,
+          -9.226709365844727
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 78,
+        "vlm_response": "Class: 9 | Reasoning: The query point is closer to the class 9 points in the t-SNE visualization, and the pie chart shows that class 9 has the highest percentage of neighbors (75%) with the smallest average distance (4.37), indicating that the query point is most similar to class 9.",
+        "parsed_prediction": 9,
+        "true_label": 6,
+        "tsne_coords": [
+          3.590074300765991,
+          16.95956039428711
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 79,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is a distinct cluster, which is consistent with the nearest neighbor analysis.",
+        "parsed_prediction": 4,
+        "true_label": 3,
+        "tsne_coords": [
+          2.722033739089966,
+          -0.6270925998687744
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 80,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that all 4 nearest neighbors are from class 7, with an average distance of 6.13. This indicates that the query point is most likely from class 7 based on both the spatial clustering and the explicit nearest neighbor analysis.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          -2.236556053161621,
+          -8.88561725616455
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 81,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 cluster in the t-SNE visualization, and its nearest neighbors (connected by red lines) are also from class 4, as indicated by the pie chart. The pie chart shows that all 4 nearest neighbors belong to class 4, with a smaller average distance (5.41) compared to other classes, suggesting higher similarity.",
+        "parsed_prediction": 4,
+        "true_label": 2,
+        "tsne_coords": [
+          -9.37289810180664,
+          -9.616910934448242
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 82,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (100%). The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -8.456957817077637,
+          3.1779046058654785
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 83,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the 4 nearest neighbors. The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 2,
+        "tsne_coords": [
+          -10.024008750915527,
+          -11.261934280395508
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 84,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors from class 6, and the pie chart shows that all 4 nearest neighbors are from class 6, with a 100% distribution. The spatial clustering in the t-SNE visualization also supports this, as the query point is close to the cluster of class 6 points.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          3.476816177368164,
+          13.439518928527832
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 85,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 6, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 6 is the most similar class to the query point.",
+        "parsed_prediction": 6,
+        "true_label": 9,
+        "tsne_coords": [
+          5.881869792938232,
+          14.720344543457031
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 86,
+        "vlm_response": "Class: 6 | Reasoning: The query point is close to the class 6 points in the t-SNE visualization, and the pie chart shows that class 6 has the highest percentage (75%) of its nearest neighbors, with an average distance of 7.65, which is the smallest among the nearest neighbors.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          4.432934761047363,
+          12.376382827758789
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 87,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -22.416250228881836,
+          -6.516537189483643
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 88,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (100%). The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -21.994298934936523,
+          -4.839852333068848
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 89,
+        "vlm_response": "Class: 6 | Reasoning: The query point is close to the class 6 points in the t-SNE visualization, and the pie chart shows that class 6 has the highest percentage (75%) of its nearest neighbors, with an average distance of 6.30, which is the smallest among the nearest neighbors. This suggests that class 6 is the most likely class for the query point.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          4.869938850402832,
+          13.30443286895752
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 90,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is distinct from the other classes, which is further supported by the pie chart showing that class 4 is the most common among the nearest neighbors.",
+        "parsed_prediction": 4,
+        "true_label": 5,
+        "tsne_coords": [
+          3.533937931060791,
+          -1.7680414915084839
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 91,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (75%). The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 1,
+        "tsne_coords": [
+          0.7913079857826233,
+          -2.44343638420105
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 92,
+        "vlm_response": "Class: 9 | Reasoning: The query point is closer to the class 9 points in the t-SNE visualization, and its nearest neighbors (class 6 and class 9) are evenly distributed, with class 9 having a slightly higher average distance (5.04 vs. 5.94). This suggests that class 9 is the most likely class for the query point.",
+        "parsed_prediction": 9,
+        "true_label": 9,
+        "tsne_coords": [
+          2.6039559841156006,
+          15.532776832580566
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 93,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 4,
+        "tsne_coords": [
+          -0.9911180138587952,
+          0.2663346827030182
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 94,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors from class 6, and the pie chart shows that all 4 nearest neighbors are from class 6, with a 100% distribution. The spatial clustering in the t-SNE visualization also supports this, as class 6 appears to be more densely clustered around the query point compared to other classes.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          2.561885356903076,
+          11.1657075881958
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 95,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. The spatial clustering in the t-SNE visualization also suggests that class 4 is the most similar class to the query point.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -22.084165573120117,
+          -5.500515937805176
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 96,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. The spatial clustering in the t-SNE visualization also suggests that class 4 is the most similar class to the query point.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -23.07357406616211,
+          -6.532222270965576
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 97,
+        "vlm_response": "Class: 3 | Reasoning: The query point is surrounded by neighbors that are also classified as class 3. The pie chart shows that all 4 nearest neighbors are from class 3, and the average distance to these neighbors is 6.67, which is relatively close. The spatial clustering in the t-SNE visualization also supports this, as class 3 appears to be a distinct cluster.",
+        "parsed_prediction": 3,
+        "true_label": 3,
+        "tsne_coords": [
+          7.869901180267334,
+          3.315645456314087
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 98,
+        "vlm_response": "Class: 5 | Reasoning: The query point is located near the cluster of points labeled with class 5 in the t-SNE visualization. The pie chart shows that the nearest neighbors to the query point are from class 5, with two neighbors and an average distance of 8.85. This suggests that the query point is most likely from class 5 based on both its spatial position and the explicit nearest neighbor analysis.",
+        "parsed_prediction": 5,
+        "true_label": 5,
+        "tsne_coords": [
+          6.136223793029785,
+          0.9192942976951599
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 99,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 3,
+        "tsne_coords": [
+          -2.3840553760528564,
+          1.486209750175476
+        ],
+        "image_size": "641x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 100,
+        "vlm_response": "Class: 3 | Reasoning: The query point is located near the red star in the t-SNE visualization, which is connected to the class 3 (red) by a thick red line. The pie chart shows that the nearest neighbors to the query point are from class 3 (red), with an average distance of 11.40, which is the smallest among the four neighbors. This suggests that the query point is most likely from class 3 based on both the spatial proximity and the nearest neighbor analysis.",
+        "parsed_prediction": 3,
+        "true_label": 8,
+        "tsne_coords": [
+          -4.28143310546875,
+          2.3693623542785645
+        ],
+        "image_size": "641x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 101,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 neighbors in the t-SNE visualization, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -22.817703247070312,
+          -5.686406135559082
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 102,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the 4 nearest neighbors. The spatial clustering in the t-SNE visualization also suggests that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 5,
+        "tsne_coords": [
+          8.884437561035156,
+          8.645904541015625
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 103,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (100%). The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -5.714714050292969,
+          2.407118082046509
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 104,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 1,
+        "tsne_coords": [
+          0.3628842830657959,
+          -3.4276974201202393
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 105,
+        "vlm_response": "Class: 3 | Reasoning: The query point is located near the red star, which is connected to four neighbors. The pie chart shows that three of these neighbors belong to class 3, with the fourth neighbor being from class 4. The spatial clustering in the t-SNE visualization also suggests that class 3 is the most likely class for the query point, as it is closer to the cluster of points representing class 3.",
+        "parsed_prediction": 3,
+        "true_label": 3,
+        "tsne_coords": [
+          9.232844352722168,
+          3.0707106590270996
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 106,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. The spatial clustering in the t-SNE visualization also suggests that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -22.369823455810547,
+          -5.402010440826416
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 107,
+        "vlm_response": "Class: 3 | Reasoning: The query point is located near the red star, which is connected to four neighbors. The pie chart shows that three of these neighbors belong to class 3, with the fourth neighbor being class 4. The spatial clustering in the t-SNE visualization also suggests that class 3 is the most likely class for the query point, as it is surrounded by points from class 3.",
+        "parsed_prediction": 3,
+        "true_label": 3,
+        "tsne_coords": [
+          9.290314674377441,
+          1.934776782989502
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 108,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that class 7 has the highest percentage of neighbors (75%) with the smallest average distance (4.69), indicating that the query point is most similar to class 7.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          -0.4224384129047394,
+          -9.08828067779541
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 109,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the 4 nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is distinct from the other classes, which is further supported by the higher percentage of neighbors from class 4.",
+        "parsed_prediction": 4,
+        "true_label": 2,
+        "tsne_coords": [
+          -7.151918888092041,
+          -10.963441848754883
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 110,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors from class 6, which has the highest percentage (50%) in the nearest neighbor analysis. The spatial clustering in the t-SNE visualization also suggests that class 6 is more densely populated in the vicinity of the query point.",
+        "parsed_prediction": 6,
+        "true_label": 4,
+        "tsne_coords": [
+          2.3956356048583984,
+          11.116243362426758
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 111,
+        "vlm_response": "Class: 3 | Reasoning: The query point is surrounded by neighbors that are also classified as class 3, and the pie chart shows that all 4 nearest neighbors are from class 3. The spatial clustering in the t-SNE visualization also supports this, as class 3 appears to be a distinct cluster.",
+        "parsed_prediction": 3,
+        "true_label": 1,
+        "tsne_coords": [
+          7.818979740142822,
+          0.9782026410102844
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 112,
+        "vlm_response": "Class: 3 | Reasoning: The query point is surrounded by neighbors that are also classified as class 3. The pie chart shows that all 4 nearest neighbors are classified as class 3, with no other classes represented. The spatial clustering in the t-SNE visualization also supports this, as the query point is close to the cluster of class 3 points.",
+        "parsed_prediction": 3,
+        "true_label": 3,
+        "tsne_coords": [
+          9.755488395690918,
+          2.2699973583221436
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 113,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 points in the t-SNE visualization and has two neighbors from class 4, which is the highest percentage among the nearest neighbors.",
+        "parsed_prediction": 4,
+        "true_label": 1,
+        "tsne_coords": [
+          -0.5739979147911072,
+          -0.2383299171924591
+        ],
+        "image_size": "641x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 114,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. The spatial clustering in the t-SNE visualization also suggests that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -7.295651435852051,
+          2.6060385704040527
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 115,
+        "vlm_response": "Class: 6 | Reasoning: The query point is closer to the class 6 points in the t-SNE visualization, and the pie chart shows that class 6 has the highest percentage of neighbors (75%) with the smallest average distance (6.38), indicating that the query point is most similar to class 6.",
+        "parsed_prediction": 6,
+        "true_label": 9,
+        "tsne_coords": [
+          2.256352186203003,
+          14.246885299682617
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 116,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the 4 nearest neighbors. The spatial clustering in the t-SNE visualization also suggests that class 4 is the most similar to the query point.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -9.044421195983887,
+          3.1182405948638916
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 117,
+        "vlm_response": "Class: 2 | Reasoning: The query point is located near the cluster of points representing class 2 in the t-SNE visualization. The pie chart shows that the nearest neighbors to the query point are all from class 2, with no other classes represented. This suggests that the query point is most likely from class 2.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -9.786941528320312,
+          -11.487045288085938
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 118,
+        "vlm_response": "Class: 3 | Reasoning: The query point is located near the red star, which is connected to four neighbors. The pie chart shows that three of these neighbors belong to class 3, with the fourth neighbor being from class 4. The spatial clustering in the t-SNE visualization also suggests that class 3 is the most likely class for the query point, as it is closer to the cluster of points representing class 3.",
+        "parsed_prediction": 3,
+        "true_label": 3,
+        "tsne_coords": [
+          9.508288383483887,
+          2.4376018047332764
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 119,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. The spatial clustering in the t-SNE visualization also shows that class 4 is relatively close to the query point, suggesting it is the most likely class for the query point.",
+        "parsed_prediction": 4,
+        "true_label": 1,
+        "tsne_coords": [
+          -0.286606103181839,
+          -1.5298705101013184
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 120,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors from class 6, and the pie chart shows that all 4 nearest neighbors are from class 6, with no other classes represented. The spatial clustering in the t-SNE visualization also supports this, as the query point is close to the cluster of points representing class 6.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          2.0803709030151367,
+          13.244499206542969
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 121,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that all 4 nearest neighbors are from class 7, with an average distance of 2.65. The spatial clustering in the t-SNE visualization also supports this, as class 7 appears to be more densely clustered around the query point compared to other classes.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          -0.6244544982910156,
+          -10.969853401184082
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 122,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that all 4 nearest neighbors are from class 7. The spatial clustering in the t-SNE visualization also indicates that class 7 is distinct from the other classes, with the query point being closer to the cluster of class 7 neighbors than to the clusters of other classes.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          -0.9707964658737183,
+          -11.397916793823242
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 123,
+        "vlm_response": "Class: 4 | Reasoning: The query point is located near the purple class (4) in the t-SNE visualization. The pie chart shows that the nearest neighbors to the query point are all from class 4, with a 100% count and an average distance of 10.48. This indicates that the query point is most likely from class 4 based on both its spatial position and the explicit nearest neighbor analysis.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -20.909605026245117,
+          -5.628697395324707
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 124,
+        "vlm_response": "Class: 6 | Reasoning: The query point is close to the class 6 points in the t-SNE visualization, and its nearest neighbors (1, 6, 8, 9) are also from class 6, with the smallest average distance (11.83).",
+        "parsed_prediction": 6,
+        "true_label": 8,
+        "tsne_coords": [
+          -4.380564212799072,
+          2.300243854522705
+        ],
+        "image_size": "641x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 125,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is distinct from the other classes, which is further supported by the pie chart showing that class 4 has the highest percentage of neighbors.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -23.53016471862793,
+          -5.80401611328125
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 126,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -21.810815811157227,
+          -6.1197991371154785
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 127,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 neighbors (purple) in the t-SNE visualization, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -9.125879287719727,
+          2.648041248321533
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 128,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (50%). The spatial clustering in the t-SNE visualization also indicates that class 4 is more densely populated in the region around the query point.",
+        "parsed_prediction": 4,
+        "true_label": 3,
+        "tsne_coords": [
+          1.4645637273788452,
+          -0.8386446833610535
+        ],
+        "image_size": "662x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 129,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (100%). The spatial clustering in the t-SNE visualization also indicates that class 4 is more densely populated in the region around the query point.",
+        "parsed_prediction": 4,
+        "true_label": 4,
+        "tsne_coords": [
+          3.449753761291504,
+          -3.0578854084014893
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 130,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (50%). The spatial clustering pattern also indicates that class 4 is more densely populated in the t-SNE visualization, suggesting that the query point is closer to class 4 than to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 4,
+        "tsne_coords": [
+          0.6173750162124634,
+          -7.010604381561279
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 131,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 2,
+        "tsne_coords": [
+          -9.653425216674805,
+          -10.494240760803223
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 132,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors. The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 5,
+        "tsne_coords": [
+          4.7626800537109375,
+          0.2983306646347046
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 133,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. The spatial clustering in the t-SNE visualization also suggests that class 4 is the most similar class to the query point.",
+        "parsed_prediction": 4,
+        "true_label": 2,
+        "tsne_coords": [
+          -8.131237983703613,
+          -11.601359367370605
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 134,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is distinct from the other classes, which is further supported by the higher percentage of neighbors from class 4.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -23.243412017822266,
+          -6.445253849029541
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 135,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. The spatial clustering in the t-SNE visualization also suggests that class 4 is the most similar class to the query point among its nearest neighbors.",
+        "parsed_prediction": 4,
+        "true_label": 5,
+        "tsne_coords": [
+          9.433039665222168,
+          6.627767086029053
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 136,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 6, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 6 is a distinct cluster, which is consistent with the nearest neighbor analysis.",
+        "parsed_prediction": 6,
+        "true_label": 9,
+        "tsne_coords": [
+          3.667827606201172,
+          12.151335716247559
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 137,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 6, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 6 is closer to the query point compared to other classes.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          4.838305950164795,
+          12.63308334350586
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 138,
+        "vlm_response": "Class: 3 | Reasoning: The query point is located near the red star, which is connected to four neighbors. The pie chart shows that three of these neighbors belong to class 3, with the fourth neighbor being class 4. The spatial clustering in the t-SNE visualization also suggests that class 3 is the most likely class for the query point, as it is closer to the cluster of points representing class 3.",
+        "parsed_prediction": 3,
+        "true_label": 3,
+        "tsne_coords": [
+          9.359848976135254,
+          2.53770112991333
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 139,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. The spatial clustering in the t-SNE visualization also suggests that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -7.174696922302246,
+          3.0181617736816406
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 140,
+        "vlm_response": "Class: 7 | Reasoning: The query point is located near the gray square points, which represent the test data. The pie chart shows that the nearest neighbors to the query point are from class 7, with two neighbors and an average distance of 4.25. This suggests that the query point is most likely from class 7 based on both its spatial position and the explicit nearest neighbor analysis.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          0.1046043261885643,
+          -9.472089767456055
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 141,
+        "vlm_response": "Class: 3 | Reasoning: The query point is closer to the class \"3\" (Red) in the t-SNE visualization, and its nearest neighbors are also predominantly from class \"3\". The pie chart shows that the query point has the highest percentage (75%) of neighbors from class \"3\", indicating a strong similarity to this class.",
+        "parsed_prediction": 3,
+        "true_label": 5,
+        "tsne_coords": [
+          8.001420974731445,
+          6.2058892250061035
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 142,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (50%). The spatial clustering in the t-SNE visualization also indicates that class 4 is more densely populated in the neighborhood of the query point.",
+        "parsed_prediction": 4,
+        "true_label": 1,
+        "tsne_coords": [
+          0.48935791850090027,
+          0.46959471702575684
+        ],
+        "image_size": "662x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 143,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 points in the t-SNE visualization and has a higher percentage of class 4 neighbors (25%) compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 6,
+        "tsne_coords": [
+          -1.0695616006851196,
+          0.7555919289588928
+        ],
+        "image_size": "641x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 144,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 2,
+        "tsne_coords": [
+          -9.42841625213623,
+          -11.120284080505371
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 145,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 6, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 6 is a distinct cluster, which is consistent with the nearest neighbor analysis.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          2.798382520675659,
+          13.199064254760742
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 146,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 points in the t-SNE visualization and its nearest neighbors (class 4) have the smallest average distance (11.83), indicating higher similarity.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -3.449274778366089,
+          1.7850732803344727
+        ],
+        "image_size": "662x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 147,
+        "vlm_response": "Class: 3 | Reasoning: The query point is located near the cluster of points representing class 3 in the t-SNE visualization. The pie chart shows that the nearest neighbors to the query point are all from class 3, with no other classes represented. The average distance to the neighbors is 6.05, which is relatively small, indicating high similarity.",
+        "parsed_prediction": 3,
+        "true_label": 3,
+        "tsne_coords": [
+          8.817694664001465,
+          3.2452142238616943
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 148,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 6, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 6 is the most similar class to the query point.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          3.252816677093506,
+          13.683603286743164
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 149,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (100%). The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -9.635621070861816,
+          2.6704514026641846
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 150,
+        "vlm_response": "Class: 2 | Reasoning: The query point is located near the cluster of points representing class 2 in the t-SNE visualization. The pie chart shows that the nearest neighbors to the query point are all from class 2, with no other classes represented. The average distance to the nearest neighbors is 4.67, which is relatively small, indicating high similarity.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -9.70793342590332,
+          -10.811659812927246
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 151,
+        "vlm_response": "Class: 7 | Reasoning: The query point is closer to the class 7 cluster in the t-SNE visualization and has two nearest neighbors from class 7, with a smaller average distance (6.12) compared to the other classes.",
+        "parsed_prediction": 7,
+        "true_label": 4,
+        "tsne_coords": [
+          -1.2850606441497803,
+          -8.308173179626465
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 152,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that all 4 nearest neighbors are from class 7, with an average distance of 3.30. The spatial clustering in the t-SNE visualization also supports this, as class 7 appears to be more densely populated in the region around the query point.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          -1.835088849067688,
+          -11.540146827697754
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 153,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, with two neighbors having the smallest average distance (6.89). The pie chart shows that class 7 has the highest percentage (50%) among the nearest neighbors, indicating it is the most likely class for the query point.",
+        "parsed_prediction": 7,
+        "true_label": 4,
+        "tsne_coords": [
+          -1.010689377784729,
+          -7.7655510902404785
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 154,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 points in the t-SNE visualization, and its nearest neighbors (connected by red lines) are also from class 4, with a smaller average distance (10.23) compared to the other classes.",
+        "parsed_prediction": 4,
+        "true_label": 3,
+        "tsne_coords": [
+          6.257626056671143,
+          3.0250284671783447
+        ],
+        "image_size": "662x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 155,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. The spatial clustering in the t-SNE visualization also suggests that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -6.871028423309326,
+          3.2197985649108887
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 156,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -7.651038646697998,
+          3.2299411296844482
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 157,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is distinct from the other classes, with the query point being closer to these neighbors than to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 7,
+        "tsne_coords": [
+          2.84093976020813,
+          -0.25971871614456177
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 158,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (100%). The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -22.144622802734375,
+          -6.247202396392822
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 159,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is distinct from the other classes, which is further supported by the higher percentage of neighbors from class 4.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -23.458003997802734,
+          -6.040208339691162
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 160,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 points in the t-SNE visualization, and its nearest neighbors (class 7 and class 1) are also relatively close, indicating a higher similarity to class 4.",
+        "parsed_prediction": 4,
+        "true_label": 2,
+        "tsne_coords": [
+          -3.0897042751312256,
+          -8.998971939086914
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 161,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 6, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 6 is closer to the query point compared to other classes.",
+        "parsed_prediction": 6,
+        "true_label": 9,
+        "tsne_coords": [
+          5.215462684631348,
+          14.925084114074707
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 162,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 points in the t-SNE visualization, and the pie chart shows that class 4 has the highest percentage of neighbors (75%) with the closest average distance (9.97).",
+        "parsed_prediction": 4,
+        "true_label": 3,
+        "tsne_coords": [
+          1.157707691192627,
+          -1.855933666229248
+        ],
+        "image_size": "641x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 163,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are mostly from class 4, as indicated by the pie chart. The spatial clustering in the t-SNE visualization also shows that class 4 is relatively close to the query point, suggesting it is the most likely class for the query point.",
+        "parsed_prediction": 4,
+        "true_label": 1,
+        "tsne_coords": [
+          0.5955983400344849,
+          -6.764494895935059
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 164,
+        "vlm_response": "Class: 3 | Reasoning: The query point is closer to the class 3 cluster in the t-SNE visualization and has two nearest neighbors from class 3, with a smaller average distance (7.40) compared to the other classes.",
+        "parsed_prediction": 3,
+        "true_label": 5,
+        "tsne_coords": [
+          8.66654109954834,
+          4.851619720458984
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 165,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 points in the t-SNE visualization, and its nearest neighbors (connected by red lines) are also from class 4, with the smallest average distance (10.16).",
+        "parsed_prediction": 4,
+        "true_label": 1,
+        "tsne_coords": [
+          -6.763267517089844,
+          -7.72644567489624
+        ],
+        "image_size": "641x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 166,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (75%) among the 4 nearest neighbors. The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 1,
+        "tsne_coords": [
+          1.2410131692886353,
+          -1.6209911108016968
+        ],
+        "image_size": "641x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 167,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 2,
+        "tsne_coords": [
+          -8.15045166015625,
+          -11.74959659576416
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 168,
+        "vlm_response": "Class: 0 | Reasoning: The query point is located near the blue-colored class points in the t-SNE visualization, which are the closest neighbors according to the pie chart. The pie chart shows that the nearest neighbors to the query point are from class 6 and class 9, with equal distances. However, the spatial clustering pattern in the t-SNE visualization suggests that the query point is more aligned with the blue-colored class points, indicating a higher probability of belonging to class 0.",
+        "parsed_prediction": 0,
+        "true_label": 9,
+        "tsne_coords": [
+          2.8204357624053955,
+          14.998272895812988
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 169,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 6, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 6 is closer to the query point compared to other classes.",
+        "parsed_prediction": 6,
+        "true_label": 9,
+        "tsne_coords": [
+          6.110536098480225,
+          14.235347747802734
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 170,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is distinct from the other classes, which is further supported by the pie chart showing that class 4 is the most common among the nearest neighbors.",
+        "parsed_prediction": 4,
+        "true_label": 4,
+        "tsne_coords": [
+          3.9342193603515625,
+          -0.8456768989562988
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 171,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 neighbors (AvgDist: 8.83) than to the class 1 neighbors (AvgDist: 6.71). Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is more distinct from the other classes, which is supported by the pie chart showing a higher percentage of class 4 neighbors.",
+        "parsed_prediction": 4,
+        "true_label": 1,
+        "tsne_coords": [
+          -1.9779508113861084,
+          -6.724645137786865
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 172,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the 4 nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is distinct from the other classes, which is further supported by the higher percentage of neighbors from class 4.",
+        "parsed_prediction": 4,
+        "true_label": 5,
+        "tsne_coords": [
+          9.83452033996582,
+          7.0935235023498535
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 173,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that all 4 nearest neighbors are from class 7, with an average distance of 5.09. The spatial clustering in the t-SNE visualization also supports this, as class 7 appears to be a distinct cluster.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          -2.6062815189361572,
+          -10.84714412689209
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 174,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that all 4 nearest neighbors are from class 7. The spatial clustering in the t-SNE visualization also indicates that class 7 is a distinct cluster, which is consistent with the nearest neighbor analysis.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          -1.8541465997695923,
+          -9.426738739013672
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 175,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors (50%). The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 1,
+        "tsne_coords": [
+          0.41665440797805786,
+          0.5091543793678284
+        ],
+        "image_size": "662x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 176,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors that are also classified as 7, and the pie chart shows that all 4 nearest neighbors are from class 7. Additionally, the spatial clustering in the t-SNE visualization suggests that class 7 is distinct from the other classes, which is further supported by the high percentage of neighbors from class 7 in the pie chart.",
+        "parsed_prediction": 7,
+        "true_label": 1,
+        "tsne_coords": [
+          -3.6661911010742188,
+          -10.5242919921875
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 177,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors from class 6, and the pie chart shows that all 4 nearest neighbors are from class 6, with a 100% distribution. The spatial clustering in the t-SNE visualization also supports this, as the query point is close to the cluster of points representing class 6.",
+        "parsed_prediction": 6,
+        "true_label": 6,
+        "tsne_coords": [
+          5.032443046569824,
+          13.558616638183594
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 178,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 6, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 6 is the most similar class to the query point.",
+        "parsed_prediction": 6,
+        "true_label": 9,
+        "tsne_coords": [
+          6.108878135681152,
+          13.665080070495605
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 179,
+        "vlm_response": "Class: 1 | Reasoning: The query point is closer to the orange-colored class (class 1) in the t-SNE visualization, and its nearest neighbors (connected by red lines) are also from class 1, with a smaller average distance (9.11) compared to the other classes.",
+        "parsed_prediction": 1,
+        "true_label": 2,
+        "tsne_coords": [
+          -6.879785537719727,
+          -7.83563756942749
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 180,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. The spatial clustering in the t-SNE visualization also shows a clear separation of classes, with class 4 being closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 4,
+        "tsne_coords": [
+          4.435397148132324,
+          -2.0872371196746826
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 181,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. The spatial clustering in the t-SNE visualization also indicates that class 4 is relatively close to the query point, suggesting it is the most likely class for the query point.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -21.035518646240234,
+          -5.223016262054443
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 182,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 neighbors in the t-SNE visualization, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors.",
+        "parsed_prediction": 4,
+        "true_label": 2,
+        "tsne_coords": [
+          -9.226375579833984,
+          -11.824548721313477
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 183,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. The spatial clustering in the t-SNE visualization also suggests that class 4 is the most similar to the query point among the classes represented.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -22.69647979736328,
+          -5.3272223472595215
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 184,
+        "vlm_response": "Class: 8 | Reasoning: The query point is surrounded by neighbors from class 8, and the pie chart shows that class 8 has the highest percentage of neighbors (75%) with the smallest average distance (11.07), indicating that the query point is most similar to class 8.",
+        "parsed_prediction": 8,
+        "true_label": 8,
+        "tsne_coords": [
+          -5.4712300300598145,
+          2.4334988594055176
+        ],
+        "image_size": "641x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 185,
+        "vlm_response": "Class: 3 | Reasoning: The query point is located near the red star, which is connected to four neighbors. The pie chart shows that three of these neighbors belong to class 3, with the fourth neighbor being from class 4. The spatial clustering in the t-SNE visualization also suggests that class 3 is the most likely class for the query point, as it is closer to the cluster of points representing class 3.",
+        "parsed_prediction": 3,
+        "true_label": 3,
+        "tsne_coords": [
+          9.214831352233887,
+          3.75946307182312
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 186,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, which has the highest percentage (50%) among the nearest neighbors. The spatial clustering in the t-SNE visualization also suggests that class 7 is more closely clustered with the query point compared to other classes.",
+        "parsed_prediction": 7,
+        "true_label": 4,
+        "tsne_coords": [
+          -0.3592579960823059,
+          -8.356038093566895
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 187,
+        "vlm_response": "Class: 3 | Reasoning: The query point is surrounded by neighbors that are also classified as class 3. The pie chart shows that all 4 nearest neighbors are from class 3, and the average distance to these neighbors is 8.54, which is the smallest among all classes. This indicates that the query point is most similar to class 3 based on both spatial clustering and the explicit nearest neighbor analysis.",
+        "parsed_prediction": 3,
+        "true_label": 1,
+        "tsne_coords": [
+          8.418976783752441,
+          2.034519910812378
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 188,
+        "vlm_response": "Class: 2 | Reasoning: The query point is located near the cluster of points representing class 2 in the t-SNE visualization. The pie chart shows that the nearest neighbors to the query point are all from class 2, with no other classes represented. The average distance to the nearest neighbors is 6.05, which is relatively small, indicating high similarity.",
+        "parsed_prediction": 2,
+        "true_label": 2,
+        "tsne_coords": [
+          -9.44793701171875,
+          -11.68970012664795
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 189,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 1,
+        "tsne_coords": [
+          0.10332752019166946,
+          -0.44289839267730713
+        ],
+        "image_size": "641x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 190,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is distinct from the other classes, which is further supported by the higher percentage of neighbors from class 4.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -22.426958084106445,
+          -6.130879878997803
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 191,
+        "vlm_response": "Class: 7 | Reasoning: The query point is surrounded by neighbors from class 7, and the pie chart shows that all 4 nearest neighbors are from class 7. The spatial clustering in the t-SNE visualization also indicates that class 7 is distinct from the other classes, with the query point being closer to the cluster of class 7 neighbors than to the clusters of other classes.",
+        "parsed_prediction": 7,
+        "true_label": 7,
+        "tsne_coords": [
+          -0.6577932834625244,
+          -10.180123329162598
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 192,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. Additionally, the spatial clustering in the t-SNE visualization suggests that class 4 is distinct from the other classes, which is further supported by the higher percentage of neighbors from class 4.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -8.527650833129883,
+          2.591731071472168
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 193,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors from class 4, and the pie chart shows that class 4 has the highest percentage of neighbors among the four nearest neighbors. The spatial clustering in the t-SNE visualization also indicates that class 4 is closer to the query point compared to other classes.",
+        "parsed_prediction": 4,
+        "true_label": 8,
+        "tsne_coords": [
+          -8.90019416809082,
+          2.666740894317627
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 194,
+        "vlm_response": "Class: 3 | Reasoning: The query point is located near the red star, which is connected to four neighbors. The pie chart shows that three of these neighbors belong to class 3, and the fourth neighbor is closer to class 4. Given the spatial clustering and the higher density of neighbors in class 3, the query point is more likely to belong to class 3.",
+        "parsed_prediction": 3,
+        "true_label": 3,
+        "tsne_coords": [
+          7.6344499588012695,
+          2.2347335815429688
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 195,
+        "vlm_response": "Class: 4 | Reasoning: The query point is closer to the class 4 neighbors (AvgDist: 7.85) than to the class 1 neighbors (AvgDist: 7.40). Additionally, the pie chart shows that class 4 has two neighbors, which is more than the class 1 neighbors. This suggests that the query point is more likely to belong to class 4 based on both the spatial proximity and the neighbor analysis.",
+        "parsed_prediction": 4,
+        "true_label": 1,
+        "tsne_coords": [
+          1.3870338201522827,
+          -2.8930816650390625
+        ],
+        "image_size": "657x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 196,
+        "vlm_response": "Class: 4 | Reasoning: The query point is surrounded by neighbors that are predominantly from class 4, as indicated by the pie chart. The spatial clustering in the t-SNE visualization also suggests that class 4 is the most similar class to the query point among the nearest neighbors.",
+        "parsed_prediction": 4,
+        "true_label": 0,
+        "tsne_coords": [
+          -22.650522232055664,
+          -6.097377300262451
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 197,
+        "vlm_response": "Class: 3 | Reasoning: The query point is closer to the cluster of class 3 in the t-SNE visualization, and its nearest neighbors (connected by red lines) are also from class 3, with the smallest average distance (8.16) indicating higher similarity.",
+        "parsed_prediction": 3,
+        "true_label": 3,
+        "tsne_coords": [
+          7.184971332550049,
+          4.2973480224609375
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 198,
+        "vlm_response": "Class: 6 | Reasoning: The query point is surrounded by neighbors from class 6, and the pie chart shows that all 4 nearest neighbors are from class 6, with a 100% distribution. The spatial clustering in the t-SNE visualization also indicates that class 6 is closely clustered with the query point.",
+        "parsed_prediction": 6,
+        "true_label": 9,
+        "tsne_coords": [
+          5.628570556640625,
+          14.999480247497559
+        ],
+        "image_size": "614x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      {
+        "test_point_idx": 199,
+        "vlm_response": "Class: 9 | Reasoning: The query point is surrounded by neighbors from class 9, with three neighbors having a smaller average distance (5.32) compared to the other class (7.14). This suggests that the query point is more similar to class 9 than to the other classes.",
+        "parsed_prediction": 9,
+        "true_label": 6,
+        "tsne_coords": [
+          2.4827213287353516,
+          16.04364585876465
+        ],
+        "image_size": "636x488",
+        "visible_classes": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      }
+    ],
+    "dataset_name": "mfeat-fourier",
+    "dataset_id": "14",
+    "task_id": "14"
+  }
+]
