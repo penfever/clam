@@ -1,0 +1,255 @@
+Could not save hash info: [Errno 2] No such file or directory: '/home/benjamin/.clam/cache/data_directory.tmp' -> '/home/benjamin/.clam/cache/data_directory.hash'
+/home/benjamin/clam/clam/utils/model_loader.py:34: UserWarning: vllm not available, falling back to transformers
+  warnings.warn("vllm not available, falling back to transformers")
+2025-07-01 21:07:17,255 - __main__ - INFO - Starting biological dataset classification tests...
+2025-07-01 21:07:17,255 - __main__ - INFO - Configuration:
+2025-07-01 21:07:17,255 - __main__ - INFO -   Datasets: fishnet, awa2, plantdoc
+2025-07-01 21:07:17,255 - __main__ - INFO -   Models: clam_tsne_bioclip2
+2025-07-01 21:07:17,255 - __main__ - INFO -   Backend: auto
+2025-07-01 21:07:17,255 - __main__ - INFO -   Balanced few-shot: False
+2025-07-01 21:07:17,255 - __main__ - INFO -   Use PCA: False
+2025-07-01 21:07:17,255 - __main__ - INFO -   3D t-SNE: False
+2025-07-01 21:07:17,255 - __main__ - INFO -   KNN connections: True
+2025-07-01 21:07:17,255 - __main__ - INFO -   KNN k: 40
+2025-07-01 21:07:17,705 - clam.utils.device_utils - INFO - Device detection: Using CUDA GPU acceleration
+2025-07-01 21:07:17,810 - __main__ - INFO - Platform: linux, PyTorch: 2.7.1+cu126, Device: cuda (NVIDIA H100 80GB HBM3)
+2025-07-01 21:07:17,810 - __main__ - INFO - 
+============================================================
+2025-07-01 21:07:17,810 - __main__ - INFO - STARTING FISHNET DATASET
+2025-07-01 21:07:17,810 - __main__ - INFO - ============================================================
+wandb: Currently logged in as: bf996 (nyu-dice-lab) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.20.1
+wandb: Run data is saved locally in ./biological_test_results/wandb/run-20250701_210717-lf9dcph5
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run fishnet_bioclip2_20250701_210717_knn40
+wandb: ⭐️ View project at https://wandb.ai/nyu-dice-lab/bioclip2-biological-datasets
+wandb: 🚀 View run at https://wandb.ai/nyu-dice-lab/bioclip2-biological-datasets/runs/lf9dcph5
+2025-07-01 21:07:18,920 - clam.utils.gpu_monitoring - INFO - CUDA available with 1 GPU(s)
+2025-07-01 21:07:18,920 - clam.utils.gpu_monitoring - INFO - Started GPU monitoring with 30.0s interval
+2025-07-01 21:07:18,920 - __main__ - INFO - Initialized Weights & Biases run: fishnet_bioclip2_20250701_210717_knn40
+2025-07-01 21:07:18,921 - __main__ - INFO - 
+============================================================
+2025-07-01 21:07:18,921 - __main__ - INFO - TESTING FISHNET
+2025-07-01 21:07:18,921 - __main__ - INFO - ============================================================
+2025-07-01 21:07:18,921 - __main__ - INFO - Models to evaluate: ['clam_tsne_bioclip2']
+2025-07-01 21:07:18,928 - __main__ - INFO - Using isolated dataset workspace: /data/benjamin/clam_datasets/dataset_fishnet/downloads
+2025-07-01 21:07:18,948 - __main__ - INFO - Downloading FishNet dataset...
+2025-07-01 21:07:19,050 - __main__ - INFO - FishNet dataset already extracted, skipping extraction...
+2025-07-01 21:07:19,052 - __main__ - INFO - Organizing FishNet data...
+2025-07-01 21:07:19,053 - __main__ - INFO - Processing FishNet data from: /data/benjamin/clam_datasets/dataset_fishnet/downloads/Image_Library
+2025-07-01 21:07:19,225 - __main__ - INFO - Found 570 fish species classes
+2025-07-01 21:18:01,628 - __main__ - INFO - FishNet data organized successfully
+2025-07-01 21:18:05,413 - __main__ - INFO - Loaded FishNet: 75595 train, 19210 test images, 570 classes
+2025-07-01 21:18:05,413 - __main__ - INFO - Testing CLAM t-SNE with BioClip2 backend...
+2025-07-01 21:18:05,413 - clam.models.clam_tsne - INFO - Fitting CLAM t-SNE model for vision data...
+2025-07-01 21:18:05,437 - clam.utils.task_detection - INFO - Using special vision task type: classification (task_id=-1)
+2025-07-01 21:18:05,438 - clam.models.clam_tsne - INFO - Task type: classification (detected via: special_vision_task_id_-1)
+2025-07-01 21:18:05,439 - clam.models.clam_tsne - INFO - Generating BIOCLIP2 embeddings for images...
+2025-07-01 21:18:05,439 - clam.utils.device_utils - INFO - Device detection: Using CUDA GPU acceleration
+2025-07-01 21:18:06,272 - clam.models.clam_tsne - INFO - Loading BioCLIP model: hf-hub:imageomics/bioclip-2
+2025-07-01 21:18:06,370 - root - INFO - Loaded hf-hub:imageomics/bioclip-2 model config.
+2025-07-01 21:18:08,770 - root - INFO - Loading pretrained hf-hub:imageomics/bioclip-2 weights (/home/benjamin/.cache/huggingface/hub/models--imageomics--bioclip-2/snapshots/15537b64d4d21233f920582ffe4645481d06c26c/open_clip_model.safetensors).
+2025-07-01 21:18:13,370 - clam.models.clam_tsne - INFO - BioCLIP model loaded successfully on cuda
+2025-07-01 21:18:13,371 - clam.models.clam_tsne - INFO - Extracting BioClip2 embeddings for 75595 images with batch_size=128
+2025-07-01 21:18:13,371 - clam.models.clam_tsne - INFO - Processing batch 1/591
+2025-07-01 21:18:25,729 - clam.models.clam_tsne - INFO - Processing batch 11/591
+2025-07-01 21:18:37,663 - clam.models.clam_tsne - INFO - Processing batch 21/591
+2025-07-01 21:18:49,769 - clam.models.clam_tsne - INFO - Processing batch 31/591
+2025-07-01 21:19:01,637 - clam.models.clam_tsne - INFO - Processing batch 41/591
+2025-07-01 21:19:13,671 - clam.models.clam_tsne - INFO - Processing batch 51/591
+2025-07-01 21:19:25,909 - clam.models.clam_tsne - INFO - Processing batch 61/591
+2025-07-01 21:19:37,902 - clam.models.clam_tsne - INFO - Processing batch 71/591
+2025-07-01 21:19:49,681 - clam.models.clam_tsne - INFO - Processing batch 81/591
+2025-07-01 21:20:01,393 - clam.models.clam_tsne - INFO - Processing batch 91/591
+2025-07-01 21:20:13,314 - clam.models.clam_tsne - INFO - Processing batch 101/591
+2025-07-01 21:20:25,550 - clam.models.clam_tsne - INFO - Processing batch 111/591
+2025-07-01 21:20:37,543 - clam.models.clam_tsne - INFO - Processing batch 121/591
+2025-07-01 21:20:49,718 - clam.models.clam_tsne - INFO - Processing batch 131/591
+2025-07-01 21:21:01,748 - clam.models.clam_tsne - INFO - Processing batch 141/591
+2025-07-01 21:21:13,695 - clam.models.clam_tsne - INFO - Processing batch 151/591
+2025-07-01 21:21:25,426 - clam.models.clam_tsne - INFO - Processing batch 161/591
+2025-07-01 21:21:37,323 - clam.models.clam_tsne - INFO - Processing batch 171/591
+2025-07-01 21:21:49,229 - clam.models.clam_tsne - INFO - Processing batch 181/591
+2025-07-01 21:22:01,151 - clam.models.clam_tsne - INFO - Processing batch 191/591
+2025-07-01 21:22:13,072 - clam.models.clam_tsne - INFO - Processing batch 201/591
+2025-07-01 21:22:24,867 - clam.models.clam_tsne - INFO - Processing batch 211/591
+2025-07-01 21:22:36,738 - clam.models.clam_tsne - INFO - Processing batch 221/591
+2025-07-01 21:22:48,716 - clam.models.clam_tsne - INFO - Processing batch 231/591
+2025-07-01 21:23:00,816 - clam.models.clam_tsne - INFO - Processing batch 241/591
+2025-07-01 21:23:12,856 - clam.models.clam_tsne - INFO - Processing batch 251/591
+2025-07-01 21:23:24,883 - clam.models.clam_tsne - INFO - Processing batch 261/591
+2025-07-01 21:23:36,733 - clam.models.clam_tsne - INFO - Processing batch 271/591
+2025-07-01 21:23:48,564 - clam.models.clam_tsne - INFO - Processing batch 281/591
+2025-07-01 21:24:00,495 - clam.models.clam_tsne - INFO - Processing batch 291/591
+2025-07-01 21:24:12,470 - clam.models.clam_tsne - INFO - Processing batch 301/591
+2025-07-01 21:24:24,336 - clam.models.clam_tsne - INFO - Processing batch 311/591
+2025-07-01 21:24:36,441 - clam.models.clam_tsne - INFO - Processing batch 321/591
+2025-07-01 21:24:48,451 - clam.models.clam_tsne - INFO - Processing batch 331/591
+2025-07-01 21:25:00,354 - clam.models.clam_tsne - INFO - Processing batch 341/591
+2025-07-01 21:25:12,308 - clam.models.clam_tsne - INFO - Processing batch 351/591
+2025-07-01 21:25:24,453 - clam.models.clam_tsne - INFO - Processing batch 361/591
+2025-07-01 21:25:36,624 - clam.models.clam_tsne - INFO - Processing batch 371/591
+2025-07-01 21:25:48,698 - clam.models.clam_tsne - INFO - Processing batch 381/591
+2025-07-01 21:26:00,671 - clam.models.clam_tsne - INFO - Processing batch 391/591
+2025-07-01 21:26:12,757 - clam.models.clam_tsne - INFO - Processing batch 401/591
+2025-07-01 21:26:24,548 - clam.models.clam_tsne - INFO - Processing batch 411/591
+2025-07-01 21:26:36,530 - clam.models.clam_tsne - INFO - Processing batch 421/591
+2025-07-01 21:26:48,557 - clam.models.clam_tsne - INFO - Processing batch 431/591
+2025-07-01 21:27:00,508 - clam.models.clam_tsne - INFO - Processing batch 441/591
+2025-07-01 21:27:12,859 - clam.models.clam_tsne - INFO - Processing batch 451/591
+2025-07-01 21:27:24,804 - clam.models.clam_tsne - INFO - Processing batch 461/591
+2025-07-01 21:27:36,865 - clam.models.clam_tsne - INFO - Processing batch 471/591
+2025-07-01 21:27:48,792 - clam.models.clam_tsne - INFO - Processing batch 481/591
+2025-07-01 21:28:00,777 - clam.models.clam_tsne - INFO - Processing batch 491/591
+2025-07-01 21:28:12,678 - clam.models.clam_tsne - INFO - Processing batch 501/591
+2025-07-01 21:28:24,825 - clam.models.clam_tsne - INFO - Processing batch 511/591
+2025-07-01 21:28:36,992 - clam.models.clam_tsne - INFO - Processing batch 521/591
+2025-07-01 21:28:49,230 - clam.models.clam_tsne - INFO - Processing batch 531/591
+2025-07-01 21:29:01,141 - clam.models.clam_tsne - INFO - Processing batch 541/591
+2025-07-01 21:29:13,055 - clam.models.clam_tsne - INFO - Processing batch 551/591
+2025-07-01 21:29:25,179 - clam.models.clam_tsne - INFO - Processing batch 561/591
+2025-07-01 21:29:37,279 - clam.models.clam_tsne - INFO - Processing batch 571/591
+2025-07-01 21:29:49,415 - clam.models.clam_tsne - INFO - Processing batch 581/591
+2025-07-01 21:30:01,344 - clam.models.clam_tsne - INFO - Processing batch 591/591
+2025-07-01 21:30:02,222 - clam.utils.device_utils - INFO - Device detection: Using CUDA GPU acceleration
+2025-07-01 21:30:02,223 - clam.models.clam_tsne - INFO - Loading BioCLIP model: hf-hub:imageomics/bioclip-2
+2025-07-01 21:30:02,291 - root - INFO - Loaded hf-hub:imageomics/bioclip-2 model config.
+2025-07-01 21:30:04,564 - root - INFO - Loading pretrained hf-hub:imageomics/bioclip-2 weights (/home/benjamin/.cache/huggingface/hub/models--imageomics--bioclip-2/snapshots/15537b64d4d21233f920582ffe4645481d06c26c/open_clip_model.safetensors).
+2025-07-01 21:30:05,064 - clam.models.clam_tsne - INFO - BioCLIP model loaded successfully on cuda
+2025-07-01 21:30:05,064 - clam.models.clam_tsne - INFO - Extracting BioClip2 embeddings for 19210 images with batch_size=128
+2025-07-01 21:30:05,064 - clam.models.clam_tsne - INFO - Processing batch 1/151
+2025-07-01 21:30:17,010 - clam.models.clam_tsne - INFO - Processing batch 11/151
+2025-07-01 21:30:28,843 - clam.models.clam_tsne - INFO - Processing batch 21/151
+2025-07-01 21:30:40,611 - clam.models.clam_tsne - INFO - Processing batch 31/151
+2025-07-01 21:30:52,811 - clam.models.clam_tsne - INFO - Processing batch 41/151
+2025-07-01 21:31:04,818 - clam.models.clam_tsne - INFO - Processing batch 51/151
+2025-07-01 21:31:16,664 - clam.models.clam_tsne - INFO - Processing batch 61/151
+2025-07-01 21:31:28,410 - clam.models.clam_tsne - INFO - Processing batch 71/151
+2025-07-01 21:31:40,185 - clam.models.clam_tsne - INFO - Processing batch 81/151
+2025-07-01 21:31:51,887 - clam.models.clam_tsne - INFO - Processing batch 91/151
+2025-07-01 21:32:03,793 - clam.models.clam_tsne - INFO - Processing batch 101/151
+2025-07-01 21:32:15,624 - clam.models.clam_tsne - INFO - Processing batch 111/151
+2025-07-01 21:32:27,499 - clam.models.clam_tsne - INFO - Processing batch 121/151
+2025-07-01 21:32:39,445 - clam.models.clam_tsne - INFO - Processing batch 131/151
+2025-07-01 21:32:51,447 - clam.models.clam_tsne - INFO - Processing batch 141/151
+2025-07-01 21:33:03,260 - clam.models.clam_tsne - INFO - Processing batch 151/151
+2025-07-01 21:33:03,390 - clam.models.clam_tsne - INFO - Creating 2D classification t-SNE visualization...
+2025-07-01 21:33:03,391 - clam.viz.tsne_functions.TSNEGenerator - INFO - Generating 2D t-SNE coordinates for 75595 train and 19210 test samples
+2025-07-01 21:33:03,473 - clam.viz.tsne_functions.TSNEGenerator - INFO - Running t-SNE with perplexity=30.0, max_iter=1000
+2025-07-01 21:43:59,733 - clam.viz.tsne_functions.TSNEGenerator - INFO - t-SNE completed successfully
+2025-07-01 21:43:59,864 - clam.models.clam_tsne - INFO - Using cached color mappings for dataset unknown_533classes with 533 classes
+2025-07-01 21:43:59,864 - clam.models.clam_tsne - INFO - CLAM t-SNE classification model fitted successfully
+2025-07-01 21:43:59,867 - clam.models.clam_tsne - INFO - Loading Vision Language Model: Qwen/Qwen2.5-VL-3B-Instruct
+2025-07-01 21:43:59,867 - clam.models.clam_tsne - INFO - Using local VLM
+2025-07-01 21:43:59,867 - clam.models.clam_tsne - INFO - Initial VLM device value: auto
+2025-07-01 21:43:59,867 - clam.utils.device_utils - INFO - Device detection: Using CUDA GPU acceleration
+2025-07-01 21:43:59,867 - clam.models.clam_tsne - INFO - Auto-detected device for VLM: cuda
+2025-07-01 21:43:59,867 - clam.models.clam_tsne - INFO - Configured VLM for CUDA
+2025-07-01 21:43:59,867 - clam.models.clam_tsne - INFO - Loading VLM with parameters: model=Qwen/Qwen2.5-VL-3B-Instruct, backend=auto, device=cuda
+2025-07-01 21:43:59,867 - clam.utils.model_loader - INFO - Auto-selected transformers backend for VLM: Qwen/Qwen2.5-VL-3B-Instruct
+2025-07-01 21:43:59,867 - clam.utils.model_loader - INFO - Loading Qwen/Qwen2.5-VL-3B-Instruct with transformers VLM backend
+You have video processor config saved in `preprocessor.json` file which is deprecated. Video processor configs should be saved in their own `video_preprocessor.json` file. You can rename the file or load and save the processor back which renames it automatically. Loading from `preprocessor.json` will be removed in v5.0.
+2025-07-01 21:44:01,461 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.37it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.59it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.55it/s]
+2025-07-01 21:44:02,869 - clam.utils.model_loader - INFO - Successfully loaded Qwen/Qwen2.5-VL-3B-Instruct with transformers VLM
+2025-07-01 21:44:02,869 - clam.utils.model_loader - INFO - Loaded and cached VLM: Qwen/Qwen2.5-VL-3B-Instruct_vlm_transformers_cuda
+2025-07-01 21:44:02,869 - clam.models.clam_tsne - INFO - VLM loaded successfully
+2025-07-01 21:44:02,869 - clam.models.clam_tsne - INFO - Starting VLM predictions for 19210 test points...
+/home/benjamin/miniconda3/envs/llata/lib/python3.12/site-packages/numpy/core/fromnumeric.py:3504: RuntimeWarning: Mean of empty slice.
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/benjamin/miniconda3/envs/llata/lib/python3.12/site-packages/numpy/core/_methods.py:129: RuntimeWarning: invalid value encountered in divide
+  ret = ret.dtype.type(ret / rcount)
+2025-07-01 21:44:41,597 - clam.models.clam_tsne - INFO - Completed 10/19210 predictions
+2025-07-01 21:45:19,462 - clam.models.clam_tsne - INFO - Completed 20/19210 predictions
+2025-07-01 21:45:54,228 - clam.models.clam_tsne - INFO - Completed 30/19210 predictions
+2025-07-01 21:46:32,114 - clam.models.clam_tsne - INFO - Completed 40/19210 predictions
+2025-07-01 21:47:07,752 - clam.models.clam_tsne - INFO - Completed 50/19210 predictions
+2025-07-01 21:47:45,164 - clam.models.clam_tsne - INFO - Completed 60/19210 predictions
+2025-07-01 21:48:20,113 - clam.models.clam_tsne - WARNING - Could not parse class from response: 'Class: Class_562 | Reasoning: The query point is surrounded by a significant number of neighbors from Class_562 (17 out of 40 neighbors), and the average distance to these neighbors is 0.53, which is the lowest among all classes. Additionally, the spatial clustering in the t-SNE visualization shows that Class_562 is distinct from the other classes, with the query point being closer to the cluster of Class_562 samples.'. Using fallback: Class_0
+2025-07-01 21:48:24,324 - clam.models.clam_tsne - INFO - Completed 70/19210 predictions
+2025-07-01 21:49:04,968 - clam.models.clam_tsne - INFO - Completed 80/19210 predictions
+2025-07-01 21:49:44,743 - clam.models.clam_tsne - INFO - Completed 90/19210 predictions
+2025-07-01 21:50:19,926 - clam.models.clam_tsne - INFO - Completed 100/19210 predictions
+2025-07-01 21:50:57,664 - clam.models.clam_tsne - INFO - Completed 110/19210 predictions
+2025-07-01 21:51:34,505 - clam.models.clam_tsne - INFO - Completed 120/19210 predictions
+2025-07-01 21:52:09,870 - clam.models.clam_tsne - INFO - Completed 130/19210 predictions
+2025-07-01 21:52:47,834 - clam.models.clam_tsne - INFO - Completed 140/19210 predictions
+2025-07-01 21:53:25,997 - clam.models.clam_tsne - INFO - Completed 150/19210 predictions
+2025-07-01 21:54:03,635 - clam.models.clam_tsne - INFO - Completed 160/19210 predictions
+2025-07-01 21:54:39,328 - clam.models.clam_tsne - INFO - Completed 170/19210 predictions
+2025-07-01 21:55:17,007 - clam.models.clam_tsne - INFO - Completed 180/19210 predictions
+2025-07-01 21:55:57,430 - clam.models.clam_tsne - INFO - Completed 190/19210 predictions
+2025-07-01 21:56:36,181 - clam.models.clam_tsne - INFO - Completed 200/19210 predictions
+2025-07-01 21:57:12,765 - clam.models.clam_tsne - INFO - Completed 210/19210 predictions
+2025-07-01 21:57:52,863 - clam.models.clam_tsne - INFO - Completed 220/19210 predictions
+2025-07-01 21:58:32,713 - clam.models.clam_tsne - INFO - Completed 230/19210 predictions
+2025-07-01 21:59:13,145 - clam.models.clam_tsne - INFO - Completed 240/19210 predictions
+2025-07-01 21:59:49,161 - clam.models.clam_tsne - INFO - Completed 250/19210 predictions
+2025-07-01 22:00:26,647 - clam.models.clam_tsne - INFO - Completed 260/19210 predictions
+2025-07-01 22:00:59,970 - clam.models.clam_tsne - WARNING - Could not parse class from response: 'Class: Class_562 | Reasoning: The query point is closer to the cluster of Class_562 samples in the t-SNE visualization and has a higher percentage of neighbors from Class_562 in the pie chart (90% vs. 5% for Class_0).'. Using fallback: Class_0
+2025-07-01 22:01:03,572 - clam.models.clam_tsne - INFO - Completed 270/19210 predictions
+2025-07-01 22:01:40,722 - clam.models.clam_tsne - INFO - Completed 280/19210 predictions
+2025-07-01 22:02:16,560 - clam.models.clam_tsne - INFO - Completed 290/19210 predictions
+2025-07-01 22:02:55,450 - clam.models.clam_tsne - INFO - Completed 300/19210 predictions
+2025-07-01 22:03:32,932 - clam.models.clam_tsne - INFO - Completed 310/19210 predictions
+2025-07-01 22:04:09,892 - clam.models.clam_tsne - INFO - Completed 320/19210 predictions
+2025-07-01 22:04:47,166 - clam.models.clam_tsne - INFO - Completed 330/19210 predictions
+2025-07-01 22:05:22,890 - clam.models.clam_tsne - INFO - Completed 340/19210 predictions
+2025-07-01 22:06:01,909 - clam.models.clam_tsne - INFO - Completed 350/19210 predictions
+2025-07-01 22:06:38,622 - clam.models.clam_tsne - INFO - Completed 360/19210 predictions
+2025-07-01 22:06:58,239 - clam.models.clam_tsne - WARNING - Could not parse class from response: 'Class: Class_567 | Reasoning: The query point is close to the class labeled Class_567 in the t-SNE visualization, and it has a high number of neighbors (9 neighbors) from Class_567 in the pie chart analysis, indicating strong similarity.'. Using fallback: Class_0
+2025-07-01 22:07:04,353 - clam.models.clam_tsne - WARNING - Could not parse class from response: 'Class: Class_567 | Reasoning: The query point is located near the cluster of Class_567 in the t-SNE visualization. The pie chart shows that Class_567 has the highest percentage of neighbors (30%) among the 40 nearest neighbors, indicating it is the most similar class to the query point. Additionally, the average distance to neighbors for Class_567 is 0.47, which is the lowest among the classes with more than one neighbor, suggesting it is the closest class to the query point.'. Using fallback: Class_0
+2025-07-01 22:07:22,153 - clam.models.clam_tsne - INFO - Completed 370/19210 predictions
+2025-07-01 22:08:04,048 - clam.models.clam_tsne - INFO - Completed 380/19210 predictions
+2025-07-01 22:08:44,088 - clam.models.clam_tsne - INFO - Completed 390/19210 predictions
+2025-07-01 22:09:18,454 - clam.models.clam_tsne - WARNING - Could not parse class from response: 'Class: Class_543 | Reasoning: The query point is close to the cluster of Class_543 neighbors, which is the largest cluster in the t-SNE visualization. Additionally, the pie chart shows that Class_543 has the highest percentage of neighbors (48%) among the 40 nearest neighbors, indicating that it is the most similar class to the query point.'. Using fallback: Class_0
+2025-07-01 22:09:28,723 - clam.models.clam_tsne - INFO - Completed 400/19210 predictions
+2025-07-01 22:10:16,951 - clam.models.clam_tsne - INFO - Completed 410/19210 predictions
+2025-07-01 22:10:59,939 - clam.models.clam_tsne - INFO - Completed 420/19210 predictions
+2025-07-01 22:11:36,793 - clam.models.clam_tsne - INFO - Completed 430/19210 predictions
+2025-07-01 22:12:12,121 - clam.models.clam_tsne - INFO - Completed 440/19210 predictions
+2025-07-01 22:12:48,214 - clam.models.clam_tsne - INFO - Completed 450/19210 predictions
+2025-07-01 22:13:25,426 - clam.models.clam_tsne - INFO - Completed 460/19210 predictions
+2025-07-01 22:14:01,077 - clam.models.clam_tsne - INFO - Completed 470/19210 predictions
+2025-07-01 22:14:46,889 - clam.models.clam_tsne - INFO - Completed 480/19210 predictions
+2025-07-01 22:15:34,494 - clam.models.clam_tsne - INFO - Completed 490/19210 predictions
+2025-07-01 22:16:20,487 - clam.models.clam_tsne - INFO - Completed 500/19210 predictions
+2025-07-01 22:17:11,001 - clam.models.clam_tsne - INFO - Completed 510/19210 predictions
+2025-07-01 22:17:56,822 - clam.models.clam_tsne - INFO - Completed 520/19210 predictions
+2025-07-01 22:18:42,174 - clam.models.clam_tsne - INFO - Completed 530/19210 predictions
+2025-07-01 22:19:26,417 - clam.models.clam_tsne - INFO - Completed 540/19210 predictions
+2025-07-01 22:20:12,854 - clam.models.clam_tsne - INFO - Completed 550/19210 predictions
+2025-07-01 22:20:57,458 - clam.models.clam_tsne - INFO - Completed 560/19210 predictions
+2025-07-01 22:21:39,231 - clam.models.clam_tsne - INFO - Completed 570/19210 predictions
+2025-07-01 22:22:20,661 - clam.models.clam_tsne - INFO - Completed 580/19210 predictions
+2025-07-01 22:23:01,363 - clam.models.clam_tsne - INFO - Completed 590/19210 predictions
+2025-07-01 22:23:42,045 - clam.models.clam_tsne - INFO - Completed 600/19210 predictions
+2025-07-01 22:24:25,558 - clam.models.clam_tsne - INFO - Completed 610/19210 predictions
+2025-07-01 22:25:16,084 - clam.models.clam_tsne - INFO - Completed 620/19210 predictions
+2025-07-01 22:25:58,942 - clam.models.clam_tsne - INFO - Completed 630/19210 predictions
+2025-07-01 22:26:45,882 - clam.models.clam_tsne - INFO - Completed 640/19210 predictions
+2025-07-01 22:27:32,164 - clam.models.clam_tsne - INFO - Completed 650/19210 predictions
+2025-07-01 22:28:12,318 - clam.models.clam_tsne - INFO - Completed 660/19210 predictions
+2025-07-01 22:28:50,619 - clam.models.clam_tsne - INFO - Completed 670/19210 predictions
+2025-07-01 22:29:31,084 - clam.models.clam_tsne - INFO - Completed 680/19210 predictions
+2025-07-01 22:30:18,504 - clam.models.clam_tsne - INFO - Completed 690/19210 predictions
+2025-07-01 22:31:00,666 - clam.models.clam_tsne - INFO - Completed 700/19210 predictions
+2025-07-01 22:31:42,004 - clam.models.clam_tsne - INFO - Completed 710/19210 predictions
+2025-07-01 22:32:28,059 - clam.models.clam_tsne - INFO - Completed 720/19210 predictions
+2025-07-01 22:33:15,257 - clam.models.clam_tsne - INFO - Completed 730/19210 predictions
+2025-07-01 22:34:01,539 - clam.models.clam_tsne - INFO - Completed 740/19210 predictions
+2025-07-01 22:34:40,154 - clam.models.clam_tsne - INFO - Completed 750/19210 predictions
+2025-07-01 22:35:18,836 - clam.models.clam_tsne - INFO - Completed 760/19210 predictions
+2025-07-01 22:36:00,304 - clam.models.clam_tsne - INFO - Completed 770/19210 predictions
+2025-07-01 22:36:47,166 - clam.models.clam_tsne - INFO - Completed 780/19210 predictions
+2025-07-01 22:37:34,140 - clam.models.clam_tsne - INFO - Completed 790/19210 predictions
+2025-07-01 22:38:15,336 - clam.models.clam_tsne - INFO - Completed 800/19210 predictions
+2025-07-01 22:38:57,548 - clam.models.clam_tsne - INFO - Completed 810/19210 predictions
+2025-07-01 22:39:35,045 - clam.models.clam_tsne - INFO - Completed 820/19210 predictions
+2025-07-01 22:40:10,933 - clam.models.clam_tsne - INFO - Completed 830/19210 predictions
+2025-07-01 22:40:49,283 - clam.models.clam_tsne - INFO - Completed 840/19210 predictions
+2025-07-01 22:41:34,221 - clam.models.clam_tsne - INFO - Completed 850/19210 predictions
+2025-07-01 22:42:15,958 - clam.models.clam_tsne - INFO - Completed 860/19210 predictions
+2025-07-01 22:42:57,880 - clam.models.clam_tsne - INFO - Completed 870/19210 predictions
+2025-07-01 22:43:38,969 - clam.models.clam_tsne - INFO - Completed 880/19210 predictions
+2025-07-01 22:44:17,867 - clam.models.clam_tsne - INFO - Completed 890/19210 predictions
