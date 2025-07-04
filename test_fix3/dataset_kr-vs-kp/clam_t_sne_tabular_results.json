@@ -1,0 +1,102 @@
+{
+  "model_name": "CLAM-t-SNE-tabular",
+  "accuracy": 1.0,
+  "balanced_accuracy": 1.0,
+  "prediction_time": 77.35348916053772,
+  "total_time": 77.35348916053772,
+  "num_test_samples": 2,
+  "completed_samples": 2,
+  "completion_rate": 1.0,
+  "num_classes": 2,
+  "predictions": [
+    1,
+    1
+  ],
+  "ground_truth": [
+    1,
+    1
+  ],
+  "roc_auc": null,
+  "f1_macro": 1.0,
+  "f1_micro": 1.0,
+  "f1_weighted": 1.0,
+  "precision_macro": 1.0,
+  "recall_macro": 1.0,
+  "r2_score": null,
+  "mae": null,
+  "mse": null,
+  "rmse": null,
+  "task_type": "classification",
+  "config": {
+    "modality": "tabular",
+    "vlm_model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "embedding_size": 1000,
+    "tsne_perplexity": 30,
+    "tsne_max_iter": 1000,
+    "use_3d": false,
+    "use_knn_connections": true,
+    "nn_k": 4,
+    "show_test_points": false,
+    "max_vlm_image_size": 768,
+    "image_dpi": 100,
+    "force_rgb_mode": false,
+    "zoom_factor": 1.0,
+    "max_tabpfn_samples": 3000,
+    "use_semantic_names": true,
+    "device": "mps",
+    "backend": "transformers",
+    "enable_thinking": true,
+    "openai_model": null,
+    "gemini_model": null,
+    "api_model": null,
+    "effective_model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "is_api_model": false,
+    "seed": 42,
+    "enable_multi_viz": false,
+    "visualization_methods": [
+      "tsne"
+    ],
+    "layout_strategy": "adaptive_grid",
+    "reasoning_focus": "classification",
+    "multi_viz_config": {},
+    "dinov2_model": null,
+    "embedding_backend": null,
+    "bioclip2_model": null,
+    "use_pca_backend": null
+  },
+  "prediction_details": [
+    {
+      "test_point_idx": 0,
+      "vlm_response": "Class: nowin | Reasoning: The query point is closer to the nowin class in the t-SNE visualization, and its nearest neighbors are all from the nowin class, with the majority (75%) being nowin neighbors. The pie chart also shows that the majority of the nearest neighbors are nowin, further supporting the classification of the query point as nowin.",
+      "parsed_prediction": 1,
+      "true_label": 1,
+      "tsne_coords": [
+        -63.33368682861328,
+        17.93479347229004
+      ],
+      "image_size": "768x585",
+      "visible_classes": [
+        "won",
+        "nowin"
+      ]
+    },
+    {
+      "test_point_idx": 1,
+      "vlm_response": "Class: nowin | Reasoning: The query point is closer to the nowin class neighbors (3 neighbors) than to the won class neighbors (1 neighbor). Additionally, the pie chart shows that the nowin class has a higher percentage (75%) of neighbors compared to the won class (25%). The spatial clustering in the t-SNE visualization also suggests that the nowin class is more concentrated around the query point, indicating a higher similarity to the query point.",
+      "parsed_prediction": 1,
+      "true_label": 1,
+      "tsne_coords": [
+        -30.006690979003906,
+        37.0541877746582
+      ],
+      "image_size": "768x585",
+      "visible_classes": [
+        "won",
+        "nowin"
+      ]
+    }
+  ],
+  "dataset_name": "kr-vs-kp",
+  "dataset_id": "3",
+  "task_id": "3"
+}

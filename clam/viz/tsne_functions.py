@@ -246,107 +246,125 @@ class BaseTSNEPlotter(ABC):
         test_coords: np.ndarray
     ) -> None:
         """
-        Apply zoom around target point while ensuring all data points remain visible.
+        Set appropriate axis limits for the data.
         
-        Improved zoom logic that prevents points from appearing outside plot boundaries.
+        Since filtering is now handled separately, this method simply ensures
+        that the plot has reasonable axis limits that show all the (filtered) data
+        with appropriate padding.
         """
-        if self.zoom_factor <= 1.0:
-            # For zoom_factor 1.0, we should show all data with some padding
-            # This ensures all points are visible in the plot
-            all_coords = np.vstack([train_coords, test_coords])
-            
+        # Always set axis limits based on the data extent with padding
+        # The data passed here is already filtered by _filter_points_by_distance
+        if len(train_coords) == 0 and len(test_coords) == 0:
+            # No data to plot - set default limits around target point
+            default_range = 10.0
             if self.use_3d:
                 for i, setter in enumerate([ax.set_xlim, ax.set_ylim, ax.set_zlim]):
-                    coord_min = all_coords[:, i].min()
-                    coord_max = all_coords[:, i].max()
-                    coord_range = coord_max - coord_min
-                    # Add 10% padding on each side
-                    padding = coord_range * 0.1 if coord_range > 0 else 1.0
-                    setter(coord_min - padding, coord_max + padding)
+                    center = target_point[i] if i < len(target_point) else 0
+                    setter(center - default_range, center + default_range)
             else:
                 for i, setter in enumerate([ax.set_xlim, ax.set_ylim]):
-                    coord_min = all_coords[:, i].min()
-                    coord_max = all_coords[:, i].max()
-                    coord_range = coord_max - coord_min
-                    # Add 10% padding on each side
-                    padding = coord_range * 0.1 if coord_range > 0 else 1.0
-                    setter(coord_min - padding, coord_max + padding)
+                    center = target_point[i] if i < len(target_point) else 0
+                    setter(center - default_range, center + default_range)
             return
-            
-        # Calculate the visible range based on zoom factor
-        # zoom_factor = 2.0 means we show 1/2 of the original range
-        all_coords = np.vstack([train_coords, test_coords])
         
+        # Combine all coordinates
+        all_coords = []
+        if len(train_coords) > 0:
+            all_coords.append(train_coords)
+        if len(test_coords) > 0:
+            all_coords.append(test_coords)
+        all_coords = np.vstack(all_coords)
+        
+        # Set axis limits based on the filtered data extent with padding
         if self.use_3d:
-            # 3D zoom logic - only apply if target_point has 3 dimensions
-            if len(target_point) >= 3:
-                for i, coord_name in enumerate(['X', 'Y', 'Z']):
-                    coord_min_data = all_coords[:, i].min()
-                    coord_max_data = all_coords[:, i].max()
-                    coord_range = coord_max_data - coord_min_data
-                    
-                    if coord_range > 0:  # Avoid division by zero
-                        visible_range = coord_range / self.zoom_factor
-                        center = target_point[i]
-                        
-                        # Calculate initial zoom bounds
-                        coord_min = center - visible_range / 2
-                        coord_max = center + visible_range / 2
-                        
-                        # Ensure zoom bounds don't exceed data bounds by too much
-                        # Allow some padding but prevent excessive empty space
-                        padding = coord_range * 0.1  # 10% padding
-                        coord_min = max(coord_min, coord_min_data - padding)
-                        coord_max = min(coord_max, coord_max_data + padding)
-                        
-                        # Ensure minimum zoom window size
-                        if coord_max - coord_min < visible_range * 0.5:
-                            # If bounds got too constrained, expand symmetrically
-                            mid_point = (coord_min + coord_max) / 2
-                            half_range = visible_range * 0.25
-                            coord_min = mid_point - half_range
-                            coord_max = mid_point + half_range
-                        
-                        if i == 0:
-                            ax.set_xlim(coord_min, coord_max)
-                        elif i == 1:
-                            ax.set_ylim(coord_min, coord_max)
-                        else:
-                            ax.set_zlim(coord_min, coord_max)
+            for i, setter in enumerate([ax.set_xlim, ax.set_ylim, ax.set_zlim]):
+                coord_min = all_coords[:, i].min()
+                coord_max = all_coords[:, i].max()
+                coord_range = coord_max - coord_min
+                # Add 15% padding on each side for better visibility
+                padding = coord_range * 0.15 if coord_range > 0 else 1.0
+                setter(coord_min - padding, coord_max + padding)
         else:
-            # 2D zoom logic
-            for i, coord_name in enumerate(['X', 'Y']):
-                coord_min_data = all_coords[:, i].min()
-                coord_max_data = all_coords[:, i].max()
-                coord_range = coord_max_data - coord_min_data
-                
-                if coord_range > 0:  # Avoid division by zero
-                    visible_range = coord_range / self.zoom_factor
-                    center = target_point[i]
+            for i, setter in enumerate([ax.set_xlim, ax.set_ylim]):
+                coord_min = all_coords[:, i].min()
+                coord_max = all_coords[:, i].max()
+                coord_range = coord_max - coord_min
+                # Add 15% padding on each side for better visibility
+                padding = coord_range * 0.15 if coord_range > 0 else 1.0
+                setter(coord_min - padding, coord_max + padding)
                     
-                    # Calculate initial zoom bounds
-                    coord_min = center - visible_range / 2
-                    coord_max = center + visible_range / 2
-                    
-                    # Ensure zoom bounds don't exceed data bounds by too much
-                    # Allow some padding but prevent excessive empty space
-                    padding = coord_range * 0.1  # 10% padding
-                    coord_min = max(coord_min, coord_min_data - padding)
-                    coord_max = min(coord_max, coord_max_data + padding)
-                    
-                    # Ensure minimum zoom window size
-                    if coord_max - coord_min < visible_range * 0.5:
-                        # If bounds got too constrained, expand symmetrically
-                        mid_point = (coord_min + coord_max) / 2
-                        half_range = visible_range * 0.25
-                        coord_min = mid_point - half_range
-                        coord_max = mid_point + half_range
-                    
-                    if i == 0:
-                        ax.set_xlim(coord_min, coord_max)
-                    else:
-                        ax.set_ylim(coord_min, coord_max)
-                    
+    def _filter_points_by_distance(
+        self,
+        train_coords: np.ndarray,
+        train_labels: np.ndarray,
+        test_coords: np.ndarray,
+        target_point: np.ndarray,
+        train_embeddings: Optional[np.ndarray] = None,
+        test_embeddings: Optional[np.ndarray] = None
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, Optional[np.ndarray], Optional[np.ndarray]]:
+        """
+        Filter points based on distance from target point when zoom is active.
+        
+        This method filters training and test points to only include those within
+        a certain radius of the target point, based on the zoom_factor.
+        
+        Args:
+            train_coords: Training coordinates [n_train, 2 or 3]
+            train_labels: Training labels [n_train]
+            test_coords: Test coordinates [n_test, 2 or 3]
+            target_point: Target point coordinates [2 or 3]
+            train_embeddings: Optional training embeddings [n_train, d]
+            test_embeddings: Optional test embeddings [n_test, d]
+            
+        Returns:
+            Tuple of (filtered_train_coords, filtered_train_labels, filtered_test_coords,
+                     filtered_train_embeddings, filtered_test_embeddings)
+        """
+        # If zoom_factor <= 1.0, return all points unfiltered
+        if self.zoom_factor <= 1.0:
+            return train_coords, train_labels, test_coords, train_embeddings, test_embeddings
+        
+        # Calculate the overall data range to determine filtering radius
+        all_coords = np.vstack([train_coords, test_coords])
+        coord_ranges = []
+        for i in range(all_coords.shape[1]):  # For each dimension
+            coord_range = all_coords[:, i].max() - all_coords[:, i].min()
+            coord_ranges.append(coord_range)
+        
+        # Use the maximum range across dimensions as the base radius
+        base_radius = max(coord_ranges)
+        
+        # The visible radius is inversely proportional to zoom_factor
+        # zoom_factor=2 means show half the radius, zoom_factor=4 means show quarter radius
+        visible_radius = base_radius / self.zoom_factor
+        
+        # Calculate distances from target point for training data
+        train_distances = np.linalg.norm(train_coords - target_point, axis=1)
+        train_mask = train_distances <= visible_radius
+        
+        # Filter training data
+        filtered_train_coords = train_coords[train_mask]
+        filtered_train_labels = train_labels[train_mask]
+        filtered_train_embeddings = train_embeddings[train_mask] if train_embeddings is not None else None
+        
+        # Calculate distances from target point for test data
+        test_distances = np.linalg.norm(test_coords - target_point, axis=1)
+        test_mask = test_distances <= visible_radius
+        
+        # Filter test data
+        filtered_test_coords = test_coords[test_mask]
+        filtered_test_embeddings = test_embeddings[test_mask] if test_embeddings is not None else None
+        
+        # Log filtering results for debugging
+        self.logger.debug(
+            f"Zoom filtering: zoom_factor={self.zoom_factor}, visible_radius={visible_radius:.2f}, "
+            f"kept {train_mask.sum()}/{len(train_coords)} training points, "
+            f"kept {test_mask.sum()}/{len(test_coords)} test points"
+        )
+        
+        return (filtered_train_coords, filtered_train_labels, filtered_test_coords,
+                filtered_train_embeddings, filtered_test_embeddings)
+    
     def _add_semantic_legend(
         self,
         fig: plt.Figure,
@@ -920,18 +938,41 @@ class KNNMixin:
                 ax = fig.add_subplot(gs[0, :3])  # Main plot spans first 3 columns
                 ax_pie = fig.add_subplot(gs[0, 3:])  # Pie chart spans last 2 columns
                 
-                # Apply zoom if highlighting a test point
+                # Get target point and filter data based on zoom
                 if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_coords):
                     target_point = test_coords[highlight_test_idx]
-                    self._apply_zoom(ax, target_point, train_coords, test_coords)
                     
-                # Task-specific point plotting
-                plot_result = self._plot_points(
-                    ax, train_coords, train_data, test_coords, test_data, 
-                    highlight_test_idx, **kwargs
-                )
+                    # Filter points based on distance from target point
+                    filtered_train_coords, filtered_train_labels, filtered_test_coords, filtered_train_embeddings, filtered_test_embeddings = \
+                        self._filter_points_by_distance(
+                            train_coords, train_data, test_coords, target_point,
+                            train_embeddings, test_embeddings
+                        )
+                    
+                    # Apply zoom to set reasonable axis limits for the filtered data
+                    self._apply_zoom(ax, target_point, filtered_train_coords, filtered_test_coords)
+                    
+                    # Task-specific point plotting with filtered data
+                    plot_result = self._plot_points(
+                        ax, filtered_train_coords, filtered_train_labels, filtered_test_coords, test_data,
+                        highlight_test_idx, **kwargs
+                    )
+                else:
+                    # No highlighting - use all data
+                    filtered_train_coords = train_coords
+                    filtered_train_labels = train_data
+                    filtered_test_coords = test_coords
+                    filtered_train_embeddings = train_embeddings
+                    filtered_test_embeddings = test_embeddings
+                    
+                    # Task-specific point plotting
+                    plot_result = self._plot_points(
+                        ax, train_coords, train_data, test_coords, test_data, 
+                        highlight_test_idx, **kwargs
+                    )
                 
-                # Compute KNN analysis and create pie chart
+                # Compute KNN analysis using ORIGINAL (unfiltered) embeddings and create pie chart
+                # This ensures KNN analysis reflects true nearest neighbors, not just visible ones
                 query_embedding = test_embeddings[highlight_test_idx]
                 knn_info = self._compute_knn_analysis(
                     query_embedding, train_embeddings, train_data, self.knn_k
@@ -1001,17 +1042,35 @@ class KNNMixin:
                 # Add pie chart in the right column
                 ax_pie = fig.add_subplot(gs[:, 2])  # Spans both rows in column 2
                 
+                # Get target point and filter data based on zoom
+                if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_coords):
+                    target_point = test_coords[highlight_test_idx]
+                    
+                    # Filter points based on distance from target point
+                    filtered_train_coords, filtered_train_labels, filtered_test_coords, filtered_train_embeddings, filtered_test_embeddings = \
+                        self._filter_points_by_distance(
+                            train_coords, train_data, test_coords, target_point,
+                            train_embeddings, test_embeddings
+                        )
+                else:
+                    # No highlighting - use all data
+                    filtered_train_coords = train_coords
+                    filtered_train_labels = train_data
+                    filtered_test_coords = test_coords
+                    filtered_train_embeddings = train_embeddings
+                    filtered_test_embeddings = test_embeddings
+                    target_point = None
+                
                 # Plot on all 3D axes
                 plot_results = []
                 for i, ax in enumerate(axes):
                     # Apply zoom if highlighting a test point
-                    if highlight_test_idx is not None and 0 <= highlight_test_idx < len(test_coords):
-                        target_point = test_coords[highlight_test_idx]
-                        self._apply_zoom(ax, target_point, train_coords, test_coords)
+                    if target_point is not None:
+                        self._apply_zoom(ax, target_point, filtered_train_coords, filtered_test_coords)
                         
-                    # Task-specific point plotting
+                    # Task-specific point plotting with filtered data
                     plot_result = self._plot_points(
-                        ax, train_coords, train_data, test_coords, test_data, 
+                        ax, filtered_train_coords, filtered_train_labels, filtered_test_coords, test_data, 
                         highlight_test_idx, 
                         show_legend=(i == 0),  # Only show legend on first subplot
                         **kwargs
